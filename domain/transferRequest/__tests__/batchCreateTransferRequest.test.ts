@@ -45,7 +45,7 @@ afterEach(() => {
 })
 
 const mockMoveFileS3 = jest.fn()
-jest.mock('lib/aws/s3', () => ({
+jest.mock('lib/fileUpload', () => ({
   moveFileS3: (params: any) => mockMoveFileS3(params),
 }))
 

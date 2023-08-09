@@ -1,5 +1,5 @@
+import { uploadFileToS3Temp } from 'lib/fileUpload'
 import { getPrismaClient } from 'lib/prisma'
-import { uploadFileToS3Temp } from 'lib/aws/s3'
 import { validate } from 'lib/yup'
 import { createTemporaryFileValidator } from './validation'
 

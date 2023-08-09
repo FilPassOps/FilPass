@@ -1,8 +1,8 @@
-import { getFile } from 'lib/aws/s3'
+import { getFile } from 'lib/fileUpload'
 import { getPrismaClient } from 'lib/prisma'
 import { validate } from 'lib/yup'
-import { getTempFileValidator } from './validation'
 import { filetypemime } from 'magic-bytes.js'
+import { getTempFileValidator } from './validation'
 
 export async function getTemporaryFile(params) {
   const { fields, errors } = await validate(getTempFileValidator, params)

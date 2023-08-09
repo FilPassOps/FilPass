@@ -73,10 +73,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - `ts-node scripts/encrypt.ts <your_decrypted_content>`
   - Encrypts the argument using the current KMS environment configuration
 - `node scripts/getDatabaseUsers.js`
-  - Lists database users and their emails based on the current KMS and DB environment variables
-- `node scripts/getAuthToken.js source=<source_name>`
-  - Creates an auth token to be used with authenticated API routes, such as the ones called from GitHub actions
-- `node scripts/getAWSAuthToken.js`
   - Generates an AWS RDS IAM auth token based on the current DB environment variables
 - `node scripts/importFromCSV.js <file_path>`
   - Imports users that are on the CSV file to the database
@@ -131,6 +127,7 @@ npm run test-contract
 ```
 
 <!-- temporary license -->
+
 ## License
 
 This project is open-source under the [MIT License](LICENSE).
