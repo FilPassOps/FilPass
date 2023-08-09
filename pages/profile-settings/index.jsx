@@ -9,7 +9,6 @@ import PersonalInformationFieldGroup from 'components/User/PersonalInformationFi
 import { WalletList } from 'components/User/WalletList'
 import { Button } from 'components/shared/Button'
 import { StatusBadge } from 'components/shared/Status'
-import { PLATFORM_NAME } from 'system.config'
 import { findUserByIdAndEmail, findUserTaxForm } from 'domain/user'
 import { personalInformationCheckValidator } from 'domain/user/validation'
 import { api } from 'lib/api'
@@ -22,6 +21,7 @@ import Head from 'next/head'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import useSWR from 'swr'
+import { PLATFORM_NAME } from 'system.config'
 
 export default function UserSettings({ data, masterAddress, taxForm }) {
   const { piiUpdatedAt } = data
@@ -223,8 +223,8 @@ export default function UserSettings({ data, masterAddress, taxForm }) {
                 <DocumentTextIcon className="w-6 h-6 shrink-0 ml-[-5px]" />
                 <button
                   className={classNames(
-                    'text-sm text-indigo-500 font-bold hover:underline cursor-pointe flex items-center min-w-0',
-                    defaultFormLoading && 'opacity-50 cursor-wait'
+                    'text-sm text-indigo-500 font-bold hover:underline flex items-center min-w-0',
+                    defaultFormLoading && 'opacity-50 cursor-wait',
                   )}
                   disabled={defaultFormLoading}
                   onClick={openDefaultForm}
