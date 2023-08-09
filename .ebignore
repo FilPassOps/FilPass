@@ -1,0 +1,17 @@
+# repository/project stuff
+.idea/
+.git/
+.gitlab-ci.yml
+README.md
+# misc
+coverage
+.DS_Store
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+# local env files
+.env.test
+.env.local
+.env.test.local
+.env.production.local

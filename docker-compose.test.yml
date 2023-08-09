@@ -1,0 +1,11 @@
+version: '3'
+services:
+  db:
+    image: postgres:12
+    container_name: pl-disbursement-db-test
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: crypto-ops

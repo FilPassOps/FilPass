@@ -1,0 +1,23 @@
+branch-defaults:
+  development:
+    environment: crypto-ops-dev-16
+  main:
+    environment: crypto-ops-production
+  release-candidate:
+    environment: crypto-ops-release-candidate-16
+environment-defaults:
+  crypto-ops-dev:
+    branch: null
+    repository: null
+global:
+  application_name: crypto-ops
+  default_ec2_keyname: aws-eb2
+  default_platform: Node.js 16 running on 64bit Amazon Linux 2
+  default_region: us-east-2
+  include_git_submodules: true
+  instance_profile: null
+  platform_name: null
+  platform_version: null
+  profile: null
+  sc: git
+  workspace_type: Application

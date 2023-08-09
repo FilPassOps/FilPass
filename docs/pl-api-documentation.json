@@ -1,0 +1,1824 @@
+{
+  "info": {
+    "_postman_id": "e202f815-2217-4323-8f4d-fbbf95a75220",
+    "name": "PL",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "21333054"
+  },
+  "item": [
+    {
+      "name": "Compliance",
+      "item": [
+        {
+          "name": "Block",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{APP_URL}}/api/users/{{USER_ID}}/sanction-review/block",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "users", "{{USER_ID}}", "sanction-review", "block"]
+            },
+            "description": "Block a user based on his id."
+          },
+          "response": []
+        },
+        {
+          "name": "Unblock",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{APP_URL}}/api/users/{{USER_ID}}/sanction-review/unblock",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "users", "{{USER_ID}}", "sanction-review", "unblock"]
+            },
+            "description": "Unblock a user based on his id"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Approver",
+      "item": [
+        {
+          "name": "Requires change",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"notes\": \"Testing\",\n    \"status\": \"REQUIRES_CHANGES\",\n    \"transferRequestId\": \"1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/transfer-requests-review",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "transfer-requests-review"]
+            },
+            "description": "Change the status of a specific transfer request to \"REQUIRES_CHANGE\" and set the requires change note.\n\nThe transferRequestId is the public id."
+          },
+          "response": []
+        },
+        {
+          "name": "Withdraw review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"SUBMITTED\",\n    \"transferRequestId\": \"1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/transfer-requests-review",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "transfer-requests-review"]
+            },
+            "description": "Change the status of a transfer request back to SUBMITTED.\n\nThe transferRequestId is the public id."
+          },
+          "response": []
+        },
+        {
+          "name": "Rejected",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"notes\": \"Testing\",\n    \"status\": \"REJECTED_BY_APPROVER\",\n    \"transferRequestId\": \"1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/transfer-requests-review",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "transfer-requests-review"]
+            },
+            "description": "Reject a transfer request and set the rejection note.\n\nThe transferRequestId is the public id."
+          },
+          "response": []
+        },
+        {
+          "name": "Approved",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"APPROVED\",\n    \"transferRequestId\": \"1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/transfer-requests-review",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "transfer-requests-review"]
+            },
+            "description": "Approve a transfer request.\n\nThe transferRequestId is the public id."
+          },
+          "response": []
+        },
+        {
+          "name": "Batch approval",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"requests\": [\n        \"1\",\n        \"2\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/transfer-requests-review/approve",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "transfer-requests-review", "approve"]
+            },
+            "description": "Approve a list of transfer requests.\n\nUse a list of the transfer request public id."
+          },
+          "response": []
+        },
+        {
+          "name": "Batch rejection",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"requests\": [\n        \"1\",\n        \"2\"\n    ],\n    \"notes\": \"Testing\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/transfer-requests-review/reject",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "transfer-requests-review", "reject"]
+            },
+            "description": "Reject a list of transfer requests and set the same rejection note for all.\n\nUse a list of the transfer request public id."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete draft",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{APP_URL}}/api/transfer-requests-draft/{{TRANSFER_PUBLIC_ID}}",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "transfer-requests-draft", "{{TRANSFER_PUBLIC_ID}}"]
+            },
+            "description": "Delete a draft transfer request based on the transfer request public id."
+          },
+          "response": []
+        },
+        {
+          "name": "Upload batch CSV file",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "data",
+                  "value": "{\"programId\":5}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/transfer-requests/upload-csv",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "transfer-requests", "upload-csv"]
+            },
+            "description": "Upload a CSV file with a transfer request to be created.\n\nPass the programId that the transfer requests will be created."
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Batch",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"requests\": [\n        {\n            \"amount\": \"1\",\n            \"receiverEmail\": \"user14@email.com\",\n            \"team\": \"Test No New New\",\n            \"wallet\": \"\",\n            \"programId\": 5,\n            \"currencyUnitId\": 1,\n            \"shouldReceiverReview\": false,\n            \"row\": 2\n        },\n        {\n            \"amount\": \"1\",\n            \"receiverEmail\": \"user14@email.com\",\n            \"team\": \"Test Yes New New\",\n            \"wallet\": \"\",\n            \"programId\": 5,\n            \"currencyUnitId\": 1,\n            \"shouldReceiverReview\": true,\n            \"row\": 3\n        }\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/transfer-requests/batch-csv",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "transfer-requests", "batch-csv"]
+            },
+            "description": "Submit a list of transfer requests to be created after uploading a CSV.\n\nPass the CSV fields to create the transfer request:\n\namount: The amount requested in FIL\n\nreceiverEmail: The receiver's email\n\nteam: The team name\n\nwallet: The wallet address\n\nprogramId: The program Id\n\ncurrencyUnitId: The currency unit (1 = FIL , 2 = USD)\n\nshouldReceiverReview: Create as a draft or not\n\nrow: row in the CSV file"
+          },
+          "response": []
+        },
+        {
+          "name": "Applying for others batch",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"receiverShouldReview\": true,\n    \"requests\": [\n        {\n            \"programId\": 5,\n            \"receiverEmail\": \"user1@email.com\",\n            \"team\": \"test\",\n            \"amount\": \"1\",\n            \"currencyUnitId\": 1,\n            \"wallet\": \"\"\n        },\n        {\n            \"programId\": 5,\n            \"receiverEmail\": \"user2@email.com\",\n            \"team\": \"test\",\n            \"amount\": \"1\",\n            \"currencyUnitId\": 1,\n            \"wallet\": \"\"\n        }\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/transfer-requests/applying-for-others",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "transfer-requests", "applying-for-others"]
+            },
+            "description": "Create a list of transfer requests for users different than the requester.\n\nPass the transfer request fields.\n\nPass the CSV fields to create the transfer request:\n\nshouldReceiverReview: Create as a draft or not\n\nprogramId: The program Id\n\nreceiverEmail: The receiver's email\n\nteam: The team name\n\namount: The amount requested in FIL\n\ncurrencyUnitId: The currency unit (1 = FIL , 2 = USD)\n\nwallet: The wallet address"
+          },
+          "response": []
+        },
+        {
+          "name": "List transfer requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{APP_URL}}/api/approvals?status=SUBMITTED&programId=5,4&number=12345&team=First+approver+team&from=1684724400000&to=1685674800000&wallet=123123213&size=100&page=1",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "approvals"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "SUBMITTED"
+                },
+                {
+                  "key": "programId",
+                  "value": "5,4"
+                },
+                {
+                  "key": "number",
+                  "value": "12345"
+                },
+                {
+                  "key": "team",
+                  "value": "First+approver+team"
+                },
+                {
+                  "key": "from",
+                  "value": "1684724400000"
+                },
+                {
+                  "key": "to",
+                  "value": "1685674800000"
+                },
+                {
+                  "key": "wallet",
+                  "value": "123123213"
+                },
+                {
+                  "key": "size",
+                  "value": "100"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List the transfer requests based on the filters.\n\nThe filter could contain:\n\nstatus= The status of the transfer request\n\nprogramId= A list of programs\n\nnumber= A specific number for the transfer request\n\nteam= A list of teams\n\nfrom= Start time frame\n\nto = End time frame\n\nwallet= A specific wallet\n\nsize= The number of transfer request per page\n\npage= The page"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete transfer request",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{APP_URL}}/api/transfer-requests?requests={{TRANSFER_PUBLIC_ID}}",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "transfer-requests"],
+              "query": [
+                {
+                  "key": "requests",
+                  "value": "{{TRANSFER_PUBLIC_ID}}"
+                }
+              ]
+            },
+            "description": "Delete a transfer request based on the transfer request public id."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Finance",
+      "item": [
+        {
+          "name": "Reject batch tax review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"rejectionReason\": \"Testing\",\n    \"taxFormIds\": [\n        305\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/files/reject",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "files", "reject"]
+            },
+            "description": "Reject a list of tax form files based on the ids and set a reason for all rejections."
+          },
+          "response": []
+        },
+        {
+          "name": "Approve batch tax review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"taxFormIds\": [\n        303\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/files/approve",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "files", "approve"]
+            },
+            "description": "Approve a list of tax form files based on the ids."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Controller",
+      "item": [
+        {
+          "name": "List transfer requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{APP_URL}}/api/approvals?status=SUBMITTED&programId=5,4&number=12345&team=First+approver+team&from=1684724400000&to=1685674800000&wallet=123123213&size=100&page=1",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "approvals"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "SUBMITTED"
+                },
+                {
+                  "key": "programId",
+                  "value": "5,4"
+                },
+                {
+                  "key": "number",
+                  "value": "12345"
+                },
+                {
+                  "key": "team",
+                  "value": "First+approver+team"
+                },
+                {
+                  "key": "from",
+                  "value": "1684724400000"
+                },
+                {
+                  "key": "to",
+                  "value": "1685674800000"
+                },
+                {
+                  "key": "wallet",
+                  "value": "123123213"
+                },
+                {
+                  "key": "size",
+                  "value": "100"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "List the transfer requests based on the filters.\n\nThe filter could contain:\n\nstatus= The status of the transfer request\n\nprogramId= A list of programs\n\nnumber= A specific number for the transfer request\n\nteam= A list of teams\n\nfrom= Start time frame\n\nto = End time frame\n\nwallet= A specific wallet\n\nsize= The number of transfer request per page\n\npage= The page"
+          },
+          "response": []
+        },
+        {
+          "name": "Reject transfer request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"notes\": \"Testing\",\n    \"transferRequestId\": [\n        \"1\"\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/transfers/reject",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "transfers", "reject"]
+            },
+            "description": "Reject a transfer request and set the rejection note.\n\nThe transferRequestId is the public id."
+          },
+          "response": []
+        },
+        {
+          "name": "Prepare send payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": ""
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"requests\":[1]}"
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/transfers/prepare",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "transfers", "prepare"]
+            },
+            "description": "Prepare a list of transfer requests to be paid  \n  \nPass a list of transfer request id."
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel send payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": ""
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"requests\":[1]}"
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/transfers/cancel",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "transfers", "cancel"]
+            },
+            "description": "Cancel a list of transfer requests to be paid if something goes wrong during the contract forward method  \n  \nPass a list of transfer request id."
+          },
+          "response": []
+        },
+        {
+          "name": "Payment sent",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": ""
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"requests\":[1],\"hash\":\"1\"}"
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/transfers/payment-sent",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "transfers", "payment-sent"]
+            },
+            "description": "Update a list of transfer requests setting the hash of the transaction after the forward.  \n  \nPass a list of transfer request id and the transaction hash."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Token price",
+      "item": [
+        {
+          "name": "Refresh token price",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{APP_URL}}/api/currency/FIL/market-rate",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "currency", "FIL", "market-rate"]
+            },
+            "description": "Refresh the token price."
+          },
+          "response": []
+        },
+        {
+          "name": "Update token price",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"rate\": 4.41,\n    \"name\": \"FIL\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/currency/FIL",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "currency", "FIL"]
+            },
+            "description": "Update the token price.\n\nPass the price and the token name."
+          },
+          "response": []
+        }
+      ],
+      "description": "Users with the SUPER and CONTROLLER could perform these actions."
+    },
+    {
+      "name": "Super",
+      "item": [
+        {
+          "name": "Set user role",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"roles\": [\n        {\n            \"value\": \"APPROVER\",\n            \"label\": \"Approver\",\n            \"disabled\": false\n        }\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/roles/{{USER_ID}}",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "roles", "{{USER_ID}}"]
+            },
+            "description": "/userId\n\nSet the user roles based on his id.\n\nPass a list of objects containing the roles for the user:\n\n> \\[  \n{  \n\"value\": \"APPROVER\",  \n\"label\": \"Approver\",  \n\"disabled\": false  \n},  \n{  \n\"value\": \"CONTROLLER\",  \n\"label\": \"Controller\",  \n\"disabled\": false  \n},  \n{  \n\"value\": \"ADDRESS_MANAGER\",  \n\"label\": \"Address Manager\",  \n\"disabled\": false  \n}  \n\\]"
+          },
+          "response": []
+        },
+        {
+          "name": "Invite user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"test@gmail.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/auth/invite",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "auth", "invite"]
+            },
+            "description": "Invite a user for the application.\n\nPass the user email."
+          },
+          "response": []
+        },
+        {
+          "name": "Ban user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"banReason\": \"testing\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/users/{{USER_ID}}/ban",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "users", "{{USER_ID}}", "ban"]
+            },
+            "description": "Ban a user from the application based on his id.\n\nPass the ban reason."
+          },
+          "response": []
+        },
+        {
+          "name": "Unban user",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{APP_URL}}/api/users/{{USER_ID}}/unban",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "users", "{{USER_ID}}", "unban"]
+            },
+            "description": "Unban a user from the application based on his id."
+          },
+          "response": []
+        },
+        {
+          "name": "Create new program",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Testing\",\n    \"paymentMethod\": 1,\n    \"deliveryMethod\": \"ONE_TIME\",\n    \"approversRole\": [\n        [\n            {\n                \"roleId\": 10,\n                \"value\": \"test-approver@protocol.ai\",\n                \"label\": \"test-approver@protocol.ai\"\n            }\n        ]\n    ],\n    \"viewersRole\": [\n        {\n            \"roleId\": 14,\n            \"value\": \"test-viewer@protocol.ai\",\n            \"label\": \"test-viewer@protocol.ai\"\n        }\n    ],\n    \"programCurrency\": [\n        {\n            \"name\": \"FIL\",\n            \"type\": \"REQUEST\"\n        },\n        {\n            \"name\": \"FIL\",\n            \"type\": \"PAYMENT\"\n        }\n    ],\n    \"visibility\": \"EXTERNAL\",\n    \"signersWalletAddresses\": [\n        {\n            \"address\": \"\"\n        }\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/programs",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "programs"]
+            },
+            "description": "Create a new program.\n\nPass the program fields:  \n\nname: Program name\n\npaymentMethod: Methods for payment request in fil and pay in fil - 1 / request in usd and pay in fil 2\n\ndeliverMethod: Methods for the deliver ONE_TIME or MULTISIG_1_OF_2\n\napproversRole: The role information\n\nviewersRole: The role information\n\nprogramCurrency: The name could be FIL or USD\n\nvisibility: The program visibility could be INTERNAL or EXTERNAL\n\nsignerWalletAddresses: The wallet addresses when multisig"
+          },
+          "response": []
+        },
+        {
+          "name": "Get associated requests with a program",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{APP_URL}}/api/programs/{{PROGRAM_ID}}/associated-requests",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "programs", "{{PROGRAM_ID}}", "associated-requests"]
+            },
+            "description": "Get the transfer request based on a program id."
+          },
+          "response": []
+        },
+        {
+          "name": "Archive a program",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{APP_URL}}/api/programs/{{PROGRAM_ID}}?unarchive=true",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "programs", "{{PROGRAM_ID}}"],
+              "query": [
+                {
+                  "key": "unarchive",
+                  "value": "true"
+                }
+              ]
+            },
+            "description": "Archive a program based on its id."
+          },
+          "response": []
+        },
+        {
+          "name": "Unarchive a program",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{APP_URL}}/api/programs/{{PROGRAM_ID}}?unarchive=false",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "programs", "{{PROGRAM_ID}}"],
+              "query": [
+                {
+                  "key": "unarchive",
+                  "value": "false"
+                }
+              ]
+            },
+            "description": "Unarchive a program based on its id."
+          },
+          "response": []
+        },
+        {
+          "name": "Update program",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"updateApprovers\": false,\n    \"updateViewers\": false,\n    \"isArchived\": false,\n    \"name\": \"Testing 2\",\n    \"paymentMethod\": 2,\n    \"deliveryMethod\": \"MULTISIG_1_OF_2\",\n    \"approversRole\": [\n        [\n            {\n                \"label\": \"test-approver@protocol.ai\",\n                \"value\": \"test-approver@protocol.ai\",\n                \"roleId\": 10\n            }\n        ]\n    ],\n    \"viewersRole\": [\n        {\n            \"label\": \"test-viewer@protocol.ai\",\n            \"value\": \"test-viewer@protocol.ai\",\n            \"roleId\": 14\n        }\n    ],\n    \"programCurrency\": [\n        {\n            \"name\": \"USD\",\n            \"type\": \"REQUEST\"\n        },\n        {\n            \"name\": \"FIL\",\n            \"type\": \"PAYMENT\"\n        }\n    ],\n    \"visibility\": \"INTERNAL\",\n    \"signersWalletAddresses\": [\n        {\n            \"address\": \"f410f2hhp7veyhgkgntjypetbhpdden4agxpjtyxxssa\"\n        }\n    ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/programs/{{PROGRAM_ID}}",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "programs", "{{PROGRAM_ID}}"]
+            },
+            "description": "Update a program based on its id.\n\nPass the program fields:\n\nname: Program name\n\npaymentMethod: Methods for payment request in fil and pay in fil - 1 / request in usd and pay in fil 2\n\ndeliverMethod: Methods for the deliver ONE_TIME or MULTISIG_1_OF_2\n\napproversRole: The role information\n\nviewersRole: The role information\n\nprogramCurrency: The name could be FIL or USD\n\nvisibility: The program visibility could be INTERNAL or EXTERNAL\n\nsignerWalletAddresses: The wallet addresses when multisig"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Account",
+      "item": [
+        {
+          "name": "Log out",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{APP_URL}}/api/auth/logout",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "auth", "logout"]
+            },
+            "description": "Log out from the account."
+          },
+          "response": []
+        },
+        {
+          "name": "Log in",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"\",\n    \"password\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/auth/login",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Log in to the application.\n\nPass the email and password.\n\n**PUBLIC**"
+          },
+          "response": []
+        },
+        {
+          "name": "Verify log in code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"code\": \"\",\n    \"token\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/auth/verify-code",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "auth", "verify-code"]
+            },
+            "description": "Verify the login code.\n\nPass the code and the jwt token."
+          },
+          "response": []
+        },
+        {
+          "name": "Sign up",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"\",\n    \"password\": \"\",\n    \"confirmPassword\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/auth/signup",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "auth", "signup"]
+            },
+            "description": "SIgn up into the application.\n\nPass the email, password, and the password confirmation.\n\n**PUBLIC**"
+          },
+          "response": []
+        },
+        {
+          "name": "Log in with Google",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"code\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/auth/google",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "auth", "google"]
+            },
+            "description": "Log in with Google.\n\nPass the authorization code.\n\n**PUBLIC**"
+          },
+          "response": []
+        },
+        {
+          "name": "Get token price",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{APP_URL}}/api/currency/FIL",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "currency", "FIL"]
+            },
+            "description": "Get the current token price."
+          },
+          "response": []
+        },
+        {
+          "name": "Get user information",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{APP_URL}}/api/auth/me",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "auth", "me"]
+            },
+            "description": "Get the logged-in user information."
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot password notification",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/auth/forgot-password",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "auth", "forgot-password"]
+            },
+            "description": "Send the notification to change the password.\n\nPass the user email.\n\n**PUBLIC**"
+          },
+          "response": []
+        },
+        {
+          "name": "Re send code",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"token\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/auth/resend-code",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "auth", "resend-code"]
+            },
+            "description": "Re-send the login code.\n\nPass the JWT token."
+          },
+          "response": []
+        },
+        {
+          "name": "Activate account",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/auth/send-email-verification",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "auth", "send-email-verification"]
+            },
+            "description": "Send an email notification to activate the account.\n\nPass the user email.\n\n**PUBLIC**"
+          },
+          "response": []
+        },
+        {
+          "name": "Reset password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"password\": \"1.\",\n    \"passwordConfirm\": \"1.\",\n    \"token\": \"\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/auth/reset-password",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "auth", "reset-password"]
+            },
+            "description": "Reset the users password.\n\nPass the:\n\npassword: The user password.\n\npasswordConfirm: The password confirmation.\n\ntoken: JWT token.\n\n**PUBLIC**"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "Tax info",
+          "item": [
+            {
+              "name": "Upload tax form",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Cookie",
+                    "value": "",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "data",
+                      "value": "{\"type\":\"W9_FORM\",\"setAsActive\":false}",
+                      "type": "text"
+                    },
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": []
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{APP_URL}}/api/files",
+                  "host": ["{{APP_URL}}"],
+                  "path": ["api", "files"]
+                },
+                "description": "Upload the tax form file.\n\nPass the tax file and the type that could be W9_FORM or W8_FORM."
+              },
+              "response": []
+            },
+            {
+              "name": "View tax form",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Cookie",
+                    "value": "",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{APP_URL}}/api/files/{{FILE_PUBLIC_ID}}",
+                  "host": ["{{APP_URL}}"],
+                  "path": ["api", "files", "{{FILE_PUBLIC_ID}}"]
+                },
+                "description": "Visualize the tax form file based on its public id."
+              },
+              "response": []
+            },
+            {
+              "name": "Save tax form",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Cookie",
+                    "value": "",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"taxForm\": {\n        \"isUSResident\": true,\n        \"userFileId\": \"\"\n    }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{APP_URL}}/api/users/current/update-tax-info",
+                  "host": ["{{APP_URL}}"],
+                  "path": ["api", "users", "current", "update-tax-info"]
+                },
+                "description": "Update the user tax form file.\n\nPass the:\n\nisUSResident: Boolean, true or false.\n\nuserFileId: Public file id."
+              },
+              "response": []
+            },
+            {
+              "name": "Delete tax form",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Cookie",
+                    "value": "",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{APP_URL}}/api/files/{{FILE_PUBLIC_ID}}",
+                  "host": ["{{APP_URL}}"],
+                  "path": ["api", "files", "{{FILE_PUBLIC_ID}}"]
+                },
+                "description": "Delete a tax form file based on its public id."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Wallet",
+          "item": [
+            {
+              "name": "Wallet verification",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Cookie",
+                    "value": "",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{APP_URL}}/api/wallet-verifications?address={{WALLET_ADDRESS}}",
+                  "host": ["{{APP_URL}}"],
+                  "path": ["api", "wallet-verifications"],
+                  "query": [
+                    {
+                      "key": "address",
+                      "value": "{{WALLET_ADDRESS}}"
+                    }
+                  ]
+                },
+                "description": "Modal to send fill"
+              },
+              "response": []
+            },
+            {
+              "name": "Validate wallet",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Cookie",
+                    "value": "",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{APP_URL}}/api/wallet-address/{{WALLET_ADDRESS}}/validate",
+                  "host": ["{{APP_URL}}"],
+                  "path": ["api", "wallet-address", "{{WALLET_ADDRESS}}", "validate"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Send verification amount",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Cookie",
+                    "value": "",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"address\": \"\",\n    \"blockchain\": \"FILECOIN\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{APP_URL}}/api/wallet-verifications",
+                  "host": ["{{APP_URL}}"],
+                  "path": ["api", "wallet-verifications"]
+                },
+                "description": "Send an X amount to verify the user's wallet.\n\nPass the wallet address and the blockchain."
+              },
+              "response": []
+            },
+            {
+              "name": "Verify wallet address",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Cookie",
+                    "value": "",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"amount\": 0.000009,\n    \"unit\": \"FIL\",\n    \"name\": \"test 2\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{APP_URL}}/api/wallet-verifications/{{VERIFICATION_ID}}/verify",
+                  "host": ["{{APP_URL}}"],
+                  "path": ["api", "wallet-verifications", "{{VERIFICATION_ID}}", "verify"]
+                },
+                "description": "Verify a wallet based on the verification id.\n\nPass the:\n\namount: Amount of fil send on the verification amount request.\n\nunit: Amount unit.\n\nname: Wallet alias."
+              },
+              "response": []
+            },
+            {
+              "name": "Connect wallet skipping",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Cookie",
+                    "value": "",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"blockchain\": \"FILECOIN\",\n    \"address\": \"\",\n    \"name\": \"testing\",\n    \"skipAlert\": true,\n    \"isDefault\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{APP_URL}}/api/wallets",
+                  "host": ["{{APP_URL}}"],
+                  "path": ["api", "wallets"]
+                },
+                "description": "Skip the wallet verification.\n\nPass the:\n\nblockchain: Wallet chain.\n\naddress: Wallet address.\n\nname: Wallet label.\n\nskipAlert: Email to verify.\n\nisDefault: Set default wallet."
+              },
+              "response": []
+            },
+            {
+              "name": "Connect ethereum address",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Cookie",
+                    "value": "",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"walletAddress\": \"\",\n    \"label\": \"\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{APP_URL}}/api/wallets/ethereum",
+                  "host": ["{{APP_URL}}"],
+                  "path": ["api", "wallets", "ethereum"]
+                },
+                "description": "Connect an Ethereum wallet address.\n\nPass the:\n\nwalletAddress: Ethereum wallet address.\n\nlabel: Wallet label."
+              },
+              "response": []
+            },
+            {
+              "name": "Delete wallet",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Cookie",
+                    "value": "",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{APP_URL}}/api/wallets/{{WALLET_ID}}",
+                  "host": ["{{APP_URL}}"],
+                  "path": ["api", "wallets", "{{WALLET_ID}}"]
+                },
+                "description": "Delete a wallet based on its id."
+              },
+              "response": []
+            },
+            {
+              "name": "Set default wallet",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Cookie",
+                    "value": "",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"id\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{APP_URL}}/api/wallets/set-default",
+                  "host": ["{{APP_URL}}"],
+                  "path": ["api", "wallets", "set-default"]
+                },
+                "description": "Set the default wallet.\n\nPass the wallet id."
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Personal info",
+          "item": [
+            {
+              "name": "Save personal info",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Cookie",
+                    "value": "",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"pii\": {\n        \"countryResidence\": \"\",\n        \"dateOfBirth\": \"\",\n        \"lastName\": \"\",\n        \"firstName\": \"\"\n    }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{APP_URL}}/api/users/current",
+                  "host": ["{{APP_URL}}"],
+                  "path": ["api", "users", "current"]
+                },
+                "description": "Save the user's personal information.\n\nPass the:\n\ncountryResidence: The name of the country.\n\ndateOfBirth: The specific date.\n\nlastName: The user's last name.\n\nfirstName: The user's first name."
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Transfer request",
+      "item": [
+        {
+          "name": "Onboarding save",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"pii\": {\n        \"countryResidence\": \"USA\",\n        \"dateOfBirth\": \"1995-01-01T02:00:00.000Z\",\n        \"lastName\": \"10\",\n        \"firstName\": \"Testing\"\n    },\n    \"terms\": {\n        \"informedDecision\": true,\n        \"release\": true,\n        \"satisfactionOfObligations\": true,\n        \"soleControl\": true,\n        \"tax\": true,\n        \"transferAuthorization\": true,\n        \"sanctions\": true,\n        \"walletAddress\": true,\n        \"informedDecisionText\": \"You represent that you have acquired sufficient information about crypto assets or tokens and wallet technology to reach an informed and knowledgeable decision regarding receipt of crypto assets or tokens.\",\n        \"releaseText\": \"In exchange for good and valuable consideration, the sufficiency of which is hereby acknowledged, you hereby agree to release and forever discharge the Company, its officers, directors, employees and other personnel, shareholders and agents, and their respective affiliates (collectively, the \\\"Released Parties\\\") from all causes of action, expenses (including attorneys' fees and costs), damages, judgments, claims and demands whatsoever, whether known or unknown, now accrued or hereafter accruing, in law or equity, against any Released Party which you ever had, now have, or may in the future have for any claim arising out of the timing of the Company's distribution of crypto assets or tokens to you via the Coin Emissary tool (“Emissary”). The Company shall work in good faith to distribute crypto assets or tokens owed to you in a timely manner.\",\n        \"satisfactionOfObligationsText\": \"You acknowledge that, upon delivery of the crypto assets or tokens to the wallet address you are providing, such crypto assets or tokens will be deemed to be delivered in full, and the obligations of the Company to deliver such crypto assets or tokens to you will be deemed satisfied.\",\n        \"soleControlText\": \"You understand and agree that, once tokens have been transferred to the provided address, the crypto asset or tokens are in your sole control. You agree that Protocol Labs will not be responsible for any loss or theft of such tokens after they have been transferred.You represent that the crypto address you are providing is correct. You are acknowledging that providing an incorrect wallet address could result in unrecoverable loss of some or all of the Crypto assets or tokens that Protocol Labs is transferring to you, and that Protocol Labs and affiliated entities will not be liable in the event you provide an inaccurate wallet address.\",\n        \"taxText\": \"You acknowledge that transferring tokens to your wallet, and your use of those crypto assets or tokens, may have significant tax consequences and that you are solely responsible for any taxes due as a result of the transfer. You further acknowledge that Protocol Labs cannot provide you with tax advice, and recognize that it is your obligation, if you so desire, to seek independent counsel to determine the full extent of your tax liability under applicable laws and regulations. You further acknowledge and agree that Protocol Labs shall be entitled to withhold taxes on any transfer, as required by law, in Protocol Labs' sole discretion.\",\n        \"transferAuthorizationText\": \"You authorize Protocol Labs to transfer any and all tokens owed to you to the address you are providing, or to one or more wallets controlled by it. You represent that you own and control the address you are providing.\",\n        \"sanctionsText\": \"You represent that you (or the entity you represent) are not 50% or more owned or controlled by an individual or entity that is the target of sanctions administered by the Office of Foreign Assets Control of the United States Treasury Department, the United States Department of State, the United Nations Security Council, the European Union, or Her Majesty’s Treasury (collectively, “Sanctions”). You represent and warrant that your conduct related to the payment(s) made via Emissary is in compliance with applicable Sanctions in all material respects.\",\n        \"walletAddressText\": \"You represent that the crypto address you are providing is correct. You are acknowledging that providing an incorrect wallet address could result in unrecoverable loss of some or all of the Crypto assets or tokens that Protocol Labs is transferring to you, and that Protocol Labs and affiliated entities will not be liable in the event you provide an inaccurate wallet address.\"\n    },\n    \"taxForm\": {\n        \"isUSResident\": true,\n        \"userFileId\": \"clhyxxbd9000hc9nm4jl9g480\"\n    },\n    \"isOnboarded\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/users/current",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "users", "current"]
+            },
+            "description": "Update user information if it was not updated inside the profile.\n\nPass the:"
+          },
+          "response": []
+        },
+        {
+          "name": "Submit transfer request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"currencyUnitId\": 1,\n    \"expectedTransferDate\": \"\",\n    \"team\": \"testing\",\n    \"userWalletId\": 1,\n    \"programId\": 1,\n    \"userAttachmentId\": \"\",\n    \"amount\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/transfer-requests",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "transfer-requests"]
+            },
+            "description": "Submit a transfer request.\n\nPass the:\n\ncurrencyUnitId: The currency unit id\n\n  \nexpectedTransferDate:\n\n  \nteam\": The team name\n\n  \nuserWalletId: The user wallet id\n\n  \nprogramId: The program id\n\n  \nuserAttachmentId: The public file id\n\n  \namount: The amount of currency requested."
+          },
+          "response": []
+        },
+        {
+          "name": "Edit transfer request",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"currencyUnitId\": 4,\n    \"expectedTransferDate\": \"2023-06-21T21:02:25.836-03:00\",\n    \"team\": \"Fourth team\",\n    \"userWalletId\": 16,\n    \"programId\": 5,\n    \"amount\": 300,\n    \"createdAt\": \"2023-05-22T21:02:25.836-03:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/transfer-requests/{{TRANSFER_PUBLIC_ID}}",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "transfer-requests", "{{TRANSFER_PUBLIC_ID}}"]
+            },
+            "description": "Edit a transfer request based on the transfer request public id.\n\nPass the:\n\ncurrencyUnitId: The currency unit id\n\nexpectedTransferDate:\n\nteam\": The team name\n\nuserWalletId: The user wallet id\n\nprogramId: The program id\n\nuserAttachmentId: The public file id\n\namount: The amount of currency requested."
+          },
+          "response": []
+        },
+        {
+          "name": "Void transfer request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{APP_URL}}/api/transfer-requests/{{TRANSFER_PUBLIC_ID}}/void",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "transfer-requests", "{{TRANSFER_PUBLIC_ID}}", "void"]
+            },
+            "description": "Void a transfer request based on the transfer request public id."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete draft transfer request",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{APP_URL}}/api/transfer-requests-draft/{{TRANSFER_PUBLIC_ID}}",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "transfer-requests-draft", "{{TRANSFER_PUBLIC_ID}}"]
+            },
+            "description": "Delete a transfer request based on the transfer request public id."
+          },
+          "response": []
+        },
+        {
+          "name": "Upload file",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "data",
+                  "value": "{\"type\":\"ATTACHMENT\",\"setAsActive\":true}",
+                  "type": "text"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{APP_URL}}/api/files",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "files"]
+            },
+            "description": "Upload an attachment file into the transfer request.\n\nPass the:\n\ndata type: ATTACHMENT.\n\nfile: The actual file."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete file",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Cookie",
+                "value": "",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{APP_URL}}/api/files/{{FILE_PUBLIC_ID}}",
+              "host": ["{{APP_URL}}"],
+              "path": ["api", "files", "{{FILE_PUBLIC_ID}}"]
+            },
+            "description": "Delete a file based on its public id."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "APP_URL",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "USER_ID",
+      "value": "1"
+    },
+    {
+      "key": "TRANSFER_PUBLIC_ID",
+      "value": "720123012206"
+    },
+    {
+      "key": "PROGRAM_ID",
+      "value": "6"
+    },
+    {
+      "key": "FILE_PUBLIC_ID",
+      "value": "clhtli9qc0007c9jl9i3p4mr7"
+    },
+    {
+      "key": "WALLET_ADDRESS",
+      "value": "f16mh772ajyi2yypikzyiqt5nd6qyqd6mza2i6gxa"
+    },
+    {
+      "key": "VERIFICATION_ID",
+      "value": "4"
+    },
+    {
+      "key": "WALLET_ID",
+      "value": "100"
+    }
+  ]
+}

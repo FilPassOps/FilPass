@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.json",
+  "ts-node": {
+    "files": true,
+    "transpileOnly": true
+  },
+  "compilerOptions": {
+    "outDir": "dist",
+    "isolatedModules": false,
+    "noEmit": false,
+    "skipLibCheck": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "lib/*": ["lib/*"],
+      "domain/*": ["domain/*"],
+      "jobs/*": ["jobs/*"],
+      "server/*": ["server/*"]
+    }
+  },
+  "include": ["server/**/*.ts", "jobs/**/*.ts", "typings/**/*.d.ts"],
+  "exclude": ["node_modules", "dist", ".next", "out", "next.config.js"]
+}

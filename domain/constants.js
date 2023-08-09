@@ -1,0 +1,1 @@
+export const MAX_INTEGER_VALUE = 2147483647

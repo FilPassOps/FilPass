@@ -1,0 +1,7 @@
+
+
+.customVerificationInput {
+  --ReactInputVerificationCode-itemWidth: 44px;
+  --ReactInputVerificationCode-itemHeight: 56px;
+  --ReactInputVerificationCode-itemSpacing: 24px;
+}

@@ -1,0 +1,360 @@
+import { ArrowDownTrayIcon, DocumentDuplicateIcon, DocumentPlusIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import config from 'chains.config'
+import { ApproveModal } from 'components/Approver/Modals/ApproveModal'
+import { RejectModal } from 'components/Approver/Modals/RejectModal'
+import TransferList from 'components/Approver/TransferList'
+import { Filters } from 'components/Filters/Filters'
+import { Layout } from 'components/Layout'
+import { CreateReportModal } from 'components/TransferRequest/shared/CreateReportModal'
+import { DeleteModal } from 'components/TransferRequest/shared/DeleteModal'
+import { Button, LinkButton } from 'components/shared/Button'
+import { PaginationCounter } from 'components/shared/PaginationCounter'
+import { PaginationWrapper, checkItemsPerPage } from 'components/shared/usePagination'
+import { PLATFORM_NAME } from 'system.config'
+import { stringify } from 'csv-stringify/sync'
+import { getApprovalsByRole } from 'domain/approvals/service'
+import { APPROVER_ROLE, COMPLIANCE_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
+import { BLOCKED_STATUS, ON_HOLD_STATUS, SUBMITTED_BY_APPROVER_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
+import JsFileDownload from 'js-file-download'
+import { api } from 'lib/api'
+import { getDelegatedAddress } from 'lib/getDelegatedAddress'
+import { getEthereumAddress } from 'lib/getEthereumAddress'
+import { withRolesSSR } from 'lib/ssr'
+import { DateTime } from 'luxon'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import errorsMessages from 'wordings-and-errors/errors-messages'
+
+export default function Approvals({
+  initialData = [],
+  totalItems,
+  programs,
+  pageSize,
+  page,
+  shouldShowHeaderCheckbox,
+  currentStatus,
+  isViewer,
+  isApprover,
+}) {
+  const router = useRouter()
+
+  const [requestList, setRequestList] = useState([])
+  const [approveModalOpen, setApproveModalOpen] = useState(false)
+  const [rejectModalOpen, setRejectModalOpen] = useState(false)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [createReportModal, setCreateReportModal] = useState(false)
+  const [data, setData] = useState(initialData)
+
+  const handleHeaderCheckboxToggle = e => {
+    const nextSelectAll = e.target.checked
+    setRequestList(requestList.map(request => ({ ...request, selected: !!nextSelectAll })))
+  }
+
+  const handleRequestChecked = requestIndex => {
+    requestList[requestIndex].selected = !requestList[requestIndex].selected
+    setRequestList([...requestList])
+  }
+
+  useEffect(() => {
+    setData(initialData)
+  }, [initialData])
+
+  useEffect(() => {
+    const initialRequestList = data.map(request => ({ ...request, selected: false }))
+    setRequestList(initialRequestList)
+  }, [data])
+
+  const selectedRequests = requestList.filter(request => request.selected)
+  const hasOnlySubmitted = selectedRequests.length > 0 && selectedRequests.every(request => request.status === SUBMITTED_STATUS)
+  const hasOnlySubmittedByApprover =
+    selectedRequests.length > 0 && selectedRequests.every(request => request.status === SUBMITTED_BY_APPROVER_STATUS)
+
+  const handleDownloadCSV = async values => {
+    const { pageSelected, columns } = values
+    try {
+      const {
+        data: { transfers },
+      } = await api.get(`/approvals`, {
+        params: {
+          ...router.query,
+          status: currentStatus,
+          size: pageSelected === 'SINGLE_PAGE' ? pageSize : totalItems,
+          page: pageSelected === 'SINGLE_PAGE' ? page : 1,
+        },
+      })
+
+      const headerFile = []
+      columns.number && headerFile.push('No')
+      columns.program && headerFile.push('Program')
+      columns.name && headerFile.push('Name')
+      columns.createDate && headerFile.push('Create Date')
+      columns.address && headerFile.push('Address')
+      columns.address && headerFile.push('Filecoin Equivalent Address')
+      columns.amount && headerFile.push('Request Amount')
+      columns.amount && headerFile.push('Request Amount Currency Unit')
+      columns.paidFilAmount && headerFile.push('Paid Amount')
+      columns.paidFilAmount && headerFile.push('Paid Amount Currency Unit')
+      columns.status && headerFile.push('Status')
+      columns.residency && headerFile.push('Residency')
+      columns.taxForm && headerFile.push('Tax Form')
+      columns.filfoxLink && headerFile.push('Filfox link')
+
+      const csvTemplate = stringify(
+        [
+          headerFile,
+          ...transfers.map(
+            ({
+              id,
+              program_name,
+              team,
+              wallet_address,
+              delegated_address,
+              amount,
+              request_unit,
+              transfer_amount,
+              transfer_amount_currency_unit,
+              create_date,
+              status,
+              is_us_resident,
+              file_id,
+              transfer_hash,
+            }) => {
+              const row = []
+              columns.number && row.push(id)
+              columns.program && row.push(program_name)
+              columns.name && row.push(team)
+              columns.createDate && row.push(create_date)
+              columns.address && row.push(wallet_address)
+              columns.address && row.push(delegated_address || getDelegatedAddress(wallet_address)?.fullAddress)
+              columns.amount && row.push(amount)
+              columns.amount && row.push(request_unit)
+              columns.paidFilAmount && row.push(transfer_amount)
+              columns.paidFilAmount && row.push(transfer_amount_currency_unit)
+              columns.status && row.push(status)
+              columns.residency && row.push(is_us_resident ? 'US' : 'Non-US')
+              columns.taxForm && row.push(`${window?.location.origin}/api/files/${file_id}/view`)
+              columns.filfoxLink && row.push(`${config.chain.blockExplorerUrls[0]}/message/${transfer_hash}`)
+              return row
+            }
+          ),
+        ],
+        {
+          delimiter: ',',
+        }
+      )
+      const blob = new Blob([csvTemplate])
+      return JsFileDownload(
+        blob,
+        `${PLATFORM_NAME.toLowerCase()}_${currentStatus.toLowerCase()}_approvals_${DateTime.now().toFormat("yyyy-MM-dd_hh'h'mm'm'ss's'")}.csv`
+      )
+    } catch (error) {
+      console.error(error)
+      alert(errorsMessages.something_went_wrong.message)
+    } finally {
+      setCreateReportModal(false)
+    }
+  }
+
+  return (
+    <>
+      <Head>
+        <title>My Approvals - {PLATFORM_NAME}</title>
+      </Head>
+
+      <div className="w-full">
+        <div>
+          {selectedRequests.length > 0 && (
+            <>
+              <div className="flex mb-4 space-x-3">
+                <div>
+                  <Button variant="green" onClick={() => setApproveModalOpen(true)} className="mr-4">
+                    Approve
+                  </Button>
+                </div>
+                <div>
+                  <Button
+                    variant="red"
+                    onClick={() => setRejectModalOpen(true)}
+                    disabled={!hasOnlySubmitted}
+                    toolTipText={!hasOnlySubmitted ? 'At least one of the requests you selected cannot be rejected' : ''}
+                  >
+                    Reject
+                  </Button>
+                </div>
+                <div>
+                  <Button
+                    variant="opacity-red"
+                    onClick={() => setDeleteModalOpen(true)}
+                    disabled={!hasOnlySubmittedByApprover}
+                    toolTipText={!hasOnlySubmittedByApprover ? 'At least one of the requests you selected cannot be deleted.' : ''}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </div>
+              <PaginationCounter total={selectedRequests.length} status={currentStatus} />
+            </>
+          )}
+        </div>
+        <div className="w-full">
+          <div className="flex items-center justify-end md:justify-between gap-2 py-4">
+            <div className="hidden md:flex">{isApprover && <BatchActionsButton />}</div>
+            <div className="flex items-center gap-2">
+              <Button onClick={() => setCreateReportModal(true)} variant="outline">
+                <div className="flex items-center gap-2 whitespace-nowrap">
+                  <ArrowDownTrayIcon className="h-5" />
+                  Create Report
+                </div>
+              </Button>
+              <Filters programs={programs} />
+            </div>
+          </div>
+          <PaginationWrapper totalItems={totalItems} pageSize={pageSize}>
+            <TransferList
+              data={requestList}
+              onRequestChecked={handleRequestChecked}
+              onHeaderToggle={handleHeaderCheckboxToggle}
+              shouldShowHeaderCheckbox={shouldShowHeaderCheckbox}
+            />
+          </PaginationWrapper>
+        </div>
+      </div>
+
+      {approveModalOpen && (
+        <ApproveModal open={approveModalOpen} data={selectedRequests} onModalClosed={() => setApproveModalOpen(false)} isBatch />
+      )}
+      {rejectModalOpen && (
+        <RejectModal open={rejectModalOpen} data={selectedRequests} onModalClosed={() => setRejectModalOpen(false)} isBatch />
+      )}
+
+      {createReportModal && (
+        <CreateReportModal
+          open={createReportModal}
+          onModalClosed={() => setCreateReportModal(false)}
+          page={page}
+          pageSize={pageSize}
+          totalItems={totalItems}
+          showPaidStatusColumns={isViewer}
+          handleDownloadCSV={handleDownloadCSV}
+        />
+      )}
+
+      {deleteModalOpen && (
+        <DeleteModal
+          status={currentStatus}
+          onModalClosed={() => setDeleteModalOpen(false)}
+          open={deleteModalOpen}
+          data={selectedRequests}
+          redirectTo="/approvals"
+        />
+      )}
+    </>
+  )
+}
+
+export const BatchActionsButton = () => {
+  const [toggle, setToggle] = useState(false)
+  return (
+    <div className="md:relative text-white whitespace-nowrap">
+      <Button onClick={() => setToggle(prev => !prev)}>
+        <div className="flex gap-2">
+          <DocumentDuplicateIcon className="h-5 w-5 hidden md:block" />
+          Batch Actions
+        </div>
+      </Button>
+      <div
+        className={`${
+          toggle ? 'absolute' : 'hidden'
+        } z-30 left-0 md:left-auto w-screen md:w-64 h-screen md:h-auto flex flex-col gap-2 mt-4 md:mt-2 py-4 bg-indigo-700 rounded-md md:shadow-lg`}
+      >
+        <div className="absolute top-0 right-0">
+          <Button variant="none" onClick={() => setToggle(false)}>
+            <XMarkIcon className="h-5 w-5" />
+          </Button>
+        </div>
+        <LinkButton variant="none" href="/csv-transfer-requests">
+          <div className="w-full flex items-center gap-2 hover:font-extrabold">
+            <DocumentDuplicateIcon className="h-6 w-6" />
+            Upload CSV
+          </div>
+        </LinkButton>
+        <LinkButton variant="none" href="/transfer-requests/create?batch=true">
+          <div className="w-full flex items-center gap-2 hover:font-extrabold">
+            <DocumentPlusIcon className="h-6 w-6" />
+            Create Transfer Requests
+          </div>
+        </LinkButton>
+      </div>
+    </div>
+  )
+}
+
+Approvals.getLayout = function getLayout(page) {
+  return <Layout title="My Approvals">{page}</Layout>
+}
+
+export const getServerSideProps = withRolesSSR([APPROVER_ROLE, COMPLIANCE_ROLE, VIEWER_ROLE], async ({ user: { id, roles }, query }) => {
+  const pageSize = checkItemsPerPage(query.itemsPerPage) ? parseInt(query.itemsPerPage) : 100
+  const page = parseInt(query.page) || 1
+  const programId = query.programId || null
+  const requestNumber = query.number
+  const team = query.team?.toString().split(',')
+  const wallet = query.wallet
+
+  const isViewer = roles.some(({ role }) => role === VIEWER_ROLE)
+  const isApprover = roles.some(({ role }) => role === APPROVER_ROLE)
+
+  // ON_HOLD is an alias for BLOCKED
+  const status = query.status === ON_HOLD_STATUS ? BLOCKED_STATUS : query.status
+
+  let fromDate, toDate
+
+  if (query.from && query.to) {
+    fromDate = new Date(parseInt(query.from.toString()))
+    fromDate.setHours(0, 0, 0, 0)
+    toDate = new Date(parseInt(query.to.toString()))
+    toDate.setHours(23, 59, 59, 999)
+  }
+
+  const ethereumWallet = getEthereumAddress(wallet)?.fullAddress.toLowerCase()
+  const delegatedAddress = getDelegatedAddress(wallet)?.fullAddress
+
+  const wallets = [wallet, ethereumWallet, delegatedAddress].filter(Boolean)
+
+  const { transfers, totalItems, error, shouldShowHeaderCheckbox, currentStatus, programs } = await getApprovalsByRole({
+    roles,
+    userId: id,
+    status,
+    programId,
+    requestNumber,
+    team,
+    from: fromDate,
+    to: toDate,
+    wallets,
+    size: pageSize,
+    sort: query?.sort,
+    order: query?.order,
+    page,
+  })
+
+  if (error && error.status !== 400) {
+    return {
+      notFound: true,
+    }
+  }
+
+  return {
+    props: {
+      totalItems: totalItems || 0,
+      initialData: JSON.parse(JSON.stringify(transfers)),
+      programs: JSON.parse(JSON.stringify(programs)),
+      page,
+      pageSize,
+      shouldShowHeaderCheckbox,
+      currentStatus,
+      isViewer,
+      isApprover,
+    },
+  }
+})
