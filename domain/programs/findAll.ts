@@ -2,7 +2,7 @@ import { Role, TransferRequestStatus } from '@prisma/client'
 import { decryptPII } from 'lib/emissaryCrypto'
 import prisma, { getPrismaClient } from 'lib/prisma'
 import { validate } from 'lib/yup'
-import { chain } from 'lodash'
+import _ from 'lodash'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { PROGRAM_TYPE_INTERNAL } from './constants'
 import { findAllProgramsCompleteValidator } from './validation'
@@ -231,7 +231,7 @@ export async function findAllProgramsComplete(params: any) {
         userRoleProgramGroupIds: program.userRoleProgramGroups.map(userRoleProgramGroup => userRoleProgramGroup.id),
         isArchived: program.isArchived,
       }
-    })
+    }),
   )
 
   return { data: { programs: decrypted, total } }
@@ -328,10 +328,10 @@ const getProgramApprovers = async (userRolePrograms: UserRoleProgramQueryResult[
       roleId: data.userRoleId,
       email: await decryptPII(data.userRole.user.email),
       groupIds: data.groups.map(userRoleProgramGroupMember => userRoleProgramGroupMember.userRoleProgramGroupId),
-    }))
+    })),
   )
 
-  const groupedData = chain(dataDecrypted)
+  const groupedData = _.chain(dataDecrypted)
     .groupBy(approver => approver.groupIds)
     .map(value => value)
     .value()
@@ -346,7 +346,7 @@ const getProgramViewers = async (userRolePrograms: UserRoleProgramQueryResult[])
     activeApprovers.map(async data => ({
       roleId: data.userRoleId,
       email: await decryptPII(data.userRole.user.email),
-    }))
+    })),
   )
 
   return dataDecrypted
