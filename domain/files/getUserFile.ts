@@ -1,6 +1,6 @@
 import { Prisma, UserFile } from '@prisma/client'
 import { APPROVER_ROLE, COMPLIANCE_ROLE, CONTROLLER_ROLE, FINANCE_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
-import { getFile, getReadStream } from 'lib/aws/s3'
+import { getFile, getReadStream } from 'lib/fileUpload'
 import { SessionUser } from 'lib/middleware'
 import prisma from 'lib/prisma'
 import { validate } from 'lib/yup'

@@ -1,5 +1,5 @@
 import { APPROVER_ROLE, CONTROLLER_ROLE } from 'domain/auth/constants'
-import { getFile } from 'lib/aws/s3'
+import { getFile } from 'lib/fileUpload'
 import { getPrismaClient } from 'lib/prisma'
 import { validate } from 'lib/yup'
 import { getFileUrlFromS3Validator } from './validation'

@@ -1,4 +1,4 @@
-import { uploadFileToS3 } from 'lib/aws/s3'
+import { uploadFileToS3 } from 'lib/fileUpload'
 import { getPrismaClient } from 'lib/prisma'
 import { validate } from 'lib/yup'
 import { createFileValidator } from './validation'

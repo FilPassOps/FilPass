@@ -1,5 +1,5 @@
 import { captureException } from '@sentry/nextjs'
-import aws from 'aws-sdk'
+import aws, { AWSError } from 'aws-sdk'
 import { createReadStream } from 'fs'
 import { last } from 'lodash'
 import { DateTime } from 'luxon'
@@ -20,7 +20,17 @@ const s3 = new aws.S3({
   signatureVersion: 'v4',
 })
 
-export const uploadFileToS3 = async ({ file, userId, type }) => {
+interface UploadFileToS3Params {
+  file: {
+    path: string
+    filename: string
+    originalname: string
+  }
+  userId: number
+  type: string
+}
+
+export const uploadFileToS3 = async ({ file, userId, type }: UploadFileToS3Params) => {
   const key = `${userId}/${type}/${file.filename}-${file.originalname}`
   try {
     await s3
@@ -37,19 +47,29 @@ export const uploadFileToS3 = async ({ file, userId, type }) => {
       },
     }
   } catch (error) {
+    const awsError = error as AWSError
     captureException(error)
     return {
       error: {
-        status: error.statusCode,
+        status: awsError.statusCode,
         errors: {
-          file: error.message,
+          file: awsError.message,
         },
       },
     }
   }
 }
 
-export const uploadFileToS3Temp = async ({ file, type }) => {
+interface UploadFileToS3Params {
+  file: {
+    path: string
+    filename: string
+    originalname: string
+  }
+  type: string
+}
+
+export const uploadFileToS3Temp = async ({ file, type }: UploadFileToS3Params) => {
   const timeStamp = DateTime.now().toMillis()
   const key = `temp/${type}/${timeStamp}/${file.filename}-${file.originalname}`
   try {
@@ -67,19 +87,26 @@ export const uploadFileToS3Temp = async ({ file, type }) => {
       },
     }
   } catch (error) {
+    const awsError = error as AWSError
     captureException(error)
     return {
       error: {
-        status: error.statusCode,
+        status: awsError.statusCode,
         errors: {
-          file: error.message,
+          file: awsError.message,
         },
       },
     }
   }
 }
 
-export const moveFileS3 = async ({ userId, type, source }) => {
+interface GetMoveFileS3Params {
+  userId: string
+  type: string
+  source: string
+}
+
+export const moveFileS3 = async ({ userId, type, source }: GetMoveFileS3Params) => {
   const fileName = last(source.split('/'))
   const key = `${userId}/${type}/${fileName}`
 
@@ -97,20 +124,25 @@ export const moveFileS3 = async ({ userId, type, source }) => {
       },
     }
   } catch (error) {
+    const awsError = error as AWSError
     captureException(error)
     console.log(error)
     return {
       error: {
-        status: error.statusCode,
+        status: awsError.statusCode,
         errors: {
-          file: error.message,
+          file: awsError.message,
         },
       },
     }
   }
 }
 
-export const removeFileFromS3 = async ({ key }) => {
+interface RemoveFileFromS3Params {
+  key: string
+}
+
+export const removeFileFromS3 = async ({ key }: RemoveFileFromS3Params) => {
   try {
     return await s3
       .deleteObject({
@@ -119,19 +151,24 @@ export const removeFileFromS3 = async ({ key }) => {
       })
       .promise()
   } catch (error) {
+    const awsError = error as AWSError
     captureException(error)
     return {
       error: {
-        status: error.statusCode,
+        status: awsError.statusCode,
         errors: {
-          file: error.message,
+          file: awsError.message,
         },
       },
     }
   }
 }
 
-export const getFile = async ({ key }) => {
+interface GetFileParams {
+  key: string
+}
+
+export const getFile = async ({ key }: GetFileParams) => {
   try {
     const response = await s3.getObject({ Bucket: BUCKET_NAME, Key: key }).promise()
 
@@ -145,31 +182,37 @@ export const getFile = async ({ key }) => {
       }
     }
 
-    return { data: Buffer.from(response.Body) }
+    return { data: Buffer.from(response.Body as Buffer) }
   } catch (error) {
+    const awsError = error as AWSError
     captureException(error)
     return {
       error: {
-        status: error.statusCode,
+        status: awsError.statusCode,
         errors: {
-          file: error.message,
+          file: awsError.message,
         },
       },
     }
   }
 }
 
-export const getReadStream = async ({ key }) => {
+interface GetReadStreamParams {
+  key: string
+}
+
+export const getReadStream = async ({ key }: GetReadStreamParams) => {
   try {
     const data = s3.getObject({ Bucket: BUCKET_NAME, Key: key }).createReadStream()
     return { data }
   } catch (error) {
+    const awsError = error as AWSError
     captureException(error)
     return {
       error: {
-        status: error.statusCode,
+        status: awsError.statusCode || 500,
         errors: {
-          file: error.message,
+          file: awsError.message,
         },
       },
     }
