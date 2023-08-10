@@ -1,4 +1,6 @@
 import { deliveryMethod as deliveryMethodConst, ONE_TIME } from 'domain/programs/constants'
+import { TOKEN } from 'system.config'
+import { formatPaymentMethod } from './formatPaymentMethod'
 
 export const generateApproversRoleOptions = approversData =>
   (approversData &&
@@ -33,33 +35,33 @@ export const formatProgramCurrency = program => {
 }
 
 export const findProgramPaymentMethod = program =>
-  paymentMethodOptions.find(option => option.label === `Request in ${program?.request_unit_name} and Pay in ${program?.payment_unit_name}`)
+  paymentMethodOptions.find(option => option.label === formatPaymentMethod(program?.request_unit_name, program?.payment_unit_name))
 
 export const paymentMethodOptions = [
   {
     value: 1,
-    label: 'Request in FIL and Pay in FIL',
+    label: formatPaymentMethod(TOKEN.symbol, TOKEN.symbol),
     programCurrency: [
       {
-        name: 'FIL',
+        name: TOKEN.symbol,
         type: 'REQUEST',
       },
       {
-        name: 'FIL',
+        name: TOKEN.symbol,
         type: 'PAYMENT',
       },
     ],
   },
   {
     value: 2,
-    label: 'Request in USD and Pay in FIL',
+    label: formatPaymentMethod(TOKEN.paymentUnit, TOKEN.symbol),
     programCurrency: [
       {
-        name: 'USD',
+        name: TOKEN.paymentUnit,
         type: 'REQUEST',
       },
       {
-        name: 'FIL',
+        name: TOKEN.symbol,
         type: 'PAYMENT',
       },
     ],

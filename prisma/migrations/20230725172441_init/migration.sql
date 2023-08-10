@@ -670,13 +670,3 @@ ALTER TABLE "auth_verification" ADD CONSTRAINT "auth_verification_user_id_fkey" 
 
 -- AddForeignKey
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- CURRENCIES
-INSERT INTO currency (id, name, rate, updated_at) VALUES (1, 'FIL', 1, now());
-INSERT INTO currency(id, name, rate, updated_at)  VALUES (2, 'USD', 0, now());
-
--- CURRENCY UNITS
-INSERT INTO currency_unit(id, currency_id, name, scale, updated_at) VALUES (1, 1, 'FIL', 0, now());
-INSERT INTO currency_unit(id, currency_id, name, scale, updated_at) VALUES (2, 1, 'NANOFIL', -9, now());
-INSERT INTO currency_unit(id, currency_id, name, scale, updated_at) VALUES (3, 1, 'ATTOFIL', -18, now());
-INSERT INTO currency_unit(id, currency_id, name, scale, updated_at) VALUES (4, 2, 'USD', 0, now());

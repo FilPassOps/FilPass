@@ -1,43 +1,41 @@
-import { CoinType } from '@glif/filecoin-address'
-
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID
-const FILECOIN_MAINNET_ID = '0x13a' // 314
-const FILECOIN_CALIBRATION_ID = '0x4cb2f' // 314159
+const MAINNET_ID = '0x89' // 137
+const TESTNET_ID = '0x13881' // 80001
 
-export const calibration = {
+export const testnet = {
   chain: {
-    chainId: FILECOIN_CALIBRATION_ID,
-    chainName: 'Filecoin - Calibration testnet',
+    chainId: TESTNET_ID,
+    chainName: 'Mumbai testnet',
     nativeCurrency: {
-      name: 'tFIL',
-      symbol: 'tFIL',
+      name: 'MATIC',
+      symbol: 'MATIC',
       decimals: 18,
     },
-    rpcUrls: ['https://api.calibration.node.glif.io'],
+    rpcUrls: ['https://rpc-mumbai.maticvigil.com'],
     blockExplorerUrls: ['https://calibration.filfox.info/en'],
   },
-  blockExplorerApi: 'https://calibration.filfox.info/api/v1',
-  coinType: CoinType.TEST,
+  blockExplorerApi: 'https://mumbai.polygonscan.com/',
+  coinType: null,
   multiforwarder: '0xbEF649DB6b4e1b2Ac044492433Bccca4287BE90F',
-  networkPrefix: 't',
+  networkPrefix: null,
 }
 
 export const mainnet = {
   chain: {
-    chainId: FILECOIN_MAINNET_ID,
-    chainName: 'Filecoin - Mainnet',
+    chainId: MAINNET_ID,
+    chainName: 'Polygon Mainnet',
     nativeCurrency: {
-      name: 'FIL',
-      symbol: 'FIL',
+      name: 'MATIC',
+      symbol: 'MATIC',
       decimals: 18,
     },
-    rpcUrls: ['https://api.node.glif.io'],
+    rpcUrls: ['https://polygon.llamarpc.com'],
     blockExplorerUrls: ['https://filfox.info/en'],
   },
-  blockExplorerApi: 'https://filfox.info/api/v1',
-  coinType: CoinType.MAIN,
+  blockExplorerApi: 'https://polygonscan.com',
+  coinType: null,
   multiforwarder: '0x593eD7Fc71F6bE340A993b809086159Fd9407c6a',
-  networkPrefix: 'f',
+  networkPrefix: null,
 }
 
-export default CHAIN_ID === FILECOIN_CALIBRATION_ID ? calibration : mainnet
+export default CHAIN_ID === TESTNET_ID ? testnet : mainnet

@@ -11,7 +11,7 @@ import yup from 'lib/yup'
 import { DateTime } from 'luxon'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { TOKEN_NAME, TOKEN_SYMBOL } from 'system.config'
+import { TOKEN } from 'system.config'
 
 type FormValue = yup.InferType<typeof updateCurrencyRateValidator>
 
@@ -31,7 +31,7 @@ export const TokenPrice = () => {
     resolver: yupResolver(updateCurrencyRateValidator),
     defaultValues: {
       rate: undefined,
-      name: TOKEN_SYMBOL,
+      name: TOKEN.symbol,
     },
   })
   const { rate, name } = watch()
@@ -76,7 +76,7 @@ export const TokenPrice = () => {
             // @ts-ignore
             className="pl-11 pointer-events-none font-medium text-gray-600"
             readOnly
-            value={TOKEN_NAME}
+            value={TOKEN.symbol}
           />
         </div>
         <div className="mb-3 relative">
@@ -112,5 +112,5 @@ export const TokenPrice = () => {
         </Button>
       </form>
     </div>
-  );
+  )
 }

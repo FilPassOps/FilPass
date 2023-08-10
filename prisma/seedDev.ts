@@ -7,7 +7,7 @@ import { DateTime } from 'luxon'
 import { encrypt, encryptPII } from '../lib/emissaryCrypto'
 loadEnvConfig(process.cwd(), true)
 
-import { EMAIL_DOMAIN } from '../system.config'
+import { EMAIL_DOMAIN, TOKEN } from '../system.config'
 
 const prisma = new PrismaClient()
 const salt = process.env.EMAIL_KEY || ''
@@ -533,7 +533,7 @@ async function createLinearVestingProgram() {
           {
             currency: {
               connect: {
-                name: 'USD',
+                name: TOKEN.paymentUnit,
               },
             },
             type: 'REQUEST',
@@ -541,7 +541,7 @@ async function createLinearVestingProgram() {
           {
             currency: {
               connect: {
-                name: 'FIL',
+                name: TOKEN.symbol,
               },
             },
             type: 'PAYMENT',
@@ -566,7 +566,7 @@ async function createOneTimeProgram() {
           {
             currency: {
               connect: {
-                name: 'FIL',
+                name: TOKEN.symbol,
               },
             },
             type: 'REQUEST',
@@ -574,7 +574,7 @@ async function createOneTimeProgram() {
           {
             currency: {
               connect: {
-                name: 'FIL',
+                name: TOKEN.symbol,
               },
             },
             type: 'PAYMENT',
