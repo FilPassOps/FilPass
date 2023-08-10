@@ -50,7 +50,7 @@ npm run migrate
 
 ## Application Start Up
 
-Before starting the application, make sure you have a file named `.env` in the root folder containing all environment variables defined at `.env-sample`, also found in the root folder.
+Before starting the application, make sure you have a file named `.env` in the root folder containing all environment variables defined at [env-vars](env-vars.md), also found in the root folder.
 
 ### Installing dependencies
 
@@ -68,10 +68,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Scripts
 
-- `ts-node scripts/decrypt.ts <your_encrypted_content>`
-  - Decrypts the argument using the current KMS environment configuration
-- `ts-node scripts/encrypt.ts <your_decrypted_content>`
-  - Encrypts the argument using the current KMS environment configuration
 - `node scripts/getDatabaseUsers.js`
   - Generates an AWS RDS IAM auth token based on the current DB environment variables
 - `node scripts/importFromCSV.js <file_path>`

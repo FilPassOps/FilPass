@@ -27,7 +27,7 @@ export const UserInfoSteps = ({ toBeginning, toEnd, totalSteps }: UserInfoStepsP
       try {
         const result = await api.post<UpdateUserResponse>('/users/current', {
           pii,
-          terms: termsAndConditions,
+          terms: termsAndConditions?.terms,
           taxForm,
           isOnboarded: true,
         })
