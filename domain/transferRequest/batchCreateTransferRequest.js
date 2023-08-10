@@ -1,5 +1,4 @@
 import { Role } from '@prisma/client'
-import { captureException } from '@sentry/nextjs'
 import { createTransferRequestSubmittedFormValidator } from 'domain/transferRequestDraft/validation'
 import { findUserTaxForm } from 'domain/user'
 import { batchCreateWallet } from 'domain/wallet/batchCreateWallet'
@@ -96,7 +95,6 @@ export async function prismaCreateUser(requests) {
     const createdUsers = await Promise.allSettled(createUserPromiseList)
     const values = createdUsers.map(({ value }) => value)
     if (createdUsers.find(req => req.status === 'rejected')) {
-      captureException(createdUsers)
       throw new TransactionError('Error while creating users', { status: 500 })
     }
     return values
@@ -128,7 +126,6 @@ export async function prismaCreateTransferRequest(requests, requesterId, approve
       if (requests.find(req => req.status === 'rejected')) {
         throw { status: 400, requests }
       }
-      captureException(requests)
       throw new TransactionError('Error while creating transfer requests', { status: 500 })
     }
 

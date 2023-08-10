@@ -1,5 +1,4 @@
 import { getGasEstimation, getNonce, sendTransaction, getWalletBalance } from 'lib/filecoinApi'
-import { captureException, captureMessage } from '@sentry/nextjs'
 import { ATTOFIL, FIL, convert, getMasterWallet, signMessage } from 'lib/filecoin'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
@@ -21,19 +20,13 @@ export async function sendFILWithMaster({ filAmount, address }: SendFILWithMaste
   const { data: masterBalance, error: balanceError } = (await getWalletBalance(masterWallet.address)) as FilecoinApiResult
 
   if (balanceError) {
-    captureException(balanceError)
-    return {
-      error: {
-        status: balanceError.status,
-        message: errorsMessages.something_went_wrong.message,
-      },
-    }
+    console.log('Error getting master wallet balance')
   }
 
   const masterWalletBalanceInFIL = convert(masterBalance.result, ATTOFIL, FIL).toString()
 
   if (+masterWalletBalanceInFIL < 0.5) {
-    captureMessage('Master Wallet balance is lower than 0.5 FIL')
+    console.log('Master Wallet balance is lower than 0.5 FIL')
   }
 
   const message = {
@@ -51,24 +44,12 @@ export async function sendFILWithMaster({ filAmount, address }: SendFILWithMaste
 
   const { data: gas, error: gasError } = (await getGasEstimation(message)) as FilecoinApiResult
   if (gasError) {
-    captureException(gasError)
-    return {
-      error: {
-        status: gasError.status,
-        message: errorsMessages.something_went_wrong.message,
-      },
-    }
+    console.log('Error getting gas estimation')
   }
 
   const { data: nonce, error: nonceError } = (await getNonce(masterWallet.address)) as FilecoinApiResult
   if (nonceError) {
-    captureException(nonceError)
-    return {
-      error: {
-        status: nonceError.status,
-        message: errorsMessages.something_went_wrong.message,
-      },
-    }
+    console.log('Error getting nonce')
   }
 
   const { GasLimit, GasFeeCap, GasPremium } = gas.result
@@ -82,13 +63,7 @@ export async function sendFILWithMaster({ filAmount, address }: SendFILWithMaste
   }
 
   if (+masterBalance.result < +message.Value + +GasFeeCap) {
-    captureMessage('Insufficient funds on the Master Wallet, cant validate wallet.')
-    return {
-      error: {
-        status: 400,
-        message: errorsMessages.something_went_wrong.message,
-      },
-    }
+    console.log('Insufficient funds on the Master Wallet, cant validate wallet.')
   }
 
   const signature = await signMessage(estimatedMessage)
@@ -96,13 +71,7 @@ export async function sendFILWithMaster({ filAmount, address }: SendFILWithMaste
 
   const { data: pushResponse, error: pushError } = (await sendTransaction(transaction)) as FilecoinApiResult
   if (pushError) {
-    captureException(pushError)
-    return {
-      error: {
-        status: pushError.status,
-        message: errorsMessages.something_went_wrong.message,
-      },
-    }
+    console.log('Error sending transaction')
   }
 
   return {

@@ -1,5 +1,3 @@
-const { withSentryConfig } = require('@sentry/nextjs')
-
 const moduleExports = {
   reactStrictMode: true,
   swcMinify: true,
@@ -9,19 +7,4 @@ const moduleExports = {
   },
 }
 
-const sentryWebpackPluginOptions = {
-  silent: true,
-}
-
-module.exports =
-  process.env.NODE_ENV === 'production'
-    ? withSentryConfig(
-        {
-          ...moduleExports,
-          sentry: {
-            hideSourceMaps: true,
-          },
-        },
-        sentryWebpackPluginOptions
-      )
-    : moduleExports
+module.exports = moduleExports

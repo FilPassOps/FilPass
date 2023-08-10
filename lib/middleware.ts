@@ -1,4 +1,3 @@
-import { captureException, withSentry } from '@sentry/nextjs'
 import crypto from 'crypto'
 import {
   ADDRESS_MANAGER_ROLE,
@@ -33,7 +32,7 @@ export type SessionUser = NonNullable<IronSessionData['user']>
 
 export type NextApiHandlerWithUser<ResponseType = any, RequestType extends NextApiRequestWithSession = NextApiRequestWithSession> = (
   req: RequestType,
-  res: NextApiResponse<ResponseType>
+  res: NextApiResponse<ResponseType>,
 ) => any | Promise<any>
 
 const APP_SECRET = process.env.APP_SECRET
@@ -62,15 +61,15 @@ const globalLimiter = rateLimit({
 })
 
 export function newHandler<T>(handler: NextApiHandler<T> | NextApiHandlerWithUser<T>) {
-  return withSentry(async (req: NextApiRequest, res: NextApiResponse<T | { message: string }>) => {
+  return async (req: NextApiRequest, res: NextApiResponse<T | { message: string }>) => {
     try {
       await handler(req, res)
     } catch (error: any) {
       console.log(error)
-      captureException(error)
+      console.log('Error in handler', error?.message ?? error)
       return res.status(error?.status ?? 500).json({ message: error?.message ?? 'An unexpected error happened. Please, try again.' })
     }
-  })
+  }
 }
 
 export function withMethods<T>(methods: Methods[] = [], handler: NextApiHandlerWithUser<T> | NextApiHandler<T>) {

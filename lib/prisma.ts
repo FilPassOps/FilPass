@@ -1,5 +1,4 @@
 import { Prisma, PrismaClient } from '@prisma/client'
-import { captureException } from '@sentry/nextjs'
 import { transferMiddleware, transferRequestMiddleware, userMiddleware } from 'prisma/middleware'
 
 // add prisma to the NodeJS global type
@@ -76,7 +75,7 @@ export async function newPrismaTransaction(fn: (transaction: Prisma.TransactionC
 
 export function reportTransactionException(error: any) {
   if (!error.status || error.status >= 500 || error.status < 400) {
-    captureException(error)
+    console.log('Transaction error: ', error)
   }
 }
 

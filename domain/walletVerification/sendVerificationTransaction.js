@@ -1,4 +1,3 @@
-import { captureException, captureMessage } from '@sentry/nextjs'
 import { ATTOFIL, FIL, convert, getMasterWallet, getVerificationAmount, signMessage } from 'lib/filecoin'
 import { getGasEstimation, getNonce, getWalletBalance, sendTransaction } from 'lib/filecoinApi'
 import prisma from 'lib/prisma'
@@ -53,18 +52,12 @@ export async function sendVerificationTransaction(params) {
   const { data: masterBalance, error: balanceError } = await getWalletBalance(masterWallet.address)
 
   if (balanceError) {
-    captureException(balanceError)
-    return {
-      error: {
-        status: balanceError.status,
-        message: errorsMessages.something_went_wrong.message,
-      },
-    }
+    console.log('Error getting master wallet balance')
   }
 
   const masterWalletBalanceInFIL = convert(masterBalance.result, ATTOFIL, FIL).toString()
   if (+masterWalletBalanceInFIL < 0.5) {
-    captureMessage('Master Wallet balance is lower than 0.5 FIL')
+    console.log('Master Wallet balance is lower than 0.5 FIL')
   }
 
   const message = {
@@ -151,24 +144,12 @@ export async function send(message, masterWallet, masterWalletBalance) {
 
   const { data: gas, error: gasError } = await getGasEstimation(message)
   if (gasError) {
-    captureException(gasError)
-    return {
-      error: {
-        status: gasError.status,
-        message: errorsMessages.something_went_wrong.message,
-      },
-    }
+    console.log('Error getting gas estimation')
   }
 
   const { data: nonce, error: nonceError } = await getNonce(masterWallet.address)
   if (nonceError) {
-    captureException(nonceError)
-    return {
-      error: {
-        status: nonceError.status,
-        message: errorsMessages.something_went_wrong.message,
-      },
-    }
+    console.log('Error getting nonce')
   }
 
   const { GasLimit, GasFeeCap, GasPremium } = gas.result
@@ -182,13 +163,7 @@ export async function send(message, masterWallet, masterWalletBalance) {
   }
 
   if (+masterWalletBalance < +message.value + +GasFeeCap) {
-    captureMessage('Insufficient funds on the Master Wallet, cant validate wallet.')
-    return {
-      error: {
-        status: 400,
-        message: errorsMessages.something_went_wrong.message,
-      },
-    }
+    console.log('Insufficient funds on the Master Wallet, cant validate wallet.')
   }
 
   const signature = await signMessage(estimatedMessage, masterWallet)
@@ -196,13 +171,7 @@ export async function send(message, masterWallet, masterWalletBalance) {
 
   const { data: pushResponse, error: pushError } = await sendTransaction(transaction)
   if (pushError) {
-    captureException(pushError)
-    return {
-      error: {
-        status: pushError.status,
-        message: errorsMessages.something_went_wrong.message,
-      },
-    }
+    console.log('Error pushing transaction')
   }
 
   return {

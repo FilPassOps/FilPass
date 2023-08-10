@@ -1,4 +1,3 @@
-import { captureException } from '@sentry/nextjs'
 import crypto from 'crypto'
 
 const CRYPTO_ALGORITHM = process.env.CRYPTO_ALGORITHM
@@ -28,7 +27,6 @@ async function baseEncrypt(key: string, rawData: string) {
     return encryptedBuffer.toString('base64')
   } catch (error) {
     console.error('Error encrypting data', error)
-    captureException(error)
     throw error
   }
 }
@@ -50,7 +48,6 @@ async function baseDecrypt(key: string, encryptedData: string) {
     return decrpytedBuffer.toString()
   } catch (error) {
     console.error('Error decrypting data', error)
-    captureException(error)
     throw error
   }
 }

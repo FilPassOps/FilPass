@@ -1,4 +1,3 @@
-import { captureException } from '@sentry/nextjs'
 import { generateSession } from 'domain/auth/session'
 import { signinWithGoogle } from 'domain/auth/signinWithGoogle'
 import { getGoogleUser } from 'lib/google/login'
@@ -8,7 +7,6 @@ async function handler(req, res) {
   const { data: googleUser, error: googleUserError } = await getGoogleUser({ code: req.body.code })
 
   if (googleUserError) {
-    captureException(googleUserError)
     console.log({ googleUserError })
     return res.status(googleUserError.status).json(googleUserError)
   }

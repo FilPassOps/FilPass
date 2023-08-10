@@ -1,4 +1,3 @@
-import { captureException } from '@sentry/nextjs'
 import aws, { AWSError } from 'aws-sdk'
 import { createReadStream } from 'fs'
 import { last } from 'lodash'
@@ -48,7 +47,6 @@ export const uploadFileToS3 = async ({ file, userId, type }: UploadFileToS3Param
     }
   } catch (error) {
     const awsError = error as AWSError
-    captureException(error)
     return {
       error: {
         status: awsError.statusCode,
@@ -88,7 +86,6 @@ export const uploadFileToS3Temp = async ({ file, type }: UploadFileToS3Params) =
     }
   } catch (error) {
     const awsError = error as AWSError
-    captureException(error)
     return {
       error: {
         status: awsError.statusCode,
@@ -125,7 +122,6 @@ export const moveFileS3 = async ({ userId, type, source }: GetMoveFileS3Params) 
     }
   } catch (error) {
     const awsError = error as AWSError
-    captureException(error)
     console.log(error)
     return {
       error: {
@@ -152,7 +148,6 @@ export const removeFileFromS3 = async ({ key }: RemoveFileFromS3Params) => {
       .promise()
   } catch (error) {
     const awsError = error as AWSError
-    captureException(error)
     return {
       error: {
         status: awsError.statusCode,
@@ -185,7 +180,6 @@ export const getFile = async ({ key }: GetFileParams) => {
     return { data: Buffer.from(response.Body as Buffer) }
   } catch (error) {
     const awsError = error as AWSError
-    captureException(error)
     return {
       error: {
         status: awsError.statusCode,
@@ -207,7 +201,6 @@ export const getReadStream = async ({ key }: GetReadStreamParams) => {
     return { data }
   } catch (error) {
     const awsError = error as AWSError
-    captureException(error)
     return {
       error: {
         status: awsError.statusCode || 500,
