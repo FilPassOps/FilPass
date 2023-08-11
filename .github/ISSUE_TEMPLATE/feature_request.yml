@@ -1,0 +1,22 @@
+name: Feature Requests
+description: Request a new feature for Emissary
+title: '[Feature Request]: '
+labels: ['Feature Request']
+body:
+  - type: textarea
+    validations:
+      required: true
+    attributes:
+      label: The vision
+      description: >-
+        Please provide a clear and concise description of the feature you would like to see implemented.
+  - type: textarea
+    attributes:
+      label: Use case
+      description: |
+        Describe what would be the use cases for the requested feature/
+  - type: textarea
+    attributes:
+      label: Additional information
+      description: >-
+        Provide any additional information that you feel will be valuable. If relevant, you can also provide screenshots.
