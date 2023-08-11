@@ -7,14 +7,14 @@ body:
     validations:
       required: true
     attributes:
-      label: The vision
+      label: Feature description
       description: >-
         Please provide a clear and concise description of the feature you would like to see implemented.
   - type: textarea
     attributes:
-      label: Use case
+      label: Use cases
       description: |
-        Describe what would be the use cases for the requested feature/
+        Describe what would be the use cases for the requested feature.
   - type: textarea
     attributes:
       label: Additional information
