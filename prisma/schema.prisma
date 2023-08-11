@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  // previewFeatures = ["extendedWhereUnique"]
 }
 
 datasource db {
@@ -61,10 +60,6 @@ enum FileType {
 enum ProgramCurrencyType {
   REQUEST
   PAYMENT
-}
-
-enum Blockchain {
-  FILECOIN
 }
 
 enum ProgramVisibility {
@@ -230,7 +225,8 @@ model UserWallet {
   verificationId   Int?                @map("verification_id")
   isActive         Boolean             @default(true) @map("is_active")
   address          String
-  blockchain       Blockchain
+  blockchain       Blockchain          @relation(fields: [blockchainId], references: [id])
+  blockchainId     Int                 @map("blockchain_id")
   name             String?
   createdAt        DateTime            @default(now()) @map("created_at")
   updatedAt        DateTime            @updatedAt @map("updated_at")
@@ -248,7 +244,8 @@ model WalletVerification {
   userId                    Int           @map("user_id")
   isVerified                Boolean       @default(false) @map("is_verified")
   isActive                  Boolean       @default(true) @map("is_active")
-  blockchain                Blockchain
+  blockchain                Blockchain    @relation(fields: [blockchainId], references: [id])
+  blockchainId              Int           @map("blockchain_id")
   address                   String
   transactionContent        Json          @map("transaction_content")
   transactionId             String        @map("transaction_id")
@@ -543,4 +540,15 @@ model NewsletterSubscriber {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("newsletter_subscriber")
+}
+
+model Blockchain {
+  id                 Int                  @id @unique
+  name               String               @unique
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @updatedAt @map("updated_at")
+  UserWallet         UserWallet[]
+  WalletVerification WalletVerification[]
+
+  @@map("blockchain")
 }

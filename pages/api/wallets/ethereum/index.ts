@@ -1,4 +1,3 @@
-import { Blockchain } from '@prisma/client'
 import { createEthereumWallet } from 'domain/wallet/createEthereumWallet'
 import { newHandler, NextApiRequestWithSession, withMethods, withUser, withValidation } from 'lib/middleware'
 import yup from 'lib/yup'
@@ -7,7 +6,7 @@ import { NextApiResponse } from 'next'
 const requestSchema = yup.object({
   walletAddress: yup.string().trim().required('Wallet address is required'),
   label: yup.string().trim(),
-  blockchain: yup.mixed<Blockchain>().oneOf([Blockchain.FILECOIN]).required(),
+  blockchain: yup.string().required(), // TODO OPEN-SOURCE: should be the id of the blockchain
 })
 
 interface EthereumWalletCreationReq extends NextApiRequestWithSession {

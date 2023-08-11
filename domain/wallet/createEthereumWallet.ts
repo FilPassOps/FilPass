@@ -1,4 +1,3 @@
-import { Blockchain } from '@prisma/client'
 import { sendWalletVerificationNotification } from 'domain/notifications/sendWalletVerificationNotification'
 import prisma from 'lib/prisma'
 
@@ -7,7 +6,7 @@ interface CreateEthereumWalletRequestParams {
   address: string
   label?: string
   email: string
-  blockchain: Blockchain
+  blockchain: string // TODO OPEN-SOURCE: should the id of the blockchain table
 }
 
 export async function createEthereumWallet(params: CreateEthereumWalletRequestParams) {
@@ -18,7 +17,7 @@ export async function createEthereumWallet(params: CreateEthereumWalletRequestPa
       data: {
         userId,
         address,
-        blockchain,
+        blockchainId: 1, // TODO OPEN-SOURCE: should get the value from params
         transactionContent: Math.floor(Math.random() * 1000000),
         transactionId: '0x',
         isVerified: true,
@@ -37,7 +36,7 @@ export async function createEthereumWallet(params: CreateEthereumWalletRequestPa
       create: {
         userId,
         address,
-        blockchain,
+        blockchainId: 1, // TODO OPEN-SOURCE: should get the value from params
         name: label,
         isActive: false,
         verificationId: walletVerification.id,

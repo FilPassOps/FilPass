@@ -12,9 +12,9 @@ import { USD } from 'domain/currency/constants'
 import { formatCrypto, formatCurrency } from 'lib/currency'
 import { shortenAddress } from 'lib/shortenAddress'
 import { useState } from 'react'
+import { SUPPORT_EMAIL, TOKEN } from 'system.config'
 import { Table, TableDiv, TableHeader } from './Table'
 import { TransactionParser } from './TransactionParser'
-import { SUPPORT_EMAIL } from 'system.config'
 
 interface ProgramCurrency {
   currency: {
@@ -141,7 +141,7 @@ const PaymentBatch = ({
             </div>
             <div className="flex items-center gap-2">
               <CurrencyDollarIcon className="w-6 text-gray-400" />
-              {formatCrypto(new Big(totalDollarAmount).div(rate).toFixed(2))} FIL
+              {formatCrypto(new Big(totalDollarAmount).div(rate).toFixed(2))} {TOKEN.symbol}
               <span className="text-sm "> ≈{formatCurrency(totalDollarAmount)}</span>
             </div>
           </div>

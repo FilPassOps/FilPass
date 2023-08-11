@@ -2,7 +2,6 @@ import yup from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
 import { MAX_INTEGER_VALUE } from '../constants'
-import { FILECOIN_BLOCKCHAIN } from './constants'
 
 export const createWalletValidator = yup
   .object({
@@ -10,7 +9,7 @@ export const createWalletValidator = yup
     verificationId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).typeError(errorsMessages.required_field.message),
     userId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).typeError(errorsMessages.required_field.message).required(),
     address: yup.string().required(),
-    blockchain: yup.string().oneOf([FILECOIN_BLOCKCHAIN]).required(),
+    blockchain: yup.string().required(), // TODO OPEN-SOURCE: should the id of the blockchain table
     isDefault: yup.bool(),
     email: yup.string().email().required(),
   })

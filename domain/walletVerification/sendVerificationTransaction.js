@@ -4,9 +4,9 @@ import { getGasEstimation, getNonce, getWalletBalance, sendTransaction } from 'l
 import prisma from 'lib/prisma'
 import { validate } from 'lib/yup'
 import { DateTime } from 'luxon'
+import { EMAIL_DOMAIN } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { sendVerificationTransactionValidator } from './validation'
-import { EMAIL_DOMAIN } from 'system.config'
 
 const ENABLE_BLOCKCHAIN_INTERACTION = process.env.ENABLE_BLOCKCHAIN_INTERACTION
 
@@ -91,7 +91,7 @@ export async function sendVerificationTransaction(params) {
   const verification = await prisma.walletVerification.create({
     data: {
       address,
-      blockchain,
+      blockchainId: 1, // TODO OPEN-SOURCE: should the id of the blockchain table
       transactionId,
       transactionAmount: value,
       transactionContent: signedTransaction,

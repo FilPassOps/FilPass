@@ -131,7 +131,7 @@ async function prismaCreateUserWallet(records, users) {
           userId: requestUser.id,
           isVerified: true,
           isActive: true,
-          blockchain: 'FILECOIN',
+          blockchainId: 1, // TODO OPEN-SOURCE: should the id of the blockchain table
           address: singleRecord['FIL Address'],
           transactionContent: {},
           transactionId: '',
@@ -144,7 +144,7 @@ async function prismaCreateUserWallet(records, users) {
           userId: requestUser.id,
           name: 'Imported by the finance team',
           address: singleRecord['FIL Address'],
-          blockchain: 'FILECOIN',
+          blockchainId: 1, // TODO OPEN-SOURCE: should the id of the blockchain table
           isDefault: true,
           verificationId: verification.id,
         },

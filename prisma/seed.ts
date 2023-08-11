@@ -54,6 +54,12 @@ async function createCurrencies() {
         rate: 0,
       },
     }),
+    prisma.blockchain.create({
+      data: {
+        id: 1,
+        name: TOKEN.name,
+      },
+    }),
   ])
   await prisma.currencyUnit.createMany({
     data: [

@@ -37,10 +37,12 @@ export async function createWallet(prisma, params) {
         verification.id = ${verificationId}
         AND verification.address = ${address}
         AND verification.user_id = ${userId}
-        AND verification.blockchain::text = ${blockchain}
+        AND verification.blockchain_id = 1
         AND verification.is_active = TRUE
     ) verification;
   `
+
+  // TODO OPEN-SOURCE: should the id of the blockchain table
 
   const { wallet_exists = 0, verification_used = 0, verification_match = 0 } = walletSearchResult
   if (wallet_exists > 0) {

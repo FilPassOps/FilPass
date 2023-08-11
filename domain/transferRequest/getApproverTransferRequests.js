@@ -99,7 +99,7 @@ export async function getApproverTransferRequests(params) {
           team,
           status: DRAFT_STATUS,
         }
-      })
+      }),
     )
     return {
       data: {
@@ -161,7 +161,7 @@ export async function getApproverTransferRequests(params) {
         transfer.amount_currency_unit_id                     transfer_amount_currency_unit_id,
         transfer_currency_unit.name                          transfer_amount_currency_unit,
         user_wallet.address                                  wallet_address,
-        user_wallet.blockchain                               wallet_blockchain,
+        blockchain.name                                      wallet_blockchain,
         wallet_verification.is_verified                      wallet_is_verified
     FROM user_role approver_role
             INNER JOIN user_role_program approver_program ON approver_program.user_role_id = approver_role.id AND approver_program.is_active = TRUE
@@ -176,6 +176,7 @@ export async function getApproverTransferRequests(params) {
                             AND program.is_active = TRUE
             LEFT JOIN user_wallet ON request.user_wallet_id = user_wallet.id
             LEFT JOIN wallet_verification ON user_wallet.verification_id = wallet_verification.id
+            LEFT JOIN blockchain ON blockchain.id = user_wallet.blockchain_id
     WHERE approver_role.is_active = TRUE
     AND approver_role.role::text = 'APPROVER'
     AND approver_role.user_id = ${approverId}
@@ -230,7 +231,7 @@ export async function getApproverTransferRequests(params) {
         delegated_address: getDelegatedAddress(request.wallet_address, WalletSize.VERY_SHORT)?.shortAddress,
         wallet_address: shortenAddress(request.wallet_address),
       }
-    })
+    }),
   )
 
   return {

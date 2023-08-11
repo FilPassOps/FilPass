@@ -82,7 +82,7 @@ export async function getComplianceTransferRequests(params: GetComplianceTransfe
         transfer.amount_currency_unit_id                     transfer_amount_currency_unit_id,
         transfer_currency_unit.name                          transfer_amount_currency_unit,
         user_wallet.address                                  wallet_address,
-        user_wallet.blockchain                               wallet_blockchain,
+        blockchain.name                                      wallet_blockchain,
         wallet_verification.is_verified                      wallet_is_verified
     FROM transfer_request request
             LEFT JOIN transfer ON transfer.transfer_request_id = request.id AND transfer.is_active = TRUE
@@ -95,6 +95,7 @@ export async function getComplianceTransferRequests(params: GetComplianceTransfe
                             AND program.is_active = TRUE
             LEFT JOIN user_wallet ON request.user_wallet_id = user_wallet.id
             LEFT JOIN wallet_verification ON user_wallet.verification_id = wallet_verification.id
+            LEFT JOIN blockchain ON user_wallet.blockchain_id = blockchain.id
     WHERE request.is_active = TRUE
     AND request.status::text = ${BLOCKED_STATUS}
     ${programFilter}
@@ -141,7 +142,7 @@ export async function getComplianceTransferRequests(params: GetComplianceTransfe
         amount,
         team,
       }
-    })
+    }),
   )
 
   return {

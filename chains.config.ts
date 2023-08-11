@@ -1,3 +1,5 @@
+import { CoinType } from '@glif/filecoin-address'
+
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID
 const MAINNET_ID = '0x89' // 137
 const TESTNET_ID = '0x13881' // 80001
@@ -15,9 +17,9 @@ export const testnet = {
     blockExplorerUrls: ['https://calibration.filfox.info/en'],
   },
   blockExplorerApi: 'https://mumbai.polygonscan.com/',
-  coinType: null,
+  coinType: CoinType.TEST, // TODO OPEN-SOURCE: should be null
   multiforwarder: '0xbEF649DB6b4e1b2Ac044492433Bccca4287BE90F',
-  networkPrefix: null,
+  networkPrefix: 't', // TODO OPEN-SOURCE: should be null
 }
 
 export const mainnet = {
@@ -33,9 +35,9 @@ export const mainnet = {
     blockExplorerUrls: ['https://filfox.info/en'],
   },
   blockExplorerApi: 'https://polygonscan.com',
-  coinType: null,
+  coinType: CoinType.MAIN, // TODO OPEN-SOURCE: should be null
   multiforwarder: '0x593eD7Fc71F6bE340A993b809086159Fd9407c6a',
-  networkPrefix: null,
+  networkPrefix: 'f', // TODO OPEN-SOURCE: should be null
 }
 
 export default CHAIN_ID === TESTNET_ID ? testnet : mainnet

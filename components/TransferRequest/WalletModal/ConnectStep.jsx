@@ -2,11 +2,11 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { useAuth } from 'components/Authentication/Provider'
 import { Button } from 'components/shared/Button'
 import { TextInput } from 'components/shared/FormInput'
-import { FILECOIN_BLOCKCHAIN } from 'domain/wallet/constants'
 import { connectWalletStepValidator } from 'domain/walletVerification/validation'
 import { api } from 'lib/api'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { TOKEN } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
 export function ConnectStep({ onBackClick, onNextStepClick, connectionMethod, wallet }) {
@@ -19,7 +19,7 @@ export function ConnectStep({ onBackClick, onNextStepClick, connectionMethod, wa
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      blockchain: FILECOIN_BLOCKCHAIN,
+      blockchain: TOKEN.name, // TODO OPEN-SOURCE: should the id of the blockchain table
       address: connectionMethod === 'Metamask' ? wallet : '',
     },
     resolver: yupResolver(connectWalletStepValidator),

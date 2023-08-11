@@ -13,6 +13,7 @@ import { formatCrypto, formatCurrency } from 'lib/currency'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { TOKEN } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { ErrorAlert, SuccessAlert } from './Alerts'
 import PaymentBatch from './PaymentBatch'
@@ -90,7 +91,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
 
     setTotalDollarAmount(totalDollarAmount)
     setPaymentBatchList(
-      [...blsChunks, ...nonBlsChunks].map(data => ({ isNonBls: data[0].wallet.address.charAt(1) !== '3', data, isPaymentSent: false }))
+      [...blsChunks, ...nonBlsChunks].map(data => ({ isNonBls: data[0].wallet.address.charAt(1) !== '3', data, isPaymentSent: false })),
     )
   }, [data, filecoin])
 
@@ -263,11 +264,11 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
         )}
         <div className="py-6 md:p-6 border-b border-gray-200">
           <h1 className="text-base md:text-lg text-gray-900 font-medium mb-2">
-            Total payout amount: {formatCrypto(new Big(totalDollarAmount).div(rate).toFixed(2))} FIL
+            Total payout amount: {formatCrypto(new Big(totalDollarAmount).div(rate).toFixed(2))} {TOKEN.symbol}
             <span className="text-sm text-gray-500"> ≈{formatCurrency(totalDollarAmount)}</span>
           </h1>
           <p className="text-xs md:text-sm text-gray-500">
-            1 FIL = {`${formatCurrency(rate)}`} ({updatedAt} updated)
+            1 {TOKEN.symbol} = {`${formatCurrency(rate)}`} ({updatedAt} updated)
           </p>
         </div>
         {currentBatch && (

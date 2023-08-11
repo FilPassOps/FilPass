@@ -1,9 +1,9 @@
 import { TransactionError } from 'lib/errors'
 import { matchWalletAddress } from 'lib/filecoinShipyard'
+import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 import prisma, { newPrismaTransaction } from 'lib/prisma'
 import _ from 'lodash'
 import errorsMessages from 'wordings-and-errors/errors-messages'
-import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 
 export const batchCreateWallet = async (requests, users, isBatchCsv) => {
   const validatePromiseList = requests.map(async (singleRequest, index) => {
@@ -19,7 +19,7 @@ export const batchCreateWallet = async (requests, users, isBatchCsv) => {
 
   if (foundRejected) {
     const errors = validatedWallets.map(({ status, reason }) =>
-      status === 'rejected' ? { wallet: { message: reason?.message ?? errorsMessages.wallet_incorrect.message } } : null
+      status === 'rejected' ? { wallet: { message: reason?.message ?? errorsMessages.wallet_incorrect.message } } : null,
     )
     return {
       error: {
@@ -106,7 +106,7 @@ const createWallets = async requests => {
             userId: singleRequest.receiver.id,
             name: 'created by approver',
             address: singleRequest.wallet.address,
-            blockchain: 'FILECOIN',
+            blockchainId: 1, // TODO OPEN-SOURCE: should the id of the blockchain table
             isDefault: false,
           },
         })
@@ -126,7 +126,7 @@ const createWallets = async requests => {
       if (reason.code === 'P2002') {
         throw new TransactionError(
           'Please update the file so you are only adding 1 wallet per user. If you are adding multiple requests for 1 user, add the wallet to the first request and keep wallet on other requests blank.',
-          { status: 400 }
+          { status: 400 },
         )
       }
       throw new TransactionError('Error while creating wallets', { status: 500 })
@@ -191,7 +191,7 @@ const cleanRequests = requests => {
   return requests.map(request => {
     if (!uniqueRequests.find(r => r.row === request.row)) {
       const createdWallet = requests.find(
-        r => r.wallet.address === request.wallet.address && r.receiverEmail === request.receiverEmail
+        r => r.wallet.address === request.wallet.address && r.receiverEmail === request.receiverEmail,
       ).wallet
       return { ...request, wallet: createdWallet }
     } else {

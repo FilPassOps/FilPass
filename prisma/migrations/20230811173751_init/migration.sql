@@ -39,9 +39,6 @@ CREATE TYPE "FileType" AS ENUM ('W8_FORM', 'W9_FORM', 'ATTACHMENT');
 CREATE TYPE "ProgramCurrencyType" AS ENUM ('REQUEST', 'PAYMENT');
 
 -- CreateEnum
-CREATE TYPE "Blockchain" AS ENUM ('FILECOIN');
-
--- CreateEnum
 CREATE TYPE "ProgramVisibility" AS ENUM ('EXTERNAL', 'INTERNAL');
 
 -- CreateEnum
@@ -162,7 +159,7 @@ CREATE TABLE "user_wallet" (
     "verification_id" INTEGER,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
     "address" TEXT NOT NULL,
-    "blockchain" "Blockchain" NOT NULL,
+    "blockchain_id" INTEGER NOT NULL,
     "name" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -177,7 +174,7 @@ CREATE TABLE "wallet_verification" (
     "user_id" INTEGER NOT NULL,
     "is_verified" BOOLEAN NOT NULL DEFAULT false,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
-    "blockchain" "Blockchain" NOT NULL,
+    "blockchain_id" INTEGER NOT NULL,
     "address" TEXT NOT NULL,
     "transaction_content" JSONB NOT NULL,
     "transaction_id" TEXT NOT NULL,
@@ -428,6 +425,16 @@ CREATE TABLE "newsletter_subscriber" (
     CONSTRAINT "newsletter_subscriber_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "blockchain" (
+    "id" INTEGER NOT NULL,
+    "name" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "blockchain_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
@@ -548,6 +555,12 @@ CREATE UNIQUE INDEX "newsletter_subscriber_email_key" ON "newsletter_subscriber"
 -- CreateIndex
 CREATE UNIQUE INDEX "newsletter_subscriber_email_hash_key" ON "newsletter_subscriber"("email_hash");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "blockchain_id_key" ON "blockchain"("id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "blockchain_name_key" ON "blockchain"("name");
+
 -- AddForeignKey
 ALTER TABLE "user" ADD CONSTRAINT "user_ban_actioned_by_id_fkey" FOREIGN KEY ("ban_actioned_by_id") REFERENCES "user_role"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
@@ -585,7 +598,13 @@ ALTER TABLE "user_wallet" ADD CONSTRAINT "user_wallet_user_id_fkey" FOREIGN KEY 
 ALTER TABLE "user_wallet" ADD CONSTRAINT "user_wallet_verification_id_fkey" FOREIGN KEY ("verification_id") REFERENCES "wallet_verification"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "user_wallet" ADD CONSTRAINT "user_wallet_blockchain_id_fkey" FOREIGN KEY ("blockchain_id") REFERENCES "blockchain"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "wallet_verification" ADD CONSTRAINT "wallet_verification_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "wallet_verification" ADD CONSTRAINT "wallet_verification_blockchain_id_fkey" FOREIGN KEY ("blockchain_id") REFERENCES "blockchain"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "wallet_verification" ADD CONSTRAINT "wallet_verification_transaction_currency_unit_id_fkey" FOREIGN KEY ("transaction_currency_unit_id") REFERENCES "currency_unit"("id") ON DELETE SET NULL ON UPDATE CASCADE;

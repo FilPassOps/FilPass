@@ -602,8 +602,8 @@ async function createUser(index: number) {
   const t1Wallet = await prisma.userWallet.create({
     data: {
       address: 't1d6udrjruc3iqhyhrd2rjnjkhzsa6gd6tb63oi6i',
-      blockchain: 'FILECOIN',
       userId: user.id,
+      blockchainId: 1,
       isDefault: true,
     },
   })
@@ -611,7 +611,7 @@ async function createUser(index: number) {
   const t3Wallet = await prisma.userWallet.create({
     data: {
       address: 't3vw7ph2pbdvwfmkhjy52pfnjkglspzq45batjybrpgrw7etpii3nc7l2sz6x6uumpc32hnhkf5qc3kj5zimeq',
-      blockchain: 'FILECOIN',
+      blockchainId: 1,
       userId: user.id,
       isDefault: false,
     },

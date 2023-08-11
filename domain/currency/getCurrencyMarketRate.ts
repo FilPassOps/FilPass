@@ -59,6 +59,6 @@ export async function getCurrencyMarketRate(params: GetCurrencyMarketRateParams)
   }
 }
 
-const coinMarketCapCurrencyMap: Record<string, string> = {
+const coinMarketCapCurrencyMap: Record<string, number> = {
   [TOKEN.symbol]: TOKEN.coinMarketApiCode,
 }
