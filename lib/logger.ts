@@ -13,7 +13,7 @@ const winstonProdOptions: winston.LoggerOptions = {
     }),
     winston.format.printf(({ label, timestamp, level, message, ...metadata }) => {
       let logString = `${label} ${timestamp} [${level}]: ${message}`
-      if (metadata) {
+      if (metadata.length > 0) {
         logString += '\n' + JSON.stringify(metadata, null, 2).replace(/\\n/g, '\n')
       }
       return logString
@@ -33,7 +33,7 @@ const winstonDevOptions: winston.LoggerOptions = {
     }),
     winston.format.printf(({ label, timestamp, level, message, ...metadata }) => {
       let logString = `${label} ${timestamp} [${level}]: ${message}`
-      if (metadata) {
+      if (metadata.length > 0) {
         logString += '\n' + JSON.stringify(metadata, null, 2).replace(/\\n/g, '\n')
       }
       return logString
