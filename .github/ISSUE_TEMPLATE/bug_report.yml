@@ -10,12 +10,12 @@ body:
         - label: I verified that the issue exists in the latest Emissary release.
           required: true
       description: >-
-        'Please check the latest version of Emissary. Some issues may already be fixed in the latest version, so please verify that your issue reproduces before opening a new issue.'
+        Please check the latest version of Emissary. Some issues may already be fixed in the latest version, so please verify that your issue reproduces before opening a new issue.
   - type: textarea
     validations:
       required: true
     attributes:
-      label: To Reproduce
+      label: Steps to Reproduce
       description: >-
         Steps to reproduce the behavior, please provide a clear description of how to reproduce the issue. If relevant, you can provide screenshots on the issue body below.
   - type: textarea
@@ -39,4 +39,4 @@ body:
     attributes:
       label: Which browser are you using?
       description: >-
-        'If possible, provide the detailed version. For example: Chrome 115.0.5790.170'
+        If possible, provide the detailed version. For example: Chrome 115.0.5790.170
