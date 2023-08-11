@@ -2,6 +2,7 @@ import { sendBatchEmail } from 'lib/sendEmail'
 import { validate } from 'lib/yup'
 import { baseEmail } from './constants'
 import { sendTaxFormRejectedNotificationValidator } from './validation'
+import { logger } from 'lib/logger'
 
 interface SendTaxFormRejectedNotificationParams {
   emails: string[]
@@ -28,10 +29,9 @@ export async function sendTaxFormRejectedNotification(params: SendTaxFormRejecte
     subject: 'Tax document rejected',
     html: emailBody,
   }
-
   const fulfilledPromises = await sendBatchEmail(content)
   const rejecteds = fulfilledPromises?.filter(fulfilledPromise => fulfilledPromise.status === 'rejected') as PromiseRejectedResult[]
-  rejecteds.forEach(rejected => console.log('failed to notify user - could not send email ', `error:${rejected.reason}`))
+  rejecteds.forEach(rejected => logger.error(`Failed to notify user - could not send email for email:${rejected.reason.email}`, rejected.reason.error))
 }
 
 const getBody = (rejectionReason: string) => {

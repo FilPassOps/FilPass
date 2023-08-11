@@ -4,6 +4,7 @@ import { validateWalletAddress } from 'lib/filecoinShipyard'
 import { amountConverter, getDelegatedAddress, hexAddressDecoder } from 'lib/getDelegatedAddress'
 import prisma from 'lib/prisma'
 import { TransferResult, select, updateTransfer } from './paymentDbTransferVerificationJob'
+import { logger } from 'lib/logger'
 
 interface TransferPaymentConfirmParams {
   id: string
@@ -61,7 +62,11 @@ export const transferPaymentConfirm = async ({ id, to, from, value, transactionH
   processPayment(pendingTransfersWithNoTxHash, to, value, transactionHash)
 
   if (pendingTransfersWithNoTxHash.length > 0) {
-    console.log('Transfer request with no transaction hash set as Paid')
+    logger.warning('Transfer request with no transaction hash set as Paid', {
+      transferRef: id,
+      transactionHash: transactionHash,
+      transferIds: pendingTransfersWithNoTxHash.map(transfer => transfer.id),
+    })
   }
 }
 
@@ -83,7 +88,11 @@ const processPayment = async (pendingTransfers: TransferResult[], to: string[], 
           transfers.push(transfer)
         }
       } catch (error) {
-        console.log('Error verifying payment - invalid wallet address')
+        logger.error('Error verifying payment - invalid wallet address', {
+          transferRef: transfer.transferRef,
+          transactionHash: transactionHash,
+          walletAddress: transfer.transferRequest.wallet.address,
+        })
       }
     }
 
@@ -101,7 +110,7 @@ const processPayment = async (pendingTransfers: TransferResult[], to: string[], 
             sendEmail,
           })
         } catch (error) {
-          console.log('Error updating transfer', error)
+          logger.error('Error updating transfer', error)
         }
       }
     }

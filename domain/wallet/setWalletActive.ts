@@ -2,6 +2,7 @@ import { sendMetaMaskConnectionReward } from 'domain/reward/sendMetaMaskConnecti
 import { decryptPII } from 'lib/emissaryCrypto'
 import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { verify } from 'lib/jwt'
+import { logger } from 'lib/logger'
 import prisma from 'lib/prisma'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
@@ -40,7 +41,7 @@ export const setWalletActive = async ({ token }: SetWalletActiveParams) => {
       const delegatedAddress = getDelegatedAddress(address)
 
       if (!delegatedAddress?.fullAddress) {
-        console.log('Delegated address not found while rewarding')
+        logger.error('Delegated address not found while rewarding')
         return {
           error: null,
         }

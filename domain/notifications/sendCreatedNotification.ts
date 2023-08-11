@@ -3,6 +3,7 @@ import { validate } from 'lib/yup'
 import { DateTime } from 'luxon'
 import { baseEmail } from './constants'
 import { sendCreatedNotificationValidator } from './validation'
+import { logger } from 'lib/logger'
 
 interface SendCreatedNotificationParams {
   email: string
@@ -37,7 +38,7 @@ export async function sendCreatedNotification(params: SendCreatedNotificationPar
       html: emailBody,
     })
   } catch (error) {
-    console.log('failed to notify user - could not send email ', `transferRequestId:${transferRequestId} `, `error:${error}`)
+    logger.error(`Failed to notify user - could not send email for transferRequestId:${transferRequestId}`, error)
   }
 }
 

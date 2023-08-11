@@ -1,4 +1,5 @@
 import crypto from 'crypto'
+import { logger } from './logger'
 
 const CRYPTO_ALGORITHM = process.env.CRYPTO_ALGORITHM
 const CRYPTO_SECRET_KEY = process.env.CRYPTO_SECRET_KEY
@@ -26,7 +27,7 @@ async function baseEncrypt(key: string, rawData: string) {
 
     return encryptedBuffer.toString('base64')
   } catch (error) {
-    console.error('Error encrypting data', error)
+    logger.error('Error encrypting data', error)
     throw error
   }
 }
@@ -47,7 +48,7 @@ async function baseDecrypt(key: string, encryptedData: string) {
 
     return decrpytedBuffer.toString()
   } catch (error) {
-    console.error('Error decrypting data', error)
+    logger.error('Error decrypting data', error)
     throw error
   }
 }

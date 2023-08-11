@@ -3,6 +3,7 @@ import { validate } from 'lib/yup'
 import { baseEmail } from './constants'
 import { sendEmailVerificationValidator } from './validation'
 import { PLATFORM_NAME } from 'system.config'
+import { logger } from 'lib/logger'
 
 interface SendPIIRejectedNotificationParams {
   email: string
@@ -33,7 +34,7 @@ export async function sendPIIRejectedNotification(params: SendPIIRejectedNotific
   try {
     await sendEmail(content)
   } catch (error) {
-    console.log('failed to notify user - could not send email ', `user email:${email} `, `error:${error}`)
+    logger.error(`Failed to notify user - could not send email for email:${email}`, error)
   }
 }
 

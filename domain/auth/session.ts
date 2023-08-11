@@ -1,4 +1,5 @@
 import { Session } from '@prisma/client'
+import { logger } from 'lib/logger'
 import prisma from 'lib/prisma'
 import { maxAge } from 'lib/session'
 import { DateTime } from 'luxon'
@@ -25,8 +26,7 @@ export const invalidateSession = async ({ sessionId }: InvalidateSessionRequest)
   try {
     return await prisma.session.update({ where: { id: sessionId }, data: { isValid: false }, select: { id: true, isValid: true } })
   } catch (err) {
-    console.log(err)
-
+    logger.error('Error invalidating session', err)
     return { id: sessionId, isValid: false }
   }
 }

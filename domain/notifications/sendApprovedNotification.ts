@@ -4,6 +4,7 @@ import { validate } from 'lib/yup'
 import { DateTime } from 'luxon'
 import { baseEmail } from './constants'
 import { sendApprovedNotificationValidator } from './validation'
+import { logger } from 'lib/logger'
 
 interface SendApprovedNotificationParams {
   encryptedEmail: string
@@ -34,7 +35,7 @@ export async function sendApprovedNotification(params: SendApprovedNotificationP
   try {
     decryptedEmail = await decryptPII(encryptedEmail)
   } catch (error) {
-    console.log('failed to notify approver - could not decrypt email ', `transferRequestId:${transferRequestId} `, `error:${error}`)
+    logger.error(`Error decrypting email for transferRequestId:${transferRequestId}`, error)
     return
   }
 
@@ -46,9 +47,9 @@ export async function sendApprovedNotification(params: SendApprovedNotificationP
       subject: 'Transfer request approved',
       html: emailBody,
     })
-    console.log('successfully notified user - sent email ', `transferRequestId:${transferRequestId} `)
+    logger.info(`Successfully notified user - sent email for transferRequestId:${transferRequestId}`)
   } catch (error) {
-    console.log('failed to notify user - could not send email ', `transferRequestId:${transferRequestId} `, `error:${error}`)
+    logger.error(`Failed to notify user - could not send email for transferRequestId:${transferRequestId}`, error)
   }
 }
 
@@ -62,7 +63,7 @@ const getBody = ({ expectedTransferDate, transferRequestId }: GetBodyParams) => 
           <p style="margin:0; color: #6B7280;line-height: 24px;">
             Hello, <br /> <br />
             Your transfer request has been approved and will be paid before ${DateTime.fromISO(
-              new Date(expectedTransferDate).toISOString()
+              new Date(expectedTransferDate).toISOString(),
             ).toLocaleString(DateTime.DATE_SHORT)}.
             <br/><br/>
             Our finance team is actively processing your payment. It usually takes one to two weeks for your funds to go out.<br/><br/>

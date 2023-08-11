@@ -5,7 +5,6 @@ const MyError = ({ statusCode, hasGetInitialPropsRun, err }) => {
     // getInitialProps is not called in case of
     // https://github.com/vercel/next.js/issues/8592. As a workaround, we pass
     // err via _app.js so it can be captured
-    console.log('err', err)
   }
 
   return <NextErrorComponent statusCode={statusCode} />
@@ -38,8 +37,6 @@ MyError.getInitialProps = async context => {
   //    Boundaries: https://reactjs.org/docs/error-boundaries.html
 
   if (err) {
-    console.log('err', err)
-
     return errorInitialProps
   }
 

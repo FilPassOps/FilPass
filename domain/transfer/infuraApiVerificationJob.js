@@ -11,6 +11,7 @@ import { ATTOFIL, FIL, convert } from 'lib/filecoin'
 import { chainGetMessageId } from 'lib/filecoinApi'
 import { getPrismaClient, newPrismaTransaction } from 'lib/prisma'
 import { FILECOIN_CURRENCY_NAME, PENDING_STATUS, SUCCESS_STATUS } from './constants'
+import { logger } from 'lib/logger'
 
 const limiter = new Bottleneck({
   maxConcurrent: 1,
@@ -59,7 +60,7 @@ export async function run() {
       updated: 0,
       failed: 0,
       remaining: pendingTransfers.length,
-    }
+    },
   )
 
   return {
@@ -71,13 +72,13 @@ async function verifyAndUpdate({ id, transaction }) {
   const { data } = await chainGetMessageId(transaction)
 
   if (data?.error) {
-    console.log('Error getting message id', data)
+    logger.error('Error getting message id', data)
     return false
   }
 
   // get transferRef -> it's the relation between chain and transfer
   if (!data?.result?.Params) {
-    console.log('No Params found')
+    logger.error('No Params found')
     return false
   }
   const transferRef = Buffer.from(data?.result?.Params, 'base64').toString('utf-8')
@@ -105,15 +106,15 @@ async function verifyAndUpdate({ id, transaction }) {
     },
   })
   if (!transfer) {
-    console.log('Transfer not found', { status: 404 })
+    logger.error('Transfer not found', { status: 404 })
     return false
   }
 
   const transferWalletAddress = transfer.transferRequest.wallet.address
   if (transferWalletAddress !== data.result.To) {
-    console.log(
+    logger.error(
       `Transaction wallet address doesn't match request wallet address `,
-      `Found:${data.result.To} Actual:${transferWalletAddress} Params:${data.result.Params}`
+      `Found:${data.result.To} Actual:${transferWalletAddress} Params:${data.result.Params}`,
     )
     return false
   }
@@ -210,7 +211,7 @@ async function updateTransfer({ id, transferId, transferRequest, txHash, amount 
   })
 
   if (error) {
-    console.log('Infura API verification job - Error updating transfer: ', error)
+    logger.error('Infura API verification job - Error updating transfer: ', error)
   }
 
   return !error

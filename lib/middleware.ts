@@ -23,6 +23,7 @@ import { tmpdir } from 'os'
 import { AnyObjectSchema } from 'yup'
 import { extractRoles } from './auth'
 import yup from './yup'
+import { logger } from './logger'
 
 type Methods = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE' | 'CONNECT' | 'OPTIONS' | 'TRACE' | 'PATCH'
 
@@ -65,8 +66,7 @@ export function newHandler<T>(handler: NextApiHandler<T> | NextApiHandlerWithUse
     try {
       await handler(req, res)
     } catch (error: any) {
-      console.log(error)
-      console.log('Error in handler', error?.message ?? error)
+      logger.error('Error in handler', error)
       return res.status(error?.status ?? 500).json({ message: error?.message ?? 'An unexpected error happened. Please, try again.' })
     }
   }
