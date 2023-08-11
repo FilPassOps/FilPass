@@ -1,18 +1,42 @@
-# Coin Emissary
+
+<h1 align="center">Emissary</h1>
+
+<p align="center">
+  <a aria-label="Protocol Labs badge" href="https://protocol.ai/">
+    <img src="https://img.shields.io/badge/MADE%20BY%20Protocol%20Labs-000000?style=for-the-badge">
+  </a>
+  <a aria-label="License" href="#license">
+    <img alt="" src="https://img.shields.io/badge/MIT-%234F46E5?style=for-the-badge&label=LICENSE&labelColor=000000">
+  </a>
+  <a aria-label="Join the community" href="https://filecoinproject.slack.com/">
+    <img alt="" src="https://img.shields.io/badge/Join%20the%20community-emissary?style=for-the-badge&logo=slack&color=%234F46E5">
+  </a>
+</p>
+
 
 ## Introduction
 
-This is the README file for Coin Emissary. It provides information about the application's setup, configuration, and usage.
+Emissary streamlines your invoicing workflow, making cryptocurrency transfer management effortless!
 
 ## Table of Contents
 
+- [Introduction](#introduction)
+- [Table of Contents](#table-of-contents)
 - [Database Setup](#database-setup)
+  - [Starting the container](#starting-the-container)
+  - [Running migrations](#running-migrations)
+  - [Seeding the database](#seeding-the-database)
 - [Application Start Up](#application-start-up)
+  - [Installing dependencies](#installing-dependencies)
+  - [Running the application](#running-the-application)
 - [Scripts](#scripts)
 - [Database Migrations](#database-migrations)
+  - [DDL Migrations (Structural changes)](#ddl-migrations-structural-changes)
+  - [DML Migrations (Data changes)](#dml-migrations-data-changes)
 - [Tests](#tests)
 - [Contract Tests](#contract-tests)
 - [License](#license)
+- [Security](#security)
 
 ## Database Setup
 
@@ -127,3 +151,9 @@ npm run test-contract
 ## License
 
 This project is open-source under the [MIT License](LICENSE).
+
+## Security
+
+Your cooperation in maintaining the security of Emissary is highly appreciated. If you have identified a potential security vulnerability within the Emissary project, we kindly request that you handle the situation by following responsible disclosure practices, refraining from publicly posting the issue.
+
+Rest assured, all credible and legitimate reports will be thoroughly investigated. To report any security vulnerabilities, please reach out to us via email at [emissary@protocol.ai](mailto:emissary@protocol.ai). Your vigilance contributes to the ongoing security of the project and is essential in ensuring the privacy and integrity of the Emissary application.
