@@ -19,6 +19,7 @@ import { shortenAddress } from 'lib/shortenAddress'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
+import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
 
 const TransferList = ({
   requests = [],
@@ -148,7 +149,7 @@ const TransferList = ({
                   <LinkedCell href={href}>{request.team}</LinkedCell>
                   <LinkedCell href={href}>
                     {DateTime.fromISO(request.status === PAID_STATUS ? request.updatedAt : request.createdAt).toLocaleString(
-                      DateTime.DATETIME_SHORT_WITH_SECONDS
+                      DateTime.DATETIME_SHORT_WITH_SECONDS,
                     )}
                   </LinkedCell>
                   <LinkedCell href={href}>
@@ -193,9 +194,10 @@ const TransferList = ({
                         className="h-full flex items-center justify-center flex-col space-y-4 2xl:space-y-0 2xl:space-x-4 2xl:flex-row"
                         onClick={e => e.stopPropagation()}
                       >
-                        <Button variant="outline-green" onClick={() => onSinglePayClick(request)}>
+                        <WithMetaMaskButton variant="outline-green" onClick={() => onSinglePayClick(request)} defaultLabel='Pay'>
                           Pay
-                        </Button>
+                        </WithMetaMaskButton>
+
                         <Button variant="outline-red" onClick={() => onSingleRejectClick(request)}>
                           Reject
                         </Button>

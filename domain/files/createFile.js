@@ -2,6 +2,7 @@ import { uploadFileToS3 } from 'lib/fileUpload'
 import { getPrismaClient } from 'lib/prisma'
 import { validate } from 'lib/yup'
 import { createFileValidator } from './validation'
+import { logger } from 'lib/logger'
 
 const MAX_FILE_SIZE = 3145728
 const ACCEPTED_FILE_TYPES = ['image/png', 'image/jpeg', 'image/heic', 'application/pdf']
@@ -21,12 +22,12 @@ export async function createFile(params) {
   const { type, file, userId, uploaderId, setAsActive } = fields
 
   if (file.size > MAX_FILE_SIZE) {
-    console.log('file too large')
+    logger.error('File too large', file.size)
     return { error: { status: 400, message: 'Maximum file size is 3MB.' } }
   }
 
   if (!ACCEPTED_FILE_TYPES.find(type => type === file.mimetype)) {
-    console.log('unsupported file type')
+    logger.error('Unsupported file type', file.mimetype)
     return { error: { status: 400, message: 'Unsupported file type, please upload a png, jpeg, pdf, heic file.' } }
   }
 

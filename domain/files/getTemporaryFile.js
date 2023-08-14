@@ -3,6 +3,7 @@ import { getPrismaClient } from 'lib/prisma'
 import { validate } from 'lib/yup'
 import { filetypemime } from 'magic-bytes.js'
 import { getTempFileValidator } from './validation'
+import { logger } from 'lib/logger'
 
 export async function getTemporaryFile(params) {
   const { fields, errors } = await validate(getTempFileValidator, params)
@@ -37,7 +38,7 @@ export async function getTemporaryFile(params) {
 
   const { data, error } = await getFile({ key: file.key })
   if (error) {
-    console.log('Failed to get file.', ` status:${error.status}`, ` message:${error.message}`)
+    logger.error('Failed to get file.', ` status:${error.status}`, ` message:${error.message}`)
     return {
       error: {
         status: error.status,

@@ -5,6 +5,7 @@ import { sendCreatedDrafNotificationValidator } from './validation'
 import { formatCurrency, formatCrypto } from 'lib/currency'
 import { USD } from 'domain/currency/constants'
 import { PLATFORM_NAME } from 'system.config'
+import { logger } from 'lib/logger'
 
 interface ProgramCurrency {
   type: string
@@ -56,7 +57,7 @@ export async function sendCreatedDraftNotification(params: SendCreatedDraftNotif
       html: emailBody,
     })
   } catch (error) {
-    console.log('failed to notify user - could not send email ', `transferRequestId:${transferRequestId} `, `error:${error}`)
+    logger.error(`Failed to notify user - could not send email for transferRequestId:${transferRequestId}`, error)
   }
 }
 

@@ -1,6 +1,6 @@
 import { Prisma, PrismaClient } from '@prisma/client'
-import { captureException } from '@sentry/nextjs'
 import { transferMiddleware, transferRequestMiddleware, userMiddleware } from 'prisma/middleware'
+import { logger } from './logger'
 
 // add prisma to the NodeJS global type
 interface CustomNodeJsGlobal extends Global {
@@ -54,7 +54,7 @@ export async function newPrismaTransaction(fn: (transaction: Prisma.TransactionC
     reportTransactionException(error)
 
     if (isPrismaError(error)) {
-      console.log('Unexpected error executing prisma transaction. ', error)
+      logger.error('Unexpected error executing prisma transaction. ', error)
       return {
         error: {
           status: 500,
@@ -76,7 +76,7 @@ export async function newPrismaTransaction(fn: (transaction: Prisma.TransactionC
 
 export function reportTransactionException(error: any) {
   if (!error.status || error.status >= 500 || error.status < 400) {
-    captureException(error)
+    logger.error('Transaction error: ', error)
   }
 }
 

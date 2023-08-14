@@ -36,6 +36,8 @@ export const createTransferRequestValidatorBackend = yup.object({
   team: yup.string().required(),
   expectedTransferDate: yup.string().required(),
   currencyUnitId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
+  test: yup.boolean().required(),
+
   user: yup.object({
     id: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
     firstName: yup.string().required(),

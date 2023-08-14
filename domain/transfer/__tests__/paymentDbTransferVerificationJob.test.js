@@ -56,10 +56,6 @@ jest.mock('lib/emissaryCrypto', () => ({
   encryptPII: field => mockEncrypt(field),
 }))
 
-const mockCaptureMessage = jest.fn()
-jest.mock('@sentry/nextjs', () => ({
-  captureMessage: (message, func) => mockCaptureMessage(message, func),
-}))
 
 const mockGenerateIdentifier = jest.fn().mockReturnValue('PLREFTEST')
 jest.mock('domain/payment/generateIdentifier', () => ({
@@ -83,7 +79,6 @@ describe('paymentDbTransferVerificationJob.test', () => {
     const { data, error } = await RunJob()
     expect(error).toBeUndefined()
     expect(data).toEqual({ found: 0, message: 'There are no pending transfers to process' })
-    expect(mockCaptureMessage).not.toBeCalled()
   })
 
   it('should return message when no transaction are found on remote db', async () => {
@@ -99,7 +94,6 @@ describe('paymentDbTransferVerificationJob.test', () => {
 
     expect(error).toBeUndefined()
     expect(data).toEqual({ found: 1, message: 'No new transactions were found' })
-    expect(mockCaptureMessage).not.toBeCalled()
   })
 
   it('should return failed when the wallet address is different', async () => {
@@ -124,7 +118,6 @@ describe('paymentDbTransferVerificationJob.test', () => {
 
     expect(error).toBeUndefined()
     expect(data).toEqual({ found: 1, failed: 1, remaining: 1, updated: 0 })
-    expect(mockCaptureMessage).toBeCalled()
   })
 
   it('should return error, when fil currency is not found', async () => {
@@ -171,7 +164,6 @@ describe('paymentDbTransferVerificationJob.test', () => {
 
     expect(error).toBeUndefined()
     expect(data).toEqual({ found: 1, failed: 1, remaining: 1, updated: 0 })
-    expect(mockCaptureMessage).toBeCalled()
   })
 
   it('should throw an error when updating the transfer', async () => {
@@ -218,7 +210,6 @@ describe('paymentDbTransferVerificationJob.test', () => {
     const { data, error } = await RunJob()
     expect(error).toBeUndefined()
     expect(data).toEqual({ found: 1, failed: 1, remaining: 1, updated: 0 })
-    expect(mockCaptureMessage).toBeCalled()
   })
 
   it('should throw an error when updating the transfer request', async () => {
@@ -269,7 +260,6 @@ describe('paymentDbTransferVerificationJob.test', () => {
     const { data, error } = await RunJob()
     expect(error).toBeUndefined()
     expect(data).toEqual({ found: 1, failed: 1, remaining: 1, updated: 0 })
-    expect(mockCaptureMessage).toBeCalled()
   })
 
   it('should complete the job successfully', async () => {
@@ -383,6 +373,5 @@ describe('paymentDbTransferVerificationJob.verifyTrasnsfers.test', () => {
     }))
 
     await verifyTransfers(mockGetPrismaClient(), mockPaymentDb(), 'PLREFTEST')
-    expect(mockCaptureMessage).toBeCalled()
   })
 })

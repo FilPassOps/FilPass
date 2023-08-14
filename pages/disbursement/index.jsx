@@ -24,6 +24,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import errorsMessages from 'wordings-and-errors/errors-messages'
+import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
 
 export default function Disbursement({ initialData = [], programs = [], pageSize, totalItems, page, status }) {
   const router = useRouter()
@@ -146,12 +147,12 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
         ],
         {
           delimiter: ',',
-        }
+        },
       )
       const blob = new Blob([csvTemplate])
       return JsFileDownload(
         blob,
-        `${PLATFORM_NAME.toLowerCase()}_${status.toLowerCase()}_disbursement_${DateTime.now().toFormat("yyyy-MM-dd_hh'h'mm'm'ss's'")}.csv`
+        `${PLATFORM_NAME.toLowerCase()}_${status.toLowerCase()}_disbursement_${DateTime.now().toFormat("yyyy-MM-dd_hh'h'mm'm'ss's'")}.csv`,
       )
     } catch (error) {
       console.error(error)
@@ -211,9 +212,9 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
             {selectedRequests.length > 0 && isNotPaidStatus && (
               <div className="flex items-center gap-4">
                 <div>
-                  <Button variant="green" onClick={onMetamaskBatchPayClick}>
+                  <WithMetaMaskButton variant="green" onClick={onMetamaskBatchPayClick} defaultLabel="Pay">
                     Pay
-                  </Button>
+                  </WithMetaMaskButton>
                 </div>
                 <div>
                   <Button variant="red" onClick={onBatchRejectClick}>

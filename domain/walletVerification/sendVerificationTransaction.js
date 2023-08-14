@@ -1,4 +1,3 @@
-import { captureException, captureMessage } from '@sentry/nextjs'
 import { ATTOFIL, FIL, convert, getMasterWallet, getVerificationAmount, signMessage } from 'lib/filecoin'
 import { getGasEstimation, getNonce, getWalletBalance, sendTransaction } from 'lib/filecoinApi'
 import prisma from 'lib/prisma'
@@ -7,6 +6,7 @@ import { DateTime } from 'luxon'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { sendVerificationTransactionValidator } from './validation'
 import { EMAIL_DOMAIN } from 'system.config'
+import { logger } from 'lib/logger'
 
 const ENABLE_BLOCKCHAIN_INTERACTION = process.env.ENABLE_BLOCKCHAIN_INTERACTION
 
@@ -24,6 +24,7 @@ export async function sendVerificationTransaction(params) {
   const { address, userId, blockchain } = fields
   const { error: dbValidationError, data: walletWithVerification } = await checkUserTransactions({ address, userId })
   if (dbValidationError) {
+    logger.error('Error checking user transactions', dbValidationError)
     return {
       error: {
         status: 400,
@@ -39,6 +40,7 @@ export async function sendVerificationTransaction(params) {
   const userData = await prisma.user.findUnique({ where: { id: userId } })
 
   if (!userData) {
+    logger.error('User not found', userId)
     return {
       error: {
         status: 400,
@@ -53,7 +55,7 @@ export async function sendVerificationTransaction(params) {
   const { data: masterBalance, error: balanceError } = await getWalletBalance(masterWallet.address)
 
   if (balanceError) {
-    captureException(balanceError)
+    logger.error('Error getting master wallet balance', balanceError)
     return {
       error: {
         status: balanceError.status,
@@ -64,7 +66,7 @@ export async function sendVerificationTransaction(params) {
 
   const masterWalletBalanceInFIL = convert(masterBalance.result, ATTOFIL, FIL).toString()
   if (+masterWalletBalanceInFIL < 0.5) {
-    captureMessage('Master Wallet balance is lower than 0.5 FIL')
+    logger.warning('Master Wallet balance is lower than 0.5 FIL')
   }
 
   const message = {
@@ -151,7 +153,7 @@ export async function send(message, masterWallet, masterWalletBalance) {
 
   const { data: gas, error: gasError } = await getGasEstimation(message)
   if (gasError) {
-    captureException(gasError)
+    logger.error('Error getting gas estimation', gasError)
     return {
       error: {
         status: gasError.status,
@@ -162,7 +164,7 @@ export async function send(message, masterWallet, masterWalletBalance) {
 
   const { data: nonce, error: nonceError } = await getNonce(masterWallet.address)
   if (nonceError) {
-    captureException(nonceError)
+    logger.error('Error getting nonce', nonceError)
     return {
       error: {
         status: nonceError.status,
@@ -182,7 +184,7 @@ export async function send(message, masterWallet, masterWalletBalance) {
   }
 
   if (+masterWalletBalance < +message.value + +GasFeeCap) {
-    captureMessage('Insufficient funds on the Master Wallet, cant validate wallet.')
+    logger.error('Insufficient funds on the Master Wallet, cant validate wallet.')
     return {
       error: {
         status: 400,
@@ -196,7 +198,7 @@ export async function send(message, masterWallet, masterWalletBalance) {
 
   const { data: pushResponse, error: pushError } = await sendTransaction(transaction)
   if (pushError) {
-    captureException(pushError)
+    logger.error('Error pushing transaction', pushError)
     return {
       error: {
         status: pushError.status,

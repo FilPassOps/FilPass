@@ -3,6 +3,7 @@ import { newPrismaTransaction } from 'lib/prisma'
 import { validate } from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { setDefaultValidator } from './validation'
+import { logger } from 'lib/logger'
 
 export const setDefault = async params => {
   const { fields, errors } = await validate(setDefaultValidator, params)
@@ -23,7 +24,7 @@ export const setDefault = async params => {
     const decoded = jwt.verify(token, process.env.APP_SECRET)
     data = decoded
   } catch (error) {
-    console.log('Error verifying token. ', JSON.stringify(error))
+    logger.error('Error verifying token. ', JSON.stringify(error))
     return {
       error: {
         status: 400,

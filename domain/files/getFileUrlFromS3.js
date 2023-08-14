@@ -3,6 +3,7 @@ import { getFile } from 'lib/fileUpload'
 import { getPrismaClient } from 'lib/prisma'
 import { validate } from 'lib/yup'
 import { getFileUrlFromS3Validator } from './validation'
+import { logger } from 'lib/logger'
 
 export async function getFileUrlFromS3(params) {
   const { fields, errors } = await validate(getFileUrlFromS3Validator, params)
@@ -50,7 +51,7 @@ export async function getFileUrlFromS3(params) {
 
   const { data, error } = await getFile({ key: file.key })
   if (error) {
-    console.log('Failed to get file.', ` status:${error.status}`, ` message:${error.message}`)
+    logger.error('Failed to get file.', ` status:${error.status}`, ` message:${error.message}`)
     return {
       error: {
         status: error.status,

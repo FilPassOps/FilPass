@@ -4,6 +4,7 @@ import { validate } from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { resetPasswordValidator } from './validation'
 import { generateEmailHash, generatePasswordHash } from 'lib/password'
+import { logger } from 'lib/logger'
 
 interface ResetPasswordParams {
   token: string
@@ -40,7 +41,7 @@ export async function resetPassword(params: ResetPasswordParams) {
     const decoded = jwt.verify(token, secret) as { email: string }
     userEmail = decoded.email
   } catch (error) {
-    console.log('Error verifying token. ', JSON.stringify(error))
+    logger.error('Error verifying token. ', error)
     return {
       error: {
         status: 400,

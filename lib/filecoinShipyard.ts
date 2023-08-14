@@ -2,6 +2,7 @@ import { NodejsProvider } from '@filecoin-shipyard/lotus-client-provider-nodejs'
 import { LotusRPC, Message } from '@filecoin-shipyard/lotus-client-rpc'
 import { mainnet } from '@filecoin-shipyard/lotus-client-schema'
 import config from 'chains.config'
+import { logger } from './logger'
 
 const LOTUS_LITE_NODE_API_ENDPOINT = process.env.LOTUS_LITE_NODE_API_ENDPOINT
 const LOTUS_LITE_TOKEN = process.env.LOTUS_LITE_TOKEN
@@ -29,7 +30,7 @@ export const matchWalletAddress = async (address: string) => {
     if (validationResult !== address) return false
     return true
   } catch (e) {
-    console.log(e)
+    logger.error('Error matching wallet address. ', e)
     return false
   }
 }

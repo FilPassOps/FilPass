@@ -183,10 +183,11 @@ export const useMetaMask = () => useContext(WalletContext)
 interface WithMetaMaskButtonProps extends Omit<ButtonProps, 'loading' | 'disabled'> {
   connectWalletLabel?: ReactNode
   switchChainLabel?: string
+  defaultLabel?: string
 }
 
 export const WithMetaMaskButton: React.FC<React.PropsWithChildren<WithMetaMaskButtonProps>> = props => {
-  const { onClick, connectWalletLabel = 'Connect MetaMask', switchChainLabel = 'Switch network', children, ...rest } = props
+  const { onClick, connectWalletLabel = 'Connect MetaMask', switchChainLabel = 'Switch network', defaultLabel, children, ...rest } = props
   const { wallet, connect, switchChain, busy, chainId } = useMetaMask()
   const [loading, setLoading] = useState(false)
   const ref = useRef<HTMLButtonElement>(null)
@@ -213,7 +214,7 @@ export const WithMetaMaskButton: React.FC<React.PropsWithChildren<WithMetaMaskBu
 
   return (
     <Button ref={ref} className="flex items-center" {...rest} loading={busy && loading} disabled={busy} onClick={handleClick}>
-      {wallet && connectedToTargetChain ? children : wallet && !connectedToTargetChain ? switchChainLabel : connectWalletLabel}
+      {wallet && connectedToTargetChain ? children : defaultLabel ? defaultLabel : wallet && !connectedToTargetChain ? switchChainLabel : connectWalletLabel}
     </Button>
   )
 }

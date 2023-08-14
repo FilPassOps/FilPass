@@ -1,10 +1,10 @@
-import { captureMessage } from '@sentry/nextjs'
 import { ethers } from 'ethers'
 import { decrypt } from 'lib/emissaryCrypto'
 import { validateWalletAddress } from 'lib/filecoinShipyard'
 import { amountConverter, getDelegatedAddress, hexAddressDecoder } from 'lib/getDelegatedAddress'
 import prisma from 'lib/prisma'
 import { TransferResult, select, updateTransfer } from './paymentDbTransferVerificationJob'
+import { logger } from 'lib/logger'
 
 interface TransferPaymentConfirmParams {
   id: string
@@ -62,16 +62,10 @@ export const transferPaymentConfirm = async ({ id, to, from, value, transactionH
   processPayment(pendingTransfersWithNoTxHash, to, value, transactionHash)
 
   if (pendingTransfersWithNoTxHash.length > 0) {
-    captureMessage('Transfer request with no transaction hash set as Paid', scope => {
-      scope.setExtras({
-        transferRef: id,
-        transactionHash: transactionHash,
-        transferIds: pendingTransfersWithNoTxHash.map(transfer => transfer.id),
-      })
-      scope.setLevel('warning')
-      scope.setTag('feature', 'payment')
-      scope.setTag('payment-verification', 'FVM')
-      return scope
+    logger.warning('Transfer request with no transaction hash set as Paid', {
+      transferRef: id,
+      transactionHash: transactionHash,
+      transferIds: pendingTransfersWithNoTxHash.map(transfer => transfer.id),
     })
   }
 }
@@ -94,16 +88,10 @@ const processPayment = async (pendingTransfers: TransferResult[], to: string[], 
           transfers.push(transfer)
         }
       } catch (error) {
-        captureMessage('Error verifying payment - invalid wallet address', scope => {
-          scope.setExtras({
-            transferRef: transfer.transferRef,
-            transactionHash: transactionHash,
-            walletAddress: transfer.transferRequest.wallet.address,
-          })
-          scope.setLevel('warning')
-          scope.setTag('feature', 'payment')
-          scope.setTag('payment-verification', 'FVM')
-          return scope
+        logger.error('Error verifying payment - invalid wallet address', {
+          transferRef: transfer.transferRef,
+          transactionHash: transactionHash,
+          walletAddress: transfer.transferRequest.wallet.address,
         })
       }
     }
@@ -122,7 +110,7 @@ const processPayment = async (pendingTransfers: TransferResult[], to: string[], 
             sendEmail,
           })
         } catch (error) {
-          console.log('Error updating transfer', error)
+          logger.error('Error updating transfer', error)
         }
       }
     }
