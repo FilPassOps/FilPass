@@ -18,7 +18,7 @@ export const testnet = {
   },
   blockExplorerApi: 'https://mumbai.polygonscan.com/',
   coinType: CoinType.TEST, // TODO OPEN-SOURCE: should be null
-  multiforwarder: '0xbEF649DB6b4e1b2Ac044492433Bccca4287BE90F',
+  multiforwarder: '0xb63704b534583Eca727d78dde6cCe438171846dc',
   networkPrefix: 't', // TODO OPEN-SOURCE: should be null
 }
 

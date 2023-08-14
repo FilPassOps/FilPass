@@ -1,6 +1,7 @@
 import fa, { Address } from '@glif/filecoin-address'
 import { WalletSize } from 'components/web3/useDelegatedAddress'
 import { ethers } from 'ethers'
+import { TOKEN } from 'system.config'
 import config from '../chains.config'
 
 export const getDelegatedAddress = (walletAddress?: string, walletSize: WalletSize = WalletSize.SHORT) => {
@@ -22,6 +23,10 @@ export const getDelegatedAddress = (walletAddress?: string, walletSize: WalletSi
 }
 
 export const hexAddressDecoder = (address: string) => {
+  if (TOKEN.name !== 'Filecoin') {
+    return ethers.utils.hexDataSlice(address, 0, 20)
+  }
+
   const buff = Buffer.from(address.substring(2), 'hex')
   let size = buff.length
   if (buff[0] == 0x01 || buff[0] == 0x02) {

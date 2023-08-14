@@ -1,7 +1,6 @@
 import { CustomWindow, useMetaMask } from './MetaMaskProvider'
 
 import { ExternalProvider } from '@ethersproject/providers'
-import filecoinAddress from '@glif/filecoin-address'
 import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
 import { MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
@@ -55,11 +54,14 @@ export const useContract = () => {
       const weiTotal = weiValues.reduce((a, b) => a.add(b), ethers.BigNumber.from(0))
 
       const addresses = destinations.map(destination => {
-        let address = destination
-        if (destination.startsWith('0x')) {
-          address = filecoinAddress.delegatedFromEthAddress(destination, config.coinType)
-        }
-        return filecoinAddress.newFromString(address).bytes
+        const address = destination
+        // TODO OPEN-SOURCE: add a check for filecoin blockchain
+
+        // if (destination.startsWith('0x')) {
+        //   address = filecoinAddress.delegatedFromEthAddress(destination, config.coinType)
+        // }
+        // return filecoinAddress.newFromString(address).bytes
+        return ethers.utils.arrayify(address)
       })
 
       return await multiForwarder.forwardAny(id, addresses, weiValues, { value: weiTotal })
@@ -90,11 +92,16 @@ export const useContract = () => {
       const weiTotal = weiValues.reduce((a, b) => a.add(b), ethers.BigNumber.from(0))
 
       const addresses = destinations.map(destination => {
-        let address = destination
-        if (destination.startsWith('0x')) {
-          address = filecoinAddress.delegatedFromEthAddress(destination, config.coinType)
-        }
-        const bytes = filecoinAddress.newFromString(address).bytes
+        const address = destination
+        // TODO OPEN-SOURCE: add a check for filecoin blockchain
+        // if (destination.startsWith('0x')) {
+        //   address = filecoinAddress.delegatedFromEthAddress(destination, config.coinType)
+        // }
+        // const bytes = filecoinAddress.newFromString(address).bytes
+
+        const bytes = ethers.utils.arrayify(address)
+        // ethers.utils.hexZeroPad(bytes, 32)
+
         const paddedAddress = new Uint8Array(32)
         paddedAddress.set(bytes)
         paddedAddress.fill(0, bytes.length, 32)
