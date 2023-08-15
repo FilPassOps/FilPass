@@ -68,4 +68,4 @@ export const TOKEN = {
     },
   },
   paymentUnit: 'USD',
-} as const
+}

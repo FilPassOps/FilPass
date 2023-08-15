@@ -1,10 +1,8 @@
-import { AxiosResponse } from 'axios'
 import config from 'chains.config'
-import { Message } from 'domain/multisig/types/FilfoxAPI'
 import { baseEmail } from 'domain/notifications/constants'
 import { transferPaymentConfirm } from 'domain/transfer/transfers-payment-confirm'
+import { ethers } from 'ethers'
 import { decryptPII } from 'lib/emissaryCrypto'
-import { getMessage } from 'lib/filfoxApi'
 import prisma from 'lib/prisma'
 import { sendBatchEmail } from 'lib/sendEmail'
 import { MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
@@ -15,8 +13,12 @@ interface EmailReminderRecipient {
 
 const contractInterface = MultiForwarderFactory.createInterface()
 const blockExplorerUrl = config.chain.blockExplorerUrls[0]
+const provider = new ethers.providers.JsonRpcProvider(config.chain.rpcUrls[0])
 
 export default async function run() {
+  const receipt = await provider.getTransactionReceipt('0x1a17dea4597367fdfa439d13122ad31beaae438582adb2d2e9ac84653c4c2113')
+  console.log('🚀 ~ file: check-pending-transfer.ts:25 ~ run ~ receipt:', receipt)
+
   try {
     const pendingTransfers = await prisma.transfer.findMany({
       where: {
@@ -45,19 +47,17 @@ export default async function run() {
         continue
       }
 
-      const { data }: AxiosResponse<Message> = await getMessage(txHash)
+      const receipt = await provider.getTransactionReceipt('0x1a17dea4597367fdfa439d13122ad31beaae438582adb2d2e9ac84653c4c2113')
 
-      if (!data.receipt) {
+      if (!receipt) {
         continue
       }
 
-      //ExitCode 0 = Success
-      if (data.receipt.exitCode === 0) {
-        if (!data.eventLogs) continue
-
+      // status 1 = Success
+      if (receipt.status === 1) {
         const logparsed = contractInterface.parseLog({
-          data: data.eventLogs[0].data,
-          topics: data.eventLogs[0].topics,
+          data: receipt.logs[0].data,
+          topics: receipt.logs[0].topics,
         })
         const { id, from, to, value } = logparsed.args
         transferPaymentConfirm({ id, from, to, value, transactionHash: txHash })
@@ -127,7 +127,7 @@ export default async function run() {
         return {
           email,
         }
-      })
+      }),
     )
 
     recipientsResult.forEach(item => {

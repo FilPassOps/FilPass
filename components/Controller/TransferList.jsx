@@ -19,6 +19,7 @@ import { shortenAddress } from 'lib/shortenAddress'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
+import { TOKEN } from 'system.config'
 
 const TransferList = ({
   requests = [],
@@ -99,7 +100,7 @@ const TransferList = ({
             </Header>
             <Header style={{ minWidth: 200 }}>Address</Header>
             <Header>Request Amount</Header>
-            <Header>{query.status === PAID_STATUS ? 'Paid FIL Amount' : 'Estimated FIL Amount'}</Header>
+            <Header>{query.status === PAID_STATUS ? `Paid ${TOKEN.symbol} Amount` : `Estimated ${TOKEN.symbol} Amount`}</Header>
             <Header style={{ minWidth: 180 }}>Vesting Start Epoch</Header>
             <Header style={{ minWidth: 180 }}>Vesting Months</Header>
             <Header style={{ minWidth: 190 }}>Status</Header>
@@ -148,7 +149,7 @@ const TransferList = ({
                   <LinkedCell href={href}>{request.team}</LinkedCell>
                   <LinkedCell href={href}>
                     {DateTime.fromISO(request.status === PAID_STATUS ? request.updatedAt : request.createdAt).toLocaleString(
-                      DateTime.DATETIME_SHORT_WITH_SECONDS
+                      DateTime.DATETIME_SHORT_WITH_SECONDS,
                     )}
                   </LinkedCell>
                   <LinkedCell href={href}>
@@ -167,7 +168,7 @@ const TransferList = ({
                       <Currency
                         amount={request.amount}
                         requestCurrency={requestUnit.currency.name}
-                        paymentCurrency={paymentUnit.currency.name}
+                        paymentUnit={paymentUnit.currency.name}
                       />
                     )}
                   </LinkedCell>
@@ -229,7 +230,7 @@ const CryptoAmountInfo = ({ filecoin, request, requestUnit, paymentUnit, paidTra
   }
 
   if (request.status === PAID_STATUS) {
-    return `${paidTransfer.amount} ${paidTransfer.amountCurrencyUnit?.name ?? 'FIL'}`
+    return `${paidTransfer.amount} ${paidTransfer.amountCurrencyUnit?.name ?? TOKEN.symbol}`
   }
 
   if (requestUnit.currency.name === USD) {

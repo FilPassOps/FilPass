@@ -1,13 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import {SendAPI} from '@zondax/filecoin-solidity/contracts/v0.8/SendAPI.sol';
-import {CommonTypes} from '@zondax/filecoin-solidity/contracts/v0.8/types/CommonTypes.sol';
 import {SafeMath} from '@openzeppelin/contracts/utils/math/SafeMath.sol';
-import {FilAddresses} from '@zondax/filecoin-solidity/contracts/v0.8/utils/FilAddresses.sol';
 
 contract MultiForwarder {
-  using SendAPI for CommonTypes.FilAddress;
   using SafeMath for uint256;
 
   event ForwardAny(string id, address from, bytes[] to, uint256[] value, uint total);
@@ -33,24 +29,16 @@ contract MultiForwarder {
     }
     require(totalAmount == msg.value, 'msg.value must be equal to the sum of all amounts');
 
-    for (uint8 i; i < addresses.length; i++) {
-      bytes32 addr = addresses[i];
-      uint8 size;
+    for (uint256 i = 0; i < addresses.length; i++) {
+      address payable recipient = payable(address(uint160(bytes20(addresses[i]))));
+      uint256 amount = amounts[i];
 
-      if (addr[0] == 0x01 || addr[0] == 0x02) {
-        size = 21;
-      } else if (addr[0] == 0x04) {
-        size = 22;
-      } else {
-        revert('address must be Secp256k1, Actor or Delegated');
-      }
+      require(recipient != address(0), 'Invalid recipient address');
+      require(amount > 0, 'Amount must be greater than 0');
+      require(address(this).balance >= amount, 'Insufficient contract balance');
 
-      bytes memory to = new bytes(size);
-      for (uint8 j = 0; j < size; j++) {
-        to[j] = addr[j];
-      }
-      CommonTypes.FilAddress memory target = FilAddresses.fromBytes(to);
-      target.send(amounts[i]);
+      (bool success, ) = recipient.call{value: amount}('');
+      require(success, 'Forwarding funds failed');
     }
 
     emit Forward(id, msg.sender, addresses, amounts, totalAmount);
@@ -75,11 +63,18 @@ contract MultiForwarder {
     }
     require(totalAmount == msg.value, 'msg.value must be equal to the sum of all amounts');
 
-    for (uint8 i; i < addresses.length; i++) {
-      CommonTypes.FilAddress memory target = FilAddresses.fromBytes(addresses[i]);
-      target.send(amounts[i]);
-    }
+    for (uint256 i = 0; i < addresses.length; i++) {
+      address payable recipient = payable(address(bytes20(addresses[i])));
+      uint256 amount = amounts[i];
 
-    emit ForwardAny(id, msg.sender, addresses, amounts, totalAmount);
+      require(recipient != address(0), 'Invalid recipient address');
+      require(amount > 0, 'Amount must be greater than 0');
+      require(address(this).balance >= amount, 'Insufficient contract balance');
+
+      (bool success, ) = recipient.call{value: amount}('');
+      require(success, 'Forwarding funds failed');
+
+      emit ForwardAny(id, msg.sender, addresses, amounts, totalAmount);
+    }
   }
 }

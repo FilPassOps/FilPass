@@ -1,8 +1,10 @@
 import { CustomWindow, useMetaMask } from './MetaMaskProvider'
 
 import { ExternalProvider } from '@ethersproject/providers'
+import filecoinAddress from '@glif/filecoin-address'
 import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
+import { TOKEN } from 'system.config'
 import { MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
 import config from '../../chains.config'
 
@@ -54,14 +56,15 @@ export const useContract = () => {
       const weiTotal = weiValues.reduce((a, b) => a.add(b), ethers.BigNumber.from(0))
 
       const addresses = destinations.map(destination => {
-        const address = destination
-        // TODO OPEN-SOURCE: add a check for filecoin blockchain
+        if (TOKEN.name !== 'Filecoin') {
+          return ethers.utils.arrayify(destination)
+        }
 
-        // if (destination.startsWith('0x')) {
-        //   address = filecoinAddress.delegatedFromEthAddress(destination, config.coinType)
-        // }
-        // return filecoinAddress.newFromString(address).bytes
-        return ethers.utils.arrayify(address)
+        let address = destination
+        if (destination.startsWith('0x')) {
+          address = filecoinAddress.delegatedFromEthAddress(destination, config.coinType)
+        }
+        return filecoinAddress.newFromString(address).bytes
       })
 
       return await multiForwarder.forwardAny(id, addresses, weiValues, { value: weiTotal })
@@ -92,20 +95,17 @@ export const useContract = () => {
       const weiTotal = weiValues.reduce((a, b) => a.add(b), ethers.BigNumber.from(0))
 
       const addresses = destinations.map(destination => {
-        const address = destination
-        // TODO OPEN-SOURCE: add a check for filecoin blockchain
-        // if (destination.startsWith('0x')) {
-        //   address = filecoinAddress.delegatedFromEthAddress(destination, config.coinType)
-        // }
-        // const bytes = filecoinAddress.newFromString(address).bytes
+        if (TOKEN.name !== 'Filecoin') {
+          const bytes = ethers.utils.arrayify(destination)
+          return zeroPad(bytes)
+        }
 
-        const bytes = ethers.utils.arrayify(address)
-        // ethers.utils.hexZeroPad(bytes, 32)
-
-        const paddedAddress = new Uint8Array(32)
-        paddedAddress.set(bytes)
-        paddedAddress.fill(0, bytes.length, 32)
-        return paddedAddress
+        let address = destination
+        if (destination.startsWith('0x')) {
+          address = filecoinAddress.delegatedFromEthAddress(destination, config.coinType)
+        }
+        const bytes = filecoinAddress.newFromString(address).bytes
+        return zeroPad(bytes)
       })
 
       return await multiForwarder.forward(id, addresses, weiValues, { value: weiTotal })
@@ -115,4 +115,11 @@ export const useContract = () => {
   }
 
   return { forwardAll: forwardAny, forwardNonBLS: forward }
+}
+
+function zeroPad(bytes: Uint8Array) {
+  const paddedAddress = new Uint8Array(32)
+  paddedAddress.set(bytes)
+  paddedAddress.fill(0, bytes.length, 32)
+  return paddedAddress
 }

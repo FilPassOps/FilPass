@@ -7,13 +7,14 @@ import { StatusPill } from 'components/shared/Status'
 import { Cell, Header, LinkedCell, Table, TableBody, TableHead } from 'components/shared/Table'
 import Currency, { CryptoAmount } from 'components/shared/Table/Currency'
 import { WalletAddress } from 'components/shared/WalletAddress'
+import useDelegatedAddress from 'components/web3/useDelegatedAddress'
 import { USD } from 'domain/currency/constants'
 import { PAID_STATUS } from 'domain/transferRequest/constants'
 import { formatCrypto } from 'lib/currency'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import useDelegatedAddress from 'components/web3/useDelegatedAddress'
+import { TOKEN } from 'system.config'
 
 const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderToggle, onRequestChecked }) => {
   const { push, query } = useRouter()
@@ -60,9 +61,9 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
             <Header style={{ minWidth: 200 }}>
               <Sortable by={'create_date'}>Create Date</Sortable>
             </Header>
-            <Header style={{minWidth: 200}}>Address</Header>
+            <Header style={{ minWidth: 200 }}>Address</Header>
             <Header>Request Amount</Header>
-            <Header>{query.status === PAID_STATUS ? 'Paid FIL Amount' : 'Estimated FIL Amount'}</Header>
+            <Header>{query.status === PAID_STATUS ? `Paid ${TOKEN.symbol} Amount` : `Estimated ${TOKEN.symbol} Amount`}</Header>
             <Header style={{ minWidth: 180 }}>Vesting Start Epoch</Header>
             <Header style={{ minWidth: 180 }}>Vesting Months</Header>
             <Header>Status</Header>

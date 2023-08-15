@@ -14,7 +14,7 @@ export const testnet = {
       decimals: 18,
     },
     rpcUrls: ['https://rpc-mumbai.maticvigil.com'],
-    blockExplorerUrls: ['https://calibration.filfox.info/en'],
+    blockExplorerUrls: ['https://mumbai.polygonscan.com'],
   },
   blockExplorerApi: 'https://mumbai.polygonscan.com/',
   coinType: CoinType.TEST, // TODO OPEN-SOURCE: should be null
@@ -32,7 +32,7 @@ export const mainnet = {
       decimals: 18,
     },
     rpcUrls: ['https://polygon.llamarpc.com'],
-    blockExplorerUrls: ['https://filfox.info/en'],
+    blockExplorerUrls: ['https://polygonscan.com'],
   },
   blockExplorerApi: 'https://polygonscan.com',
   coinType: CoinType.MAIN, // TODO OPEN-SOURCE: should be null

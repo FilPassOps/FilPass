@@ -15,7 +15,7 @@ export const DEFAULT_TIMEOUT = 4 * 60 * 1000
 export const PADDED_WALLET_SIZE = 32
 export const UNIQUE_ID = 'unique-generate-id'
 
-export const getProvider = () => new ethers.providers.JsonRpcProvider(config.networks.calibration.url)
+export const getProvider = () => new ethers.providers.JsonRpcProvider(config.networks.mumbai.url)
 export const getContract = async () => {
   return (await ethers.getContractAt('contracts/MultiForwarder.sol:MultiForwarder', testnet.multiforwarder)) as MultiForwarder
 }
