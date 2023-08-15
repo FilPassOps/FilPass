@@ -114,7 +114,7 @@ describe('deleteWallet', () => {
         },
       }
 
-      const error = await deleteWalletModule.validateWalletTransferRequests(prisma, 1, 2)
+      const error = await deleteWalletModule.validateWalletTransferRequests({ prisma, userId: 1, userWalletId: 2 })
 
       expect(error).toBeUndefined()
       expect(findMany).toBeCalledWith({
@@ -138,7 +138,7 @@ describe('deleteWallet', () => {
         },
       }
 
-      const error = await deleteWalletModule.validateWalletTransferRequests(prisma, 1, 2)
+      const error = await deleteWalletModule.validateWalletTransferRequests({ prisma, userId: 1, userWalletId: 2 })
 
       expect(error).toEqual(errorsMessages.wallet_has_active_transfer_request.message([1, 2]))
     })
@@ -150,7 +150,7 @@ describe('deleteWallet', () => {
         },
       }
 
-      const error = await deleteWalletModule.validateWalletTransferRequests(prisma, 1, 2)
+      const error = await deleteWalletModule.validateWalletTransferRequests({ prisma, userId: 1, userWalletId: 2 })
 
       expect(error).toEqual(errorsMessages.wallet_has_active_transfer_request.message([1]))
     })

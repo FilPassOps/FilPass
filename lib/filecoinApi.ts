@@ -85,7 +85,7 @@ export const sendTransaction = (signedTransaction: unknown) => {
   })
 }
 
-const chainGetMessageId = (messageId: unknown) => {
+export const chainGetMessageId = (messageId: unknown) => {
   return api.post('/', {
     id: 0,
     jsonrpc: '2.0',

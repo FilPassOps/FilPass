@@ -60,7 +60,7 @@ export const uploadFileToS3 = async ({ file, userId, type }: UploadFileToS3Param
   }
 }
 
-interface UploadFileToS3Params {
+interface UploadFileToS3TempParams {
   file: {
     path: string
     filename: string
@@ -69,7 +69,7 @@ interface UploadFileToS3Params {
   type: string
 }
 
-export const uploadFileToS3Temp = async ({ file, type }: UploadFileToS3Params) => {
+export const uploadFileToS3Temp = async ({ file, type }: UploadFileToS3TempParams) => {
   const timeStamp = DateTime.now().toMillis()
   const key = `temp/${type}/${timeStamp}/${file.filename}-${file.originalname}`
   try {

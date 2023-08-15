@@ -11,6 +11,10 @@ export const createFileValidator = yup.object({
   file: yup
     .object({
       originalname: yup.string().required(),
+      size: yup.number().required(),
+      mimetype: yup.string().required(),
+      path: yup.string().required(),
+      filename: yup.string().required(),
     })
     .required(),
 })
@@ -21,6 +25,10 @@ export const createTemporaryFileValidator = yup.object({
   file: yup
     .object({
       originalname: yup.string().required(),
+      size: yup.number().required(),
+      mimetype: yup.string().required(),
+      path: yup.string().required(),
+      filename: yup.string().required(),
     })
     .required(),
 })

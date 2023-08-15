@@ -30,21 +30,21 @@ describe('getWalletVerifications', () => {
   it('should return error when validation fails', async () => {
     mockValidate.mockImplementation((validator, params) => {
       expect(params).toEqual({})
-  
+
       return {
         errors: {
           test: 'test',
         },
       }
     })
-  
+
     const expectedError = {
       status: 400,
       errors: {
         test: 'test',
       },
     }
-  
+
     const { data, error } = await getWalletVerifications({},{})
     expect(data).toBeUndefined()
     expect(error).toEqual(expectedError)
@@ -57,7 +57,7 @@ describe('getWalletVerifications', () => {
     })
 
     mockPrismaWalletVerification.mockImplementation(() => ({
-      findFirst: ({ data, where }) => {
+      findFirst: ({ where }) => {
         expect(where.address).toEqual('f1ifoar2uwirdrmr5hylvhpphdph6z6ppgebummli')
         expect(where.userId).toEqual(1)
         return {
@@ -72,15 +72,15 @@ describe('getWalletVerifications', () => {
       address: 'f1ifoar2uwirdrmr5hylvhpphdph6z6ppgebummli',
       userId: 1
     }
-  
+
     const expectedResponse = {
       id: 1,
       address: 'f1ifoar2uwirdrmr5hylvhpphdph6z6ppgebummli',
       isVerified: true
     }
-  
+
     const { data, error } = await getWalletVerifications(requestParams)
-  
+
     expect(data).toEqual(expectedResponse)
     expect(error).toBeUndefined()
   })

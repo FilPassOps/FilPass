@@ -7,6 +7,8 @@ const NODE_ENV = process.env.NODE_ENV
 const ENV_NAME = process.env.ENV_NAME
 const MASTER_WALLET_PK = process.env.MASTER_WALLET_PK
 
+type FilecoinScaleType = keyof typeof FILECOIN_SCALE_MAP
+
 export function getMasterWallet() {
   if (!MASTER_WALLET_PK) throw new Error('Master wallet not found')
 
@@ -52,7 +54,7 @@ export function getVerificationAmount(fromProtocol: boolean) {
   }
   return {
     value: value,
-    scale: FIL,
+    scale: FIL as FilecoinScaleType,
   }
 }
 
