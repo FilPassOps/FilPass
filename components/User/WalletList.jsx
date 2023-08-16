@@ -3,11 +3,10 @@ import { DeleteWalletAddressModal } from 'components/TransferRequest/TransferReq
 import { LoadingIndicator } from 'components/shared/LoadingIndicator'
 import { WalletAddress } from 'components/shared/WalletAddress'
 import { WarningPopup } from 'components/shared/WarningPopup'
-import useDelegatedAddress, { WalletSize } from 'components/web3/useDelegatedAddress'
 import { api } from 'lib/api'
 import { classNames } from 'lib/classNames'
-import { shortenAddress } from 'lib/shortenAddress'
 import { useState } from 'react'
+import { TOKEN } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
 export const WalletList = ({ data = [], isLoading, setLoading, refresh }) => {
@@ -25,7 +24,6 @@ const ListItems = ({ items, isLoading, setLoading, refresh }) => {
   const [currentWallet, setcurrentWallet] = useState()
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const [openWarningPopup, setOpenWarningPopup] = useState(false)
-  const getDelegatedAddress = useDelegatedAddress()
 
   const handleRemove = wallet => {
     if (wallet.isDefault) {
@@ -51,7 +49,6 @@ const ListItems = ({ items, isLoading, setLoading, refresh }) => {
   return (
     <>
       {items.map((wallet, index) => {
-        const delegatedAddress = getDelegatedAddress(wallet.address)
         const disableEthereum = wallet.address.startsWith('0x') || wallet.address.startsWith('f4') || wallet.address.startsWith('t4')
         const hoverMessage = disableEthereum
           ? errorsMessages.invalid_default_wallet_ethereum.message
@@ -64,17 +61,19 @@ const ListItems = ({ items, isLoading, setLoading, refresh }) => {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm flex-1">
               <>
                 <WalletAddress
-                  address={shortenAddress(wallet.address, WalletSize.SHORT)}
+                  address={wallet.address}
                   isVerified={wallet.verification?.isVerified}
-                  delegatedAddress={delegatedAddress?.shortAddress}
                   label={wallet.name}
+                  blockchain={TOKEN.name}
+                  walletSize="short"
                   className="sm:hidden"
                 />
                 <WalletAddress
                   address={wallet.address}
                   isVerified={wallet.verification?.isVerified}
-                  delegatedAddress={delegatedAddress?.fullAddress}
                   label={wallet.name}
+                  blockchain={TOKEN.name}
+                  walletSize="full"
                   className="hidden sm:flex"
                 />
               </>
@@ -84,7 +83,7 @@ const ListItems = ({ items, isLoading, setLoading, refresh }) => {
                   <Tooltip content={hoverMessage}>
                     <button
                       className={classNames(
-                        wallet.isDefault || disableEthereum ? 'text-gray-400 pointer-events-auto' : 'text-indigo-600 hover:underline'
+                        wallet.isDefault || disableEthereum ? 'text-gray-400 pointer-events-auto' : 'text-indigo-600 hover:underline',
                       )}
                       onClick={() => handeSetDefault(wallet)}
                       disabled={wallet.isDefault || isLoading || disableEthereum}

@@ -7,7 +7,6 @@ import { StatusPill } from 'components/shared/Status'
 import { Cell, Header, LinkedCell, Table, TableBody, TableHead } from 'components/shared/Table'
 import Currency, { CryptoAmount } from 'components/shared/Table/Currency'
 import { WalletAddress } from 'components/shared/WalletAddress'
-import useDelegatedAddress from 'components/web3/useDelegatedAddress'
 import { USD } from 'domain/currency/constants'
 import { PAID_STATUS } from 'domain/transferRequest/constants'
 import { formatCrypto } from 'lib/currency'
@@ -21,7 +20,6 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
   const { filecoin } = useCurrency()
   const [selectAll, setSelectAll] = useState(false)
   const selectAllRef = useRef(null)
-  const getDelegatedAddress = useDelegatedAddress()
 
   useEffect(() => {
     if (data && shouldShowHeaderCheckbox) {
@@ -73,7 +71,6 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
         <TableBody>
           {data.map((request, requestIndex) => {
             const href = `/approvals/${request.id}`
-            const delegatedAddress = request.delegated_address || getDelegatedAddress(request.wallet_address)?.fullAddress
 
             return (
               <tr
@@ -105,7 +102,6 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
                       address={request.wallet_address}
                       blockchain={request.wallet_blockchain}
                       isVerified={!!request.wallet_is_verified}
-                      delegatedAddress={delegatedAddress}
                     />
                   )}
                   {!request.wallet_address && '-'}

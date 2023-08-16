@@ -8,11 +8,10 @@ import Currency, { CryptoAmount } from 'components/shared/Table/Currency'
 import { WalletAddress } from 'components/shared/WalletAddress'
 import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
 import { contractInterface } from 'components/web3/useContract'
-import useDelegatedAddress, { WalletSize } from 'components/web3/useDelegatedAddress'
 import { USD } from 'domain/currency/constants'
 import { ethers } from 'ethers'
 import { formatCrypto, formatCurrency } from 'lib/currency'
-import { shortenAddress } from 'lib/shortenAddress'
+import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { useState } from 'react'
 import { SUPPORT_EMAIL, TOKEN } from 'system.config'
 import { Table, TableDiv, TableHeader } from './Table'
@@ -74,7 +73,6 @@ const PaymentBatch = ({
 }: BatchProps) => {
   const { data, isNonBls, isPaymentSent, isHexMatch } = batchData
   const [isOpen, setIsOpen] = useState(false)
-  const getDelegatedAddress = useDelegatedAddress()
 
   let totalDollarAmount = 0
 
@@ -208,12 +206,7 @@ const PaymentBatch = ({
                     </div>
                   </TableDiv>
                   <TableDiv>
-                    <WalletAddress
-                      address={shortenAddress(wallet.address)}
-                      blockchain={wallet.blockchain}
-                      delegatedAddress={getDelegatedAddress(wallet.address, WalletSize.VERY_SHORT)?.shortAddress}
-                      isVerified={!!wallet.verificationId}
-                    />
+                    <WalletAddress address={wallet.address} blockchain={wallet.blockchain.name} isVerified={!!wallet.verificationId} />
                   </TableDiv>
                   <TableDiv>
                     <Currency amount={Number(amount)} requestCurrency={requestUnit.currency.name} paymentUnit={paymentUnit.currency.name} />

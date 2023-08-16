@@ -4,7 +4,7 @@ import { Button } from 'components/shared/Button'
 import Sortable from 'components/shared/Sortable'
 import { Cell, Header, Table, TableBody, TableHead } from 'components/shared/Table'
 import { WalletAddress } from 'components/shared/WalletAddress'
-import useDelegatedAddress from 'components/web3/useDelegatedAddress'
+import { TOKEN } from 'system.config'
 
 interface UserListProps {
   data: {
@@ -42,8 +42,6 @@ const getStatus = (isSanctioned: boolean, isReviewedByCompliance: boolean) => {
 }
 
 export const UserList = ({ data, status, handleOnUnblockClick, handleOnBlockClick, handleOnViewClick }: UserListProps) => {
-  const getDelegatedAddress = useDelegatedAddress()
-
   return (
     <div className="flex flex-col relative py-4">
       {/* @ts-ignore */}
@@ -75,7 +73,6 @@ export const UserList = ({ data, status, handleOnUnblockClick, handleOnBlockClic
         </TableHead>
         <TableBody>
           {data.map(user => {
-            const delegatedAddress = getDelegatedAddress(user.wallets[0]?.address)
             return (
               <tr key={user.id}>
                 {/* @ts-ignore */}
@@ -94,8 +91,8 @@ export const UserList = ({ data, status, handleOnUnblockClick, handleOnBlockClic
                 <Cell className="break-all">
                   <WalletAddress
                     address={user.wallets[0]?.address}
-                    delegatedAddress={delegatedAddress?.fullAddress}
                     isVerified={user.wallets[0]?.verification?.isVerified}
+                    blockchain={TOKEN.name}
                   />
                 </Cell>
                 {/* @ts-ignore */}

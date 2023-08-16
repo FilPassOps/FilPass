@@ -3,9 +3,8 @@ import { Divider } from 'components/shared/Divider'
 import { NumberInput, SelectInput, TextInput } from 'components/shared/FormInput'
 import { StatusBadge } from 'components/shared/Status'
 import { WalletAddress } from 'components/shared/WalletAddress'
-import useDelegatedAddress, { WalletSize } from 'components/web3/useDelegatedAddress'
-import { shortenAddress } from 'lib/shortenAddress'
 import { DateTime } from 'luxon'
+import { TOKEN } from 'system.config'
 import { ProgramInfo } from '../shared/ProgramInfo'
 import { RequestorReceiver } from '../shared/RequestorReceiver'
 import { useDownloadFile } from '../shared/useDownloadFile'
@@ -13,8 +12,6 @@ import { StatusNotes } from './StatusNotes'
 import { TransferRequestHistory } from './TransferRequestHistory'
 
 export const EditTransferRequestAsApprover = ({ data, role }) => {
-  const getDelegatedAddress = useDelegatedAddress()
-
   return (
     <div className="my-8 max-w-3xl mx-auto">
       <div className="flex justify-between items-center mb-7">
@@ -43,22 +40,22 @@ export const EditTransferRequestAsApprover = ({ data, role }) => {
             {
               label: data?.wallet_id
                 ? (() => {
-                    const delegatedAddress = data.delegated_address || getDelegatedAddress(data?.wallet_address)?.fullAddress
                     return (
                       data?.wallet_address && (
                         <>
                           <WalletAddress
-                            address={shortenAddress(data.wallet_address, WalletSize.SHORT)}
+                            address={data.wallet_address}
                             isVerified={data.wallet_is_verified}
-                            delegatedAddress={delegatedAddress?.shortAddress}
                             label={data.wallet_name}
+                            walletSize="short"
+                            blockchain={TOKEN.name}
                             className="sm:hidden"
                           />
                           <WalletAddress
                             address={data.wallet_address}
                             isVerified={data.wallet_is_verified}
-                            delegatedAddress={delegatedAddress?.fullAddress}
                             label={data.wallet_name}
+                            blockchain={TOKEN.name}
                             className="hidden sm:flex"
                           />
                         </>

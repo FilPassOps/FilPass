@@ -1,7 +1,6 @@
 import { Prisma } from '@prisma/client'
-import { WalletSize } from 'components/web3/useDelegatedAddress'
 import { decrypt, decryptPII } from 'lib/emissaryCrypto'
-import { getDelegatedAddress } from 'lib/getDelegatedAddress'
+import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import prisma from 'lib/prisma'
 import { shortenAddress } from 'lib/shortenAddress'
 import { validate } from 'lib/yup'

@@ -9,13 +9,11 @@ import { StatusPill } from 'components/shared/Status'
 import { Cell, Header, LinkedCell, Table, TableBody, TableHead } from 'components/shared/Table'
 import Currency, { CryptoAmount } from 'components/shared/Table/Currency'
 import { WalletAddress } from 'components/shared/WalletAddress'
-import useDelegatedAddress, { WalletSize } from 'components/web3/useDelegatedAddress'
 import { USD } from 'domain/currency/constants'
 import { SUCCESS_STATUS } from 'domain/transfer/constants'
 import { APPROVED_STATUS, PAID_STATUS } from 'domain/transferRequest/constants'
 import { classNames } from 'lib/classNames'
 import { formatCrypto } from 'lib/currency'
-import { shortenAddress } from 'lib/shortenAddress'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
@@ -34,7 +32,6 @@ const TransferList = ({
   const { filecoin } = useCurrency()
   const selectAllRef = useRef(null)
   const [selectAll, setSelectAll] = useState(false)
-  const getDelegatedAddress = useDelegatedAddress()
 
   // Select checkbox
   useEffect(() => {
@@ -113,7 +110,6 @@ const TransferList = ({
               const paymentUnit = request.program.programCurrency.find(({ type }) => type === 'PAYMENT')
               const requestUnit = request.program.programCurrency.find(({ type }) => type === 'REQUEST')
               const href = `/disbursement/${request.publicId}`
-              const delegatedAddress = getDelegatedAddress(request.wallet.address, WalletSize.VERY_SHORT)
 
               const paidTransfer = request?.transfers?.find(({ status }) => status === SUCCESS_STATUS)
               return (
@@ -155,8 +151,7 @@ const TransferList = ({
                   <LinkedCell href={href}>
                     {request?.wallet?.address && (
                       <WalletAddress
-                        address={shortenAddress(request.wallet.address)}
-                        delegatedAddress={delegatedAddress?.shortAddress}
+                        address={request.wallet.address}
                         blockchain={request.wallet.blockchain}
                         isVerified={!!request.wallet.verificationId}
                       />

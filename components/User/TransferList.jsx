@@ -9,16 +9,13 @@ import { Cell, Header, LinkedCell, Table, TableBody, TableHead } from 'component
 import Currency from 'components/shared/Table/Currency'
 import PaymentControl from 'components/shared/Table/PaymentControl'
 import { WalletAddress } from 'components/shared/WalletAddress'
-import useDelegatedAddress, { WalletSize } from 'components/web3/useDelegatedAddress'
 import { DRAFT_STATUS } from 'domain/transferRequest/constants'
-import { shortenAddress } from 'lib/shortenAddress'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 
 const TransferList = ({ data = [] }) => {
   const router = useRouter()
   const { filecoin } = useCurrency()
-  const getDelegatedAddress = useDelegatedAddress()
 
   return (
     <div className="flex flex-col">
@@ -48,7 +45,6 @@ const TransferList = ({ data = [] }) => {
         </TableHead>
         <TableBody>
           {data.map(request => {
-            const delegatedAddress = getDelegatedAddress(request.user_wallet_address, WalletSize.VERY_SHORT)
             const href = `/transfer-requests/${request.id}${request.status === DRAFT_STATUS ? '/edit' : ''}`
             return (
               <tr
@@ -70,8 +66,7 @@ const TransferList = ({ data = [] }) => {
                 <LinkedCell href={href}>
                   {request.user_wallet_address && (
                     <WalletAddress
-                      address={shortenAddress(request.user_wallet_address)}
-                      delegatedAddress={delegatedAddress?.shortAddress}
+                      address={request.user_wallet_address}
                       blockchain={request.user_wallet_blockchain}
                       isVerified={!!request.user_wallet_is_verified}
                     />
