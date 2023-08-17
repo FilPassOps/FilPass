@@ -7,7 +7,6 @@ import { checkItemsPerPage, PaginationWrapper } from 'components/shared/usePagin
 import { PLATFORM_NAME } from 'system.config'
 import { findAllTaxForms } from 'domain/files'
 import { withFinanceSSR } from 'lib/ssr'
-import Head from 'next/head'
 import { ReactElement, useEffect, useState } from 'react'
 
 export enum TaxStatus {
@@ -48,9 +47,6 @@ export default function TaxReviewPage({ data, totalItems, pageSize, status }: Ta
 
   return (
     <>
-      <Head>
-        <title>Tax Review - {PLATFORM_NAME}</title>
-      </Head>
       {selectedTotalTaxForms > 0 && (
         <>
           <div className="flex mb-4 gap-2">
@@ -80,7 +76,7 @@ export default function TaxReviewPage({ data, totalItems, pageSize, status }: Ta
 }
 
 TaxReviewPage.getLayout = function getLayout(page: ReactElement) {
-  return <Layout title="Tax Review">{page}</Layout>
+  return <Layout title={`Tax Review - ${PLATFORM_NAME}`}>{page}</Layout>
 }
 
 export const getServerSideProps = withFinanceSSR(async ({ query }: any) => {

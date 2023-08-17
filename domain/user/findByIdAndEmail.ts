@@ -7,7 +7,7 @@ import { orderBy } from 'lodash'
 import { getUserByIdAndEmailValidator } from './validation'
 
 interface GetUserByIdAndEmailParams {
-  userId: number
+  userId?: number
   email?: string
 }
 

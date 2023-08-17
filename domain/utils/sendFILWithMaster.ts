@@ -8,7 +8,7 @@ interface SendFILWithMasterRequestParams {
   address: string
 }
 
-interface FilecoinApiResult {
+export interface FilecoinApiResult {
   data?: any
   error?: {
     status?: number

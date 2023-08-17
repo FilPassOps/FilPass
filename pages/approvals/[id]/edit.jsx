@@ -4,14 +4,10 @@ import { PLATFORM_NAME } from 'system.config'
 import { APPROVED_STATUS, REQUIRES_CHANGES_STATUS, SUBMITTED_BY_APPROVER_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
 import { getApproverTransferRequestById } from 'domain/transferRequest/getApproverTransferRequestById'
 import { withApproverSSR } from 'lib/ssr'
-import Head from 'next/head'
 
 export default function ApproverViewAwaiting({ data }) {
   return (
     <>
-      <Head>
-        <title>Approval #{data?.id} - {PLATFORM_NAME}</title>
-      </Head>
       <TransferRequestEdit data={data} />
     </>
   )
@@ -19,7 +15,7 @@ export default function ApproverViewAwaiting({ data }) {
 
 ApproverViewAwaiting.getLayout = function getLayout(page) {
   const data = page.props.data
-  return <Layout title={`Edit Transfer Request #${data?.id}`}>{page}</Layout>
+  return <Layout title={`Edit Transfer Request #${data?.id} - ${PLATFORM_NAME}`}>{page}</Layout>
 }
 export const getServerSideProps = withApproverSSR(async ({ user, query }) => {
   const { data, error } = await getApproverTransferRequestById({

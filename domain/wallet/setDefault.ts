@@ -6,7 +6,7 @@ import { setDefaultValidator } from './validation'
 import { logger } from 'lib/logger'
 
 interface SetDefaultParams {
-  token: string
+  token?: string
 }
 
 interface DecodedData {

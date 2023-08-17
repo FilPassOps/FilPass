@@ -21,7 +21,6 @@ import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { getEthereumAddress } from 'lib/getEthereumAddress'
 import { withRolesSSR } from 'lib/ssr'
 import { DateTime } from 'luxon'
-import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import errorsMessages from 'wordings-and-errors/errors-messages'
@@ -158,10 +157,6 @@ export default function Approvals({
 
   return (
     <>
-      <Head>
-        <title>My Approvals - {PLATFORM_NAME}</title>
-      </Head>
-
       <div className="w-full">
         <div>
           {selectedRequests.length > 0 && (
@@ -291,7 +286,7 @@ export const BatchActionsButton = () => {
 }
 
 Approvals.getLayout = function getLayout(page) {
-  return <Layout title="My Approvals">{page}</Layout>
+  return <Layout title={`My Approvals - ${PLATFORM_NAME}`}>{page}</Layout>
 }
 
 export const getServerSideProps = withRolesSSR([APPROVER_ROLE, COMPLIANCE_ROLE, VIEWER_ROLE], async ({ user: { id, roles }, query }) => {

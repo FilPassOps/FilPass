@@ -22,7 +22,7 @@ import { SelectWalletInput } from './SelectWalletInput'
 import { SubmittedModal } from './SubmittedModal'
 import { useFormSubmit } from './useFormSubmit'
 
-export const TransferRequestForm = ({ isEditable = false, data, programs = [], masterAddress = '' }) => {
+export const TransferRequestForm = ({ isEditable = false, data = null, programs = [], masterAddress = '' }) => {
   const { user } = useAuth()
   const [openWalletModal, setOpenWalletModal] = useState(false)
   const [hasUnhandledError, setHasUnhandledError] = useState(false)

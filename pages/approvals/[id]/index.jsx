@@ -9,9 +9,6 @@ import Head from 'next/head'
 export default function ApproverViewAwaiting({ data }) {
   return (
     <>
-      <Head>
-        <title>Approval #{data?.id} - {PLATFORM_NAME}</title>
-      </Head>
       <TransferRequestView data={data} />
     </>
   )
@@ -21,7 +18,7 @@ ApproverViewAwaiting.getLayout = function getLayout(page) {
   const data = page.props.data
   const hasApprovalBar = data?.approversGroup?.length > 1
   return (
-    <Layout title={`Transfer Request #${data?.id}`} defaultPadding={!hasApprovalBar}>
+    <Layout title={`Transfer Request #${data?.id} - ${PLATFORM_NAME}`} defaultPadding={!hasApprovalBar}>
       {page}
     </Layout>
   )
