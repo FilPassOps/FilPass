@@ -3,11 +3,11 @@ import Crypto from 'crypto'
 interface GenerateIdentifierParams {
   address: string
   amount: number
-  createdAt: string
+  createdAt: Date
   email: string
 }
 
-const generateIdentifier = ({ address, amount, createdAt, email }: GenerateIdentifierParams) => {
+export const generateIdentifier = ({ address, amount, createdAt, email }: GenerateIdentifierParams) => {
   if (isNaN(Number(amount))) {
     throw 'Amount needs to be a Number'
   }

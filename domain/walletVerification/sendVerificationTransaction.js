@@ -183,6 +183,7 @@ export async function send(message, masterWallet, masterWalletBalance) {
     GasPremium: GasPremium,
   }
 
+  // TODO: investigate value case should be Value
   if (+masterWalletBalance < +message.value + +GasFeeCap) {
     logger.error('Insufficient funds on the Master Wallet, cant validate wallet.')
     return {
@@ -193,6 +194,7 @@ export async function send(message, masterWallet, masterWalletBalance) {
     }
   }
 
+  // TODO: investigate signMessage receiving only one parameter
   const signature = await signMessage(estimatedMessage, masterWallet)
   const transaction = { Message: estimatedMessage, Signature: signature }
 
