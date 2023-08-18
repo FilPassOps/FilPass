@@ -8,9 +8,9 @@ import { ethers } from 'ethers'
 import { api } from 'lib/api'
 import Head from 'next/head'
 import { useEffect, useState } from 'react'
+import { PLATFORM_NAME } from 'system.config'
 import { MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
 import { NextPageWithLayout } from './_app'
-import { PLATFORM_NAME } from 'system.config'
 
 declare const window: CustomWindow
 
@@ -118,7 +118,7 @@ const Playground: NextPageWithLayout = () => {
       const value = ethers.utils.parseEther('0.01').toString()
       const total = ethers.utils.parseEther('0.45').toString()
       const address = filecoinAddress.newFromString(
-        't3vzc7naq3khx3bjkbelvce2yw4brl5bw4ejjhrcdoh63qma66elz26fxkmayl2qtvte7dzgod6qc3ou2j676a'
+        't3vzc7naq3khx3bjkbelvce2yw4brl5bw4ejjhrcdoh63qma66elz26fxkmayl2qtvte7dzgod6qc3ou2j676a',
       ).bytes
 
       const addresses = Array.from({ length: 45 }, () => address)
@@ -276,7 +276,7 @@ const Playground: NextPageWithLayout = () => {
               <div className="mt-6">
                 Transaction Hash:{' '}
                 <a
-                  href={`${config.chain.blockExplorerUrls[0]}/message/${hash}`}
+                  href={`${config.chain.blockExplorerUrls[0]}/${hash}`}
                   rel="noreferrer"
                   target="_blank"
                   className="underline text-indigo-600"

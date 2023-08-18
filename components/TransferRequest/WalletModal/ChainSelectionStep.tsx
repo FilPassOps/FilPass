@@ -1,5 +1,6 @@
 import { Button } from 'components/shared/Button'
 import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
+import { TOKEN } from 'system.config'
 
 interface ChainSelectionProps {
   onConnectionMethodClick: (method: 'Metamask' | 'Manually') => void
@@ -27,14 +28,18 @@ export function ChainSelection({ onConnectionMethodClick }: ChainSelectionProps)
           <br />
           (0x and f4 wallets)
         </WithMetaMaskButton>
-        {/* @ts-ignore */}
-        <Button variant="primary-lighter" onClick={() => onConnectionMethodClick('Manually')}>
-          Connect Manually
-          <br />
-          (f1, f2, and f3 wallets)
-        </Button>
+        {TOKEN.name === 'Filecoin' && (
+          <>
+            {/* @ts-ignore */}
+            <Button variant="primary-lighter" onClick={() => onConnectionMethodClick('Manually')}>
+              Connect Manually
+              <br />
+              (f1, f2, and f3 wallets)
+            </Button>
+            <small className="text-gray-500 text-center font-normal mt-2">*Manually connecting a wallet can lead to errors</small>
+          </>
+        )}
       </div>
-      <small className="text-gray-500 text-center font-normal mt-2">*Manually connecting a wallet can lead to errors</small>
     </div>
   )
 }
