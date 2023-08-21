@@ -154,8 +154,8 @@ export const Filters = ({ programs, statusOptions, teams, dateFilterLabel = 'Cre
                     placeholder="1234567890"
                   />
                   <div className={`${requestNumber ? 'absolute' : 'hidden'} top-[10px] right-4`}>
-                    <button onClick={() => setRequestNumber('')}>
-                      <XMarkIcon width={16} height={16} aria-label="Clear" />
+                    <button type="button" aria-label="Clear Transfer Request number field" onClick={() => setRequestNumber('')}>
+                      <XMarkIcon width={16} height={16} />
                     </button>
                   </div>
                 </div>
@@ -265,8 +265,8 @@ export const Filters = ({ programs, statusOptions, teams, dateFilterLabel = 'Cre
                     placeholder="f1ifoar2uwirdrmr5hylvhpphdph6z6ahrqvxashw"
                   />
                   <div className={`${requestNumber ? 'absolute' : 'hidden'} top-[10px] right-4`}>
-                    <button onClick={() => setWalletAdress('')}>
-                      <XMarkIcon width={16} height={16} aria-label="Clear" />
+                    <button type="button" aria-label="Clear wallet address" onClick={() => setWalletAdress('')}>
+                      <XMarkIcon width={16} height={16} />
                     </button>
                   </div>
                 </div>
@@ -386,6 +386,7 @@ function Select({ name, placeholder, options, onChange, selectedOptions, setSele
                       unselect(option)
                       inputRef.current?.focus()
                     }}
+                    aria-label="Clear selected programs"
                   >
                     <XMarkIcon width={16} height={16} />
                   </button>

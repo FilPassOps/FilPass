@@ -7,6 +7,7 @@ import blockchainWatcher from './blockchain-watcher'
 import checkAwaitingTaxFormReviewNotification from './check-awaiting-tax-form-review-notification'
 import checkPendingTransfer from './check-pending-transfer'
 import requiresChangeNotification from './requires-change-notification'
+import { logger } from 'lib/logger'
 
 const blockchainWatcherLimiter = new Bottleneck({
   maxConcurrent: 1,
@@ -39,4 +40,4 @@ schedule.scheduleJob('0 16 * * *', checkAwaitingTaxFormReviewNotification)
 schedule.scheduleJob('* * * * *', job(blockchainWatcherLimiter, blockchainWatcher))
 schedule.scheduleJob('*/2 * * * *', job(checkPendingTransferLimiter, checkPendingTransfer))
 
-console.log(`> Jobs started...`)
+logger.info(`> Jobs scheduled...`)

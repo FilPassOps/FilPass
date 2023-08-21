@@ -28,8 +28,6 @@ export async function findAllUsers(params: FindAllUsersParams) {
     }
   }
 
-  console.log('params', params)
-
   const { sortType, orderBy } = getSortParams(params)
   const { size = 100, page = 1 } = params
 

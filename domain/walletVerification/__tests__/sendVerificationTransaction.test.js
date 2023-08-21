@@ -338,7 +338,7 @@ describe('sendVerificationTransaction', () => {
         message: errorsMessages.something_went_wrong.message,
       }
 
-      const { data, error } = await sendVerificationModule.send('transaction', {})
+      const { data, error } = await sendVerificationModule.send({message: 'transaction', masterWallet: {}})
 
       expect(data).toBeUndefined()
       expect(error).toEqual(expectedError)
@@ -354,9 +354,9 @@ describe('sendVerificationTransaction', () => {
         message: errorsMessages.something_went_wrong.message,
       }
 
-      const { data, error } = await sendVerificationModule.send('transaction', {
+      const { data, error } = await sendVerificationModule.send({message: 'transaction', masterWallet: {
         address: 'master_wallet_address',
-      })
+      }})
 
       expect(data).toBeUndefined()
       expect(error).toEqual(expectedError)
@@ -383,9 +383,9 @@ describe('sendVerificationTransaction', () => {
         params: '',
       }
 
-      const { data, error } = await sendVerificationModule.send(transaction, {
+      const { data, error } = await sendVerificationModule.send({message: transaction, masterWallet: {
         private_raw: 'private_raw',
-      })
+      }})
 
       const expectedError = {
         status: 400,
@@ -422,9 +422,9 @@ describe('sendVerificationTransaction', () => {
         },
       })
 
-      const { data, error } = await sendVerificationModule.send('', {
+      const { data, error } = await sendVerificationModule.send({message: '', masterWallet: {
         private_raw: 'private_raw',
-      })
+      }})
 
       expect(error).toBeUndefined()
       expect(data).toEqual({

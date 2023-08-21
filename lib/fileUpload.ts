@@ -1,6 +1,6 @@
-import { captureException } from '@sentry/nextjs'
 import aws, { AWSError } from 'aws-sdk'
 import { createReadStream } from 'fs'
+import { logger } from 'lib/logger'
 import { last } from 'lodash'
 import { DateTime } from 'luxon'
 
@@ -48,7 +48,7 @@ export const uploadFileToS3 = async ({ file, userId, type }: UploadFileToS3Param
     }
   } catch (error) {
     const awsError = error as AWSError
-    captureException(error)
+    logger.error('Error uploading file to S3', error)
     return {
       error: {
         status: awsError.statusCode,
@@ -60,7 +60,7 @@ export const uploadFileToS3 = async ({ file, userId, type }: UploadFileToS3Param
   }
 }
 
-interface UploadFileToS3Params {
+interface UploadFileToS3TempParams {
   file: {
     path: string
     filename: string
@@ -69,7 +69,7 @@ interface UploadFileToS3Params {
   type: string
 }
 
-export const uploadFileToS3Temp = async ({ file, type }: UploadFileToS3Params) => {
+export const uploadFileToS3Temp = async ({ file, type }: UploadFileToS3TempParams) => {
   const timeStamp = DateTime.now().toMillis()
   const key = `temp/${type}/${timeStamp}/${file.filename}-${file.originalname}`
   try {
@@ -88,7 +88,7 @@ export const uploadFileToS3Temp = async ({ file, type }: UploadFileToS3Params) =
     }
   } catch (error) {
     const awsError = error as AWSError
-    captureException(error)
+    logger.error('Error uploading file to S3 temp', error)
     return {
       error: {
         status: awsError.statusCode,
@@ -125,8 +125,8 @@ export const moveFileS3 = async ({ userId, type, source }: GetMoveFileS3Params) 
     }
   } catch (error) {
     const awsError = error as AWSError
-    captureException(error)
     console.log(error)
+    logger.error('Error moving file in S3', error)
     return {
       error: {
         status: awsError.statusCode,
@@ -152,7 +152,7 @@ export const removeFileFromS3 = async ({ key }: RemoveFileFromS3Params) => {
       .promise()
   } catch (error) {
     const awsError = error as AWSError
-    captureException(error)
+    logger.error('Error removing file from S3', error)
     return {
       error: {
         status: awsError.statusCode,
@@ -174,6 +174,7 @@ export const getFile = async ({ key }: GetFileParams) => {
 
     const error = response.$response.error
     if (error) {
+      logger.error('Error getting file from S3', error)
       return {
         error: {
           status: error.statusCode,
@@ -185,7 +186,7 @@ export const getFile = async ({ key }: GetFileParams) => {
     return { data: Buffer.from(response.Body as Buffer) }
   } catch (error) {
     const awsError = error as AWSError
-    captureException(error)
+    logger.error('Error getting file from S3', error)
     return {
       error: {
         status: awsError.statusCode,
@@ -207,7 +208,7 @@ export const getReadStream = async ({ key }: GetReadStreamParams) => {
     return { data }
   } catch (error) {
     const awsError = error as AWSError
-    captureException(error)
+    logger.error('Error getting file from S3 - read stream', error)
     return {
       error: {
         status: awsError.statusCode || 500,

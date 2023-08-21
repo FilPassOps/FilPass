@@ -9,6 +9,7 @@ import { StatusPill } from 'components/shared/Status'
 import { Cell, Header, LinkedCell, Table, TableBody, TableHead } from 'components/shared/Table'
 import Currency, { CryptoAmount } from 'components/shared/Table/Currency'
 import { WalletAddress } from 'components/shared/WalletAddress'
+import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
 import { USD } from 'domain/currency/constants'
 import { SUCCESS_STATUS } from 'domain/transfer/constants'
 import { APPROVED_STATUS, PAID_STATUS } from 'domain/transferRequest/constants'
@@ -189,9 +190,10 @@ const TransferList = ({
                         className="h-full flex items-center justify-center flex-col space-y-4 2xl:space-y-0 2xl:space-x-4 2xl:flex-row"
                         onClick={e => e.stopPropagation()}
                       >
-                        <Button variant="outline-green" onClick={() => onSinglePayClick(request)}>
+                        <WithMetaMaskButton variant="outline-green" onClick={() => onSinglePayClick(request)} defaultLabel="Pay">
                           Pay
-                        </Button>
+                        </WithMetaMaskButton>
+
                         <Button variant="outline-red" onClick={() => onSingleRejectClick(request)}>
                           Reject
                         </Button>

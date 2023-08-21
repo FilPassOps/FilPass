@@ -1,5 +1,6 @@
 import { loadEnvConfig } from '@next/env'
 import express from 'express'
+import { logger } from 'lib/logger'
 import next from 'next'
 import schedule from 'node-schedule'
 loadEnvConfig(process.cwd(), process.env.NODE_ENV !== 'production')
@@ -16,7 +17,7 @@ app.prepare().then(() => {
   })
 
   server.listen(port, () => {
-    console.log(`> Ready on http://localhost:${port}`)
+    logger.info(`> Ready on http://localhost:${port}`)
   })
 
   import('jobs/index')
@@ -24,13 +25,13 @@ app.prepare().then(() => {
 })
 
 function handleExit(signal: string) {
-  console.log(`\r\n> Received ${signal}. Shutting down schedule gracefully...`)
+  logger.info(`\r\n> Received ${signal}. Shutting down gracefully...`)
   schedule
     .gracefulShutdown()
-    .then(() => console.log('> Schedule shutdown successful.'))
-    .catch(() => console.log('> Schedule shutdown failed.'))
+    .then(() => logger.info('> Schedule shutdown successful.'))
+    .catch(() => logger.info('> Schedule shutdown failed.'))
     .finally(() => {
-      console.log('> Exiting...')
+      logger.info('> Exiting...')
       process.exit(0)
     })
 }

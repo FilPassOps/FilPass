@@ -4,6 +4,7 @@ import { validate } from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { verifyAccountValidator } from './validation'
 import { generateEmailHash } from 'lib/password'
+import { logger } from 'lib/logger'
 
 interface VerifyAccountParams {
   token: string
@@ -38,7 +39,7 @@ export async function verifyAccount(params: VerifyAccountParams) {
     const decoded = jwt.verify(token, secret) as { email: string }
     userEmail = decoded.email
   } catch (error) {
-    console.log('Error verifying token. ', JSON.stringify(error))
+    logger.error('Error verifying token. ', error)
     return {
       error: {
         status: 400,

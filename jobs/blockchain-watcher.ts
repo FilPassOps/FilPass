@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client'
 import config from 'chains.config'
 import { transferPaymentConfirm } from 'domain/transfer/transfers-payment-confirm'
 import { ethers } from 'ethers'
+import { logger } from 'lib/logger'
 import prisma from 'lib/prisma'
 import { MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
 import { ForwardAnyEvent } from 'typechain-types/MultiForwarder'
@@ -28,7 +29,7 @@ export default async function run() {
       const _startBlock = i
       const _endBlock = Math.min(toBlock, i + chunkSize)
 
-      console.log(`Start block: ${_startBlock} - End block: ${_endBlock}`)
+      logger.info(`Processing blocks ${_startBlock} to ${_endBlock}`)
 
       const [forwardAnyEvents, forwardEvents] = await Promise.all([
         multiForwarder.queryFilter(filterAny, _startBlock, _endBlock),
@@ -49,12 +50,12 @@ export default async function run() {
       }
 
       await prisma.blockTracker.updateMany({ data: { blockNumber: _endBlock + 1 } })
-      console.log('Updated block number:', _endBlock + 1)
+      logger.info(`Updated block number: ${_endBlock + 1}`)
     }
   } catch (error: any) {
-    console.error(error)
+    logger.error('Error in blockchain watcher', error)
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-      console.log('Creating block tracker...')
+      logger.info('Creating block tracker...')
       await prisma.blockTracker.create({ data: { blockNumber: currentBlock } })
       return
     }

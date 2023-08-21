@@ -1,11 +1,11 @@
 import { updateUserOnHoldTranferRequests } from 'domain/user'
 import { encryptPII } from 'lib/emissaryCrypto'
 import { checkSanction } from 'lib/emissarySanctionCheck'
+import { logger } from 'lib/logger'
 import prisma, { newPrismaTransaction } from 'lib/prisma'
 
 export default async function run() {
   try {
-
     const users = await prisma.user.findMany({
       select: {
         id: true,
@@ -34,7 +34,7 @@ export default async function run() {
         let sanctionReason = sanctionReasonResult
 
         if (isSanctioned === null) {
-          console.log(`SANCTION CHECK FAILED => ${id}`)
+          logger.error(`SANCTION CHECK FAILED => ${id}`)
           sanctionReason = 'Sanctions check failed'
         }
 
@@ -81,11 +81,11 @@ export default async function run() {
             sanctionReason: null,
           })
 
-          console.log(`SANCTION UNBLOCKED TRANSACTIONS => ${updatedRequests}`)
+          logger.info(`SANCTION UNBLOCKED TRANSACTIONS => ${updatedRequests}`)
         })
       }
     }
   } catch (error) {
-    console.log(error)
+    logger.error('Failed to check sanctions', error)
   }
 }

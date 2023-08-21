@@ -6,6 +6,7 @@ import prisma from 'lib/prisma'
 import { validate } from 'lib/yup'
 import { filetypemime } from 'magic-bytes.js'
 import { getFileValidator } from './validation'
+import { logger } from 'lib/logger'
 
 interface GetUserFileParams {
   filePublicId: string
@@ -22,7 +23,7 @@ export async function getUserFileReadStream(params: GetUserFileParams) {
   const { error: awsError, data } = await getReadStream({ key: file.key })
 
   if (awsError) {
-    console.log('Failed to get file read stream.', ` status:${awsError.status}`, ` message:${awsError.errors.file}`)
+    logger.error('Failed to get file read stream.', ` status:${awsError.status}`, ` message:${awsError.errors.file}`)
     return {
       error: {
         status: awsError.status,
@@ -49,7 +50,7 @@ export async function getUserFile(params: GetUserFileParams) {
   const { data, error: awsError } = await getFile({ key: file.key })
 
   if (awsError) {
-    console.log('Failed to get file.', ` status:${awsError.status}`, ` message:${awsError.message}`)
+    logger.error('Failed to get file.', ` status:${awsError.status}`, ` message:${awsError.message}`)
     return {
       error: {
         status: awsError.status,

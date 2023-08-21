@@ -1,4 +1,3 @@
-import { captureException, withSentry } from '@sentry/nextjs'
 import crypto from 'crypto'
 import {
   ADDRESS_MANAGER_ROLE,
@@ -24,6 +23,7 @@ import { tmpdir } from 'os'
 import { AnyObjectSchema } from 'yup'
 import { extractRoles } from './auth'
 import yup from './yup'
+import { logger } from './logger'
 
 type Methods = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE' | 'CONNECT' | 'OPTIONS' | 'TRACE' | 'PATCH'
 
@@ -33,7 +33,7 @@ export type SessionUser = NonNullable<IronSessionData['user']>
 
 export type NextApiHandlerWithUser<ResponseType = any, RequestType extends NextApiRequestWithSession = NextApiRequestWithSession> = (
   req: RequestType,
-  res: NextApiResponse<ResponseType>
+  res: NextApiResponse<ResponseType>,
 ) => any | Promise<any>
 
 const APP_SECRET = process.env.APP_SECRET
@@ -62,15 +62,14 @@ const globalLimiter = rateLimit({
 })
 
 export function newHandler<T>(handler: NextApiHandler<T> | NextApiHandlerWithUser<T>) {
-  return withSentry(async (req: NextApiRequest, res: NextApiResponse<T | { message: string }>) => {
+  return async (req: NextApiRequest, res: NextApiResponse<T | { message: string }>) => {
     try {
       await handler(req, res)
     } catch (error: any) {
-      console.log(error)
-      captureException(error)
+      logger.error('Error in handler', error)
       return res.status(error?.status ?? 500).json({ message: error?.message ?? 'An unexpected error happened. Please, try again.' })
     }
-  })
+  }
 }
 
 export function withMethods<T>(methods: Methods[] = [], handler: NextApiHandlerWithUser<T> | NextApiHandler<T>) {
