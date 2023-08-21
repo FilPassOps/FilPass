@@ -4,18 +4,16 @@ import { useAuth } from 'components/Authentication/Provider'
 import { Button } from 'components/shared/Button'
 import { SelectInput } from 'components/shared/FormInput'
 import { WalletAddress } from 'components/shared/WalletAddress'
-import useDelegatedAddress, { WalletSize } from 'components/web3/useDelegatedAddress'
-import { shortenAddress } from 'lib/shortenAddress'
 import _get from 'lodash/get'
 import { useMemo, useState } from 'react'
 import { Controller } from 'react-hook-form'
+import { TOKEN } from 'system.config'
 import { DeleteWalletAddressModal } from './DeleteWalletAddressModal'
 
 export const SelectWalletInput = ({ control, errors, submitErrors, data, onCreateWalletClick }) => {
   const { user } = useAuth()
   const [walletData, setWalletData] = useState()
   const [openDeleteWalletAddressModal, setOpenDeleteWalletAddressModal] = useState(false)
-  const getDelegatedAddress = useDelegatedAddress()
 
   const defaultTransferWallet = useMemo(() => {
     if (!data || !data?.wallet_id) {
@@ -35,25 +33,25 @@ export const SelectWalletInput = ({ control, errors, submitErrors, data, onCreat
     }
 
     const userWalletOptions = _get(user, 'wallets', []).map(wallet => {
-      const delegatedAddress = getDelegatedAddress(wallet.address, WalletSize.SHORT)
-
       return {
         label: (
           <div className="flex items-start gap-1">
             <div className="flex flex-col lg:flex-row lg:gap-1 truncate">
               <div className="flex gap-1 items-center">
                 <WalletAddress
-                  address={shortenAddress(wallet.address, WalletSize.SHORT)}
+                  address={wallet.address}
                   isVerified={wallet.verification}
-                  delegatedAddress={delegatedAddress?.shortAddress}
                   label={wallet?.name}
+                  blockchain={TOKEN.name}
+                  walletSize="short"
                   className="sm:hidden"
                 />
                 <WalletAddress
                   address={wallet.address}
                   isVerified={wallet.verification}
-                  delegatedAddress={delegatedAddress?.fullAddress}
                   label={wallet?.name}
+                  blockchain={TOKEN.name}
+                  walletSize="full"
                   className="hidden sm:flex"
                 />
               </div>
@@ -83,7 +81,7 @@ export const SelectWalletInput = ({ control, errors, submitErrors, data, onCreat
     }
 
     return userWalletOptions
-  }, [user, defaultTransferWallet, getDelegatedAddress])
+  }, [user, defaultTransferWallet])
 
   return (
     <>

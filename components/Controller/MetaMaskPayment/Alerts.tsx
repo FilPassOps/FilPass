@@ -42,7 +42,7 @@ export const SuccessAlert: React.FC<React.PropsWithChildren<{ hash: string; hand
     <p className="text-sm text-gray-500 mb-4 text-center">Your payment has been successfully sent.</p>
     <div className="mt-4 text-sm text-gray-500 text-center mb-4">
       <a
-        href={`${config.chain.blockExplorerUrls[0]}/message/${hash}`}
+        href={`${config.chain.blockExplorerUrls[0]}/${hash}`}
         onClick={() => handleClose()}
         rel="noreferrer"
         target="_blank"

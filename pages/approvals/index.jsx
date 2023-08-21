@@ -10,7 +10,6 @@ import { DeleteModal } from 'components/TransferRequest/shared/DeleteModal'
 import { Button, LinkButton } from 'components/shared/Button'
 import { PaginationCounter } from 'components/shared/PaginationCounter'
 import { PaginationWrapper, checkItemsPerPage } from 'components/shared/usePagination'
-import { PLATFORM_NAME } from 'system.config'
 import { stringify } from 'csv-stringify/sync'
 import { getApprovalsByRole } from 'domain/approvals/service'
 import { APPROVER_ROLE, COMPLIANCE_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
@@ -24,6 +23,7 @@ import { DateTime } from 'luxon'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { PLATFORM_NAME } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
 export default function Approvals({
@@ -134,19 +134,21 @@ export default function Approvals({
               columns.status && row.push(status)
               columns.residency && row.push(is_us_resident ? 'US' : 'Non-US')
               columns.taxForm && row.push(`${window?.location.origin}/api/files/${file_id}/view`)
-              columns.filfoxLink && row.push(`${config.chain.blockExplorerUrls[0]}/message/${transfer_hash}`)
+              columns.filfoxLink && row.push(`${config.chain.blockExplorerUrls[0]}/${transfer_hash}`)
               return row
-            }
+            },
           ),
         ],
         {
           delimiter: ',',
-        }
+        },
       )
       const blob = new Blob([csvTemplate])
       return JsFileDownload(
         blob,
-        `${PLATFORM_NAME.toLowerCase()}_${currentStatus.toLowerCase()}_approvals_${DateTime.now().toFormat("yyyy-MM-dd_hh'h'mm'm'ss's'")}.csv`
+        `${PLATFORM_NAME.toLowerCase()}_${currentStatus.toLowerCase()}_approvals_${DateTime.now().toFormat(
+          "yyyy-MM-dd_hh'h'mm'm'ss's'",
+        )}.csv`,
       )
     } catch (error) {
       console.error(error)

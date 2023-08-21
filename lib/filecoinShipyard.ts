@@ -1,7 +1,9 @@
 import { NodejsProvider } from '@filecoin-shipyard/lotus-client-provider-nodejs'
-import { LotusRPC, Message } from '@filecoin-shipyard/lotus-client-rpc'
+import { LotusRPC } from '@filecoin-shipyard/lotus-client-rpc'
 import { mainnet } from '@filecoin-shipyard/lotus-client-schema'
 import config from 'chains.config'
+import { TOKEN } from 'system.config'
+import { logger } from './logger'
 
 const LOTUS_LITE_NODE_API_ENDPOINT = process.env.LOTUS_LITE_NODE_API_ENDPOINT
 const LOTUS_LITE_TOKEN = process.env.LOTUS_LITE_TOKEN
@@ -18,10 +20,6 @@ const url = `${LOTUS_LITE_NODE_API_ENDPOINT}/rpc/v0?token=${LOTUS_LITE_TOKEN}`
 const provider = new NodejsProvider(url)
 const client = new LotusRPC(provider, { schema: mainnet.fullNode })
 
-export const gasEstimateMessageGas = (message: Message, tipSetKey = []) => {
-  return client.gasEstimateMessageGas(message, { MaxFee: '0' }, tipSetKey)
-}
-
 export const matchWalletAddress = async (address: string) => {
   try {
     if (!address.startsWith(config.coinType)) return false
@@ -29,16 +27,13 @@ export const matchWalletAddress = async (address: string) => {
     if (validationResult !== address) return false
     return true
   } catch (e) {
-    console.log(e)
+    logger.error('Error matching wallet address. ', e)
     return false
   }
 }
 
 export const validateWalletAddress = async (address: string) => {
+  if (TOKEN.name !== 'Filecoin') return address
   if (!address.startsWith(config.coinType)) throw new Error('Invalid address')
   return client.walletValidateAddress(address)
-}
-
-export const getMessage = async (cid: string) => {
-  return client.stateSearchMsg([{ '/': cid }], { '/': cid }, 2712838, false)
 }

@@ -1,6 +1,7 @@
 import { baseEmail } from 'domain/notifications/constants'
 import { REQUIRES_CHANGES_STATUS } from 'domain/transferRequest/constants'
 import { decryptPII } from 'lib/emissaryCrypto'
+import { logger } from 'lib/logger'
 import prisma from 'lib/prisma'
 import { sendBatchEmail } from 'lib/sendEmail'
 
@@ -61,7 +62,7 @@ export default async function run() {
   try {
     await sendBatchEmail({ recipients, subject: 'Transfer Request pending action', html: baseEmail(getBody()) })
   } catch (e) {
-    console.log('Something went wrong during the batch email sent', e)
+    logger.error('Something went wrong during the batch email sent', e)
     return
   }
 

@@ -6,17 +6,17 @@ import { Button } from 'components/shared/Button'
 import { Divider } from 'components/shared/Divider'
 import { CheckboxInput, TextInput } from 'components/shared/FormInput'
 import { GoBackConfirmation } from 'components/shared/GoBackConfirmation'
-import useDelegatedAddress from 'components/web3/useDelegatedAddress'
 import { DRAFT_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
 import {
   createTransferRequestDraftFormValidator,
   createTransferRequestSubmittedFormValidator,
 } from 'domain/transferRequestDraft/validation'
 import { api } from 'lib/api'
+import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import { PLATFORM_NAME } from 'system.config'
+import { PLATFORM_NAME, TOKEN } from 'system.config'
 import { PageAlert } from '../../Layout/Alerts'
 import { AttachmentInput } from '../TransferRequestForm/AttachmentInput'
 import { ProgramInfo } from '../shared/ProgramInfo'
@@ -118,8 +118,8 @@ export const ApplyForSomeoneForm = () => {
         <Divider className="my-8" />
         <PageAlert type="warning" withIcon={false} className="mb-8">
           <p>
-            {PLATFORM_NAME} won&apos;t ask the receiver(s) to submit their tax form and personal information for sanction purposes. Please ensure
-            you have collected the appropriate information regarding tax and sanction checks if you proceed.
+            {PLATFORM_NAME} won&apos;t ask the receiver(s) to submit their tax form and personal information for sanction purposes. Please
+            ensure you have collected the appropriate information regarding tax and sanction checks if you proceed.
           </p>
         </PageAlert>
 
@@ -196,8 +196,7 @@ const FormComponent = ({
     programs: approverPrograms,
     programId: requests?.[index].programId,
   })
-  const getDelegatedAddress = useDelegatedAddress()
-  const delegatedAddress = getDelegatedAddress(requests[index].wallet)
+  const delegatedAddress = TOKEN.name === 'Filecoin' && getDelegatedAddress(requests[index].wallet)
 
   useEffect(() => {
     if (setValue) {
@@ -278,9 +277,7 @@ const FormComponent = ({
               type="text"
               placeholder="Insert a valid address"
               error={
-                errors.requests?.[index]?.wallet ||
-                submitErrors?.requests?.[index]?.wallet ||
-                submitErrors?.requests?.[index]?.userWalletId
+                errors.requests?.[index]?.wallet || submitErrors?.requests?.[index]?.wallet || submitErrors?.requests?.[index]?.userWalletId
               }
               {...register(`requests[${index}].wallet`)}
             />
@@ -301,7 +298,7 @@ const FormComponent = ({
         <ProgramInfo paymentCurrency={paymentCurrency} requestCurrency={requestCurrency} selectedProgram={selectedProgram} />
       </div>
     </div>
-  );
+  )
 }
 
 const Asterisk = () => <span className="text-indigo-500">*</span>

@@ -1,5 +1,4 @@
 import { Role } from '@prisma/client'
-import { captureException } from '@sentry/nextjs'
 import { createTransferRequestSubmittedFormValidator } from 'domain/transferRequestDraft/validation'
 import { findUserTaxForm } from 'domain/user'
 import { batchCreateWallet } from 'domain/wallet/batchCreateWallet'
@@ -12,6 +11,7 @@ import { validate } from 'lib/yup'
 import { DateTime } from 'luxon'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { SUBMITTED_BY_APPROVER_STATUS } from './constants'
+import { logger } from 'lib/logger'
 
 export async function batchCreateTransferRequest(params) {
   const { fields, errors } = await validate(createTransferRequestSubmittedFormValidator, params)
@@ -96,7 +96,7 @@ export async function prismaCreateUser(requests) {
     const createdUsers = await Promise.allSettled(createUserPromiseList)
     const values = createdUsers.map(({ value }) => value)
     if (createdUsers.find(req => req.status === 'rejected')) {
-      captureException(createdUsers)
+      logger.error('Error while creating users', createdUsers)
       throw new TransactionError('Error while creating users', { status: 500 })
     }
     return values
@@ -128,7 +128,7 @@ export async function prismaCreateTransferRequest(requests, requesterId, approve
       if (requests.find(req => req.status === 'rejected')) {
         throw { status: 400, requests }
       }
-      captureException(requests)
+      logger.error('Error while creating transfer requests', requests)
       throw new TransactionError('Error while creating transfer requests', { status: 500 })
     }
 

@@ -5,11 +5,11 @@ import { ViewReasonModal } from 'components/Compliance/Modals/ViewReasonModal'
 import { UserList } from 'components/Compliance/UserList'
 import { Layout } from 'components/Layout'
 import { PaginationWrapper } from 'components/shared/usePagination'
-import { PLATFORM_NAME } from 'system.config'
 import { findAllPII, findAllSanctioned } from 'domain/user'
 import { withComplianceSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { ReactElement, useState } from 'react'
+import { PLATFORM_NAME } from 'system.config'
 
 interface FlaggedUsersPage {
   data: {

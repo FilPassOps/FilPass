@@ -70,7 +70,7 @@ export default async function run() {
           },
           data: {
             status: 'FAILED',
-            notes: data.error,
+            // notes: data.error, // TODO OPEN-SOURCE: Add error message
             isActive: false,
           },
         })
@@ -168,7 +168,7 @@ const getBody = (failedTransactions: string[], failedTransferRequestPublicIds: s
 
       <ul style="font-size:12px;word-break: break-all;padding: 16px 10px; margin: 20px 0px; background: #4f46e5; color: white; border-radius: 6px; line-height:24px; font-weight: 500;">
         ${failedTransactions.map(
-          txHash => `<li><a href=${blockExplorerUrl}/message/${txHash} style="color: white; text-decoration: underline;">${txHash}</a></li>`
+          txHash => `<li><a href=${blockExplorerUrl}/${txHash} style="color: white; text-decoration: underline;">${txHash}</a></li>`
         ).join('')}
       </ul>
     </td>

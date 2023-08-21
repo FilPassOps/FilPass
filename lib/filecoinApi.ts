@@ -1,5 +1,6 @@
 import axios from 'axios'
 import config from 'chains.config'
+import { logger } from './logger'
 
 const api = axios.create({
   baseURL: config.chain.rpcUrls[0],
@@ -12,7 +13,7 @@ api.interceptors.request.use(
     return config
   },
   function (error) {
-    console.log('glif api request error', error)
+    logger.error('glif api request error', error)
     return Promise.reject({
       status: 503,
       message: 'Glif API is not available. Please, try again later.',
@@ -33,7 +34,7 @@ api.interceptors.response.use(
     return response
   },
   error => {
-    console.log('error', JSON.stringify(error, null, 2))
+    logger.error('glif api response error', error)
     let err
     if (error.response) {
       err = {
@@ -46,7 +47,7 @@ api.interceptors.response.use(
         message: 'Dependency failed. Please, try again.',
       }
     } else {
-      console.log('An unexpected error happened ', error)
+      logger.error('An unexpected error happened ', error)
       err = {
         status: 500,
         message: 'An unexpected error happened. Please, try again.',
@@ -84,7 +85,7 @@ export const sendTransaction = (signedTransaction: unknown) => {
   })
 }
 
-const chainGetMessageId = (messageId: unknown) => {
+export const chainGetMessageId = (messageId: unknown) => {
   return api.post('/', {
     id: 0,
     jsonrpc: '2.0',

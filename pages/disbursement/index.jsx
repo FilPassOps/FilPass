@@ -10,7 +10,6 @@ import { Button } from 'components/shared/Button'
 import { PaginationCounter } from 'components/shared/PaginationCounter'
 import { checkItemsPerPage, PaginationWrapper } from 'components/shared/usePagination'
 import { CreateReportModal } from 'components/TransferRequest/shared/CreateReportModal'
-import { PLATFORM_NAME } from 'system.config'
 import { stringify } from 'csv-stringify/sync'
 import { getAll } from 'domain/disbursement/getAll'
 import { findAllPrograms } from 'domain/programs/findAll'
@@ -23,7 +22,9 @@ import { DateTime } from 'luxon'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { PLATFORM_NAME } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
+import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
 
 export default function Disbursement({ initialData = [], programs = [], pageSize, totalItems, page, status }) {
   const router = useRouter()
@@ -140,18 +141,18 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
             columns.status && row.push(status)
             columns.residency && row.push(request.isUSResident ? 'US' : 'Non-US')
             columns.taxForm && !!form && row.push(`${window?.location.origin}/api/files/${form.publicId}/view`)
-            columns.filfoxLink && row.push(`${config.chain.blockExplorerUrls[0]}/message/${transfers[0].txHash}`)
+            columns.filfoxLink && row.push(`${config.chain.blockExplorerUrls[0]}/${transfers[0].txHash}`)
             return row
           }),
         ],
         {
           delimiter: ',',
-        }
+        },
       )
       const blob = new Blob([csvTemplate])
       return JsFileDownload(
         blob,
-        `${PLATFORM_NAME.toLowerCase()}_${status.toLowerCase()}_disbursement_${DateTime.now().toFormat("yyyy-MM-dd_hh'h'mm'm'ss's'")}.csv`
+        `${PLATFORM_NAME.toLowerCase()}_${status.toLowerCase()}_disbursement_${DateTime.now().toFormat("yyyy-MM-dd_hh'h'mm'm'ss's'")}.csv`,
       )
     } catch (error) {
       console.error(error)
@@ -211,9 +212,9 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
             {selectedRequests.length > 0 && isNotPaidStatus && (
               <div className="flex items-center gap-4">
                 <div>
-                  <Button variant="green" onClick={onMetamaskBatchPayClick}>
+                  <WithMetaMaskButton variant="green" onClick={onMetamaskBatchPayClick} defaultLabel="Pay">
                     Pay
-                  </Button>
+                  </WithMetaMaskButton>
                 </div>
                 <div>
                   <Button variant="red" onClick={onBatchRejectClick}>

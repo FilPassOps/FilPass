@@ -1,3 +1,4 @@
+import { logger } from 'lib/logger'
 import prisma from 'lib/prisma'
 
 export default async function run() {
@@ -12,5 +13,5 @@ export default async function run() {
     },
   })
 
-  console.log('FORMS (W8 AND W9) OF ALL USERS DEACTIVATED')
+  logger.info('FORMS (W8 AND W9) OF ALL USERS DEACTIVATED')
 }

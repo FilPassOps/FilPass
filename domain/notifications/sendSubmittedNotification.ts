@@ -4,6 +4,7 @@ import { sendEmail } from 'lib/sendEmail'
 import { validate } from 'lib/yup'
 import { baseEmail } from './constants'
 import { sendSubmittedNotificationValidator } from './validation'
+import { logger } from 'lib/logger'
 
 interface SendSubmittedNotificationParams {
   programId: number
@@ -55,7 +56,7 @@ async function notifyApprover({ encryptedEmail, transferRequestId }: NotifyAppro
   try {
     decryptedEmail = await decryptPII(encryptedEmail)
   } catch (error) {
-    console.log('failed to notify approver - could not decrypt email ', `transferRequestId:${transferRequestId} `, `error:${error}`)
+    logger.error(`Failed to notify approver - could not decrypt email for transferRequestId:${transferRequestId}`, error)
     return
   }
 
@@ -68,7 +69,7 @@ async function notifyApprover({ encryptedEmail, transferRequestId }: NotifyAppro
       html: emailBody,
     })
   } catch (error) {
-    console.log('failed to notify approver - could not send email ', `transferRequestId:${transferRequestId} `, `error:${error}`)
+    logger.error(`Failed to notify approver - could not send email for transferRequestId:${transferRequestId}`, error)
   }
 }
 

@@ -24,10 +24,7 @@ import { BlockedReason } from './BlockedReason'
 import { StatusNotes } from './StatusNotes'
 import { TransferRequestHistory } from './TransferRequestHistory'
 
-import useDelegatedAddress, { WalletSize } from 'components/web3/useDelegatedAddress'
-import { shortenAddress } from 'lib/shortenAddress'
-
-const SHORT_WITH_DOTS = WalletSize.SHORT + 3
+import { TOKEN } from 'system.config'
 
 export const ViewTransferRequest = ({ data, role, showLegacyWarning }) => {
   const { loadingFile, fileError, handleDownloadFile } = useDownloadFile({ fileId: data?.form_id, fileName: data?.form_filename })
@@ -37,8 +34,6 @@ export const ViewTransferRequest = ({ data, role, showLegacyWarning }) => {
   const rejected = [REJECTED, REJECTED_BY_APPROVER_STATUS, REJECTED_BY_CONTROLLER_STATUS].includes(status)
   const submitted = [SUBMITTED_STATUS, SUBMITTED_BY_APPROVER_STATUS].includes(status)
   const isApprover = role === APPROVER_ROLE
-
-  const getDelegatedAddress = useDelegatedAddress()
 
   return (
     <>
@@ -101,21 +96,18 @@ export const ViewTransferRequest = ({ data, role, showLegacyWarning }) => {
                   label: (
                     <>
                       <WalletAddress
-                        address={
-                          data.wallet_address.length > SHORT_WITH_DOTS
-                            ? shortenAddress(data.wallet_address, WalletSize.SHORT)
-                            : data.wallet_address
-                        }
+                        address={data.wallet_address}
                         isVerified={data.wallet_is_verified}
-                        delegatedAddress={data.delegated_address || getDelegatedAddress(data.wallet_address)?.shortAddress}
                         label={data.wallet_name}
+                        blockchain={TOKEN.name}
                         className="sm:hidden"
                       />
                       <WalletAddress
                         address={data.wallet_address}
                         isVerified={data.wallet_is_verified}
-                        delegatedAddress={data.delegated_address || getDelegatedAddress(data.wallet_address)?.fullAddress}
                         label={data.wallet_name}
+                        blockchain={TOKEN.name}
+                        walletSize="full"
                         className="hidden sm:flex"
                       />
                     </>
@@ -159,7 +151,7 @@ export const ViewTransferRequest = ({ data, role, showLegacyWarning }) => {
                   <button
                     className={classNames(
                       'text-sm text-indigo-500 font-bold hover:underline cursor-pointer',
-                      loadingFile && 'opacity-50 cursor-wait'
+                      loadingFile && 'opacity-50 cursor-wait',
                     )}
                     disabled={loadingFile}
                     onClick={handleDownloadFile}

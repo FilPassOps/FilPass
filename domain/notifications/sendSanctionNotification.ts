@@ -3,6 +3,7 @@ import { validate } from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { baseEmail } from './constants'
 import { sendSanctionNotificationValidator } from './validation'
+import { logger } from 'lib/logger'
 
 const emailReceiver = process.env.OFAC_SANCTION_EMAIL_RECEIVER || ''
 
@@ -45,7 +46,7 @@ export async function sendSanctionNotification(params: SendSanctionNotificationP
       text: undefined,
     })
   } catch (error) {
-    console.log('failed to notify compliance officer - could not send email ', `userId:${userId} `, `error:${error}`)
+    logger.error(`Failed to notify compliance officer - could not send email. userId:${userId} `, error)
   }
 }
 
