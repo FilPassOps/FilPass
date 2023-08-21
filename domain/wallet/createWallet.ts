@@ -1,15 +1,15 @@
+import { Prisma } from '@prisma/client'
 import { sendWalletVerificationNotification } from 'domain/notifications/sendWalletVerificationNotification'
 import { validate } from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { createWalletValidator } from './validation'
-import { Prisma } from '@prisma/client'
 
 interface CreateWalletParams {
   name?: string
   verificationId: number
   userId: number
   address: string
-  blockchain: string
+  blockchain: string // TODO OPEN-SOURCE: should be the id of the blockchain table
   isDefault: boolean
   email: string
 }
@@ -108,7 +108,7 @@ export async function createWallet(prisma: Prisma.TransactionClient, params: Cre
       verificationId,
       name,
       address,
-      blockchain,
+      blockchainId: 1, // TODO OPEN-SOURCE: should get the value from params
       isDefault,
       isActive: false,
     },
