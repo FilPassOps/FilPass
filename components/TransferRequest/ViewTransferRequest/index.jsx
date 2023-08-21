@@ -26,7 +26,6 @@ import { TransferRequestHistory } from './TransferRequestHistory'
 
 import { TOKEN } from 'system.config'
 
-
 export const ViewTransferRequest = ({ data, role, showLegacyWarning }) => {
   const { loadingFile, fileError, handleDownloadFile } = useDownloadFile({ fileId: data?.form_id, fileName: data?.form_filename })
   const { approversGroup, status } = data
@@ -35,7 +34,6 @@ export const ViewTransferRequest = ({ data, role, showLegacyWarning }) => {
   const rejected = [REJECTED, REJECTED_BY_APPROVER_STATUS, REJECTED_BY_CONTROLLER_STATUS].includes(status)
   const submitted = [SUBMITTED_STATUS, SUBMITTED_BY_APPROVER_STATUS].includes(status)
   const isApprover = role === APPROVER_ROLE
-
 
   return (
     <>
@@ -65,6 +63,7 @@ export const ViewTransferRequest = ({ data, role, showLegacyWarning }) => {
             })}
       </div>
       <div className="my-8 max-w-3xl mx-auto">
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center items-start mb-7 gap-3 sm:gap-0">
           <div>
             <h1 className="text-gray-700 font-medium">Transfer Request #{data?.id}</h1>
           </div>

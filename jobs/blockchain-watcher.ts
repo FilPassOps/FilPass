@@ -4,7 +4,7 @@ import { transferPaymentConfirm } from 'domain/transfer/transfers-payment-confir
 import { ethers } from 'ethers'
 import prisma from 'lib/prisma'
 import { MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
-import { ForwardAnyEvent } from 'typechain-types/contracts/MultiForwarder'
+import { ForwardAnyEvent } from 'typechain-types/MultiForwarder'
 
 const provider = new ethers.providers.JsonRpcProvider(config.chain.rpcUrls[0])
 const signer = provider.getSigner()

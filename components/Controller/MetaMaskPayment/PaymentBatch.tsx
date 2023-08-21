@@ -2,22 +2,18 @@ import { Bars4Icon } from '@heroicons/react/24/outline'
 import { CheckCircleIcon, ChevronDownIcon, ChevronUpIcon, CurrencyDollarIcon, XCircleIcon } from '@heroicons/react/24/solid'
 import { Blockchain, TransferStatus } from '@prisma/client'
 import Big from 'big.js'
-import config from 'chains.config'
 import { Button } from 'components/shared/Button'
 import Currency, { CryptoAmount } from 'components/shared/Table/Currency'
 import { WalletAddress } from 'components/shared/WalletAddress'
 import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
 import { contractInterface } from 'components/web3/useContract'
 import { USD } from 'domain/currency/constants'
-import { ethers } from 'ethers'
 import { formatCrypto, formatCurrency } from 'lib/currency'
 import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { useState } from 'react'
 import { SUPPORT_EMAIL, TOKEN } from 'system.config'
 import { Table, TableDiv, TableHeader } from './Table'
 import { TransactionParser } from './TransactionParser'
-
-const provider = new ethers.providers.JsonRpcProvider(config.chain.rpcUrls[0])
 
 interface ProgramCurrency {
   currency: {
@@ -126,14 +122,7 @@ const PaymentBatch = ({
     }
     return true
   }
-  //0x15633e23000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000002430323732323233392d336530342d343164322d393962642d616535626635306131636136000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001e1d4a6d35d980ef93cc3be03c543edec2948c3d10000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000002386f26fc10000
   const handleParseData = async (parsedData: ParsedData) => {
-    const receipt = await provider.getTransactionReceipt('0x1a17dea4597367fdfa439d13122ad31beaae438582adb2d2e9ac84653c4c2113')
-    console.log('🚀 ~ file: check-pending-transfer.ts:25 ~ run ~ receipt:', receipt)
-
-    const logparsed = contractInterface.parseLog(receipt.logs[0])
-    console.log('🚀 ~ file: PaymentBatch.tsx:142 ~ handleParseData ~ logparsed:', logparsed)
-
     const isValid = validateParseData(parsedData)
     setIsChunkHextMatch(isValid)
   }
