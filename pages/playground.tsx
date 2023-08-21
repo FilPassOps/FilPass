@@ -4,13 +4,15 @@ import config from 'chains.config'
 import { Layout } from 'components/Layout'
 import { Button } from 'components/shared/Button'
 import { CustomWindow, useMetaMask } from 'components/web3/MetaMaskProvider'
+import { useContract } from 'components/web3/useContract'
 import { ethers } from 'ethers'
 import { api } from 'lib/api'
 import Head from 'next/head'
 import { useEffect, useState } from 'react'
-import { MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
-import { NextPageWithLayout } from './_app'
 import { PLATFORM_NAME } from 'system.config'
+import { MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
+import { MultiForwarder } from 'typechain-types/contracts'
+import { NextPageWithLayout } from './_app'
 
 declare const window: CustomWindow
 
@@ -18,19 +20,14 @@ const Playground: NextPageWithLayout = () => {
   const { wallet, connect } = useMetaMask()
   const [provider, setProvider] = useState<ethers.providers.Web3Provider>()
   const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner>()
-  const [multiForwarder, setMultiForwarder] = useState<MultiForwarder>()
+  const { forwardAll } = useContract()
 
-  const [amounts, setAmounts] = useState<string[]>(['0.01', '0.02', '0.03', '0.04', '0.05'])
-  const [destinations, setDestinations] = useState<string[]>([
-    '0xbE0395df351d895C4E3Da5741140B4C1f9882D0A',
-    't1d6udrjruc3iqhyhrd2rjnjkhzsa6gd6tb63oi6i',
-    't2yusrm7oi4mpl2h6qfncg4f2pz5ymyftdpdfhywa',
-    't3vzc7naq3khx3bjkbelvce2yw4brl5bw4ejjhrcdoh63qma66elz26fxkmayl2qtvte7dzgod6qc3ou2j676a',
-    't410fqfq5marnwspuk4scmrovk7ppau2zzhy3hotesxq',
-  ])
+  const [amounts, setAmounts] = useState<string[]>(['0.01'])
+  const [destinations, setDestinations] = useState<string[]>(['0x8161d6022Db49f457242645D557dEf05359c9F1B'])
   const [msigWallet, setMsigWallet] = useState('f2hwuttfrzziinrniv57jlgov6mrimvron3ec66ya')
   const [msigSigner, setMsigSigner] = useState('t410f3oxy7m2e3hsx772imwne5nyyysakd7lcvtu67ba')
   const [hash, setHash] = useState<string>()
+  const [multiForwarder, setMultiForwarder] = useState<MultiForwarder>()
 
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum as ExternalProvider)
@@ -46,88 +43,16 @@ const Playground: NextPageWithLayout = () => {
     }
   }, [])
 
-  const sendFIL = async () => {
-    if (!multiForwarder || !signer || !provider || !destinations || !amounts) {
+  const send = async () => {
+    if (!signer || !provider || !destinations || !amounts) {
       return
     }
 
     try {
-      const weiValues = amounts.map(amount => ethers.utils.parseEther(amount))
-      const weiTotal = weiValues.reduce((a, b) => a.add(b), ethers.BigNumber.from(0))
-
-      const addresses = destinations.map(destination => {
-        let address = destination
-        if (destination.startsWith('0x')) {
-          address = filecoinAddress.delegatedFromEthAddress(destination, config.coinType)
-        }
-        return filecoinAddress.newFromString(address).bytes
-      })
-
-      const response = await multiForwarder.forwardAny('Forward All ID', addresses, weiValues, { value: weiTotal })
+      const response = await forwardAll('Forward All ID', destinations, amounts)
       setHash(response.hash)
     } catch (error) {
       console.error(error)
-    }
-  }
-
-  const forward100 = async () => {
-    if (!multiForwarder || !signer || !provider || !destinations || !amounts) {
-      return
-    }
-
-    try {
-      const value = ethers.utils.parseEther('0.01').toString()
-      const total = ethers.utils.parseEther('1').toString()
-      const t1Address = filecoinAddress.newFromString('t1d6udrjruc3iqhyhrd2rjnjkhzsa6gd6tb63oi6i').bytes
-      const t2Address = filecoinAddress.newFromString('t2yusrm7oi4mpl2h6qfncg4f2pz5ymyftdpdfhywa').bytes
-      const t4Address = filecoinAddress.newFromString('t410fqfq5marnwspuk4scmrovk7ppau2zzhy3hotesxq').bytes
-
-      const t1Padded = new Uint8Array(32)
-      t1Padded.set(t1Address)
-      t1Padded.fill(0, t1Address.length, 32)
-
-      const t2Padded = new Uint8Array(32)
-      t2Padded.set(t2Address)
-      t2Padded.fill(0, t2Address.length, 32)
-
-      const t4Padded = new Uint8Array(32)
-      t4Padded.set(t4Address)
-      t4Padded.fill(0, t4Address.length, 32)
-
-      const t1Addresses = Array.from({ length: 1 }, () => t1Padded)
-      const t2Addresses = Array.from({ length: 1 }, () => t2Padded)
-      const t4Addresses = Array.from({ length: 98 }, () => t4Padded)
-      const values = Array.from({ length: 100 }, () => value)
-
-      const response = await multiForwarder.forward('Forward Non BLS ID', [...t1Addresses, ...t2Addresses, ...t4Addresses], values, {
-        value: total,
-      })
-
-      setHash(response.hash)
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  const forward50 = async () => {
-    if (!multiForwarder || !signer || !provider || !destinations || !amounts) {
-      return
-    }
-
-    try {
-      const value = ethers.utils.parseEther('0.01').toString()
-      const total = ethers.utils.parseEther('0.45').toString()
-      const address = filecoinAddress.newFromString(
-        't3vzc7naq3khx3bjkbelvce2yw4brl5bw4ejjhrcdoh63qma66elz26fxkmayl2qtvte7dzgod6qc3ou2j676a'
-      ).bytes
-
-      const addresses = Array.from({ length: 45 }, () => address)
-      const values = Array.from({ length: 45 }, () => value)
-
-      const response = await multiForwarder.forwardAny('Forward All ID', addresses, values, { value: total })
-      setHash(response.hash)
-    } catch (error) {
-      console.log(error)
     }
   }
 
@@ -144,6 +69,21 @@ const Playground: NextPageWithLayout = () => {
     setHash(data)
   }
 
+  const readLogs = async () => {
+    if (!signer || !provider || !multiForwarder) {
+      return
+    }
+    const receipt = await provider.getTransactionReceipt('0x7625d7998514c9d099ebb1179fa80e1e592d996201c9570dfb36cd37ac8b3f05')
+
+    receipt.logs.forEach(log => {
+      if (log.address !== config.multiforwarder) {
+        return
+      }
+      const parsedLog = multiForwarder.interface.parseLog(log)
+      console.log(parsedLog)
+    })
+  }
+
   return (
     <>
       <Head>
@@ -156,11 +96,17 @@ const Playground: NextPageWithLayout = () => {
           <div>
             <div>Ethereum Address: {wallet}</div>
             <div>Filecoin Address: {filecoinAddress.delegatedFromEthAddress(wallet, config.coinType)}</div>
+            <div className="mt-4 w-[600px] p-4 border border-black rounded-md flex flex-col gap-2">
+              <p>Read Logs</p>
+              <button className="py-2 px-4 rounded-md text-white bg-indigo-600" onClick={() => readLogs()}>
+                Read Logs
+              </button>
+            </div>
             <form
               className="mt-4 w-[600px] p-4 border border-black rounded-md flex flex-col gap-2"
               onSubmit={event => {
                 event.preventDefault()
-                sendFIL()
+                send()
               }}
             >
               <div className="flex flex-col gap-6">
@@ -208,21 +154,9 @@ const Playground: NextPageWithLayout = () => {
                 ))}
               </div>
               <button type="submit" className="py-2 px-4 rounded-md text-white bg-indigo-600">
-                Send FIL
+                Send
               </button>
             </form>
-            <div className="mt-4 w-[600px] p-4 border border-black rounded-md flex flex-col gap-2">
-              <p>Send 100 requests of 0.1 FIL to Secp256k1, Actor and Delegated addresses</p>
-              <button className="py-2 px-4 rounded-md text-white bg-indigo-600" onClick={() => forward100()}>
-                Send 100 Requests
-              </button>
-            </div>
-            <div className="mt-4 w-[600px] p-4 border border-black rounded-md flex flex-col gap-2">
-              <p>Send 45 requests of 0.1 FIL to BLS addresses</p>
-              <button className="py-2 px-4 rounded-md text-white bg-indigo-600" onClick={() => forward50()}>
-                Send 45 Requests
-              </button>
-            </div>
             <div className="mt-4 w-[600px] p-4 border border-black rounded-md flex flex-col gap-2">
               <p>Create Msig Wallet</p>
               <button className="py-2 px-4 rounded-md text-white bg-indigo-600" onClick={() => handleCreateMsigWallet()}>
@@ -276,7 +210,7 @@ const Playground: NextPageWithLayout = () => {
               <div className="mt-6">
                 Transaction Hash:{' '}
                 <a
-                  href={`${config.chain.blockExplorerUrls[0]}/message/${hash}`}
+                  href={`${config.chain.blockExplorerUrls[0]}/tx/${hash}`}
                   rel="noreferrer"
                   target="_blank"
                   className="underline text-indigo-600"
