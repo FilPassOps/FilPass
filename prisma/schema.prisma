@@ -430,7 +430,7 @@ model Transfer {
 }
 
 model Currency {
-  id        Int            @id @unique
+  id        Int            @id @default(autoincrement())
   name      String         @unique
   rate      Decimal        @db.Decimal(65, 2)
   isActive  Boolean        @default(true) @map("is_active")
@@ -442,10 +442,10 @@ model Currency {
 }
 
 model CurrencyUnit {
-  id                   Int                    @id @unique
+  id                   Int                    @id @default(autoincrement())
   currency             Currency               @relation(fields: [currencyId], references: [id])
   currencyId           Int                    @map("currency_id")
-  name                 String                 @unique
+  name                 String
   scale                Int
   isActive             Boolean                @default(true) @map("is_active")
   createdAt            DateTime               @default(now()) @map("created_at")
@@ -457,6 +457,7 @@ model CurrencyUnit {
 
   Transfer Transfer[]
 
+  @@unique([currencyId, name])
   @@map("currency_unit")
 }
 
@@ -543,7 +544,7 @@ model NewsletterSubscriber {
 }
 
 model Blockchain {
-  id                 Int                  @id @unique
+  id                 Int                  @id @default(autoincrement())
   name               String               @unique
   createdAt          DateTime             @default(now()) @map("created_at")
   updatedAt          DateTime             @updatedAt @map("updated_at")

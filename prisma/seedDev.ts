@@ -7,7 +7,7 @@ import { DateTime } from 'luxon'
 import { encrypt, encryptPII } from '../lib/emissaryCrypto'
 loadEnvConfig(process.cwd(), true)
 
-import { EMAIL_DOMAIN, TOKEN } from '../system.config'
+import { EMAIL_DOMAIN, TOKEN, TOKENS } from '../system.config'
 
 const prisma = new PrismaClient()
 const salt = process.env.EMAIL_KEY || ''
@@ -519,6 +519,47 @@ async function createTransferRequestDraft({ requesterId, receiverId, program, te
       teamHash: teams[team].hash,
       amount: await encrypt(amount.toString()),
     },
+  })
+}
+
+async function createLinearVestingPrograms() {
+  TOKENS.map(async token => {
+    // const usd = await prisma.currencyUnit.findUniqueOrThrow({
+    //   where: { currencyId_name: { currencyId: 1, name: 'USD' } },
+    // })
+
+    const { id: currencyId } = await prisma.currency.findUniqueOrThrow({ where: { name: token.symbol } })
+
+    const { id: requestCurrencyUnitId } = await prisma.currencyUnit.findUniqueOrThrow({
+      where: { currencyId_name: { currencyId, name: 'USD' } },
+    })
+
+    const { id: paymentCurrencyUnitId } = await prisma.currencyUnit.findUniqueOrThrow({
+      where: { currencyId_name: { currencyId, name: token.symbol } },
+    })
+
+    return prisma.program.create({
+      data: {
+        deliveryMethod: 'LINEAR_VESTING',
+        name: `LINEAR VESTING USD TO ${token.symbol} PROGRAM`,
+        visibility: 'EXTERNAL',
+        programCurrency: {
+          create: [
+            {
+              currencyUnitId: requestCurrencyUnitId,
+              type: 'REQUEST',
+            },
+            {
+              currencyUnitId: paymentCurrencyUnitId,
+              type: 'PAYMENT',
+            },
+          ],
+        },
+      },
+      include: {
+        programCurrency: true,
+      },
+    })
   })
 }
 

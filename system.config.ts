@@ -68,4 +68,66 @@ export const TOKEN = {
     },
   },
   paymentUnit: 'USD',
+} as const
+
+const ethereum = {
+  name: 'Ethereum',
+  symbol: 'ETH',
+  coinMarketApiCode: 1027, // from https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?symbol=MATIC
+  units: {
+    0: {
+      name: 'ETH',
+      scale: 0,
+    },
+    '-9': {
+      name: 'GWEI',
+      scale: -9,
+    },
+    '-18': {
+      name: 'WEI',
+      scale: -18,
+    },
+  },
+} as const
+
+const polygon = {
+  name: 'Polygon',
+  symbol: 'MATIC',
+  coinMarketApiCode: 3890, // from https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?symbol=MATIC
+  units: {
+    0: {
+      name: 'MATIC',
+      scale: 0,
+    },
+    '-9': {
+      name: 'GWEI',
+      scale: -9,
+    },
+    '-18': {
+      name: 'WEI',
+      scale: -18,
+    },
+  },
+} as const
+
+const filecoin = {
+  name: 'Filecoin',
+  symbol: 'FIL',
+  coinMarketApiCode: 2280, // from https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?symbol=FIL
+  units: {
+    0: {
+      name: 'FIL',
+      scale: 0,
+    },
+    '-9': {
+      name: 'NANOFIL',
+      scale: -9,
+    },
+    '-18': {
+      name: 'ATTOFIL',
+      scale: -18,
+    },
+  },
 }
+
+export const TOKENS = [ethereum, polygon, filecoin] as const

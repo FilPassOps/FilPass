@@ -321,7 +321,7 @@ CREATE TABLE "transfer" (
 
 -- CreateTable
 CREATE TABLE "currency" (
-    "id" INTEGER NOT NULL,
+    "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "rate" DECIMAL(65,2) NOT NULL,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
@@ -333,7 +333,7 @@ CREATE TABLE "currency" (
 
 -- CreateTable
 CREATE TABLE "currency_unit" (
-    "id" INTEGER NOT NULL,
+    "id" SERIAL NOT NULL,
     "currency_id" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
     "scale" INTEGER NOT NULL,
@@ -427,7 +427,7 @@ CREATE TABLE "newsletter_subscriber" (
 
 -- CreateTable
 CREATE TABLE "blockchain" (
-    "id" INTEGER NOT NULL,
+    "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -520,16 +520,10 @@ CREATE INDEX "transfer_request_draft_team_hash_idx" ON "transfer_request_draft"(
 CREATE INDEX "transfer_transfer_ref_idx" ON "transfer"("transfer_ref");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "currency_id_key" ON "currency"("id");
-
--- CreateIndex
 CREATE UNIQUE INDEX "currency_name_key" ON "currency"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "currency_unit_id_key" ON "currency_unit"("id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "currency_unit_name_key" ON "currency_unit"("name");
+CREATE UNIQUE INDEX "currency_unit_currency_id_name_key" ON "currency_unit"("currency_id", "name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "script_transaction_transaction_key" ON "script_transaction"("transaction");
@@ -554,9 +548,6 @@ CREATE UNIQUE INDEX "newsletter_subscriber_email_key" ON "newsletter_subscriber"
 
 -- CreateIndex
 CREATE UNIQUE INDEX "newsletter_subscriber_email_hash_key" ON "newsletter_subscriber"("email_hash");
-
--- CreateIndex
-CREATE UNIQUE INDEX "blockchain_id_key" ON "blockchain"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "blockchain_name_key" ON "blockchain"("name");

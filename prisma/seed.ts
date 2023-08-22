@@ -2,7 +2,7 @@ import { loadEnvConfig } from '@next/env'
 import { PrismaClient } from '@prisma/client'
 import { hash } from 'bcrypt'
 import { encryptPII } from '../lib/emissaryCrypto'
-import { EMAIL_DOMAIN, TOKEN } from '../system.config'
+import { EMAIL_DOMAIN, TOKENS } from '../system.config'
 
 loadEnvConfig(process.cwd(), true)
 
@@ -39,35 +39,40 @@ async function createSystemUser() {
 }
 
 async function createCurrencies() {
-  const [tokenCurrency, usdCurrency] = await prisma.$transaction([
-    prisma.currency.create({
-      data: {
-        id: 1,
-        name: TOKEN.symbol,
-        rate: 1,
-      },
-    }),
-    prisma.currency.create({
-      data: {
-        id: 2,
-        name: TOKEN.paymentUnit,
-        rate: 0,
-      },
-    }),
-    prisma.blockchain.create({
-      data: {
-        id: 1,
-        name: TOKEN.name,
-      },
-    }),
-  ])
-  await prisma.currencyUnit.createMany({
-    data: [
-      { id: 1, currencyId: tokenCurrency.id, name: TOKEN.symbol, scale: 0 },
-      { id: 2, currencyId: tokenCurrency.id, name: TOKEN.units['-9'].name, scale: TOKEN.units['-9'].scale },
-      { id: 3, currencyId: tokenCurrency.id, name: TOKEN.units['-18'].name, scale: TOKEN.units['-18'].scale },
-      { id: 4, currencyId: usdCurrency.id, name: TOKEN.paymentUnit, scale: 0 },
-    ],
+  const usdCurrency = await prisma.currency.create({
+    data: {
+      name: 'USD',
+      rate: 0,
+    },
+  })
+  await prisma.currencyUnit.create({
+    data: {
+      currencyId: usdCurrency.id,
+      name: 'USD',
+      scale: 0,
+    },
+  })
+  TOKENS.forEach(async token => {
+    const [tokenCurrency] = await prisma.$transaction([
+      prisma.currency.create({
+        data: {
+          name: token.symbol,
+          rate: 1,
+        },
+      }),
+      prisma.blockchain.create({
+        data: {
+          name: token.name,
+        },
+      }),
+    ])
+    await prisma.currencyUnit.createMany({
+      data: [
+        { currencyId: tokenCurrency.id, name: token.symbol, scale: 0 },
+        { currencyId: tokenCurrency.id, name: token.units['-9'].name, scale: token.units['-9'].scale },
+        { currencyId: tokenCurrency.id, name: token.units['-18'].name, scale: token.units['-18'].scale },
+      ],
+    })
   })
 }
 
