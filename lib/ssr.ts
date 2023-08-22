@@ -1,14 +1,14 @@
+import { Role } from '@prisma/client'
 import { ADDRESS_MANAGER_ROLE, APPROVER_ROLE, COMPLIANCE_ROLE, CONTROLLER_ROLE, FINANCE_ROLE, SUPERADMIN_ROLE } from 'domain/auth/constants'
 import { getSession, invalidateSession } from 'domain/auth/session'
 import { findUserByIdAndEmail } from 'domain/user/findByIdAndEmail'
 import { IncomingMessage } from 'http'
 import { withIronSessionApiRoute, withIronSessionSsr } from 'iron-session/next'
 import { extractRoles } from 'lib/auth'
+import { sessionOptions } from 'lib/session'
 import { DateTime } from 'luxon'
 import { GetServerSidePropsContext, GetServerSidePropsResult, NextApiHandler } from 'next/types'
-import { sessionOptions } from 'lib/session'
 import { SessionUser } from './middleware'
-import { Role } from '@prisma/client'
 
 interface User {
   id: number
@@ -48,8 +48,17 @@ export function withUserSSR(
 
     const { data, error } = await findUserByIdAndEmail({ userId: user?.id, email: user?.email })
 
-    if (error) {
+    if (error || !data) {
       return destroySession(req)
+    }
+
+    if (data.isBanned) {
+      return {
+        redirect: {
+          destination: '/terms-condition-violation',
+          permanent: false,
+        },
+      }
     }
 
     const extractedRoles = extractRoles(data?.roles)
