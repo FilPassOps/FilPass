@@ -68,7 +68,7 @@ export const TOKEN = {
     },
   },
   paymentUnit: 'USD',
-} as const
+}
 
 const ethereum = {
   name: 'Ethereum',
@@ -128,6 +128,6 @@ const filecoin = {
       scale: -18,
     },
   },
-}
+} as const
 
-export const TOKENS = [ethereum, polygon, filecoin] as const
+export const CONFIG = { fiatPaymentUnit: 'USD', chains: [ethereum, polygon, filecoin] } as const

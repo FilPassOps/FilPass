@@ -2,7 +2,7 @@ import { loadEnvConfig } from '@next/env'
 import { PrismaClient } from '@prisma/client'
 import { hash } from 'bcrypt'
 import { encryptPII } from '../lib/emissaryCrypto'
-import { EMAIL_DOMAIN, TOKENS } from '../system.config'
+import { CONFIG, EMAIL_DOMAIN } from '../system.config'
 
 loadEnvConfig(process.cwd(), true)
 
@@ -52,25 +52,25 @@ async function createCurrencies() {
       scale: 0,
     },
   })
-  TOKENS.forEach(async token => {
+  CONFIG.chains.forEach(async chain => {
     const [tokenCurrency] = await prisma.$transaction([
       prisma.currency.create({
         data: {
-          name: token.symbol,
+          name: chain.symbol,
           rate: 1,
         },
       }),
       prisma.blockchain.create({
         data: {
-          name: token.name,
+          name: chain.name,
         },
       }),
     ])
     await prisma.currencyUnit.createMany({
       data: [
-        { currencyId: tokenCurrency.id, name: token.symbol, scale: 0 },
-        { currencyId: tokenCurrency.id, name: token.units['-9'].name, scale: token.units['-9'].scale },
-        { currencyId: tokenCurrency.id, name: token.units['-18'].name, scale: token.units['-18'].scale },
+        { currencyId: tokenCurrency.id, name: chain.symbol, scale: 0 },
+        { currencyId: tokenCurrency.id, name: chain.units['-9'].name, scale: chain.units['-9'].scale },
+        { currencyId: tokenCurrency.id, name: chain.units['-18'].name, scale: chain.units['-18'].scale },
       ],
     })
   })

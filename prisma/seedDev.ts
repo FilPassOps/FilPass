@@ -7,7 +7,7 @@ import { DateTime } from 'luxon'
 import { encrypt, encryptPII } from '../lib/emissaryCrypto'
 loadEnvConfig(process.cwd(), true)
 
-import { EMAIL_DOMAIN, TOKEN, TOKENS } from '../system.config'
+import { CONFIG, EMAIL_DOMAIN } from '../system.config'
 
 const prisma = new PrismaClient()
 const salt = process.env.EMAIL_KEY || ''
@@ -65,44 +65,47 @@ const defaultTerms = {
 }
 
 async function main() {
-  await createSuperAdmin()
-  await createCompliance()
-  await createFinance()
+  await Promise.all([createSuperAdmin(), createCompliance(), createFinance()])
+  const [[approver, approverRole], [controller, controllerRole], viewerRole, vestingPrograms, oneTimePrograms] = await Promise.all([
+    createApprover(),
+    createController(),
+    createViewer(),
+    createLinearVestingPrograms(),
+    createOneTimeProgramIds(),
+  ])
 
-  const [approver, approverRole] = await createApprover()
-  const [controller, controllerRole] = await createController()
-  const viewerRole = await createViewer()
-
-  const linearVestingProgram = await createLinearVestingProgram()
-  const oneTimeProgram = await createOneTimeProgram()
-
-  await prisma.userRoleProgram.create({
-    data: {
-      programId: oneTimeProgram.id,
-      userRoleId: approverRole.id,
-    },
-  })
-
-  await prisma.userRoleProgram.create({
-    data: {
-      programId: linearVestingProgram.id,
-      userRoleId: approverRole.id,
-    },
-  })
-
-  await prisma.userRoleProgram.create({
-    data: {
-      programId: oneTimeProgram.id,
-      userRoleId: viewerRole.id,
-    },
-  })
-
-  await prisma.userRoleProgram.create({
-    data: {
-      programId: linearVestingProgram.id,
-      userRoleId: viewerRole.id,
-    },
-  })
+  for (const program of vestingPrograms) {
+    await Promise.all([
+      prisma.userRoleProgram.create({
+        data: {
+          programId: program.id,
+          userRoleId: approverRole.id,
+        },
+      }),
+      prisma.userRoleProgram.create({
+        data: {
+          programId: program.id,
+          userRoleId: viewerRole.id,
+        },
+      }),
+    ])
+  }
+  for (const program of oneTimePrograms) {
+    await Promise.all([
+      prisma.userRoleProgram.create({
+        data: {
+          programId: program.id,
+          userRoleId: approverRole.id,
+        },
+      }),
+      prisma.userRoleProgram.create({
+        data: {
+          programId: program.id,
+          userRoleId: viewerRole.id,
+        },
+      }),
+    ])
+  }
 
   for await (const team of teamNames) {
     teams[team] = {
@@ -122,231 +125,221 @@ async function main() {
 
   for (let i = 0; i < 150; i++) {
     const { user, w9, w8, t1Wallet, t3Wallet, userRole } = await createUser(i)
-    await createTransferRequest({
-      receiverId: user.id,
-      requesterId: userRole.userId,
-      amount: 0.1,
-      isUSResident: true,
-      userFileId: w9.id,
-      program: oneTimeProgram,
-      team: 'First team',
-      userWalletId: t1Wallet.id,
-    })
-
-    await createTransferRequest({
-      receiverId: user.id,
-      requesterId: user.id,
-      amount: 0.2,
-      isUSResident: true,
-      userFileId: w9.id,
-      program: oneTimeProgram,
-      team: 'Second team',
-      userWalletId: t1Wallet.id,
-      status: 'VOIDED',
-    })
-
-    await createTransferRequest({
-      receiverId: user.id,
-      requesterId: user.id,
-      amount: 0.3,
-      isUSResident: true,
-      userFileId: w9.id,
-      program: oneTimeProgram,
-      team: 'Third team',
-      userWalletId: t1Wallet.id,
-      status: 'APPROVED',
-      review: {
-        approverId: approverRole.id,
-        status: 'APPROVED',
-      },
-    })
-
-    await createTransferRequest({
-      receiverId: user.id,
-      requesterId: user.id,
-      amount: 0.3,
-      isUSResident: true,
-      userFileId: w9.id,
-      program: oneTimeProgram,
-      team: 'Third team',
-      userWalletId: t1Wallet.id,
-      status: 'APPROVED',
-      review: {
-        approverId: approverRole.id,
-        status: 'APPROVED',
-      },
-    })
-
-    await createTransferRequest({
-      receiverId: user.id,
-      requesterId: user.id,
-      amount: 0.32,
-      isUSResident: true,
-      userFileId: w9.id,
-      program: oneTimeProgram,
-      team: 'Third team',
-      userWalletId: t3Wallet.id,
-      status: 'APPROVED',
-      review: {
-        approverId: approverRole.id,
-        status: 'APPROVED',
-      },
-    })
-
-    await createTransferRequest({
-      receiverId: user.id,
-      requesterId: user.id,
-      amount: 0.4,
-      isUSResident: true,
-      userFileId: w9.id,
-      program: oneTimeProgram,
-      team: 'Fourth team',
-      userWalletId: t1Wallet.id,
-      status: 'REQUIRES_CHANGES',
-      review: {
-        approverId: approverRole.id,
-        status: 'REQUIRES_CHANGES',
-        notes: 'Change team name',
-      },
-    })
-
-    await createTransferRequest({
-      receiverId: user.id,
-      requesterId: user.id,
-      amount: 0.5,
-      isUSResident: true,
-      userFileId: w9.id,
-      program: oneTimeProgram,
-      team: 'Fifth team',
-      userWalletId: t1Wallet.id,
-      status: 'REJECTED_BY_APPROVER',
-      review: {
-        approverId: approverRole.id,
-        status: 'REJECTED',
-        notes: 'I do not recognize this program',
-      },
-    })
-
-    await createTransferRequest({
-      receiverId: user.id,
-      requesterId: user.id,
-      amount: 0.6,
-      isUSResident: true,
-      userFileId: w9.id,
-      program: oneTimeProgram,
-      team: 'Sixth team',
-      userWalletId: t1Wallet.id,
-      status: 'REJECTED_BY_CONTROLLER',
-      review: {
-        approverId: approverRole.id,
-        status: 'APPROVED',
-      },
-      payment: {
-        controllerId: controllerRole.id,
-        status: 'REJECTED',
-        notes: 'Too expensive',
-      },
-    })
-
-    await createTransferRequest({
-      receiverId: user.id,
-      requesterId: user.id,
-      amount: 0.6,
-      isUSResident: true,
-      userFileId: w9.id,
-      program: oneTimeProgram,
-      team: 'Seventh team',
-      userWalletId: t1Wallet.id,
-      status: 'PAID',
-      review: {
-        approverId: approverRole.id,
-        status: 'APPROVED',
-      },
-      payment: {
-        controllerId: controllerRole.id,
-        status: 'SUCCESS',
-        transferRef: 'TRANSFER_REF',
-        txHash: 'bafy2bzaceched74v5i5rvhkkv7czbenicibcyafsfnbedayzeupauer7mdqni',
-      },
-    })
-
-    await createTransferRequest({
-      receiverId: user.id,
-      requesterId: approver.id,
-      amount: 0.1,
-      isUSResident: true,
-      userFileId: w9.id,
-      program: oneTimeProgram,
-      team: 'First approver team',
-      userWalletId: t1Wallet.id,
-    })
-
-    await createTransferRequest({
-      receiverId: user.id,
-      requesterId: controller.id,
-      amount: 0.1,
-      isUSResident: true,
-      userFileId: w9.id,
-      program: linearVestingProgram,
-      team: 'First controller team',
-      userWalletId: t1Wallet.id,
-    })
-
-    await createTransferRequestDraft({
-      receiverId: user.id,
-      requesterId: approver.id,
-      amount: 0.1,
-      team: 'Draft team',
-      program: oneTimeProgram,
-    })
-
-    await createTransferRequest({
-      receiverId: user.id,
-      requesterId: user.id,
-      amount: 0.1,
-      isUSResident: false,
-      userFileId: w8.id,
-      program: oneTimeProgram,
-      team: 'First team',
-      userWalletId: t1Wallet.id,
-      status: 'BLOCKED',
-      firstName: 'John',
-      sanctionReason: 'Country of residence is sanctioned',
-      isSanctioned: true,
-    })
-
-    await createTransferRequest({
-      receiverId: user.id,
-      requesterId: user.id,
-      amount: 0.1,
-      isUSResident: false,
-      userFileId: w8.id,
-      program: oneTimeProgram,
-      team: 'Second team',
-      userWalletId: t1Wallet.id,
-      status: 'BLOCKED',
-      firstName: 'John',
-      sanctionReason: 'Country of residence is sanctioned',
-      isSanctioned: true,
-    })
-
-    await createTransferRequest({
-      receiverId: user.id,
-      requesterId: user.id,
-      amount: 0.1,
-      isUSResident: false,
-      userFileId: w8.id,
-      program: oneTimeProgram,
-      team: 'Third team',
-      userWalletId: t1Wallet.id,
-      status: 'BLOCKED',
-      firstName: 'John',
-      sanctionReason: `
-      SDNT(Specially Designated Narcotics Traffickers).<br/>
-      Entity Number: 1234; Sanctioned Since: 11-9-2005; DOB 24-11-1993; POB Armenia, Quindio, Colombia; POB Roldanillo, Valle, Colombia;
-      Cedula No. 123456789 (Colombia); Cedula No. 123456789 (Colombia); Citizenship Colombia; Passport AB12345 (Colombia)`,
-      isSanctioned: true,
-    })
+    for (let index = 0; index < vestingPrograms.length; index++) {
+      await Promise.all([
+        createTransferRequest({
+          receiverId: user.id,
+          requesterId: userRole.userId,
+          amount: 0.1,
+          isUSResident: true,
+          userFileId: w9.id,
+          program: oneTimePrograms[index],
+          team: 'First team',
+          userWalletId: t1Wallet.id,
+        }),
+        createTransferRequest({
+          receiverId: user.id,
+          requesterId: user.id,
+          amount: 0.2,
+          isUSResident: true,
+          userFileId: w9.id,
+          program: oneTimePrograms[index],
+          team: 'Second team',
+          userWalletId: t1Wallet.id,
+          status: 'VOIDED',
+        }),
+        createTransferRequest({
+          receiverId: user.id,
+          requesterId: user.id,
+          amount: 0.3,
+          isUSResident: true,
+          userFileId: w9.id,
+          program: oneTimePrograms[index],
+          team: 'Third team',
+          userWalletId: t1Wallet.id,
+          status: 'APPROVED',
+          review: {
+            approverId: approverRole.id,
+            status: 'APPROVED',
+          },
+        }),
+        createTransferRequest({
+          receiverId: user.id,
+          requesterId: user.id,
+          amount: 0.3,
+          isUSResident: true,
+          userFileId: w9.id,
+          program: oneTimePrograms[index],
+          team: 'Third team',
+          userWalletId: t1Wallet.id,
+          status: 'APPROVED',
+          review: {
+            approverId: approverRole.id,
+            status: 'APPROVED',
+          },
+        }),
+        createTransferRequest({
+          receiverId: user.id,
+          requesterId: user.id,
+          amount: 0.32,
+          isUSResident: true,
+          userFileId: w9.id,
+          program: oneTimePrograms[index],
+          team: 'Third team',
+          userWalletId: t3Wallet.id,
+          status: 'APPROVED',
+          review: {
+            approverId: approverRole.id,
+            status: 'APPROVED',
+          },
+        }),
+        createTransferRequest({
+          receiverId: user.id,
+          requesterId: user.id,
+          amount: 0.4,
+          isUSResident: true,
+          userFileId: w9.id,
+          program: oneTimePrograms[index],
+          team: 'Fourth team',
+          userWalletId: t1Wallet.id,
+          status: 'REQUIRES_CHANGES',
+          review: {
+            approverId: approverRole.id,
+            status: 'REQUIRES_CHANGES',
+            notes: 'Change team name',
+          },
+        }),
+        createTransferRequest({
+          receiverId: user.id,
+          requesterId: user.id,
+          amount: 0.5,
+          isUSResident: true,
+          userFileId: w9.id,
+          program: oneTimePrograms[index],
+          team: 'Fifth team',
+          userWalletId: t1Wallet.id,
+          status: 'REJECTED_BY_APPROVER',
+          review: {
+            approverId: approverRole.id,
+            status: 'REJECTED',
+            notes: 'I do not recognize this program',
+          },
+        }),
+        createTransferRequest({
+          receiverId: user.id,
+          requesterId: user.id,
+          amount: 0.6,
+          isUSResident: true,
+          userFileId: w9.id,
+          program: oneTimePrograms[index],
+          team: 'Sixth team',
+          userWalletId: t1Wallet.id,
+          status: 'REJECTED_BY_CONTROLLER',
+          review: {
+            approverId: approverRole.id,
+            status: 'APPROVED',
+          },
+          payment: {
+            controllerId: controllerRole.id,
+            status: 'REJECTED',
+            notes: 'Too expensive',
+          },
+        }),
+        createTransferRequest({
+          receiverId: user.id,
+          requesterId: user.id,
+          amount: 0.6,
+          isUSResident: true,
+          userFileId: w9.id,
+          program: oneTimePrograms[index],
+          team: 'Seventh team',
+          userWalletId: t1Wallet.id,
+          status: 'PAID',
+          review: {
+            approverId: approverRole.id,
+            status: 'APPROVED',
+          },
+          payment: {
+            controllerId: controllerRole.id,
+            status: 'SUCCESS',
+            transferRef: 'TRANSFER_REF',
+            txHash: 'bafy2bzaceched74v5i5rvhkkv7czbenicibcyafsfnbedayzeupauer7mdqni',
+          },
+        }),
+        createTransferRequest({
+          receiverId: user.id,
+          requesterId: approver.id,
+          amount: 0.1,
+          isUSResident: true,
+          userFileId: w9.id,
+          program: oneTimePrograms[index],
+          team: 'First approver team',
+          userWalletId: t1Wallet.id,
+        }),
+        createTransferRequest({
+          receiverId: user.id,
+          requesterId: controller.id,
+          amount: 0.1,
+          isUSResident: true,
+          userFileId: w9.id,
+          program: vestingPrograms[index],
+          team: 'First controller team',
+          userWalletId: t1Wallet.id,
+        }),
+        createTransferRequestDraft({
+          receiverId: user.id,
+          requesterId: approver.id,
+          amount: 0.1,
+          team: 'Draft team',
+          program: oneTimePrograms[index],
+        }),
+        createTransferRequest({
+          receiverId: user.id,
+          requesterId: user.id,
+          amount: 0.1,
+          isUSResident: false,
+          userFileId: w8.id,
+          program: oneTimePrograms[index],
+          team: 'First team',
+          userWalletId: t1Wallet.id,
+          status: 'BLOCKED',
+          firstName: 'John',
+          sanctionReason: 'Country of residence is sanctioned',
+          isSanctioned: true,
+        }),
+        createTransferRequest({
+          receiverId: user.id,
+          requesterId: user.id,
+          amount: 0.1,
+          isUSResident: false,
+          userFileId: w8.id,
+          program: oneTimePrograms[index],
+          team: 'Second team',
+          userWalletId: t1Wallet.id,
+          status: 'BLOCKED',
+          firstName: 'John',
+          sanctionReason: 'Country of residence is sanctioned',
+          isSanctioned: true,
+        }),
+        createTransferRequest({
+          receiverId: user.id,
+          requesterId: user.id,
+          amount: 0.1,
+          isUSResident: false,
+          userFileId: w8.id,
+          program: oneTimePrograms[index],
+          team: 'Third team',
+          userWalletId: t1Wallet.id,
+          status: 'BLOCKED',
+          firstName: 'John',
+          sanctionReason: `
+        SDNT(Specially Designated Narcotics Traffickers).<br/>
+        Entity Number: 1234; Sanctioned Since: 11-9-2005; DOB 24-11-1993; POB Armenia, Quindio, Colombia; POB Roldanillo, Valle, Colombia;
+        Cedula No. 123456789 (Colombia); Cedula No. 123456789 (Colombia); Citizenship Colombia; Passport AB12345 (Colombia)`,
+          isSanctioned: true,
+        }),
+      ])
+    }
   }
 }
 
@@ -523,25 +516,22 @@ async function createTransferRequestDraft({ requesterId, receiverId, program, te
 }
 
 async function createLinearVestingPrograms() {
-  TOKENS.map(async token => {
-    // const usd = await prisma.currencyUnit.findUniqueOrThrow({
-    //   where: { currencyId_name: { currencyId: 1, name: 'USD' } },
-    // })
-
-    const { id: currencyId } = await prisma.currency.findUniqueOrThrow({ where: { name: token.symbol } })
-
-    const { id: requestCurrencyUnitId } = await prisma.currencyUnit.findUniqueOrThrow({
-      where: { currencyId_name: { currencyId, name: 'USD' } },
+  const programs = []
+  for (const chain of CONFIG.chains) {
+    const { id: requestCurrencyUnitId } = await prisma.currencyUnit.findFirstOrThrow({
+      where: {
+        name: CONFIG.fiatPaymentUnit,
+      },
     })
 
-    const { id: paymentCurrencyUnitId } = await prisma.currencyUnit.findUniqueOrThrow({
-      where: { currencyId_name: { currencyId, name: token.symbol } },
+    const { id: paymentCurrencyUnitId } = await prisma.currencyUnit.findFirstOrThrow({
+      where: { name: chain.symbol },
     })
 
-    return prisma.program.create({
+    const program = await prisma.program.create({
       data: {
         deliveryMethod: 'LINEAR_VESTING',
-        name: `LINEAR VESTING USD TO ${token.symbol} PROGRAM`,
+        name: `LINEAR VESTING USD TO ${chain.symbol} PROGRAM`,
         visibility: 'EXTERNAL',
         programCurrency: {
           create: [
@@ -560,73 +550,43 @@ async function createLinearVestingPrograms() {
         programCurrency: true,
       },
     })
-  })
+    programs.push(program)
+  }
+  return programs
 }
 
-async function createLinearVestingProgram() {
-  return prisma.program.create({
-    data: {
-      deliveryMethod: 'LINEAR_VESTING',
-      name: 'LINEAR VESTING USD TO FIL PROGRAM',
-      visibility: 'EXTERNAL',
-      programCurrency: {
-        create: [
-          {
-            currency: {
-              connect: {
-                name: TOKEN.paymentUnit,
-              },
-            },
-            type: 'REQUEST',
-          },
-          {
-            currency: {
-              connect: {
-                name: TOKEN.symbol,
-              },
-            },
-            type: 'PAYMENT',
-          },
-        ],
-      },
-    },
-    include: {
-      programCurrency: true,
-    },
-  })
-}
+async function createOneTimeProgramIds() {
+  const programs = []
+  for (const chain of CONFIG.chains) {
+    const { id: currencyUnitId } = await prisma.currencyUnit.findFirstOrThrow({
+      where: { name: chain.symbol },
+    })
 
-async function createOneTimeProgram() {
-  return prisma.program.create({
-    data: {
-      deliveryMethod: 'ONE_TIME',
-      name: 'FIL ONE TIME PROGRAM',
-      visibility: 'EXTERNAL',
-      programCurrency: {
-        create: [
-          {
-            currency: {
-              connect: {
-                name: TOKEN.symbol,
-              },
+    const program = await prisma.program.create({
+      data: {
+        deliveryMethod: 'ONE_TIME',
+        name: `ONE TIME PROGRAM - ${chain.symbol}`,
+        visibility: 'EXTERNAL',
+        programCurrency: {
+          create: [
+            {
+              currencyUnitId,
+              type: 'REQUEST',
             },
-            type: 'REQUEST',
-          },
-          {
-            currency: {
-              connect: {
-                name: TOKEN.symbol,
-              },
+            {
+              currencyUnitId,
+              type: 'PAYMENT',
             },
-            type: 'PAYMENT',
-          },
-        ],
+          ],
+        },
       },
-    },
-    include: {
-      programCurrency: true,
-    },
-  })
+      include: {
+        programCurrency: true,
+      },
+    })
+    programs.push(program)
+  }
+  return programs
 }
 
 async function createUser(index: number) {
