@@ -5,8 +5,9 @@ import {SendAPI} from '@zondax/filecoin-solidity/contracts/v0.8/SendAPI.sol';
 import {CommonTypes} from '@zondax/filecoin-solidity/contracts/v0.8/types/CommonTypes.sol';
 import {SafeMath} from '@openzeppelin/contracts/utils/math/SafeMath.sol';
 import {FilAddresses} from '@zondax/filecoin-solidity/contracts/v0.8/utils/FilAddresses.sol';
+import {Forwarder} from './Forwarder.sol';
 
-contract MultiForwarder {
+contract MultiForwarder is Forwarder {
   using SendAPI for CommonTypes.FilAddress;
   using SafeMath for uint256;
 

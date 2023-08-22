@@ -8,9 +8,9 @@ import { ethers } from 'ethers'
 import { api } from 'lib/api'
 import Head from 'next/head'
 import { useEffect, useState } from 'react'
+import { PLATFORM_NAME } from 'system.config'
 import { MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
 import { NextPageWithLayout } from './_app'
-import { PLATFORM_NAME } from 'system.config'
 
 declare const window: CustomWindow
 
@@ -20,14 +20,8 @@ const Playground: NextPageWithLayout = () => {
   const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner>()
   const [multiForwarder, setMultiForwarder] = useState<MultiForwarder>()
 
-  const [amounts, setAmounts] = useState<string[]>(['0.01', '0.02', '0.03', '0.04', '0.05'])
-  const [destinations, setDestinations] = useState<string[]>([
-    '0xbE0395df351d895C4E3Da5741140B4C1f9882D0A',
-    't1d6udrjruc3iqhyhrd2rjnjkhzsa6gd6tb63oi6i',
-    't2yusrm7oi4mpl2h6qfncg4f2pz5ymyftdpdfhywa',
-    't3vzc7naq3khx3bjkbelvce2yw4brl5bw4ejjhrcdoh63qma66elz26fxkmayl2qtvte7dzgod6qc3ou2j676a',
-    't410fqfq5marnwspuk4scmrovk7ppau2zzhy3hotesxq',
-  ])
+  const [amounts, setAmounts] = useState<string[]>(['0.01'])
+  const [destinations, setDestinations] = useState<string[]>(['0xbE0395df351d895C4E3Da5741140B4C1f9882D0A'])
   const [msigWallet, setMsigWallet] = useState('f2hwuttfrzziinrniv57jlgov6mrimvron3ec66ya')
   const [msigSigner, setMsigSigner] = useState('t410f3oxy7m2e3hsx772imwne5nyyysakd7lcvtu67ba')
   const [hash, setHash] = useState<string>()
@@ -118,7 +112,7 @@ const Playground: NextPageWithLayout = () => {
       const value = ethers.utils.parseEther('0.01').toString()
       const total = ethers.utils.parseEther('0.45').toString()
       const address = filecoinAddress.newFromString(
-        't3vzc7naq3khx3bjkbelvce2yw4brl5bw4ejjhrcdoh63qma66elz26fxkmayl2qtvte7dzgod6qc3ou2j676a'
+        't3vzc7naq3khx3bjkbelvce2yw4brl5bw4ejjhrcdoh63qma66elz26fxkmayl2qtvte7dzgod6qc3ou2j676a',
       ).bytes
 
       const addresses = Array.from({ length: 45 }, () => address)
@@ -144,6 +138,18 @@ const Playground: NextPageWithLayout = () => {
     setHash(data)
   }
 
+  const readEventLog = async () => {
+    if (!provider || !multiForwarder) return
+
+    const receipt = await provider.getTransactionReceipt('0xcf6ddaf9db364305e3f1f637774a563fc18459ce2b7ba29872ed33394b0269db')
+
+    receipt.logs.forEach(log => {
+      if (log.address !== multiForwarder.address) return
+      const parsed = multiForwarder.interface.parseLog(log)
+      console.log(parsed)
+    })
+  }
+
   return (
     <>
       <Head>
@@ -156,6 +162,12 @@ const Playground: NextPageWithLayout = () => {
           <div>
             <div>Ethereum Address: {wallet}</div>
             <div>Filecoin Address: {filecoinAddress.delegatedFromEthAddress(wallet, config.coinType)}</div>
+            <div className="mt-4 w-[600px] p-4 border border-black rounded-md flex flex-col gap-2">
+              <p>Read event log</p>
+              <button className="py-2 px-4 rounded-md text-white bg-indigo-600" onClick={() => readEventLog()}>
+                Read
+              </button>
+            </div>
             <form
               className="mt-4 w-[600px] p-4 border border-black rounded-md flex flex-col gap-2"
               onSubmit={event => {
