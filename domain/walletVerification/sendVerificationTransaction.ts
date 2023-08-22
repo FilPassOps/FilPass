@@ -7,12 +7,43 @@ import errorsMessages from 'wordings-and-errors/errors-messages'
 import { sendVerificationTransactionValidator } from './validation'
 import { EMAIL_DOMAIN } from 'system.config'
 import { logger } from 'lib/logger'
+import { FilecoinApiResult } from 'domain/utils/sendFILWithMaster'
 
 const ENABLE_BLOCKCHAIN_INTERACTION = process.env.ENABLE_BLOCKCHAIN_INTERACTION
 
-export async function sendVerificationTransaction(params) {
+interface SendVerificationTransactionParams {
+  address: string
+  userId: number
+  blockchain: string
+}
+
+interface CheckVerificationParams {
+  address: string
+  userId: number
+}
+
+interface SendParams {
+  message: any
+  masterWallet: any
+  masterWalletBalance: any
+}
+
+interface Message {
+  To: string
+  From: string
+  Nonce: number
+  Value: string
+  GasLimit: number
+  GasPremium: string
+  GasFeeCap: string
+  GasPrice: string
+  Method: number
+  Params: string
+}
+
+export async function sendVerificationTransaction(params: SendVerificationTransactionParams) {
   const { fields, errors } = await validate(sendVerificationTransactionValidator, params)
-  if (errors) {
+  if (errors || !fields) {
     return {
       error: {
         status: 400,
@@ -52,7 +83,7 @@ export async function sendVerificationTransaction(params) {
   const masterWallet = getMasterWallet()
   const { scale, value } = getVerificationAmount(userData.email.endsWith(EMAIL_DOMAIN))
 
-  const { data: masterBalance, error: balanceError } = await getWalletBalance(masterWallet.address)
+  const { data: masterBalance, error: balanceError } = (await getWalletBalance(masterWallet.address)) as FilecoinApiResult
 
   if (balanceError) {
     logger.error('Error getting master wallet balance', balanceError)
@@ -69,11 +100,11 @@ export async function sendVerificationTransaction(params) {
     logger.warning('Master Wallet balance is lower than 0.5 FIL')
   }
 
-  const message = {
+  const message: Message = {
     To: address,
     From: masterWallet.address,
     Nonce: 0,
-    Value: convert(value, scale, ATTOFIL).toString(),
+    Value: convert(String(value), scale, ATTOFIL).toString(),
     GasLimit: 0,
     GasPremium: '0',
     GasFeeCap: '0',
@@ -82,9 +113,9 @@ export async function sendVerificationTransaction(params) {
     Params: '',
   }
 
-  const { data, error } = await send(message, masterWallet, masterBalance.result)
+  const { data, error } = await send({ message, masterWallet, masterWalletBalance: masterBalance.result })
 
-  if (error) {
+  if (error || !data) {
     return { error }
   }
 
@@ -94,7 +125,7 @@ export async function sendVerificationTransaction(params) {
     data: {
       address,
       blockchain,
-      transactionId,
+      transactionId: transactionId as string,
       transactionAmount: value,
       transactionContent: signedTransaction,
       transactionCurrencyUnit: {
@@ -121,11 +152,11 @@ export async function sendVerificationTransaction(params) {
   }
 }
 
-export async function checkUserTransactions({ address, userId }) {
+export async function checkUserTransactions({ address, userId }: CheckVerificationParams) {
   const verifications = await prisma.walletVerification.findMany({
     where: {
       userId,
-      createdAt: { gte: DateTime.now().minus({ hours: 24 }).toISO() },
+      createdAt: { gte: DateTime.now().minus({ hours: 24 }).toISO() as string },
     },
   })
 
@@ -141,8 +172,8 @@ export async function checkUserTransactions({ address, userId }) {
   return {}
 }
 
-export async function send(message, masterWallet, masterWalletBalance) {
-  if (ENABLE_BLOCKCHAIN_INTERACTION == 0) {
+export async function send({ message, masterWallet, masterWalletBalance }: SendParams) {
+  if (ENABLE_BLOCKCHAIN_INTERACTION == '0') {
     return {
       data: {
         transactionId: 'TEST_TRANSACTION_ID',
@@ -151,7 +182,7 @@ export async function send(message, masterWallet, masterWalletBalance) {
     }
   }
 
-  const { data: gas, error: gasError } = await getGasEstimation(message)
+  const { data: gas, error: gasError } = (await getGasEstimation(message)) as FilecoinApiResult
   if (gasError) {
     logger.error('Error getting gas estimation', gasError)
     return {
@@ -162,7 +193,7 @@ export async function send(message, masterWallet, masterWalletBalance) {
     }
   }
 
-  const { data: nonce, error: nonceError } = await getNonce(masterWallet.address)
+  const { data: nonce, error: nonceError } = (await getNonce(masterWallet.address)) as FilecoinApiResult
   if (nonceError) {
     logger.error('Error getting nonce', nonceError)
     return {
@@ -195,10 +226,10 @@ export async function send(message, masterWallet, masterWalletBalance) {
   }
 
   // TODO: investigate signMessage receiving only one parameter
-  const signature = await signMessage(estimatedMessage, masterWallet)
+  const signature = await signMessage(estimatedMessage)
   const transaction = { Message: estimatedMessage, Signature: signature }
 
-  const { data: pushResponse, error: pushError } = await sendTransaction(transaction)
+  const { data: pushResponse, error: pushError } = (await sendTransaction(transaction)) as FilecoinApiResult
   if (pushError) {
     logger.error('Error pushing transaction', pushError)
     return {

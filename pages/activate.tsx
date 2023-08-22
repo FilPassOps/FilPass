@@ -1,11 +1,12 @@
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline'
 import { Button } from 'components/shared/Button'
 import { verifyAccount } from 'domain/auth/verifyAccount'
+import { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import NextLink from 'next/link'
 import { PLATFORM_NAME } from 'system.config'
 
-export default function Activate({ error }) {
+export default function Activate({ error }: { error: any }) {
   return (
     <>
       <Head>
@@ -36,9 +37,9 @@ export default function Activate({ error }) {
   )
 }
 
-export const getServerSideProps = async ctx => {
-  const { token } = ctx.query
-  const { data, error } = await verifyAccount({ token })
+export const getServerSideProps: GetServerSideProps = async ({ query }) => {
+  const { token } = query
+  const { data, error } = await verifyAccount({ token: (token as string) || undefined })
 
   if (error) {
     return {

@@ -13,6 +13,8 @@ declare module 'iron-session' {
       lastName: string | null
       dateOfBirth: string | null
       countryResidence: string | null
+      isReviewedByCompliance?: boolean | null
+      isSanctioned?: boolean | null
       roles: {
         id: number
         role: Role

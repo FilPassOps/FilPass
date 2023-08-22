@@ -2,16 +2,12 @@ import { LockClosedIcon } from '@heroicons/react/24/solid'
 import { Layout } from 'components/Layout'
 import { LinkButton } from 'components/shared/Button'
 import { withUserSSR } from 'lib/ssr'
-import Head from 'next/head'
 import { ReactElement } from 'react'
 import { PLATFORM_NAME, SUPPORT_EMAIL } from 'system.config'
 
 export default function FlaggedAccountPage() {
   return (
     <>
-      <Head>
-        <title>Flagged Account - {PLATFORM_NAME}</title>
-      </Head>
       <div className="h-full flex flex-col justify-center items-center mt-20">
         <LockClosedIcon className="w-14 h-14 text-gray-500 mb-3" />
         <h1 className="text-gray-500 text-3xl font-bold mb-3">Flagged Account</h1>
@@ -32,7 +28,7 @@ export default function FlaggedAccountPage() {
   )
 }
 FlaggedAccountPage.getLayout = function getLayout(page: ReactElement) {
-  return <Layout title="Transfer Request">{page}</Layout>
+  return <Layout title={`Flagged Account - ${PLATFORM_NAME}`}>{page}</Layout>
 }
 
 export const getServerSideProps = withUserSSR(async ({ user }: any) => {

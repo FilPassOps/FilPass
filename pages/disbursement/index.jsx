@@ -20,7 +20,6 @@ import { api } from 'lib/api'
 import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { withControllerSSR } from 'lib/ssr'
 import { DateTime } from 'luxon'
-import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import errorsMessages from 'wordings-and-errors/errors-messages'
@@ -168,10 +167,6 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
 
   return (
     <>
-      <Head>
-        <title>Disbursement - {PLATFORM_NAME}</title>
-      </Head>
-
       {isPayment && paymentModalTransactions.length ? (
         <MetamaskPayment data={paymentModalTransactions} />
       ) : (
@@ -256,7 +251,7 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
 }
 
 Disbursement.getLayout = function getLayout(page) {
-  return <Layout title="Disbursement">{page}</Layout>
+  return <Layout title={`Disbursement - ${PLATFORM_NAME}`}>{page}</Layout>
 }
 
 export const getServerSideProps = withControllerSSR(async ({ query }) => {

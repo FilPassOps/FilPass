@@ -39,7 +39,7 @@ export const SelectInput = forwardRef(
       ...props
     },
     // eslint-disable-next-line no-unused-vars
-    ref
+    ref,
   ) => {
     const classes = getSelectClasses({ error, disabled })
     const selected = options.find(c => c.value === value) || null
@@ -105,117 +105,109 @@ export const SelectInput = forwardRef(
         </Listbox>
       </InputController>
     )
-  }
+  },
 )
 
-export const MultipleSelectInput = ({
-  id,
-  label,
-  error,
-  placeholder,
-  disabled,
-  emptyState,
-  value = [],
-  onChange,
-  options,
-  variant,
-  name,
-  truncate = false,
-  ...rest
-}) => {
-  const [selecteds, setSelecteds] = useState(value)
-  const classes = getSelectClasses({ error, disabled, variant })
+export const MultipleSelectInput = forwardRef(
+  (
+    { id, label, error, placeholder, disabled, emptyState, value = [], onChange, options, variant, name, truncate = false, ...rest },
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+    ref,
+  ) => {
+    const [selecteds, setSelecteds] = useState(value)
+    const classes = getSelectClasses({ error, disabled, variant })
 
-  return (
-    <InputController id={id} label={label} error={error} name={name}>
-      <Listbox defaultValue={selecteds} disabled={disabled} name={name} {...rest}>
-        {({ open }) => (
-          <>
-            <div className="mt-1 relative">
-              <Listbox.Button className={classes} title={selecteds.map(item => item.label).join(', ')}>
-                <span
-                  className={classNames(
-                    selecteds.length > 0
-                      ? `text-black ${truncate ? 'truncate inline-block w-[calc(80%)]' : ''}`
-                      : error
-                      ? 'text-red-300'
-                      : variant === 'invisible'
-                      ? 'text-black'
-                      : 'text-gray-500'
-                  )}
-                >
-                  {selecteds.length > 0 ? selecteds.map(({ label }) => label).join(', ') : placeholder}
-                </span>
-                {!disabled && (
-                  <span className="absolute inset-y-0 right-0 flex items-center pr-2 cursor-default">
-                    {open ? (
-                      <ChevronUpIcon className="h-7 w-7 text-gray-400" aria-hidden="true" />
-                    ) : (
-                      <ChevronDownIcon className="h-7 w-7 text-gray-400" aria-hidden="true" />
+    return (
+      <InputController id={id} label={label} error={error} name={name}>
+        <Listbox defaultValue={selecteds} disabled={disabled} name={name} {...rest}>
+          {({ open }) => (
+            <>
+              <div className="mt-1 relative">
+                <Listbox.Button className={classes} title={selecteds.map(item => item.label).join(', ')}>
+                  <span
+                    className={classNames(
+                      selecteds.length > 0
+                        ? `text-black ${truncate ? 'truncate inline-block w-[calc(80%)]' : ''}`
+                        : error
+                        ? 'text-red-300'
+                        : variant === 'invisible'
+                        ? 'text-black'
+                        : 'text-gray-500',
                     )}
+                  >
+                    {selecteds.length > 0 ? selecteds.map(({ label }) => label).join(', ') : placeholder}
                   </span>
-                )}
-              </Listbox.Button>
-              <Listbox.Options className="absolute z-20 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                {emptyState && !options.length && (
-                  <Listbox.Option disabled>
-                    {() => (
-                      <div className="flex flex-1 items-center pl-4 pt-3 pb-3">
-                        <span className={classNames('block truncate font-normal')}>{emptyState}</span>
-                      </div>
-                    )}
-                  </Listbox.Option>
-                )}
-                <div className="overflow-auto max-h-36">
-                  {options.map(option => {
-                    const handleChange = () => {
-                      if (selecteds.find(item => item.value === option.value)) {
-                        onChange && onChange(selecteds.filter(item => item.value !== option.value))
-                        setSelecteds(selecteds.filter(item => item.value !== option.value))
-                      } else {
-                        onChange && onChange([...selecteds, option])
-                        setSelecteds([...selecteds, option])
+                  {!disabled && (
+                    <span className="absolute inset-y-0 right-0 flex items-center pr-2 cursor-default">
+                      {open ? (
+                        <ChevronUpIcon className="h-7 w-7 text-gray-400" aria-hidden="true" />
+                      ) : (
+                        <ChevronDownIcon className="h-7 w-7 text-gray-400" aria-hidden="true" />
+                      )}
+                    </span>
+                  )}
+                </Listbox.Button>
+                <Listbox.Options className="absolute z-20 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                  {emptyState && !options.length && (
+                    <Listbox.Option disabled>
+                      {() => (
+                        <div className="flex flex-1 items-center pl-4 pt-3 pb-3">
+                          <span className={classNames('block truncate font-normal')}>{emptyState}</span>
+                        </div>
+                      )}
+                    </Listbox.Option>
+                  )}
+                  <div className="overflow-auto max-h-36">
+                    {options.map(option => {
+                      const handleChange = () => {
+                        if (selecteds.find(item => item.value === option.value)) {
+                          onChange && onChange(selecteds.filter(item => item.value !== option.value))
+                          setSelecteds(selecteds.filter(item => item.value !== option.value))
+                        } else {
+                          onChange && onChange([...selecteds, option])
+                          setSelecteds([...selecteds, option])
+                        }
                       }
-                    }
-                    return (
-                      <div key={option.value} className="relative">
-                        {option.tooltip && (
-                          <div className="absolute break-normal h-11 text-xs bg-gray-700 text-white opacity-0 hover:opacity-100 p-2 z-50">
-                            {option.tooltip}
-                          </div>
-                        )}
-                        <div
-                          className={classNames(
-                            'cursor-default select-none relative p-3 text-gray-900 ',
-                            !disabled && 'hover:bg-indigo-600 hover:text-white',
-                            (disabled || option.disabled) && 'opacity-50 hover:bg-white pointer-events-none'
+                      return (
+                        <div key={option.value} className="relative">
+                          {option.tooltip && (
+                            <div className="absolute break-normal h-11 text-xs bg-gray-700 text-white opacity-0 hover:opacity-100 p-2 z-50">
+                              {option.tooltip}
+                            </div>
                           )}
-                        >
-                          <div className="flex flex-1 w-full items-center">
-                            <CheckboxInput
-                              id={option.value}
-                              value={Boolean(selecteds.find(item => item.value === option.value))}
-                              onChange={handleChange}
-                              className="w-full"
-                              disabled={disabled}
-                              title={option.tooltip}
-                            >
-                              <span className="flex items-center truncate">{option.label}</span>
-                            </CheckboxInput>
+                          <div
+                            className={classNames(
+                              'cursor-default select-none relative p-3 text-gray-900 ',
+                              !disabled && 'hover:bg-indigo-600 hover:text-white',
+                              (disabled || option.disabled) && 'opacity-50 hover:bg-white pointer-events-none',
+                            )}
+                          >
+                            <div className="flex flex-1 w-full items-center">
+                              <CheckboxInput
+                                id={option.value}
+                                value={Boolean(selecteds.find(item => item.value === option.value))}
+                                onChange={handleChange}
+                                className="w-full"
+                                disabled={disabled}
+                                title={option.tooltip}
+                              >
+                                <span className="flex items-center truncate">{option.label}</span>
+                              </CheckboxInput>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </Listbox.Options>
-            </div>
-          </>
-        )}
-      </Listbox>
-    </InputController>
-  )
-}
+                      )
+                    })}
+                  </div>
+                </Listbox.Options>
+              </div>
+            </>
+          )}
+        </Listbox>
+      </InputController>
+    )
+  },
+)
 
 export const MultipleSelectInputV2 = ({
   id,
@@ -279,7 +271,7 @@ export const MultipleSelectInputV2 = ({
                         className={classNames(
                           'cursor-default select-none relative p-3 text-gray-900 ',
                           !disabled && 'hover:bg-indigo-600 hover:text-white',
-                          disabled && 'opacity-50 hover:bg-white pointer-events-none'
+                          disabled && 'opacity-50 hover:bg-white pointer-events-none',
                         )}
                       >
                         <div className="flex flex-1 w-full items-center">
@@ -349,7 +341,7 @@ export const CheckRadioInput = forwardRef(
         </div>
       </>
     )
-  }
+  },
 )
 
 export const CheckboxInput = forwardRef(({ error, id, children, name, onChange = () => {}, onBlur, value, disabled, className }, ref) => {
@@ -506,7 +498,7 @@ export const getInputClasses = ({ error, disabled }) =>
     error && 'border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500 focus:ring-1',
     !error && 'focus:ring-indigo-500 focus:border-indigo-500 border-gray-300',
     'border leading-5 shadow-sm block w-full rounded-md px-3 py-2 text-sm bg-white',
-    disabled && 'cursor-default opacity-50 bg-gray-100'
+    disabled && 'cursor-default opacity-50 bg-gray-100',
   )
 
 const getSelectClasses = ({ error, disabled, variant }) =>
@@ -517,7 +509,7 @@ const getSelectClasses = ({ error, disabled, variant }) =>
     'bg-white relative w-full py-2 text-left cursor-default focus:outline-none text-sm',
     variant !== 'invisible' && 'pl-3 pr-10 border shadow-sm rounded-md focus:ring-1',
     disabled && variant !== 'invisible' && 'cursor-default opacity-50 bg-gray-100',
-    disabled && variant === 'invisible' && 'cursor-default opacity-50'
+    disabled && variant === 'invisible' && 'cursor-default opacity-50',
   )
 
 const getCheckboxClasses = ({ error, disabled }) => {
@@ -525,7 +517,7 @@ const getCheckboxClasses = ({ error, disabled }) => {
     error && 'bg-red-100 border border-red-300',
     disabled && 'cursor-default opacity-50',
     !error && 'border border-gray-300',
-    'focus:ring-indigo-500 h-4 w-4 text-indigo-600 rounded mr-3'
+    'focus:ring-indigo-500 h-4 w-4 text-indigo-600 rounded mr-3',
   )
 }
 
@@ -533,7 +525,7 @@ const getRadioClasses = ({ error, disabled }) => {
   const checkboxClasses = classNames(
     error && 'bg-red-100',
     disabled && 'cursor-default opacity-50 bg-gray-300',
-    'h-4 w-4 text-white rounded mr-3'
+    'h-4 w-4 text-white rounded mr-3',
   )
   const iconClasses = checked =>
     classNames(
@@ -541,7 +533,7 @@ const getRadioClasses = ({ error, disabled }) => {
       disabled && 'cursor-default opacity-70',
       checked && 'bg-indigo-600 border border-indigo-600',
       !checked && !error && 'bg-white border border-gray-300',
-      'focus:ring-indigo-500 h-4 w-4 rounded absolute top-0.5 left-0 flex items-center justify-center'
+      'focus:ring-indigo-500 h-4 w-4 rounded absolute top-0.5 left-0 flex items-center justify-center',
     )
 
   return { checkboxClasses, iconClasses }

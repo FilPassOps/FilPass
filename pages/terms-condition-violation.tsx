@@ -38,13 +38,14 @@ export default function BannedUserPage() {
   )
 }
 
-export const getServerSideProps = withSessionSSR(async ({ req }: any) => {
+export const getServerSideProps = withSessionSSR(async function getServerSideProps({ req }) {
   const user = req.session.user
 
   if (!user) {
     return {
       redirect: {
         destination: '/',
+        permanent: false,
       },
     }
   }
@@ -54,6 +55,7 @@ export const getServerSideProps = withSessionSSR(async ({ req }: any) => {
     return {
       redirect: {
         destination: '/my-transfer-requests',
+        permanent: false,
       },
     }
   }
