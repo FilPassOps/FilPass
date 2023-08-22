@@ -8,7 +8,6 @@ import { PaginationWrapper } from 'components/shared/usePagination'
 import { PLATFORM_NAME } from 'system.config'
 import { findAllPII, findAllSanctioned } from 'domain/user'
 import { withComplianceSSR } from 'lib/ssr'
-import Head from 'next/head'
 import { ReactElement, useState } from 'react'
 
 interface FlaggedUsersPage {
@@ -50,9 +49,6 @@ export default function FlaggedUsersPage({ data, totalItems, pageSize, status }:
 
   return (
     <>
-      <Head>
-        <title>Compliance - {PLATFORM_NAME}</title>
-      </Head>
       <PaginationWrapper totalItems={totalItems} pageSize={pageSize} isLoading={false}>
         <UserList
           data={data}
@@ -75,7 +71,7 @@ export default function FlaggedUsersPage({ data, totalItems, pageSize, status }:
 }
 
 FlaggedUsersPage.getLayout = function getLayout(page: ReactElement) {
-  return <Layout title="Compliance">{page}</Layout>
+  return <Layout title={`Compliance - ${PLATFORM_NAME}`}>{page}</Layout>
 }
 
 export const getServerSideProps = withComplianceSSR(async ({ query }: any) => {

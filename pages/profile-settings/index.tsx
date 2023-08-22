@@ -5,7 +5,7 @@ import { PageAlert, useAlertDispatcher } from 'components/Layout/Alerts'
 import { TaxForm } from 'components/ProfileSettings/TaxForm'
 import { WalletModal } from 'components/TransferRequest/WalletModal'
 import { useDownloadFile } from 'components/TransferRequest/shared/useDownloadFile'
-import PersonalInformationFieldGroup from 'components/User/PersonalInformationFieldGroup'
+import PersonalInformationFieldGroup, { PersonalInformationFieldGroupValues } from 'components/User/PersonalInformationFieldGroup'
 import { WalletList } from 'components/User/WalletList'
 import { Button } from 'components/shared/Button'
 import { StatusBadge } from 'components/shared/Status'
@@ -17,13 +17,23 @@ import { fetcher } from 'lib/fetcher'
 import { getMasterWallet } from 'lib/filecoin'
 import { withUserSSR } from 'lib/ssr'
 import { DateTime } from 'luxon'
-import Head from 'next/head'
-import { useState } from 'react'
+import { ReactElement, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import useSWR from 'swr'
+import yup from 'lib/yup'
 import { PLATFORM_NAME } from 'system.config'
+import { taxFormValidator } from 'domain/user/validation'
 
-export default function UserSettings({ data, masterAddress, taxForm }) {
+type FormValuePersonal = PersonalInformationFieldGroupValues
+
+type FormValueTax = yup.Asserts<typeof taxFormValidator>
+
+interface UserSettingsProps {
+  data: any
+  taxForm: FormValuePersonal
+}
+
+export default function UserSettings({ data, taxForm }: UserSettingsProps) {
   const { piiUpdatedAt } = data
   const [openWalletModal, setOpenWalletModal] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -34,11 +44,12 @@ export default function UserSettings({ data, masterAddress, taxForm }) {
   })
   const [lastUpdate, setLastUpdate] = useState(piiUpdatedAt ? DateTime.fromISO(piiUpdatedAt) : undefined)
   const [defaultTaxForm, setDefaultTaxForm] = useState(taxForm)
+
   const {
     loadingFile: defaultFormLoading,
     fileError: defaultFormError,
     handleDownloadFile: openDefaultForm,
-  } = useDownloadFile({ fileId: defaultTaxForm?.publicId, fileName: defaultTaxForm?.filename })
+  } = useDownloadFile({ fileId: defaultTaxForm?.publicId || '', fileName: defaultTaxForm?.filename })
 
   const {
     register,
@@ -46,7 +57,7 @@ export default function UserSettings({ data, masterAddress, taxForm }) {
     control,
     formState: { errors, isSubmitting, isDirty },
     reset,
-  } = useForm({
+  } = useForm<FormValuePersonal>({
     resolver: yupResolver(personalInformationCheckValidator),
     defaultValues: {
       firstName: data?.firstName || '',
@@ -57,7 +68,7 @@ export default function UserSettings({ data, masterAddress, taxForm }) {
     shouldFocusError: true,
   })
 
-  const handlePIISubmit = async values => {
+  const handlePIISubmit = async (values: { dateOfBirth: any }) => {
     const dob = values.dateOfBirth
     const year = dob.getFullYear()
     const month = dob.getMonth()
@@ -74,7 +85,7 @@ export default function UserSettings({ data, masterAddress, taxForm }) {
           closeable: true,
         },
       })
-    } else if (result.error.status === 412) {
+    } else if (result.error?.status === 412) {
       dispatch({
         type: 'error',
         title: 'You can only change this information once every 30 days!',
@@ -95,7 +106,7 @@ export default function UserSettings({ data, masterAddress, taxForm }) {
     }
   }
 
-  const handleTaxFormSubmit = async values => {
+  const handleTaxFormSubmit = async (values: FormValueTax) => {
     const result = await api.post('/users/current/update-tax-info', { taxForm: values })
 
     if (result.status === 200) {
@@ -120,14 +131,10 @@ export default function UserSettings({ data, masterAddress, taxForm }) {
     }
   }
 
-  const defaultWallet = user?.wallets?.find(wallet => wallet.isDefault)
+  const defaultWallet = user?.wallets?.find((wallet: { isDefault: any }) => wallet.isDefault)
 
   return (
     <>
-      <Head>
-        <title>Profile & Settings - {PLATFORM_NAME}</title>
-      </Head>
-
       {defaultTaxForm?.rejectionReason && (
         <PageAlert type="error" withIcon={false} className="mb-8">
           <span className="flex flex-col gap-2">
@@ -259,27 +266,27 @@ export default function UserSettings({ data, masterAddress, taxForm }) {
           refresh()
           setOpenWalletModal(false)
         }}
-        address={masterAddress}
       />
     </>
   )
 }
 
-UserSettings.getLayout = function getLayout(page) {
+UserSettings.getLayout = function getLayout(page: ReactElement) {
   return (
-    <Layout title="Profile & Settings" containerClass="bg-gray-50 h-screen">
+    <Layout title={`Profile & Settings - ${PLATFORM_NAME}`} containerClass="bg-gray-50 h-screen">
       {page}
     </Layout>
   )
 }
 
-export const getServerSideProps = withUserSSR(async ({ user }) => {
+export const getServerSideProps = withUserSSR(async function getServerSideProps({ user }) {
   const { isSanctioned, isReviewedByCompliance } = user
 
   if (isReviewedByCompliance && isSanctioned) {
     return {
       redirect: {
         destination: '/flagged-account',
+        permanent: false,
       },
     }
   }

@@ -1,8 +1,15 @@
 import { DateTime } from 'luxon'
 
-export const RequestorReceiver = ({ applyer, issuedOn, receiver, expectedTransferDate }) => {
-  const _issuedOn = issuedOn || DateTime.now().toISO()
-  const _expectedTransferDate = expectedTransferDate || DateTime.now().plus({ days: 30 }).toISO()
+interface RequestorReceiverProps {
+  applyer: string
+  issuedOn?: string
+  receiver?: string
+  expectedTransferDate?: string
+}
+
+export const RequestorReceiver = ({ applyer, issuedOn, receiver, expectedTransferDate }: RequestorReceiverProps) => {
+  const _issuedOn = issuedOn || DateTime.now().toISO() as string
+  const _expectedTransferDate = expectedTransferDate || DateTime.now().plus({ days: 30 }).toISO() as string
   const renderReceiver = receiver && applyer !== receiver
 
   return (

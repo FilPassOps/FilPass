@@ -18,6 +18,7 @@ interface AuthPoviderParams {
   children: ReactChild
 }
 
+// Check for possible issues here with data being null/undefined as its not waiting for loading to finish
 export const AuthProvider = ({ children }: AuthPoviderParams) => {
   const { data: user, mutate } = useSWR<UserMeType>('/auth/me', fetcher, {
     revalidateOnMount: true,

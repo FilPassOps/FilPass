@@ -24,8 +24,7 @@ export default function SignUp() {
     </>
   )
 }
-
-export const getServerSideProps = withSessionSSR(async ({ req }) => {
+export const getServerSideProps = withSessionSSR(async function getServerSideProps({ req }) {
   const user = req.session.user
   if (user) {
     return {

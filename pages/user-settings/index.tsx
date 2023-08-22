@@ -1,16 +1,22 @@
 import { PlusCircleIcon } from '@heroicons/react/24/solid'
 import { Layout } from 'components/Layout'
 import { Button } from 'components/shared/Button'
-import { checkItemsPerPage, PaginationWrapper } from 'components/shared/usePagination'
+import { getItemsPerPage, PaginationWrapper } from 'components/shared/usePagination'
 import { InviteUserModal } from 'components/SuperAdmin/Modals/InviteUserModal'
 import { UserList } from 'components/SuperAdmin/UserList'
 import { PLATFORM_NAME } from 'system.config'
 import { findAllUsers } from 'domain/user/findAll'
 import { withSuperAdminSSR } from 'lib/ssr'
 import Head from 'next/head'
-import { useState } from 'react'
+import { ReactElement, useState } from 'react'
 
-export default function UserSettings({ data = [], pageSize, totalItems }) {
+interface UserSettingsProps {
+  data: any[]
+  pageSize: number
+  totalItems: number
+}
+
+export default function UserSettings({ data = [], pageSize, totalItems }: UserSettingsProps) {
   const [openInviteModal, setOpenInviteModal] = useState(false)
 
   return (
@@ -39,26 +45,25 @@ export default function UserSettings({ data = [], pageSize, totalItems }) {
   )
 }
 
-UserSettings.getLayout = function getLayout(page) {
-  return <Layout title="User Settings">{page}</Layout>
+UserSettings.getLayout = function getLayout(page: ReactElement) {
+  return <Layout title={`User Settings - ${PLATFORM_NAME}`}>{page}</Layout>
 }
 
-export const getServerSideProps = withSuperAdminSSR(async ({ user, query }) => {
-  const pageSize = checkItemsPerPage(query.itemsPerPage) ? parseInt(query.itemsPerPage) : 100
-  const page = parseInt(query.page) || 1
-  const {
-    data: { users, totalItems },
-  } = await findAllUsers({
-    sort: query?.sort,
-    order: query?.order,
+export const getServerSideProps = withSuperAdminSSR(async function getServerSideProps({ query, user }) {
+  const pageSize = getItemsPerPage(query.itemsPerPage)
+  const page = query.page && typeof query.page === 'string' ? parseInt(query.page) : 1
+
+  const { data } = await findAllUsers({
+    sort: query?.sort as string | undefined,
+    order: query?.order as string | undefined,
     size: pageSize,
     page,
   })
   return {
     props: {
       user,
-      data: JSON.parse(JSON.stringify(users)),
-      totalItems: JSON.parse(JSON.stringify(totalItems)),
+      data: JSON.parse(JSON.stringify(data?.users)),
+      totalItems: JSON.parse(JSON.stringify(data?.totalItems)),
       pageSize,
     },
   }

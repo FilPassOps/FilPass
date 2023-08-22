@@ -6,7 +6,6 @@ import { Button } from 'components/shared/Button'
 import { CustomWindow, useMetaMask } from 'components/web3/MetaMaskProvider'
 import { ethers } from 'ethers'
 import { api } from 'lib/api'
-import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import { PLATFORM_NAME } from 'system.config'
 import { MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
@@ -152,9 +151,6 @@ const Playground: NextPageWithLayout = () => {
 
   return (
     <>
-      <Head>
-        <title>Playground - {PLATFORM_NAME}</title>
-      </Head>
       <div className="w-full">
         <h1 className="font-bold text-lg">Web3 Playground</h1>
         {!wallet && <Button onClick={() => connect()}>Connect to MetaMask</Button>}
@@ -307,5 +303,5 @@ const Playground: NextPageWithLayout = () => {
 export default Playground
 
 Playground.getLayout = function getLayout(page) {
-  return <Layout title="Playground">{page}</Layout>
+  return <Layout title={`Playground - ${PLATFORM_NAME}`}>{page}</Layout>
 }

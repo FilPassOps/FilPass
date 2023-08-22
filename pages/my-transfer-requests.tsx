@@ -3,7 +3,7 @@ import { statusFilterOptions } from 'components/Filters/constants'
 import { Filters } from 'components/Filters/Filters'
 import { Layout } from 'components/Layout'
 import { LinkButton } from 'components/shared/Button'
-import { checkItemsPerPage, PaginationWrapper } from 'components/shared/usePagination'
+import { getItemsPerPage, PaginationWrapper } from 'components/shared/usePagination'
 import TransferList from 'components/User/TransferList'
 import { PLATFORM_NAME } from 'system.config'
 import { findReceiverPrograms } from 'domain/programs/findReceiverPrograms'
@@ -11,14 +11,18 @@ import { getUserTransferRequests } from 'domain/transferRequest/getUserTransferR
 import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { getEthereumAddress } from 'lib/getEthereumAddress'
 import { withUserSSR } from 'lib/ssr'
-import Head from 'next/head'
+import { ReactElement } from 'react'
 
-export default function Home({ data = [], pageSize, totalItems = 0, programs }) {
+interface HomeProps {
+  data: any[]
+  pageSize: number
+  totalItems: number
+  programs: any[]
+}
+
+export default function Home({ data = [], pageSize, totalItems = 0, programs }: HomeProps) {
   return (
     <>
-      <Head>
-        <title>Home - {PLATFORM_NAME}</title>
-      </Head>
       <div className="w-full">
         <div className="flex items-center justify-end md:justify-between gap-2 py-4">
           <div className="hidden md:flex items-center">
@@ -41,14 +45,14 @@ export default function Home({ data = [], pageSize, totalItems = 0, programs }) 
   )
 }
 
-Home.getLayout = function getLayout(page) {
-  return <Layout title="My Transfer Requests">{page}</Layout>
+Home.getLayout = function getLayout(page: ReactElement) {
+  return <Layout title={`Home - ${PLATFORM_NAME}`}>{page}</Layout>
 }
 
 export const getServerSideProps = withUserSSR(async ({ query, user }) => {
   const { itemsPerPage, programId, number, team, sort, status, order, from, to, wallet } = query
-  const pageSize = checkItemsPerPage(itemsPerPage) ? parseInt(itemsPerPage) : 100
-  const page = parseInt(query.page) || 1
+  const pageSize = getItemsPerPage(itemsPerPage)
+  const page = query.page && typeof query.page === 'string' ? parseInt(query.page) : 1
 
   const programIds =
     programId
@@ -65,14 +69,14 @@ export const getServerSideProps = withUserSSR(async ({ query, user }) => {
     toDate.setHours(23, 59, 59, 999)
   }
 
-  const ethereumWallet = getEthereumAddress(wallet)?.fullAddress.toLowerCase()
-  const delegatedAddress = getDelegatedAddress(wallet)?.fullAddress
+  const walletTypeCheck = wallet && typeof wallet === 'string'
+
+  const ethereumWallet = walletTypeCheck ? getEthereumAddress(wallet)?.fullAddress.toLowerCase() : undefined
+  const delegatedAddress = walletTypeCheck ? getDelegatedAddress(wallet)?.fullAddress : undefined
 
   const wallets = [wallet, ethereumWallet, delegatedAddress].filter(Boolean)
 
-  const {
-    data: { requests, totalItems },
-  } = await getUserTransferRequests({
+  const { data } = await getUserTransferRequests({
     userId: user.id,
     page,
     size: pageSize,
@@ -87,15 +91,15 @@ export const getServerSideProps = withUserSSR(async ({ query, user }) => {
     wallets,
   })
 
-  const programs = await findReceiverPrograms(user.id)
+  const programs = await findReceiverPrograms({ receiverId: user.id })
 
   return {
     props: {
       user: {},
-      data: JSON.parse(JSON.stringify(requests)),
+      data: JSON.parse(JSON.stringify(data?.requests)),
       programs: JSON.parse(JSON.stringify(programs)),
       pageSize,
-      totalItems: JSON.parse(JSON.stringify(totalItems)),
+      totalItems: JSON.parse(JSON.stringify(data?.totalItems)),
     },
   }
 })

@@ -7,7 +7,7 @@ import { generateEmailHash } from 'lib/password'
 import { logger } from 'lib/logger'
 
 interface VerifyAccountParams {
-  token: string
+  token?: string
 }
 
 export async function verifyAccount(params: VerifyAccountParams) {
