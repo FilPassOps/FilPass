@@ -1,10 +1,8 @@
-import { AxiosResponse } from 'axios'
 import config from 'chains.config'
-import { Message } from 'domain/multisig/types/FilfoxAPI'
 import { baseEmail } from 'domain/notifications/constants'
 import { transferPaymentConfirm } from 'domain/transfer/transfers-payment-confirm'
+import { ethers } from 'ethers'
 import { decryptPII } from 'lib/emissaryCrypto'
-import { getMessage } from 'lib/filfoxApi'
 import prisma from 'lib/prisma'
 import { sendBatchEmail } from 'lib/sendEmail'
 import { MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
@@ -15,6 +13,9 @@ interface EmailReminderRecipient {
 
 const contractInterface = MultiForwarderFactory.createInterface()
 const blockExplorerUrl = config.chain.blockExplorerUrls[0]
+const provider = new ethers.providers.JsonRpcProvider(config.chain.rpcUrls[0])
+const forwardAnyEvent = contractInterface.getEvent('ForwardAny')
+const forwardEvent = contractInterface.getEvent('Forward')
 
 export default async function run() {
   try {
@@ -41,28 +42,21 @@ export default async function run() {
     const failedTransferRequestPublicIds = []
 
     for (const { txHash } of pendingTransfers) {
-      if (!txHash) {
-        continue
-      }
+      if (!txHash || !txHash.startsWith('0x')) continue
 
-      const { data }: AxiosResponse<Message> = await getMessage(txHash)
+      const receipt = await provider.getTransactionReceipt(txHash)
 
-      if (!data.receipt) {
-        continue
-      }
+      if (!receipt) continue
 
-      //ExitCode 0 = Success
-      if (data.receipt.exitCode === 0) {
-        if (!data.eventLogs) continue
-
-        const logparsed = contractInterface.parseLog({
-          data: data.eventLogs[0].data,
-          topics: data.eventLogs[0].topics,
+      if (receipt.status === 1) {
+        receipt.logs.forEach(log => {
+          if (log.address !== config.multiforwarder) return
+          const parsed = contractInterface.parseLog(log)
+          if (parsed.name !== forwardAnyEvent.name && parsed.name !== forwardEvent.name) return
+          const { id, from, to, value } = parsed.args
+          transferPaymentConfirm({ id, from, to, value, transactionHash: txHash })
         })
-        const { id, from, to, value } = logparsed.args
-        transferPaymentConfirm({ id, from, to, value, transactionHash: txHash })
       } else {
-        //ExitCode != 0 = Failed
         await prisma.transfer.updateMany({
           where: {
             txHash: txHash,
@@ -70,7 +64,7 @@ export default async function run() {
           },
           data: {
             status: 'FAILED',
-            notes: data.error,
+            notes: 'Payment failed',
             isActive: false,
           },
         })
@@ -127,7 +121,7 @@ export default async function run() {
         return {
           email,
         }
-      })
+      }),
     )
 
     recipientsResult.forEach(item => {

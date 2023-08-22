@@ -38,6 +38,7 @@ export const getServerSideProps = withUserSSR(async ({ user }: any) => {
     return {
       redirect: {
         destination: '/my-transfer-requests',
+        permanent: false,
       },
     }
   }
