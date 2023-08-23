@@ -29,6 +29,11 @@ export async function findAllPII({ page, pageSize }: FindAllPIIParams) {
         select: {
           address: true,
           verification: true,
+          blockchain: {
+            select: {
+              name: true,
+            },
+          },
         },
         where: {
           isActive: true,

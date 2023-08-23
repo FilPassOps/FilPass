@@ -6,10 +6,9 @@ import { connectWalletStepValidator } from 'domain/walletVerification/validation
 import { api } from 'lib/api'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { TOKEN } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
-export function ConnectStep({ onBackClick, onNextStepClick, connectionMethod, wallet }) {
+export function ConnectStep({ onBackClick, onNextStepClick, connectionMethod, wallet, blockchainName }) {
   const { user } = useAuth()
   const [submitErrors, setSubmitErrors] = useState()
 
@@ -19,7 +18,7 @@ export function ConnectStep({ onBackClick, onNextStepClick, connectionMethod, wa
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      blockchain: TOKEN.name, // TODO OPEN-SOURCE: should the id of the blockchain table
+      blockchain: connectionMethod === 'Filecoin' ? 'Filecoin' : blockchainName, // TODO OPEN-SOURCE: should the id of the blockchain table
       address: connectionMethod === 'Metamask' ? wallet : '',
     },
     resolver: yupResolver(connectWalletStepValidator),
@@ -63,6 +62,7 @@ export function ConnectStep({ onBackClick, onNextStepClick, connectionMethod, wa
           error={errors.blockchain || submitErrors?.blockchain}
           {...register('blockchain')}
         />
+
         <TextInput
           label="Wallet Address"
           id="address"

@@ -10,12 +10,12 @@ import { Divider } from 'components/shared/Divider'
 import { TextInput } from 'components/shared/FormInput'
 
 import { ProgramVisibility } from '@prisma/client'
+import { WalletModal } from '../WalletModal'
 import { ProgramInfo } from '../shared/ProgramInfo'
 import { RequestAmountInput } from '../shared/RequestAmountInput'
 import { RequestorReceiver } from '../shared/RequestorReceiver'
 import { SelectProgramInput } from '../shared/SelectProgramInput'
 import { useProgramCurrency } from '../shared/useProgramCurrency'
-import { WalletModal } from '../WalletModal'
 import { AttachmentInput } from './AttachmentInput'
 import { FooterButtons } from './FooterButtons'
 import { SelectWalletInput } from './SelectWalletInput'
@@ -86,104 +86,109 @@ export const TransferRequestForm = ({ isEditable = false, data, programs = [], m
   useEffect(() => {
     if (submitErrors) {
       setHasUnhandledError(
-        (!!submitErrors?.errors && !submitErrors.errors.type) || (!!submitErrors?.errors && submitErrors.errors.type !== 'internal')
+        (!!submitErrors?.errors && !submitErrors.errors.type) || (!!submitErrors?.errors && submitErrors.errors.type !== 'internal'),
       )
     }
   }, [submitErrors])
 
   const currencyUnitIdRegister = register('currencyUnitId')
 
-  return <>
-    <form onSubmit={handleSubmit(handleFormSubmit)}>
-      <div className="py-8 bg-white">
-        <RequestorReceiver
-          applyer={data?.applyer || user?.email}
-          receiver={data?.receiver || user?.email}
-          issuedOn={data?.created_at}
-          expectedTransferDate={expectedTransferDate}
-        />
-        <Divider className="my-8" />
-        <div className="space-y-6">
-          <div>
-            <input
-              type="hidden"
-              id="currencyUnitId"
-              name={currencyUnitIdRegister.name}
-              onChange={currencyUnitIdRegister.onChange}
-              onBlur={currencyUnitIdRegister.onBlur}
-              //currencyUnitId is a hidden field. The ref prop should not be set to avoid react hook form focusing on an invisible field when there's an error
-            />
-          </div>
-          <div className=" space-y-6">
-            {data?.program_visibility === ProgramVisibility.INTERNAL ? (
-              <TextInput label="Program" disabled defaultValue={data?.program_name} />
-            ) : (
-              <SelectProgramInput control={control} errors={errors} programs={programs} defaultProgram={defaultRequestProgram} />
-            )}
-
-            <TextInput
-              label="Project Name"
-              id="team"
-              type="text"
-              placeholder="Project/team (as was submitted in the event)"
-              error={errors.team}
-              {...register('team')}
-            />
-          </div>
-
-          <SelectWalletInput
-            submitErrors={submitErrors?.errors}
-            errors={errors}
-            data={data}
-            control={control}
-            onCreateWalletClick={() => setOpenWalletModal(true)}
-          />
-
-          <RequestAmountInput
-            requestCurrency={requestCurrency}
-            value={amount}
-            errors={errors}
-            {...register('amount', {
-              setValueAs: val => {
-                const parsedValue = String(val).replaceAll(/[, \s]+/g, '')
-                return isNaN(parsedValue) ? 0 : parsedValue
-              },
-            })}
-          />
-
-          <ProgramInfo
-            paymentCurrency={paymentCurrency}
-            requestCurrency={requestCurrency}
-            selectedProgram={selectedProgram}
+  return (
+    <>
+      <form onSubmit={handleSubmit(handleFormSubmit)}>
+        <div className="py-8 bg-white">
+          <RequestorReceiver
+            applyer={data?.applyer || user?.email}
+            receiver={data?.receiver || user?.email}
+            issuedOn={data?.created_at}
             expectedTransferDate={expectedTransferDate}
           />
+          <Divider className="my-8" />
+          <div className="space-y-6">
+            <div>
+              <input
+                type="hidden"
+                id="currencyUnitId"
+                name={currencyUnitIdRegister.name}
+                onChange={currencyUnitIdRegister.onChange}
+                onBlur={currencyUnitIdRegister.onBlur}
+                //currencyUnitId is a hidden field. The ref prop should not be set to avoid react hook form focusing on an invisible field when there's an error
+              />
+            </div>
+            <div className=" space-y-6">
+              {data?.program_visibility === ProgramVisibility.INTERNAL ? (
+                <TextInput label="Program" disabled defaultValue={data?.program_name} />
+              ) : (
+                <SelectProgramInput control={control} errors={errors} programs={programs} defaultProgram={defaultRequestProgram} />
+              )}
 
-          <div className="w-full sm:max-w-[13rem]">
-            <AttachmentInput
-              userAttachmentId={userAttachmentId}
-              setUserAttachmentId={val => {
-                setValue('userAttachmentId', val)
-                clearErrors('userAttachmentId')
-              }}
+              <TextInput
+                label="Project Name"
+                id="team"
+                type="text"
+                placeholder="Project/team (as was submitted in the event)"
+                error={errors.team}
+                {...register('team')}
+              />
+            </div>
+
+            <SelectWalletInput
+              submitErrors={submitErrors?.errors}
+              errors={errors}
+              data={data}
+              control={control}
+              onCreateWalletClick={() => setOpenWalletModal(true)}
+              blockchainIdFilter={selectedProgram?.blockchainId}
+              disabled={!programId}
             />
+
+            <RequestAmountInput
+              requestCurrency={requestCurrency}
+              value={amount}
+              errors={errors}
+              {...register('amount', {
+                setValueAs: val => {
+                  const parsedValue = String(val).replaceAll(/[, \s]+/g, '')
+                  return isNaN(parsedValue) ? 0 : parsedValue
+                },
+              })}
+            />
+
+            <ProgramInfo
+              paymentCurrency={paymentCurrency}
+              requestCurrency={requestCurrency}
+              selectedProgram={selectedProgram}
+              expectedTransferDate={expectedTransferDate}
+            />
+
+            <div className="w-full sm:max-w-[13rem]">
+              <AttachmentInput
+                userAttachmentId={userAttachmentId}
+                setUserAttachmentId={val => {
+                  setValue('userAttachmentId', val)
+                  clearErrors('userAttachmentId')
+                }}
+              />
+            </div>
           </div>
         </div>
-      </div>
-      <Divider />
+        <Divider />
 
-      <FooterButtons isEditable={isEditable} data={data} isSubmitting={isSubmitting} reset={reset} />
-    </form>
+        <FooterButtons isEditable={isEditable} data={data} isSubmitting={isSubmitting} reset={reset} />
+      </form>
 
-    <WalletModal
-      setUserWalletId={val => {
-        setValue('userWalletId', val)
-        clearErrors('userWalletId')
-      }}
-      open={openWalletModal}
-      onModalClosed={() => setOpenWalletModal(false)}
-      address={masterAddress}
-    />
+      <WalletModal
+        setUserWalletId={val => {
+          setValue('userWalletId', val)
+          clearErrors('userWalletId')
+        }}
+        open={openWalletModal}
+        onModalClosed={() => setOpenWalletModal(false)}
+        address={masterAddress}
+        blockchain={selectedProgram?.blockchain.name}
+      />
 
-    <SubmittedModal openModal={openSubmittedModal && (!submitErrors || hasUnhandledError)} hasError={hasUnhandledError} />
-  </>;
+      <SubmittedModal openModal={openSubmittedModal && (!submitErrors || hasUnhandledError)} hasError={hasUnhandledError} />
+    </>
+  )
 }

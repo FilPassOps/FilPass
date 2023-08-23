@@ -52,7 +52,8 @@ async function createCurrencies() {
       scale: 0,
     },
   })
-  CONFIG.chains.forEach(async chain => {
+
+  for (const chain of CONFIG.chains) {
     const [tokenCurrency] = await prisma.$transaction([
       prisma.currency.create({
         data: {
@@ -73,7 +74,7 @@ async function createCurrencies() {
         { currencyId: tokenCurrency.id, name: chain.units['-18'].name, scale: chain.units['-18'].scale },
       ],
     })
-  })
+  }
 }
 
 main()

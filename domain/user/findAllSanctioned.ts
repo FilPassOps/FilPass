@@ -32,6 +32,11 @@ export async function findAllSanctioned({ isReviewedByCompliance, isSanctioned, 
         select: {
           address: true,
           verification: true,
+          blockchain: {
+            select: {
+              name: true,
+            },
+          },
         },
         where: {
           isActive: true,

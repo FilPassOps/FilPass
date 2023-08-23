@@ -18,7 +18,7 @@ import { formatCrypto } from 'lib/currency'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import { TOKEN } from 'system.config'
+import { TOKEN, getChainByName } from 'system.config'
 
 const TransferList = ({
   requests = [],
@@ -98,7 +98,7 @@ const TransferList = ({
             </Header>
             <Header style={{ minWidth: 200 }}>Address</Header>
             <Header>Request Amount</Header>
-            <Header>{query.status === PAID_STATUS ? `Paid ${TOKEN.symbol} Amount` : `Estimated ${TOKEN.symbol} Amount`}</Header>
+            <Header>{query.status === PAID_STATUS ? `Paid Amount` : `Estimated Amount`}</Header>
             <Header style={{ minWidth: 180 }}>Vesting Start Epoch</Header>
             <Header style={{ minWidth: 180 }}>Vesting Months</Header>
             <Header style={{ minWidth: 190 }}>Status</Header>
@@ -111,6 +111,7 @@ const TransferList = ({
               const paymentUnit = request.program.programCurrency.find(({ type }) => type === 'PAYMENT')
               const requestUnit = request.program.programCurrency.find(({ type }) => type === 'REQUEST')
               const href = `/disbursement/${request.publicId}`
+              const { blockExplorer } = getChainByName(request.program.blockchain.name)
 
               const paidTransfer = request?.transfers?.find(({ status }) => status === SUCCESS_STATUS)
               return (
@@ -153,7 +154,7 @@ const TransferList = ({
                     {request?.wallet?.address && (
                       <WalletAddress
                         address={request.wallet.address}
-                        blockchain={request.wallet.blockchain}
+                        blockchain={request.wallet.blockchain.name}
                         isVerified={!!request.wallet.verificationId}
                       />
                     )}
@@ -199,7 +200,13 @@ const TransferList = ({
                         </Button>
                       </div>
                     )}
-                    {request.status === PAID_STATUS && <Filfox transfer_hash={paidTransfer?.txHash} />}
+                    {request.status === PAID_STATUS && (
+                      <Filfox
+                        blockExplorerName={blockExplorer.name}
+                        blockExplorerUrl={blockExplorer.url}
+                        transactionHash={paidTransfer?.txHash}
+                      />
+                    )}
                   </Cell>
                 </tr>
               )

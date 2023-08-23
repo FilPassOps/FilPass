@@ -269,6 +269,8 @@ model Program {
   updatedAt              DateTime               @updatedAt @map("updated_at")
   signersWalletAddresses String[]               @map("signers_wallet_addresses")
   visibility             ProgramVisibility?     @default(EXTERNAL) @map("visibility")
+  blockchain             Blockchain             @relation(fields: [blockchainId], references: [id])
+  blockchainId           Int                    @map("blockchain_id")
   userRolePrograms       UserRoleProgram[]
   transferRequests       TransferRequest[]
   programCurrency        ProgramCurrency[]
@@ -550,6 +552,7 @@ model Blockchain {
   updatedAt          DateTime             @updatedAt @map("updated_at")
   UserWallet         UserWallet[]
   WalletVerification WalletVerification[]
+  Program            Program[]
 
   @@map("blockchain")
 }

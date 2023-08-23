@@ -1,12 +1,14 @@
 import { Button } from 'components/shared/Button'
 import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
-import { TOKEN } from 'system.config'
+import { getChainByName, isFilecoinEnabled } from 'system.config'
 
 interface ChainSelectionProps {
-  onConnectionMethodClick: (method: 'Metamask' | 'Manually') => void
+  onConnectionMethodClick: (method: 'Metamask' | 'Filecoin') => void
+  blockchain: string
 }
 
-export function ChainSelection({ onConnectionMethodClick }: ChainSelectionProps) {
+export function ChainSelection({ onConnectionMethodClick, blockchain }: ChainSelectionProps) {
+  const chainId = getChainByName(blockchain)?.chainId
   return (
     <div className="w-full h-full flex flex-col justify-center items-center sm:py-2 sm:px-11">
       <p className="font-medium text-lg text-gray-900 text-center mb-2">Connect Wallet</p>
@@ -16,6 +18,7 @@ export function ChainSelection({ onConnectionMethodClick }: ChainSelectionProps)
           className="w-full"
           buttonStyle="flex gap-2 justify-center items-center"
           onClick={() => onConnectionMethodClick('Metamask')}
+          targetChainId={chainId}
           connectWalletLabel={
             <>
               Connect with MetaMask
@@ -28,10 +31,10 @@ export function ChainSelection({ onConnectionMethodClick }: ChainSelectionProps)
           <br />
           (0x and f4 wallets)
         </WithMetaMaskButton>
-        {TOKEN.name === 'Filecoin' && (
+        {isFilecoinEnabled && (
           <>
             {/* @ts-ignore */}
-            <Button variant="primary-lighter" onClick={() => onConnectionMethodClick('Manually')}>
+            <Button variant="primary-lighter" onClick={() => onConnectionMethodClick('Filecoin')}>
               Connect Manually
               <br />
               (f1, f2, and f3 wallets)

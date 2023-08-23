@@ -1,5 +1,6 @@
 import { sendWalletVerificationNotification } from 'domain/notifications/sendWalletVerificationNotification'
 import prisma from 'lib/prisma'
+import errorsMessages from 'wordings-and-errors/errors-messages'
 
 interface CreateEthereumWalletRequestParams {
   userId: number
@@ -12,12 +13,25 @@ interface CreateEthereumWalletRequestParams {
 export async function createEthereumWallet(params: CreateEthereumWalletRequestParams) {
   const { userId, address, label, email, blockchain } = params
 
+  const blokchainEntity = await prisma.blockchain.findUnique({ where: { name: blockchain } })
+
+  if (!blokchainEntity) {
+    return {
+      error: {
+        status: 400,
+        errors: {
+          address: errorsMessages.wallet_blockchain_not_found,
+        },
+      },
+    }
+  }
+
   const result = await prisma.$transaction(async tx => {
     const walletVerification = await tx.walletVerification.create({
       data: {
         userId,
         address,
-        blockchainId: 1, // TODO OPEN-SOURCE: should get the value from params
+        blockchainId: blokchainEntity.id,
         transactionContent: Math.floor(Math.random() * 1000000),
         transactionId: '0x',
         isVerified: true,
@@ -36,7 +50,7 @@ export async function createEthereumWallet(params: CreateEthereumWalletRequestPa
       create: {
         userId,
         address,
-        blockchainId: 1, // TODO OPEN-SOURCE: should get the value from params
+        blockchainId: blokchainEntity.id,
         name: label,
         isActive: false,
         verificationId: walletVerification.id,

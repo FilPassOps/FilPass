@@ -4,7 +4,6 @@ import { Button } from 'components/shared/Button'
 import Sortable from 'components/shared/Sortable'
 import { Cell, Header, Table, TableBody, TableHead } from 'components/shared/Table'
 import { WalletAddress } from 'components/shared/WalletAddress'
-import { TOKEN } from 'system.config'
 
 interface UserListProps {
   data: {
@@ -17,7 +16,7 @@ interface UserListProps {
     sanctionReason?: string
     isSanctioned?: boolean
     isReviewedByCompliance?: boolean
-    wallets: { address: string; verification: WalletVerification }[]
+    wallets: { address: string; blockchain: { name: string }; verification: WalletVerification }[]
   }[]
   status: 'FLAGGED' | 'BLOCKED' | 'UNBLOCKED' | 'ALL'
   handleOnUnblockClick: (userId: number) => void
@@ -92,7 +91,7 @@ export const UserList = ({ data, status, handleOnUnblockClick, handleOnBlockClic
                   <WalletAddress
                     address={user.wallets[0]?.address}
                     isVerified={user.wallets[0]?.verification?.isVerified}
-                    blockchain={TOKEN.name}
+                    blockchain={user.wallets[0]?.blockchain?.name}
                   />
                 </Cell>
                 {/* @ts-ignore */}

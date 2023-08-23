@@ -13,7 +13,6 @@ import { formatCrypto } from 'lib/currency'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import { TOKEN } from 'system.config'
 
 const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderToggle, onRequestChecked }) => {
   const { push, query } = useRouter()
@@ -61,7 +60,7 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
             </Header>
             <Header style={{ minWidth: 200 }}>Address</Header>
             <Header>Request Amount</Header>
-            <Header>{query.status === PAID_STATUS ? `Paid ${TOKEN.symbol} Amount` : `Estimated ${TOKEN.symbol} Amount`}</Header>
+            <Header>{query.status === PAID_STATUS ? `Paid Amount` : `Estimated Amount`}</Header>
             <Header style={{ minWidth: 180 }}>Vesting Start Epoch</Header>
             <Header style={{ minWidth: 180 }}>Vesting Months</Header>
             <Header>Status</Header>

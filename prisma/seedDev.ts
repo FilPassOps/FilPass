@@ -1,4 +1,4 @@
-import { ProgramCurrencyType, TransferRequestReviewStatus, TransferRequestStatus, TransferStatus } from '@prisma/client'
+import { Blockchain, ProgramCurrencyType, TransferRequestReviewStatus, TransferRequestStatus, TransferStatus } from '@prisma/client'
 import { hash } from 'bcrypt'
 
 import { loadEnvConfig } from '@next/env'
@@ -64,7 +64,10 @@ const defaultTerms = {
   satisfactionOfObligations: true,
 }
 
+let blockchainList: Blockchain[] = []
+
 async function main() {
+  blockchainList = await getBlockchainValues()
   await Promise.all([createSuperAdmin(), createCompliance(), createFinance()])
   const [[approver, approverRole], [controller, controllerRole], viewerRole, vestingPrograms, oneTimePrograms] = await Promise.all([
     createApprover(),
@@ -527,6 +530,9 @@ async function createLinearVestingPrograms() {
     const { id: paymentCurrencyUnitId } = await prisma.currencyUnit.findFirstOrThrow({
       where: { name: chain.symbol },
     })
+    const blockchainId = blockchainList.find(blockchain => blockchain.name === chain.name)?.id
+
+    if (!blockchainId) throw new Error(`Blockchain ${chain.name} not found`)
 
     const program = await prisma.program.create({
       data: {
@@ -545,6 +551,7 @@ async function createLinearVestingPrograms() {
             },
           ],
         },
+        blockchainId,
       },
       include: {
         programCurrency: true,
@@ -558,6 +565,10 @@ async function createLinearVestingPrograms() {
 async function createOneTimeProgramIds() {
   const programs = []
   for (const chain of CONFIG.chains) {
+    const blockchainId = blockchainList.find(blockchain => blockchain.name === chain.name)?.id
+
+    if (!blockchainId) throw new Error(`Blockchain ${chain.name} not found`)
+
     const { id: currencyUnitId } = await prisma.currencyUnit.findFirstOrThrow({
       where: { name: chain.symbol },
     })
@@ -579,6 +590,7 @@ async function createOneTimeProgramIds() {
             },
           ],
         },
+        blockchainId,
       },
       include: {
         programCurrency: true,
@@ -761,6 +773,10 @@ async function createFinance() {
   })
 
   return [finance, financeRole]
+}
+
+async function getBlockchainValues() {
+  return await prisma.blockchain.findMany({})
 }
 
 async function createApprover() {

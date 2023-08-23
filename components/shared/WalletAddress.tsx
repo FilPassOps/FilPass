@@ -50,6 +50,7 @@ export const WalletAddress = ({
     <div title={address} className={classNames('flex items-center text-sm text-gray-900', className)}>
       {enableBlockchainIcon && <FilecoinIcon className="w-4 h-4 mr-2 shrink-0" />}
       <span className="flex flex-col justify-center items-start">
+        {blockchain && <p className="text-gray-500 ui-active:text-white truncate">{blockchain}</p>}
         <p className="text-gray-500 ui-active:text-white truncate">{label}</p>
         <p className="ui-active:text-white break-all">{formattedAddress}</p>
         {filecoinDelegatedAddress ? <p className="text-gray-500 ui-active:text-white break-all">{filecoinDelegatedAddress}</p> : ''}

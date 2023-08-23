@@ -197,6 +197,7 @@ CREATE TABLE "program" (
     "updated_at" TIMESTAMP(3) NOT NULL,
     "signers_wallet_addresses" TEXT[],
     "visibility" "ProgramVisibility" DEFAULT 'EXTERNAL',
+    "blockchain_id" INTEGER NOT NULL,
 
     CONSTRAINT "program_pkey" PRIMARY KEY ("id")
 );
@@ -599,6 +600,9 @@ ALTER TABLE "wallet_verification" ADD CONSTRAINT "wallet_verification_blockchain
 
 -- AddForeignKey
 ALTER TABLE "wallet_verification" ADD CONSTRAINT "wallet_verification_transaction_currency_unit_id_fkey" FOREIGN KEY ("transaction_currency_unit_id") REFERENCES "currency_unit"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "program" ADD CONSTRAINT "program_blockchain_id_fkey" FOREIGN KEY ("blockchain_id") REFERENCES "blockchain"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "transfer_request" ADD CONSTRAINT "transfer_request_requester_id_fkey" FOREIGN KEY ("requester_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -1,4 +1,4 @@
-import { SUPPORT_EMAIL, PLATFORM_NAME } from "system.config"
+import { PLATFORM_NAME, SUPPORT_EMAIL } from 'system.config'
 
 const errorsMessages = {
   required_field: { message: 'This field is required.' },
@@ -12,6 +12,7 @@ const errorsMessages = {
   not_found: { message: 'Not found.' },
   email_in_use: { message: 'Email already being used.' },
   wallet_address_in_use: { message: 'Address already being used.' },
+  wallet_blockchain_not_found: { message: 'Blockchain not found.' },
   wrong_credentials: { message: 'Wrong credentials.' },
   invalid_token: { message: 'Invalid token.' },
   something_went_wrong: { message: 'Something went wrong, please try again later.' },
@@ -45,7 +46,7 @@ const errorsMessages = {
       `This file is used by transfer requests ${ids
         .map(
           id =>
-            `<a style="text-decoration: underline;color: rgba(3, 105, 161, 1);" href="${process.env.APP_URL}/transfer-requests/${id}" target="_blank">#${id}</a>`
+            `<a style="text-decoration: underline;color: rgba(3, 105, 161, 1);" href="${process.env.APP_URL}/transfer-requests/${id}" target="_blank">#${id}</a>`,
         )
         .join(', ')}. Please change the file of those requests before deleting.`,
   },
@@ -54,7 +55,7 @@ const errorsMessages = {
       `Wallet is used by transfer requests ${ids
         .map(
           id =>
-            `<a style="text-decoration: underline;color: rgba(3, 105, 161, 1);" href="${process.env.APP_URL}/transfer-requests/${id}" target="_blank">#${id}</a>`
+            `<a style="text-decoration: underline;color: rgba(3, 105, 161, 1);" href="${process.env.APP_URL}/transfer-requests/${id}" target="_blank">#${id}</a>`,
         )
         .join(', ')}. Please change the wallet addresses of those requests before deleting the wallet.`,
   },

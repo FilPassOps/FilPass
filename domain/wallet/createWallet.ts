@@ -34,6 +34,19 @@ export async function createWallet(prisma: Prisma.TransactionClient, params: Cre
 
   const { name, address, blockchain, verificationId, userId, isDefault, email } = fields
 
+  const blokchainEntity = await prisma.blockchain.findUnique({ where: { name: blockchain } })
+
+  if (!blokchainEntity) {
+    return {
+      error: {
+        status: 400,
+        errors: {
+          address: errorsMessages.wallet_blockchain_not_found,
+        },
+      },
+    }
+  }
+
   const [walletSearchResult] = await prisma.$queryRaw<WalletSearchResult[]>`
   SELECT *
   FROM
@@ -108,7 +121,7 @@ export async function createWallet(prisma: Prisma.TransactionClient, params: Cre
       verificationId,
       name,
       address,
-      blockchainId: 1, // TODO OPEN-SOURCE: should get the value from params
+      blockchainId: blokchainEntity.id, // TODO OPEN-SOURCE: should get the value from params
       isDefault,
       isActive: false,
     },

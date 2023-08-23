@@ -6,7 +6,6 @@ import { WarningPopup } from 'components/shared/WarningPopup'
 import { api } from 'lib/api'
 import { classNames } from 'lib/classNames'
 import { useState } from 'react'
-import { TOKEN } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
 export const WalletList = ({ data = [], isLoading, setLoading, refresh }) => {
@@ -64,7 +63,7 @@ const ListItems = ({ items, isLoading, setLoading, refresh }) => {
                   address={wallet.address}
                   isVerified={wallet.verification?.isVerified}
                   label={wallet.name}
-                  blockchain={TOKEN.name}
+                  blockchain={wallet.blockchain.name}
                   walletSize="short"
                   className="sm:hidden"
                 />
@@ -72,7 +71,7 @@ const ListItems = ({ items, isLoading, setLoading, refresh }) => {
                   address={wallet.address}
                   isVerified={wallet.verification?.isVerified}
                   label={wallet.name}
-                  blockchain={TOKEN.name}
+                  blockchain={wallet.blockchain.name}
                   walletSize="full"
                   className="hidden sm:flex"
                 />
