@@ -13,6 +13,7 @@ interface CreateProgramParams {
   programCurrency: {
     name: string
     type: string
+    blockchain: string
   }[]
   signersWalletAddresses?: { address: string }[]
   visibility: ProgramVisibility
@@ -30,16 +31,19 @@ export async function createProgram(params: CreateProgramParams) {
     }
   }
 
+  // TODO OPEN-SOURCE: add unique name validation
+
   const { name, deliveryMethod, approversRole, programCurrency, visibility, viewersRole } = fields
 
   return await newPrismaTransaction(async fnPrisma => {
-    const [request, payment] = await Promise.all([
+    const [request, payment, blockchain] = await Promise.all([
       fnPrisma.currencyUnit.findFirstOrThrow({
         where: { name: programCurrency.find(currency => currency.type === 'REQUEST')?.name },
       }),
       fnPrisma.currencyUnit.findFirstOrThrow({
         where: { name: programCurrency.find(currency => currency.type === 'PAYMENT')?.name },
       }),
+      fnPrisma.blockchain.findFirstOrThrow({ where: { name: programCurrency[0].blockchain } }),
     ])
 
     const createdProgram = await fnPrisma.program.create({
@@ -48,6 +52,7 @@ export async function createProgram(params: CreateProgramParams) {
         name,
         signersWalletAddresses: [],
         visibility,
+        blockchainId: blockchain.id,
         programCurrency: {
           create: [
             {

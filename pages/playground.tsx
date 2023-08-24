@@ -10,12 +10,7 @@ import { api } from 'lib/api'
 import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import { PLATFORM_NAME } from 'system.config'
-<<<<<<< HEAD
-import { MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
-import { MultiForwarder } from 'typechain-types/contracts'
-=======
 import { MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
->>>>>>> e3c6005558bd1b211e14c3a5b91004e760e71c49
 import { NextPageWithLayout } from './_app'
 
 declare const window: CustomWindow

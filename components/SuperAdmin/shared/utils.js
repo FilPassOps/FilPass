@@ -48,10 +48,12 @@ const createPaymentMethodOptions = () => {
         {
           name: chain.symbol,
           type: 'REQUEST',
+          blockchain: chain.name,
         },
         {
           name: chain.symbol,
           type: 'PAYMENT',
+          blockchain: chain.name,
         },
       ],
     })
@@ -62,10 +64,12 @@ const createPaymentMethodOptions = () => {
         {
           name: CONFIG.fiatPaymentUnit,
           type: 'REQUEST',
+          blockchain: chain.name,
         },
         {
           name: chain.symbol,
           type: 'PAYMENT',
+          blockchain: chain.name,
         },
       ],
     })

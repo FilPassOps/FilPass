@@ -19,7 +19,7 @@ interface FlaggedUsersPage {
     lastName?: string
     dateOfBirth?: string
     countryResidence?: string
-    wallets: { address: string; verification: WalletVerification }[]
+    wallets: { address: string; blockchain: { name: string }; verification: WalletVerification }[]
   }[]
   totalItems: number
   pageSize: number

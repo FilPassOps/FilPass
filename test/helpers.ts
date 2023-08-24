@@ -296,23 +296,16 @@ export async function createLinearVestingProgram(
       programCurrency: {
         create: [
           {
-            currency: {
-              connect: {
-                name: 'USD',
-              },
-            },
+            currencyUnitId: 1,
             type: 'REQUEST',
           },
           {
-            currency: {
-              connect: {
-                name: 'FIL',
-              },
-            },
+            currencyUnitId: 1,
             type: 'PAYMENT',
           },
         ],
       },
+      blockchainId: 1,
     },
     include: {
       programCurrency: {
@@ -336,23 +329,16 @@ export async function createOneTimeProgram(name: string | undefined = 'FIL ONE T
       programCurrency: {
         create: [
           {
-            currency: {
-              connect: {
-                name: 'FIL',
-              },
-            },
+            currencyUnitId: 1,
             type: 'REQUEST',
           },
           {
-            currency: {
-              connect: {
-                name: 'FIL',
-              },
-            },
+            currencyUnitId: 1,
             type: 'PAYMENT',
           },
         ],
       },
+      blockchainId: 1,
     },
     include: {
       programCurrency: {
