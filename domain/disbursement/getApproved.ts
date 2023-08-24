@@ -118,6 +118,11 @@ export const getApproved = async (params: GetApprovedParams): Promise<GetApprove
               },
             },
           },
+          blockchain: {
+            select: {
+              name: true,
+            },
+          },
         },
       },
       currency: {

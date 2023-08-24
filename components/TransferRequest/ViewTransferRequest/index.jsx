@@ -24,8 +24,6 @@ import { BlockedReason } from './BlockedReason'
 import { StatusNotes } from './StatusNotes'
 import { TransferRequestHistory } from './TransferRequestHistory'
 
-import { TOKEN } from 'system.config'
-
 export const ViewTransferRequest = ({ data, role, showLegacyWarning }) => {
   const { loadingFile, fileError, handleDownloadFile } = useDownloadFile({ fileId: data?.form_id, fileName: data?.form_filename })
   const { approversGroup, status } = data
@@ -99,14 +97,14 @@ export const ViewTransferRequest = ({ data, role, showLegacyWarning }) => {
                         address={data.wallet_address}
                         isVerified={data.wallet_is_verified}
                         label={data.wallet_name}
-                        blockchain={TOKEN.name}
+                        blockchain={data.wallet_blockchain_name}
                         className="sm:hidden"
                       />
                       <WalletAddress
                         address={data.wallet_address}
                         isVerified={data.wallet_is_verified}
                         label={data.wallet_name}
-                        blockchain={TOKEN.name}
+                        blockchain={data.wallet_blockchain_name}
                         walletSize="full"
                         className="hidden sm:flex"
                       />
