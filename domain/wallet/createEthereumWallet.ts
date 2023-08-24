@@ -40,7 +40,7 @@ export async function createEthereumWallet(params: CreateEthereumWalletRequestPa
 
     const userWallet = await tx.userWallet.upsert({
       where: {
-        userId_address: { address, userId },
+        userId_address_blockchainId: { address, userId, blockchainId: blokchainEntity.id },
       },
       update: {
         isActive: false,

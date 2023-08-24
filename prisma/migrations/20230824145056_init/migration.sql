@@ -467,7 +467,7 @@ CREATE INDEX "temporary_file_public_id_idx" ON "temporary_file"("public_id");
 CREATE INDEX "user_wallet_address_idx" ON "user_wallet"("address");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "user_wallet_user_id_address_key" ON "user_wallet"("user_id", "address");
+CREATE UNIQUE INDEX "user_wallet_user_id_address_blockchain_id_key" ON "user_wallet"("user_id", "address", "blockchain_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "program_name_key" ON "program"("name");

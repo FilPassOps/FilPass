@@ -47,6 +47,8 @@ export async function createWallet(prisma: Prisma.TransactionClient, params: Cre
     }
   }
 
+  console.log({ address, verificationId, userId })
+
   const [walletSearchResult] = await prisma.$queryRaw<WalletSearchResult[]>`
   SELECT *
   FROM
@@ -67,7 +69,7 @@ export async function createWallet(prisma: Prisma.TransactionClient, params: Cre
         verification.id = ${verificationId}
         AND verification.address = ${address}
         AND verification.user_id = ${userId}
-        AND verification.blockchain_id = 1
+        AND verification.blockchain_id = blokchainEntity.id
         AND verification.is_active = TRUE
     ) verification;
   `
@@ -109,7 +111,7 @@ export async function createWallet(prisma: Prisma.TransactionClient, params: Cre
 
   const wallet = await prisma.userWallet.upsert({
     where: {
-      userId_address: { userId, address },
+      userId_address_blockchainId: { address, userId, blockchainId: blokchainEntity.id },
     },
     update: {
       verificationId,

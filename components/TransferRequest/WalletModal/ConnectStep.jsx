@@ -25,7 +25,9 @@ export function ConnectStep({ onBackClick, onNextStepClick, connectionMethod, wa
   })
 
   const handleFormSubmit = async formData => {
-    const addressIndex = user.wallets?.findIndex(wallet => wallet.address.toLowerCase() === formData.address.toLowerCase())
+    const addressIndex = user.wallets?.findIndex(
+      wallet => wallet.address.toLowerCase() === formData.address.toLowerCase() && wallet.blockchain.name === formData.blockchain,
+    )
 
     if (addressIndex >= 0) {
       setSubmitErrors({

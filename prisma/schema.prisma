@@ -233,7 +233,7 @@ model UserWallet {
   transferRequests TransferRequest[]
   isDefault        Boolean             @default(false) @map("is_default")
 
-  @@unique([userId, address])
+  @@unique([userId, address, blockchainId])
   @@index([address])
   @@map("user_wallet")
 }
