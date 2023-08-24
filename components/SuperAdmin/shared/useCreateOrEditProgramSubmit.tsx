@@ -45,7 +45,6 @@ export const useCreateOrEditProgramSubmit = ({
   const { dispatch, close } = useAlertDispatcher()
 
   const handleFormSubmit = async (values: ProgramValues, e: React.MouseEvent<HTMLElement>) => {
-    console.log('TESTING', e)
     e.preventDefault()
     setSubmitErrors(null)
 
