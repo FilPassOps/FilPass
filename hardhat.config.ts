@@ -39,6 +39,7 @@ const config: Config = {
     },
   },
   paths: {
+    sources: './contracts/src',
     tests: './contracts/test',
   },
 }

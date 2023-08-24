@@ -966,7 +966,13 @@ library SafeMath {
   }
 }
 
-contract MultiForwarder {
+interface Forwarder {
+  function forward(string calldata id, bytes32[] calldata addresses, uint256[] calldata amounts) external payable;
+
+  function forwardAny(string calldata id, bytes[] calldata addresses, uint256[] calldata amounts) external payable;
+}
+
+contract MultiForwarder is Forwarder {
   using SendAPI for CommonTypes.FilAddress;
   using SafeMath for uint256;
 
