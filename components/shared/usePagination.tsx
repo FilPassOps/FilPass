@@ -84,6 +84,7 @@ export const PaginationWrapper = ({
             <SelectInput
               //@ts-ignore
               options={options}
+              name="itemsPerPage"
               label=""
               value={`${pageSize}`}
               onChange={(value: number) => changePage({ page: 1, itemsPerPage: value })}

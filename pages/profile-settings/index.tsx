@@ -23,6 +23,7 @@ import useSWR from 'swr'
 import yup from 'lib/yup'
 import { PLATFORM_NAME } from 'system.config'
 import { taxFormValidator } from 'domain/user/validation'
+import Head from 'next/head'
 
 type FormValuePersonal = PersonalInformationFieldGroupValues
 
@@ -135,6 +136,9 @@ export default function UserSettings({ data, taxForm }: UserSettingsProps) {
 
   return (
     <>
+      <Head>
+        <title>{`Profile & Settings - ${PLATFORM_NAME}`}</title>
+      </Head>
       {defaultTaxForm?.rejectionReason && (
         <PageAlert type="error" withIcon={false} className="mb-8">
           <span className="flex flex-col gap-2">
@@ -273,7 +277,7 @@ export default function UserSettings({ data, taxForm }: UserSettingsProps) {
 
 UserSettings.getLayout = function getLayout(page: ReactElement) {
   return (
-    <Layout title={`Profile & Settings - ${PLATFORM_NAME}`} containerClass="bg-gray-50 h-screen">
+    <Layout title="Profile & Settings" containerClass="bg-gray-50 h-screen">
       {page}
     </Layout>
   )

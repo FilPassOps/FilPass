@@ -89,12 +89,13 @@ export const ViewTransferRequest = ({ data, role, showLegacyWarning }) => {
         <Divider className="my-8" />
 
         <div className="my-8 space-y-6">
-          <TextInput label="Program" disabled defaultValue={data?.program_name} />
-          <TextInput label="Project Name" disabled defaultValue={data?.team} />
+          <TextInput name="program" label="Program" disabled defaultValue={data?.program_name} />
+          <TextInput name="projectName" label="Project Name" disabled defaultValue={data?.team} />
           {data?.wallet_id && data?.wallet_address ? (
             <SelectInput
               value={data.wallet_id}
               label="Wallet Address"
+              name="walletAddress"
               disabled
               options={[
                 {
@@ -125,7 +126,7 @@ export const ViewTransferRequest = ({ data, role, showLegacyWarning }) => {
               ]}
             />
           ) : (
-            <TextInput label="Wallet Address" disabled defaultValue="-" />
+            <TextInput name="wallet" label="Wallet Address" disabled defaultValue="-" />
           )}
 
           {!!data?.vesting_start_epoch && <TextInput label="Vesting Start Epoch" disabled defaultValue={data.vesting_start_epoch} />}
@@ -138,6 +139,7 @@ export const ViewTransferRequest = ({ data, role, showLegacyWarning }) => {
             rightIcon={data?.request_unit}
             thousandSeparator={true}
             defaultValue={data?.amount}
+            name="amount"
           />
 
           <ProgramInfo

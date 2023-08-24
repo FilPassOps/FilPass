@@ -3,10 +3,16 @@ import { TransferDetails } from 'components/User/TransferDetails'
 import { PLATFORM_NAME } from 'system.config'
 import { getUserTransferRequestById } from 'domain/transferRequest/getUserTransferRequestById'
 import { withUserSSR } from 'lib/ssr'
+import Head from 'next/head'
 
 export default function TransferRequestDetails({ data }) {
   return (
     <>
+      <Head>
+        <title>
+          {`Transfer Request #${data?.id} - ${PLATFORM_NAME}`}
+        </title>
+      </Head>
       <TransferDetails data={data} />
     </>
   )
@@ -14,7 +20,7 @@ export default function TransferRequestDetails({ data }) {
 
 TransferRequestDetails.getLayout = function getLayout(page) {
   const data = page.props.data
-  return <Layout title={`Transfer Request #${data?.id} - ${PLATFORM_NAME}`}>{page}</Layout>
+  return <Layout title={`Transfer Request #${data?.id}`}>{page}</Layout>
 }
 
 export const getServerSideProps = withUserSSR(async ({ user, query }) => {

@@ -62,7 +62,7 @@ export default function Home({ data: { features, socialLinks } }: PageProps) {
 
   return <>
     <Head>
-      <title>Emissary - Protocol Labs</title>
+      <title key='company'>{`Emissary - Protocol Labs`}</title>
       <meta name="theme-color" content="#4F46E5" />
       <meta
         name="description"
@@ -88,9 +88,9 @@ export default function Home({ data: { features, socialLinks } }: PageProps) {
               <Link
                 href="/signup"
                 className="rounded-md bg-indigo-600 hover:bg-indigo-500 duration-200 text-white px-4 py-2 font-medium block">
-                
+
                   Sign Up
-                
+
               </Link>
             </li>
           </ul>
@@ -113,9 +113,9 @@ export default function Home({ data: { features, socialLinks } }: PageProps) {
             <Link
               href="/signup"
               className="block rounded-md bg-indigo-600 hover:bg-indigo-500 duration-200 text-white py-3 px-10 font-medium w-full lg:w-fit lg:py-4 lg:text-lg">
-              
+
                 Sign Up
-              
+
             </Link>
           </div>
           <div className="hidden xl:block flex-shrink-0 overflow-hidden animate-fadeInRight motion-reduce:animate-none">

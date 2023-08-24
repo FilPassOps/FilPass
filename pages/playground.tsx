@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react'
 import { MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
 import { NextPageWithLayout } from './_app'
 import { PLATFORM_NAME } from 'system.config'
+import Head from 'next/head'
 
 declare const window: CustomWindow
 
@@ -117,7 +118,7 @@ const Playground: NextPageWithLayout = () => {
       const value = ethers.utils.parseEther('0.01').toString()
       const total = ethers.utils.parseEther('0.45').toString()
       const address = filecoinAddress.newFromString(
-        't3vzc7naq3khx3bjkbelvce2yw4brl5bw4ejjhrcdoh63qma66elz26fxkmayl2qtvte7dzgod6qc3ou2j676a'
+        't3vzc7naq3khx3bjkbelvce2yw4brl5bw4ejjhrcdoh63qma66elz26fxkmayl2qtvte7dzgod6qc3ou2j676a',
       ).bytes
 
       const addresses = Array.from({ length: 45 }, () => address)
@@ -145,6 +146,9 @@ const Playground: NextPageWithLayout = () => {
 
   return (
     <>
+      <Head>
+        <title>{`Playground - ${PLATFORM_NAME}`}</title>
+      </Head>
       <div className="w-full">
         <h1 className="font-bold text-lg">Web3 Playground</h1>
         {!wallet && <Button onClick={() => connect()}>Connect to MetaMask</Button>}
@@ -291,5 +295,5 @@ const Playground: NextPageWithLayout = () => {
 export default Playground
 
 Playground.getLayout = function getLayout(page) {
-  return <Layout title={`Playground - ${PLATFORM_NAME}`}>{page}</Layout>
+  return <Layout title={`Playground`}>{page}</Layout>
 }

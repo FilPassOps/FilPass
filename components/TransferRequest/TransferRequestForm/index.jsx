@@ -116,7 +116,7 @@ export const TransferRequestForm = ({ isEditable = false, data = null, programs 
           </div>
           <div className=" space-y-6">
             {data?.program_visibility === ProgramVisibility.INTERNAL ? (
-              <TextInput label="Program" disabled defaultValue={data?.program_name} />
+              <TextInput label="Program" name="program" disabled defaultValue={data?.program_name} />
             ) : (
               <SelectProgramInput control={control} errors={errors} programs={programs} defaultProgram={defaultRequestProgram} />
             )}

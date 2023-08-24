@@ -9,6 +9,11 @@ import Head from 'next/head'
 export default function ApproverViewAwaiting({ data }) {
   return (
     <>
+      <Head>
+        <title>
+          {`Approval #${data?.id} - ${PLATFORM_NAME}`}
+        </title>
+      </Head>
       <TransferRequestView data={data} />
     </>
   )

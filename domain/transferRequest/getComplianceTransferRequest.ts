@@ -12,7 +12,7 @@ interface SortParams {
 
 interface GetComplianceTransferRequestsParams extends SortParams {
   page?: number
-  size: number
+  size?: number
   programId?: number[]
   requestNumber?: string
   teamHashes?: string[]

@@ -10,10 +10,16 @@ import { DRAFT_STATUS } from 'domain/transferRequest/constants'
 import { getUserTransferRequestById } from 'domain/transferRequest/getUserTransferRequestById'
 import { getMasterWallet } from 'lib/filecoin'
 import { withUserSSR } from 'lib/ssr'
+import Head from 'next/head'
 
 export default function EditTransferRequest({ data, programs, masterAddress }) {
   return (
     <>
+      <Head>
+        <title>
+          {`Edit Transfer Request #${data?.id} - ${PLATFORM_NAME}`}
+        </title>
+      </Head>
       <div className="max-w-3xl mx-auto">
         <div className="flex justify-between items-center my-6">
           <h1 className="text-gray-700 font-medium">Transfer Request #{data?.id}</h1>
@@ -42,7 +48,7 @@ export default function EditTransferRequest({ data, programs, masterAddress }) {
 
 EditTransferRequest.getLayout = function getLayout(page) {
   const data = page.props.data
-  return <Layout title={`Edit Transfer Request #${data?.id} - ${PLATFORM_NAME}`}>{page}</Layout>
+  return <Layout title={`Edit Transfer Request #${data?.id}`}>{page}</Layout>
 }
 
 export const getServerSideProps = withUserSSR(async ({ user, query }) => {

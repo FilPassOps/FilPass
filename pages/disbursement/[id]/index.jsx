@@ -3,10 +3,16 @@ import { Layout } from 'components/Layout'
 import { PLATFORM_NAME } from 'system.config'
 import { getTransferRequestById } from 'domain/transferRequest/getTransferRequestById'
 import { withControllerSSR } from 'lib/ssr'
+import Head from 'next/head'
 
 export default function ControllerView({ data }) {
   return (
     <>
+      <Head>
+        <title>
+          {`Disbursement #${data?.id} - ${PLATFORM_NAME}`}
+        </title>
+      </Head>
       <TransferRequestView data={data} />
     </>
   )
@@ -16,7 +22,7 @@ ControllerView.getLayout = function getLayout(page) {
   const data = page.props.data
   const hasApprovalBar = data?.approversGroup?.length > 1
   return (
-    <Layout title={`Transfer Request #${data?.id} - ${PLATFORM_NAME}`} defaultPadding={!hasApprovalBar}>
+    <Layout title={`Transfer Request #${data?.id}`} defaultPadding={!hasApprovalBar}>
       {page}
     </Layout>
   )

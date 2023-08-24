@@ -24,6 +24,7 @@ import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import errorsMessages from 'wordings-and-errors/errors-messages'
+import Head from 'next/head'
 
 export default function Approvals({
   initialData = [],
@@ -135,17 +136,19 @@ export default function Approvals({
               columns.taxForm && row.push(`${window?.location.origin}/api/files/${file_id}/view`)
               columns.filfoxLink && row.push(`${config.chain.blockExplorerUrls[0]}/message/${transfer_hash}`)
               return row
-            }
+            },
           ),
         ],
         {
           delimiter: ',',
-        }
+        },
       )
       const blob = new Blob([csvTemplate])
       return JsFileDownload(
         blob,
-        `${PLATFORM_NAME.toLowerCase()}_${currentStatus.toLowerCase()}_approvals_${DateTime.now().toFormat("yyyy-MM-dd_hh'h'mm'm'ss's'")}.csv`
+        `${PLATFORM_NAME.toLowerCase()}_${currentStatus.toLowerCase()}_approvals_${DateTime.now().toFormat(
+          "yyyy-MM-dd_hh'h'mm'm'ss's'",
+        )}.csv`,
       )
     } catch (error) {
       console.error(error)
@@ -157,6 +160,9 @@ export default function Approvals({
 
   return (
     <>
+      <Head>
+        <title>{`My Approvals - ${PLATFORM_NAME}`}</title>
+      </Head>
       <div className="w-full">
         <div>
           {selectedRequests.length > 0 && (
@@ -286,7 +292,7 @@ export const BatchActionsButton = () => {
 }
 
 Approvals.getLayout = function getLayout(page) {
-  return <Layout title={`My Approvals - ${PLATFORM_NAME}`}>{page}</Layout>
+  return <Layout title="My Approvals">{page}</Layout>
 }
 
 export const getServerSideProps = withRolesSSR([APPROVER_ROLE, COMPLIANCE_ROLE, VIEWER_ROLE], async ({ user: { id, roles }, query }) => {

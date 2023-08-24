@@ -20,7 +20,7 @@ export default function Login() {
   return (
     <>
       <Head>
-        <title>Login - {PLATFORM_NAME}</title>
+        <title key='login'>{`Login - ${PLATFORM_NAME}`}</title>
       </Head>
       <LoginComponent redirectAfterLogin={redirect} />
     </>

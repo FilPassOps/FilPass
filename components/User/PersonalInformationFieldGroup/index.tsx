@@ -73,6 +73,7 @@ export default function PersonalInformationFieldGroup<T extends PersonalInformat
             //@ts-ignore
             id="countryResidence"
             placeholder="Select your country of residence"
+            name="countryResidence"
             options={Countries}
             label="Country of Residence"
             error={errors.countryResidence}

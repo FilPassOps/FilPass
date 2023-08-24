@@ -5,13 +5,14 @@ import { Layout } from 'components/Layout'
 import { LinkButton } from 'components/shared/Button'
 import { getItemsPerPage, PaginationWrapper } from 'components/shared/usePagination'
 import TransferList from 'components/User/TransferList'
-import { PLATFORM_NAME } from 'system.config'
 import { findReceiverPrograms } from 'domain/programs/findReceiverPrograms'
 import { getUserTransferRequests } from 'domain/transferRequest/getUserTransferRequests'
 import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { getEthereumAddress } from 'lib/getEthereumAddress'
 import { withUserSSR } from 'lib/ssr'
+import Head from 'next/head'
 import { ReactElement } from 'react'
+import { PLATFORM_NAME } from 'system.config'
 
 interface HomeProps {
   data: any[]
@@ -23,6 +24,9 @@ interface HomeProps {
 export default function Home({ data = [], pageSize, totalItems = 0, programs }: HomeProps) {
   return (
     <>
+      <Head>
+        <title>{`Home - ${PLATFORM_NAME}`}</title>
+      </Head>
       <div className="w-full">
         <div className="flex items-center justify-end md:justify-between gap-2 py-4">
           <div className="hidden md:flex items-center">
@@ -46,7 +50,7 @@ export default function Home({ data = [], pageSize, totalItems = 0, programs }: 
 }
 
 Home.getLayout = function getLayout(page: ReactElement) {
-  return <Layout title={`Home - ${PLATFORM_NAME}`}>{page}</Layout>
+  return <Layout title="Home">{page}</Layout>
 }
 
 export const getServerSideProps = withUserSSR(async ({ query, user }) => {

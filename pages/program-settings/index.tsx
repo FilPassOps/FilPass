@@ -11,6 +11,7 @@ import { findAllViewers } from 'domain/user/findAllViewers'
 import { withSuperAdminSSR } from 'lib/ssr'
 import { useRouter } from 'next/router'
 import { ReactElement, useState } from 'react'
+import Head from 'next/head'
 
 interface ProgramSettingsProps {
   data: any[]
@@ -35,6 +36,9 @@ export default function ProgramSettings({
 
   return (
     <>
+      <Head>
+        <title>{`Program Settings - ${PLATFORM_NAME}`}</title>
+      </Head>
       <div className="w-full">
         <Button
           className="w-56 my-4 ml-auto"
@@ -67,7 +71,7 @@ export default function ProgramSettings({
 }
 
 ProgramSettings.getLayout = function getLayout(page: ReactElement) {
-  return <Layout title={`Program Settings - ${PLATFORM_NAME}`}>{page}</Layout>
+  return <Layout title="Program Settings">{page}</Layout>
 }
 
 export const getServerSideProps = withSuperAdminSSR(async ({ user, query }) => {
