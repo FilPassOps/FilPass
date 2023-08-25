@@ -62,8 +62,8 @@ export default function FlaggedUsersPage({ data, totalItems, pageSize, status }:
           status={status}
         />
       </PaginationWrapper>
-      <ApproveBlockedModal open={approveModalOpen} onModalClosed={() => setApproveModalOpen(false)} userId={selectedUserId} />
-      <RejectBlockedModal open={rejectModalOpen} onModalClosed={() => setRejectModalOpen(false)} userId={selectedUserId} />
+      <ApproveBlockedModal open={approveModalOpen} onModalClosed={() => setApproveModalOpen(false)} userId={selectedUserId as number} />
+      <RejectBlockedModal open={rejectModalOpen} onModalClosed={() => setRejectModalOpen(false)} userId={selectedUserId as number} />
       <ViewReasonModal
         open={viewReasonModalOpen}
         onModalClosed={() => setViewReasonModalOpen(false)}

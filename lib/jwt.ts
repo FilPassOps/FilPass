@@ -9,6 +9,6 @@ export const verify = (value: string) => {
   }
 }
 
-export const sign = (value: string, options: SignOptions & { algorithm: 'none' }) => {
+export const sign = (value: any, options?: SignOptions & { algorithm: 'none' }) => {
   return jwt.sign(value, process.env.APP_SECRET as string, options)
 }

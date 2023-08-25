@@ -44,7 +44,6 @@
     "@headlessui/tailwindcss": "^0.2.0",
     "@heroicons/react": "^2.0.18",
     "@hookform/resolvers": "^3.1.1",
-    "@inlightmedia/react-countdown-timer": "^1.1.2",
     "@metamask/onboarding": "^1.0.1",
     "@openzeppelin/contracts": "^4.9.2",
     "@prisma/client": "^5.0.0",

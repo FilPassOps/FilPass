@@ -56,9 +56,9 @@ export const OnboardingTaxForms = ({ onBackClick, onFormSubmit, isUpdateTaxFormM
         <div className="flex flex-col items-center">
           <SelectFormFileInput
             userFileId={userFileId}
-            isUSResident={isUSResident}
-            setUserFileId={(value: string) => {
-              setValue('userFileId', value)
+            isUSResident={isUSResident as any}
+            setUserFileId={(value: string | undefined) => {
+              setValue('userFileId', value as string)
               clearErrors('userFileId')
             }}
           />

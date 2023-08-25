@@ -1,4 +1,4 @@
-class TransactionError extends Error {
+export class TransactionError extends Error {
   status: any
   errors: any
 
@@ -7,8 +7,4 @@ class TransactionError extends Error {
     this.status = status
     this.errors = errors
   }
-}
-
-module.exports = {
-  TransactionError: TransactionError,
 }

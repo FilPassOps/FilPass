@@ -143,7 +143,7 @@ export const AttachmentInput = ({
         file={attachmentData}
         onDelete={() => {
           setTimeout(() => {
-            setUserAttachmentId()
+            setUserAttachmentId(undefined)
             setAttachmentData(undefined)
           }, 300)
         }}

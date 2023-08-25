@@ -136,7 +136,7 @@ export const formatProgramApproversRole = (program: Program) => {
 }
 
 export const groupProgramApproversRole = (
-  approversRole: { roleId: number; roleName: string; roleDescription: string }[],
+  approversRole: { roleId: number }[][],
   programId: number,
 ) => {
   const groupedApproversRole = new Map()

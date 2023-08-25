@@ -2,7 +2,7 @@ import { Button } from 'components/shared/Button'
 import { Modal } from 'components/shared/Modal'
 
 interface ViewReasonModalProps {
-  reason: string
+  reason?: string
   open: boolean
   onModalClosed: () => void
   trustedDangerousHtml?: boolean

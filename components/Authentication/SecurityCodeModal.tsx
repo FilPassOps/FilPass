@@ -3,17 +3,19 @@ import { Button } from 'components/shared/Button'
 import ReactInputVerificationCode from 'react-input-verification-code'
 import { classNames } from 'lib/classNames'
 import { useState } from 'react'
-import CountDownTimer from '@inlightmedia/react-countdown-timer'
 import { DateTime } from 'luxon'
 import styles from './securityCodeModal.module.css'
+import CountDownTimer from './CountDownTimer'
 
 interface SecurityCodeModalProps {
   open?: boolean
   onClose: (open: boolean) => void
   email?: string
-  handleVerifyCode: (value: string) => Promise<{ error: any }>
+  handleVerifyCode: (value: string) => Promise<{ error: any }> | Promise<Record<string, never>>
   onResend: () => Promise<{ error: any }>
 }
+
+const BLOCKED_TIMER_MS = 60000
 
 export const SecurityCodeModal = ({
   open = false,
@@ -30,6 +32,7 @@ export const SecurityCodeModal = ({
     setSubmitErrors(null)
     setLoading(false)
     onClose(false)
+    setBlocked(false)
   }
 
   const handleComplete = async (value: string) => {
@@ -54,7 +57,7 @@ export const SecurityCodeModal = ({
 
   const blockedTimer = () => {
     setBlocked(true)
-    setTimeout(() => setBlocked(false), 60000)
+    setTimeout(() => setBlocked(false), BLOCKED_TIMER_MS)
   }
 
   return (
@@ -75,15 +78,7 @@ export const SecurityCodeModal = ({
             Resend
           </Button>
           {blocked && (
-            <div className="absolute -bottom-5 left-1/4 right-1/4 transform">
-              <CountDownTimer
-                dateTime={DateTime.now().plus(60000).toISO()}
-                style={{
-                  color: '#000000',
-                  fontSize: '14px',
-                }}
-              />
-            </div>
+            <CountDownTimer className="flex items-end justify-end" deadline={DateTime.now().plus(BLOCKED_TIMER_MS).toISO() as string} />
           )}
         </div>
       </div>

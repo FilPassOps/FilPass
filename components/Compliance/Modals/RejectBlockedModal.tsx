@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 interface RejectBlockedModalProps {
-  userId: string
+  userId: number
   open: boolean
   onModalClosed: () => void
 }
