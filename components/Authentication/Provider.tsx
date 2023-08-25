@@ -20,7 +20,7 @@ interface AuthPoviderParams {
 
 // Check for possible issues here with data being null/undefined as its not waiting for loading to finish
 export const AuthProvider = ({ children }: AuthPoviderParams) => {
-  const { data: user, mutate } = useSWR<UserMeType>('/auth/me', fetcher, {
+  const { data: user, mutate, isLoading } = useSWR<UserMeType>('/auth/me', fetcher, {
     revalidateOnMount: true,
     revalidateOnFocus: true,
     revalidateOnReconnect: true,
@@ -29,6 +29,7 @@ export const AuthProvider = ({ children }: AuthPoviderParams) => {
   const context = {
     user,
     refresh: mutate,
+    isLoading
   }
 
   return <AuthContext.Provider value={context}>{children}</AuthContext.Provider>
