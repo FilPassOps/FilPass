@@ -35,7 +35,7 @@ interface SubmitDraftTransferRequestProps {
 }
 
 export const useFormSubmit = ({ errors, data, isEditable = false }: UseFormSubmitProps) => {
-  const [submitErrors, setSubmitErrors] = useState()
+  const [submitErrors, setSubmitErrors] = useState<any>()
   const [openSubmittedModal, setOpenSubmittedModal] = useState(false)
   const { user } = useAuth()
   const { setOpenOnboardingModal } = useOnboard()

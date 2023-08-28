@@ -28,6 +28,7 @@ const handlePatchRequest = async (req, res) => {
 }
 
 const handleDeleteRequest = async (req, res) => {
+  // TODO: check the params
   const { data, error } = await deleteTransferRequestById({ transferRequestId: req.query.id }, req.user)
 
   if (error) {

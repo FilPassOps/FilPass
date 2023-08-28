@@ -1,8 +1,9 @@
 import { archiveProgram, unarchiveProgram } from 'domain/programs/archiveProgram'
 import { updateProgram } from 'domain/programs/updateProgram'
-import { newHandler, withMethods, withSuperAdmin } from 'lib/middleware'
+import { NextApiRequestWithSession, newHandler, withMethods, withSuperAdmin } from 'lib/middleware'
+import { NextApiResponse } from 'next/types'
 
-async function handler(req, res) {
+async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
   if (req.method === 'PATCH') {
     return await handlePatchRequest(req, res)
   }
@@ -12,8 +13,8 @@ async function handler(req, res) {
   }
 }
 
-async function handleDeleteRequest(req, res) {
-  const id = req.query.id
+async function handleDeleteRequest(req: NextApiRequestWithSession, res: NextApiResponse) {
+  const id = req.query.id as number | undefined
   const { error, data } = await archiveProgram({ id })
 
   if (error) {
@@ -23,10 +24,10 @@ async function handleDeleteRequest(req, res) {
   return res.status(200).json(data)
 }
 
-async function handlePatchRequest(req, res) {
+async function handlePatchRequest(req: NextApiRequestWithSession, res: NextApiResponse) {
   const id = req.query.id
   const unarchive = req?.query?.unarchive
-  const superId = req.user.id
+  const superId = req.user?.id
 
   const action = unarchive ? unarchiveProgram : updateProgram
   const payload = unarchive ? { id } : { id, superId, ...req.body }

@@ -1,9 +1,10 @@
 import { deleteWallet } from 'domain/wallet/deleteWallet'
-import { newHandler, withLimiter, withMethods, withUser } from 'lib/middleware'
+import { NextApiRequestWithSession, newHandler, withLimiter, withMethods, withUser } from 'lib/middleware'
+import { NextApiResponse } from 'next/types'
 
-async function handler(req, res) {
-  const userId = req.user.id
-  const id = req.query.id
+async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
+  const userId = req.user?.id
+  const id = Number(req.query.id)
 
   const { data, error } = await deleteWallet({ userId, id })
   if (error) {

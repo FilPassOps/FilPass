@@ -11,14 +11,24 @@ import { getUserTransferRequestById } from 'domain/transferRequest/getUserTransf
 import { getMasterWallet } from 'lib/filecoin'
 import { withUserSSR } from 'lib/ssr'
 import Head from 'next/head'
+import { ReactElement } from 'react'
 
-export default function EditTransferRequest({ data, programs, masterAddress }) {
+interface EditTransferRequestProps {
+  data: {
+    id: number
+    isVoidable: boolean
+    isEditable: boolean
+    applyer_id: number
+    status: string
+  }
+  programs: any[]
+}
+
+export default function EditTransferRequest({ data, programs }: EditTransferRequestProps) {
   return (
     <>
       <Head>
-        <title>
-          {`Edit Transfer Request #${data?.id} - ${PLATFORM_NAME}`}
-        </title>
+        <title>{`Edit Transfer Request #${data?.id} - ${PLATFORM_NAME}`}</title>
       </Head>
       <div className="max-w-3xl mx-auto">
         <div className="flex justify-between items-center my-6">
@@ -39,14 +49,14 @@ export default function EditTransferRequest({ data, programs, masterAddress }) {
         )}
 
         <Divider />
-        <TransferRequestForm isEditable programs={programs} data={data} masterAddress={masterAddress} />
+        <TransferRequestForm isEditable programs={programs} data={data} />
       </div>
       <GoBackConfirmationWithRouter />
     </>
   )
 }
 
-EditTransferRequest.getLayout = function getLayout(page) {
+EditTransferRequest.getLayout = function getLayout(page: ReactElement) {
   const data = page.props.data
   return <Layout title={`Edit Transfer Request #${data?.id}`}>{page}</Layout>
 }
@@ -58,12 +68,13 @@ export const getServerSideProps = withUserSSR(async ({ user, query }) => {
     return {
       redirect: {
         destination: '/flagged-account',
+        permanent: false,
       },
     }
   }
 
   const { data, error: dataError } = await getUserTransferRequestById({
-    transferRequestId: query.id,
+    transferRequestId: query.id as string,
     userId: user.id,
   })
 

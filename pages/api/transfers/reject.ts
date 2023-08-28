@@ -1,13 +1,14 @@
 import { rejectTransferRequest } from 'domain/transfer/rejectTransferRequest'
-import { newHandler, withMethods, withController } from 'lib/middleware'
+import { newHandler, withMethods, withController, NextApiRequestWithSession } from 'lib/middleware'
+import { NextApiResponse } from 'next/types'
 
-async function handler(req, res) {
+async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
   const controllerId = req.controllerId
 
   const { error } = await rejectTransferRequest({
     ...req.body,
     controllerId,
-  })
+  }) as { error: any}
 
   if (error) {
     return res.status(error.status).json(error)

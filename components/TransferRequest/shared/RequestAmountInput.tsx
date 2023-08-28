@@ -3,11 +3,13 @@ import _get from 'lodash/get'
 import { forwardRef } from 'react'
 
 interface RequestAmountInputProps {
-  requestCurrency: any
+  requestCurrency: {
+    name: string
+  }
   value: any
-  errors: any
-  submitErrors: any
-  placeholder: string
+  errors?: any
+  submitErrors?: any
+  placeholder?: string
   name: string
   required?: boolean
 }

@@ -1,7 +1,8 @@
 import { createTransferRequestReview } from 'domain/transferRequestReview/createTransferRequestReview'
-import { newHandler, withMethods, withApprover } from 'lib/middleware'
+import { newHandler, withMethods, withApprover, NextApiRequestWithSession } from 'lib/middleware'
+import { NextApiResponse } from 'next/types'
 
-async function handler(req, res) {
+async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
   const approverId = req.approverId
 
   const { data, error } = await createTransferRequestReview({

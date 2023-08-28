@@ -1,7 +1,8 @@
 import { findAllUsers } from 'domain/user/findAll'
-import { newHandler, withSuperAdmin, withMethods } from 'lib/middleware'
+import { newHandler, withSuperAdmin, withMethods, NextApiRequestWithSession } from 'lib/middleware'
+import { NextApiResponse } from 'next/types'
 
-async function handler(req, res) {
+async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
   const query = req.query
   const { data, error } = await findAllUsers(query)
   if (error) {

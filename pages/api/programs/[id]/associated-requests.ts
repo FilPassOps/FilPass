@@ -1,8 +1,9 @@
 import { programAssociatedRequests } from 'domain/programs/programAssociatedRequests'
-import { newHandler, withMethods, withSuperAdmin } from 'lib/middleware'
+import { NextApiRequestWithSession, newHandler, withMethods, withSuperAdmin } from 'lib/middleware'
+import { NextApiResponse } from 'next/types'
 
-async function handler(req, res) {
-  const id = req.query.id
+async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
+  const id = req.query.id as number | undefined
   const { data, error } = await programAssociatedRequests({ programId: id })
 
   if (error) {

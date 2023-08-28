@@ -4,7 +4,7 @@ import { removeFileValidator } from './validation'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
 interface DeleteTemporaryFileParams {
-  id: string
+  id?: string
 }
 
 export async function deleteTemporaryFile(params: DeleteTemporaryFileParams) {

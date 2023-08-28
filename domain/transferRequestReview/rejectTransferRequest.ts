@@ -26,7 +26,7 @@ interface RejectTransferRequestParams {
 
 interface BatchRejectTransferRequestParams {
   requests: string[]
-  approverId: number
+  approverId?: number
   notes: string
 }
 
@@ -137,7 +137,7 @@ export async function rejectTransferRequest(params: RejectTransferRequestParams)
       }
     }
 
-    return newTransferRequestValue
+    return { data: newTransferRequestValue }
   })
 
   if (error) {
@@ -253,7 +253,7 @@ export async function batchRejectTransferRequest(params: BatchRejectTransferRequ
         userRoleId: approverId,
       })
 
-      return newTransferRequestValue
+      return {data: newTransferRequestValue}
     })
 
     const data = await Promise.allSettled(promiseList)
@@ -266,7 +266,7 @@ export async function batchRejectTransferRequest(params: BatchRejectTransferRequ
       }
     })
 
-    return transferRequestResult
+    return {data: transferRequestResult}
   })
 
   if (error) {

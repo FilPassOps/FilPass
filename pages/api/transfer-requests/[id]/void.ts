@@ -1,9 +1,10 @@
 import { voidTransferRequest } from 'domain/transferRequest/voidTransferRequest'
-import { newHandler, withMethods, withUser } from 'lib/middleware'
+import { NextApiRequestWithSession, newHandler, withMethods, withUser } from 'lib/middleware'
+import { NextApiResponse } from 'next/types'
 
-async function handler(req, res) {
-  const transferRequestId = req.query.id
-  const userId = req.user.id
+async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
+  const transferRequestId = req.query.id as string | undefined
+  const userId = req.user?.id
 
   const { data, error } = await voidTransferRequest({ transferRequestId, userId })
   if (error) {

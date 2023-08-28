@@ -1,7 +1,8 @@
 import { updateRoles } from 'domain/roles/updateRoles'
-import { newHandler, withMethods, withSuperAdmin } from 'lib/middleware'
+import { NextApiRequestWithSession, newHandler, withMethods, withSuperAdmin } from 'lib/middleware'
+import { NextApiResponse } from 'next/types'
 
-async function handler(req, res) {
+async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
   const userId = req.query.userId
   const { error, data } = await updateRoles({ ...req.body, userId })
 

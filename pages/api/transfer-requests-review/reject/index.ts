@@ -1,7 +1,8 @@
 import { batchRejectTransferRequest } from 'domain/transferRequestReview/rejectTransferRequest'
-import { newHandler, withMethods, withApprover } from 'lib/middleware'
+import { newHandler, withMethods, withApprover, NextApiRequestWithSession } from 'lib/middleware'
+import { NextApiResponse } from 'next/types'
 
-async function handler(req, res) {
+async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
   const approverId = req.approverId
 
   const { requests, notes } = req.body

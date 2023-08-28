@@ -4,16 +4,16 @@ import errorsMessages from 'wordings-and-errors/errors-messages'
 import { archiveProgramValidator } from './validation'
 
 interface UpdateProgramArchiveStatusParams {
-  id: number
-  isArchived: boolean
+  id?: number
+  isArchived?: boolean
 }
 
 interface ArchiveProgramParams {
-  id: number
+  id?: number
 }
 
 interface UnarchiveProgramParams {
-  id: number
+  id?: number
 }
 
 export async function updateProgramArchiveStatus(params: UpdateProgramArchiveStatusParams) {

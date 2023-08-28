@@ -6,7 +6,7 @@ interface SelectProgramInputProps {
   required?: boolean
   control: any
   errors: any
-  submitErrors: any
+  submitErrors?: any
   programs?: {
     id: string
     name: string

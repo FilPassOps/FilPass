@@ -7,8 +7,8 @@ import errorsMessages from 'wordings-and-errors/errors-messages'
 import { Prisma } from '@prisma/client'
 
 interface DeleteWalletParams {
-  id: number
-  userId: number
+  id?: number
+  userId?: number
 }
 
 interface ValidateWalletTransferRequestsParams {
