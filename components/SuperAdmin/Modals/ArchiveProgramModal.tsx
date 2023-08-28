@@ -28,7 +28,7 @@ export const ArchiveProgramModal = ({ onModalClosed, open, program, isActive }: 
 
     const { data } = (await actionHandler(`/programs/${program.id}?unarchive=${isActive}`))
 
-    if (data.error) {
+    if (data?.error) {
       setError(data.error?.message || data.error?.errors)
       return
     }

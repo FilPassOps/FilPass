@@ -42,7 +42,6 @@ export const DeleteModal = ({ onModalClosed, open, data, redirectTo }: DeleteMod
         paramsSerializer: qs.stringify as ParamsSerializerOptions,
       })) as FilecoinApiResult
       setIsLoading(false)
-      console.log('error', error)
 
       if (error) {
         if (error.errors) {
@@ -70,7 +69,6 @@ export const DeleteModal = ({ onModalClosed, open, data, redirectTo }: DeleteMod
         paramsSerializer: qs.stringify as ParamsSerializerOptions,
       })) as FilecoinApiResult
       setIsLoading(false)
-      console.log('error', error)
 
       if (error) {
         if (error.errors) {

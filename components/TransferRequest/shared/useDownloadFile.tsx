@@ -34,7 +34,6 @@ export const useDownloadFile = ({ fileId, uploadingForOthers = false, fileName }
 
       return
     }
-    console.log(data)
     setLoadingFile(false)
 
     const buffer = Buffer.from(data.file.data, 'base64')

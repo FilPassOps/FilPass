@@ -137,7 +137,7 @@ export async function rejectTransferRequest(params: RejectTransferRequestParams)
       }
     }
 
-    return { data: newTransferRequestValue }
+    return newTransferRequestValue
   })
 
   if (error) {
@@ -253,7 +253,7 @@ export async function batchRejectTransferRequest(params: BatchRejectTransferRequ
         userRoleId: approverId,
       })
 
-      return {data: newTransferRequestValue}
+      return newTransferRequestValue
     })
 
     const data = await Promise.allSettled(promiseList)
@@ -266,7 +266,7 @@ export async function batchRejectTransferRequest(params: BatchRejectTransferRequ
       }
     })
 
-    return {data: transferRequestResult}
+    return transferRequestResult
   })
 
   if (error) {

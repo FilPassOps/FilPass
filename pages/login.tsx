@@ -1,5 +1,4 @@
 import { Login as LoginComponent } from 'components/Authentication/Login'
-import { withSessionSSR } from 'lib/ssr'
 import Head from 'next/head'
 import Cookie from 'js-cookie'
 import { useEffect, useState } from 'react'
@@ -26,9 +25,3 @@ export default function Login() {
     </>
   )
 }
-
-export const getServerSideProps = withSessionSSR(async () => {
-  return {
-    props: {},
-  }
-})

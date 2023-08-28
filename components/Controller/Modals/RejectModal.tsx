@@ -33,6 +33,7 @@ const RejectModal = ({ data, open, onModalClosed }: RejectModalProps) => {
       return
     }
     onModalClosed()
+    setTimeout(reset, 300)
     router.push(router.asPath)
   }
 

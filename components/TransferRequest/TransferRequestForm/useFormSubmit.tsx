@@ -69,7 +69,7 @@ export const useFormSubmit = ({ errors, data, isEditable = false }: UseFormSubmi
 
 const createTransferRequest = async ({ values, setSubmitErrors }: CreateTransferRequestProps) => {
   const { data, error } = await api.post('/transfer-requests', values)
-  const transferRequestError = error || data.error
+  const transferRequestError = error || data?.error
 
   setSubmitErrors(transferRequestError)
 }
@@ -80,7 +80,7 @@ const editTransferRequest = async ({ id, values, setSubmitErrors }: EditTransfer
     expectedTransferDate: DateTime.now().plus({ days: 30 }).toISO(),
     createdAt: DateTime.now().toISO(),
   })
-  const transferRequestError = error || data.error
+  const transferRequestError = error || data?.error
 
   setSubmitErrors(transferRequestError)
 }
@@ -91,7 +91,7 @@ const submitDraftTransferRequest = async ({ values, data, setSubmitErrors }: Sub
     applyerId: data?.applyerId,
   })
 
-  const transferRequestError = error || draftData.error
+  const transferRequestError = error || draftData?.error
 
   setSubmitErrors(transferRequestError)
 }
