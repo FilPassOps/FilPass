@@ -31,7 +31,7 @@ interface TransferRequest {
   publicId: string
   amount: string
   wallet: { address: string; blockchain: Blockchain }
-  program: { programCurrency: ProgramCurrency[] }
+  program: { programCurrency: ProgramCurrency[]; blockchain: { name: string } }
   transfers: { txHash: string; status: TransferStatus; amount: string; isActive: boolean; amountCurrencyUnit: { name: string } }[]
   isHexMatch?: boolean
 }
@@ -41,7 +41,7 @@ interface MetamaskPaymentModalProps {
 }
 
 interface PaymentBatchData {
-  isNonBls: boolean
+  blockchainName: string
   isPaymentSent: boolean
   isHexMatch?: boolean
   data: TransferRequest[]
@@ -61,14 +61,9 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
   const currentBatch = paymentBatchList[currentBatchIndex]
 
   useEffect(() => {
-    const bls: typeof data = []
-    const nonBls: typeof data = []
-    const blsChunks: (typeof data)[] = []
-    const nonBlsChunks: (typeof data)[] = []
     let totalDollarAmount = 0
 
     for (const item of data) {
-      const protocol = item.wallet.address.charAt(1)
       const programCurrency = item.program.programCurrency.find(({ type }) => type === 'REQUEST')
 
       if (programCurrency?.currency.name === USD) {
@@ -76,23 +71,42 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
       } else {
         totalDollarAmount += Number(item.amount) * filecoin.rate
       }
-      if (protocol === '3') {
-        bls.push(item)
-      } else {
-        nonBls.push(item)
-      }
-    }
-    for (let i = 0; i < nonBls.length; i += 100) {
-      nonBlsChunks.push(nonBls.slice(i, i + 100))
-    }
-    for (let i = 0; i < bls.length; i += 45) {
-      blsChunks.push(bls.slice(i, i + 45))
     }
 
     setTotalDollarAmount(totalDollarAmount)
-    setPaymentBatchList(
-      [...blsChunks, ...nonBlsChunks].map(data => ({ isNonBls: data[0].wallet.address.charAt(1) !== '3', data, isPaymentSent: false })),
-    )
+
+    const blockchainMap = new Map<string, TransferRequest[]>()
+
+    for (const item of data) {
+      const chain = item.program.blockchain.name
+
+      let list = blockchainMap.get(chain)
+
+      if (!list) {
+        list = []
+        blockchainMap.set(chain, list)
+      }
+
+      list.push(item)
+    }
+
+    const chunks = []
+
+    for (const [chain, items] of blockchainMap) {
+      const chainChunks = []
+      for (let i = 0; i < items.length; i += 10) {
+        chainChunks.push({
+          blockchainName: chain,
+          isPaymentSent: false,
+          data: items.slice(i, i + 10),
+        })
+      }
+      chunks.push(chainChunks)
+    }
+
+    const finalList = chunks.flat()
+
+    setPaymentBatchList(finalList)
   }, [data, filecoin])
 
   useEffect(() => {
@@ -277,7 +291,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
             batchData={currentBatch}
             filecoin={filecoin}
             rate={rate}
-            forwardHandler={currentBatch.isNonBls ? handleForwardNonBLS : handleForwardAll}
+            forwardHandler={handleForwardAll}
             setIsBatchSent={setIsBatchSent}
             setHextMatch={setHextMatch}
             setIsChunkHextMatch={setIsChunkHextMatch}

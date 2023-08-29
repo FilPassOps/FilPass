@@ -10,6 +10,7 @@ import { Button } from 'components/shared/Button'
 import { PaginationCounter } from 'components/shared/PaginationCounter'
 import { checkItemsPerPage, PaginationWrapper } from 'components/shared/usePagination'
 import { CreateReportModal } from 'components/TransferRequest/shared/CreateReportModal'
+import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
 import { stringify } from 'csv-stringify/sync'
 import { getAll } from 'domain/disbursement/getAll'
 import { findAllPrograms } from 'domain/programs/findAll'
@@ -22,9 +23,8 @@ import { DateTime } from 'luxon'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { PLATFORM_NAME } from 'system.config'
+import { getChainByName, PLATFORM_NAME } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
-import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
 
 export default function Disbursement({ initialData = [], programs = [], pageSize, totalItems, page, status }) {
   const router = useRouter()
@@ -39,6 +39,13 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
   const [openNotifyModal, setOpenNotifyModal] = useState(false)
   const [createReportModal, setCreateReportModal] = useState(false)
   const [data, setData] = useState(initialData)
+
+  useEffect(() => {
+    localStorage.setItem(
+      'disbursement-selected',
+      JSON.stringify(requestList.filter(request => request.selected).map(({ publicId }) => publicId)),
+    )
+  }, [requestList])
 
   const handleRequestChecked = requestIndex => {
     requestList[requestIndex].selected = !requestList[requestIndex].selected
@@ -67,13 +74,11 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
   }
 
   const onSinglePayClick = data => {
-    setPaymentModalTransactions([data])
-    router.push('#payment')
+    handlePayment([data])
   }
 
   const onMetamaskBatchPayClick = () => {
-    setPaymentModalTransactions(requestList.filter(request => request.selected))
-    router.push('#payment')
+    handlePayment(requestList.filter(request => request.selected))
   }
 
   const onSingleRejectClick = data => {
@@ -89,6 +94,12 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
   const handleNotifyClick = () => {
     setPaymentModalTransactions(requestList.filter(request => request.selected))
     setOpenNotifyModal(true)
+  }
+
+  const handlePayment = requestListData => {
+    localStorage.setItem('disbursement', JSON.stringify(requestListData.map(({ publicId }) => publicId)))
+    setPaymentModalTransactions(requestListData)
+    router.push('#payment')
   }
 
   const handleDownloadCSV = async values => {
@@ -212,7 +223,12 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
             {selectedRequests.length > 0 && isNotPaidStatus && (
               <div className="flex items-center gap-4">
                 <div>
-                  <WithMetaMaskButton variant="green" onClick={onMetamaskBatchPayClick} defaultLabel="Pay">
+                  <WithMetaMaskButton
+                    variant="green"
+                    onClick={onMetamaskBatchPayClick}
+                    defaultLabel="Pay"
+                    targetChainId={getChainByName(selectedRequests[0].program.blockchain.name).chainId}
+                  >
                     Pay
                   </WithMetaMaskButton>
                 </div>

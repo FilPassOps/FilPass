@@ -11,7 +11,7 @@ import { USD } from 'domain/currency/constants'
 import { formatCrypto, formatCurrency } from 'lib/currency'
 import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { useState } from 'react'
-import { SUPPORT_EMAIL, TOKEN } from 'system.config'
+import { SUPPORT_EMAIL, TOKEN, getChainByName } from 'system.config'
 import { Table, TableDiv, TableHeader } from './Table'
 import { TransactionParser } from './TransactionParser'
 
@@ -27,13 +27,13 @@ interface TransferRequest {
   publicId: string
   amount: string
   wallet: { address: string; blockchain: Blockchain; verificationId?: string }
-  program: { programCurrency: ProgramCurrency[] }
+  program: { programCurrency: ProgramCurrency[]; blockchain: { name: string } }
   transfers: { txHash: string; status: TransferStatus; amount: string; isActive: boolean; amountCurrencyUnit: { name: string } }[]
   isHexMatch?: boolean
 }
 
 interface PaymentBatchData {
-  isNonBls: boolean
+  blockchainName: string
   isPaymentSent: boolean
   isHexMatch?: boolean
   data: TransferRequest[]
@@ -67,7 +67,7 @@ const PaymentBatch = ({
   setIsChunkHextMatch,
   setHextMatch,
 }: BatchProps) => {
-  const { data, isNonBls, isPaymentSent, isHexMatch } = batchData
+  const { data, isPaymentSent, isHexMatch, blockchainName } = batchData
   const [isOpen, setIsOpen] = useState(false)
 
   let totalDollarAmount = 0
@@ -83,9 +83,7 @@ const PaymentBatch = ({
   }
 
   const validateParseData = (parsedData: ParsedData) => {
-    const isValidFunctionCall = isNonBls
-      ? parsedData.functionName === contractInterface.getFunction('forward').name
-      : contractInterface.getFunction('forwardAny').name
+    const isValidFunctionCall = contractInterface.getFunction('forwardAny').name
 
     const parsedDataArray = parsedData.addresses.reduce((acc, address, index) => {
       return [...acc, { address, amount: parsedData.amount[index] }]
@@ -131,14 +129,14 @@ const PaymentBatch = ({
     <div key={index} className="text-gray-900">
       <div className="md:p-6 flex flex-wrap items-center justify-between border-b border-gray-200 gap-4 py-5">
         <div>
-          <h2 className="text-base md:text-xl text-gray-900 font-medium mb-2">{`Batch ${index + 1}${isNonBls ? '' : ' - BLS'}`}</h2>
+          <h2 className="text-base md:text-xl text-gray-900 font-medium mb-2">{`Batch ${index + 1}`}</h2>
           <div className="flex items-center gap-2 md:gap-6 text-gray-500 text-xs md:text-base">
             <div className="flex items-center gap-2">
               <Bars4Icon className="w-6 text-gray-400" /> {data.length} Requests
             </div>
             <div className="flex items-center gap-2">
               <CurrencyDollarIcon className="w-6 text-gray-400" />
-              {formatCrypto(new Big(totalDollarAmount).div(rate).toFixed(2))} {TOKEN.symbol}
+              {formatCrypto(new Big(totalDollarAmount).div(rate).toFixed(2))} {getChainByName(blockchainName).symbol}
               <span className="text-sm "> ≈{formatCurrency(totalDollarAmount)}</span>
             </div>
           </div>
@@ -147,6 +145,7 @@ const PaymentBatch = ({
           {!isPaymentSent && (
             <WithMetaMaskButton
               className="w-full md:w-auto"
+              targetChainId={getChainByName(blockchainName).chainId}
               onClick={async () => {
                 const sent = await forwardHandler(data)
                 setIsBatchSent(sent)

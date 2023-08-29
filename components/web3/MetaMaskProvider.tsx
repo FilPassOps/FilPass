@@ -193,7 +193,7 @@ export const WithMetaMaskButton: React.FC<React.PropsWithChildren<WithMetaMaskBu
     connectWalletLabel = 'Connect MetaMask',
     switchChainLabel = 'Switch network',
     defaultLabel,
-    targetChainId = CONFIG.chains[0].chainId,
+    targetChainId = CONFIG.chains[0].chainId, // TODO: OPEN-SOURCE
     children,
     ...rest
   } = props
