@@ -7,7 +7,7 @@ export default function NotFoundPage() {
   return (
     <>
       <Head>
-        <title>Not Found - {PLATFORM_NAME}</title>
+        <title key='not-found'>{`Not Found - ${PLATFORM_NAME}`}</title>
       </Head>
       <div className="h-screen flex flex-col justify-center items-center py-16">
         <FaceFrownIcon className="w-14 h-14 text-gray-500 mb-3" />

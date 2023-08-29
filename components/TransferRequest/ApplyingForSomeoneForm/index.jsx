@@ -123,7 +123,7 @@ export const ApplyForSomeoneForm = () => {
           </p>
         </PageAlert>
 
-        <CheckboxInput id="id-ask-review" className="items-center mb-2" value={receiverShouldReview} onChange={handleReceiverShouldReview}>
+        <CheckboxInput id="id-ask-review" name="askReview" className="items-center mb-2" value={receiverShouldReview} onChange={handleReceiverShouldReview}>
           <span className="text-gray-700 font-medium text-sm">{`Ask the receivers to review and submit the requests`}</span>
         </CheckboxInput>
 

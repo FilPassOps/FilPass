@@ -28,7 +28,10 @@ export const createRequestChangeHistory = async (
     const parsedChanges = await Promise.all(
       changes.map(async change => {
         if (change.field === HISTORY_ENCRYPTED_FIELDS_TEAM) {
-          const [encryptedOldValue, encryptedNewValue] = await Promise.all([encryptPII(change.oldValue), encryptPII(change.newValue)])
+          const [encryptedOldValue, encryptedNewValue] = await Promise.all([
+            encryptPII(change.oldValue as string),
+            encryptPII(change.newValue as string),
+          ])
           return {
             field: change.field,
             oldValue: encryptedOldValue,
@@ -36,7 +39,10 @@ export const createRequestChangeHistory = async (
           }
         }
         if (change.field === HISTORY_ENCRYPTED_FIELDS_AMOUNT) {
-          const [encryptedOldValue, encryptedNewValue] = await Promise.all([encrypt(change.oldValue), encrypt(change.newValue)])
+          const [encryptedOldValue, encryptedNewValue] = await Promise.all([
+            encrypt(change.oldValue as string),
+            encrypt(change.newValue as string),
+          ])
           return {
             field: change.field,
             oldValue: encryptedOldValue,
@@ -48,11 +54,14 @@ export const createRequestChangeHistory = async (
     )
 
     return prisma.transferRequestHistory.createMany({
-      data: parsedChanges.map(change => ({
-        ...change,
-        userRoleId,
-        transferRequestId,
-      })),
+      data: parsedChanges.map(
+        change =>
+          ({
+            ...change,
+            userRoleId,
+            transferRequestId,
+          }) as any,
+      ),
     })
   }
 }

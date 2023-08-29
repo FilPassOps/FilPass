@@ -26,7 +26,7 @@ interface RejectTransferRequestParams {
 
 interface BatchRejectTransferRequestParams {
   requests: string[]
-  approverId: number
+  approverId?: number
   notes: string
 }
 

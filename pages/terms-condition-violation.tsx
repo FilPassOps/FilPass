@@ -16,7 +16,7 @@ export default function BannedUserPage() {
   return (
     <>
       <Head>
-        <title>Terms and Condition violation - {PLATFORM_NAME}</title>
+        <title key='terms-conditions'>{`Terms and Condition violation - ${PLATFORM_NAME}`}</title>
       </Head>
       <div className="h-screen flex flex-col justify-center items-center">
         <LockClosedIcon className="w-14 h-14 text-gray-500 mb-3" />

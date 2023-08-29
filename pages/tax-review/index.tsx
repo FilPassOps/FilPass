@@ -8,6 +8,7 @@ import { PLATFORM_NAME } from 'system.config'
 import { findAllTaxForms } from 'domain/files'
 import { withFinanceSSR } from 'lib/ssr'
 import { ReactElement, useEffect, useState } from 'react'
+import Head from 'next/head'
 
 export enum TaxStatus {
   UNREVIEWED = 'UNREVIEWED',
@@ -47,6 +48,9 @@ export default function TaxReviewPage({ data, totalItems, pageSize, status }: Ta
 
   return (
     <>
+      <Head>
+        <title>{`Tax Review - ${PLATFORM_NAME}`}</title>
+      </Head>
       {selectedTotalTaxForms > 0 && (
         <>
           <div className="flex mb-4 gap-2">
@@ -76,7 +80,7 @@ export default function TaxReviewPage({ data, totalItems, pageSize, status }: Ta
 }
 
 TaxReviewPage.getLayout = function getLayout(page: ReactElement) {
-  return <Layout title={`Tax Review - ${PLATFORM_NAME}`}>{page}</Layout>
+  return <Layout title="Tax Review">{page}</Layout>
 }
 
 export const getServerSideProps = withFinanceSSR(async ({ query }: any) => {

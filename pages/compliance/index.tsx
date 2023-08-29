@@ -9,6 +9,7 @@ import { PLATFORM_NAME } from 'system.config'
 import { findAllPII, findAllSanctioned } from 'domain/user'
 import { withComplianceSSR } from 'lib/ssr'
 import { ReactElement, useState } from 'react'
+import Head from 'next/head'
 
 interface FlaggedUsersPage {
   data: {
@@ -49,6 +50,9 @@ export default function FlaggedUsersPage({ data, totalItems, pageSize, status }:
 
   return (
     <>
+      <Head>
+        <title>Compliance - {PLATFORM_NAME}</title>
+      </Head>
       <PaginationWrapper totalItems={totalItems} pageSize={pageSize} isLoading={false}>
         <UserList
           data={data}
@@ -58,8 +62,8 @@ export default function FlaggedUsersPage({ data, totalItems, pageSize, status }:
           status={status}
         />
       </PaginationWrapper>
-      <ApproveBlockedModal open={approveModalOpen} onModalClosed={() => setApproveModalOpen(false)} userId={selectedUserId} />
-      <RejectBlockedModal open={rejectModalOpen} onModalClosed={() => setRejectModalOpen(false)} userId={selectedUserId} />
+      <ApproveBlockedModal open={approveModalOpen} onModalClosed={() => setApproveModalOpen(false)} userId={selectedUserId as number} />
+      <RejectBlockedModal open={rejectModalOpen} onModalClosed={() => setRejectModalOpen(false)} userId={selectedUserId as number} />
       <ViewReasonModal
         open={viewReasonModalOpen}
         onModalClosed={() => setViewReasonModalOpen(false)}
@@ -71,7 +75,7 @@ export default function FlaggedUsersPage({ data, totalItems, pageSize, status }:
 }
 
 FlaggedUsersPage.getLayout = function getLayout(page: ReactElement) {
-  return <Layout title={`Compliance - ${PLATFORM_NAME}`}>{page}</Layout>
+  return <Layout title="Compliance">{page}</Layout>
 }
 
 export const getServerSideProps = withComplianceSSR(async ({ query }: any) => {

@@ -81,15 +81,17 @@ export function Login({ redirectAfterLogin }: LoginProps) {
     })
 
     if (verifyError) {
-      return { error: verifyError }
+      return { error: verifyError } as { error: any }
     }
 
     refresh()
     if (redirectAfterLogin) {
       Cookie.remove('@PL:fromDraftEmail')
-      return router.push(redirectAfterLogin)
+      router.push(redirectAfterLogin)
+      return { error: undefined }
     } else {
-      return router.push('/my-transfer-requests')
+      router.push('/my-transfer-requests')
+      return { error: undefined }
     }
   }
 
@@ -99,10 +101,10 @@ export function Login({ redirectAfterLogin }: LoginProps) {
     })
 
     if (verifyError) {
-      return { error: verifyError }
+      return { error: verifyError } as { error: any }
     }
 
-    return {}
+    return { error: undefined }
   }
 
   return (
@@ -148,7 +150,7 @@ export function Login({ redirectAfterLogin }: LoginProps) {
 
         <ForgotPasswordModal open={openForgotPassModal} onClose={() => setOpenForgotPassModal(false)} />
 
-        <ResetPasswordModal open={openResetPassModal} onClose={() => setOpenResetPassModal(false)} token={router.query.token} />
+        <ResetPasswordModal open={openResetPassModal} onClose={() => setOpenResetPassModal(false)} token={router.query.token as string} />
 
         <ResendVerificationModal
           openModal={openModal}

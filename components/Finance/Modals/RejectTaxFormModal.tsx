@@ -50,8 +50,8 @@ export const RejectTaxFormModal = ({ taxForms, open, onModalClosed }: RejectTaxF
 
   const handleReject = async ({ rejectionReason }: FormValues) => {
     const { data } = await api.post<ApiResult>('/files/reject', { rejectionReason, taxFormIds: taxForms.map(taxForm => taxForm.id) })
-    if (data.error) {
-      setError(data.error.message)
+    if (data?.error) {
+      setError(data.error?.message)
       return
     }
     closeModal()

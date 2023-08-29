@@ -35,7 +35,7 @@ export async function createTransferRequestReview(params: CreateTransferRequestR
 
   const { transferRequestId, approverId, status, notes } = fields
 
-  const sanitizedNotes = notes ? sanitizeText(notes) : null
+  const sanitizedNotes = notes ? sanitizeText(notes) : null as string | null
 
   if (status === APPROVED_STATUS) {
     return await approveTransferRequest({
@@ -46,8 +46,8 @@ export async function createTransferRequestReview(params: CreateTransferRequestR
   if (status === REJECTED_BY_APPROVER_STATUS) {
     if (!sanitizedNotes) {
       return {
-        status: 400,
         error: {
+          status: 400,
           message: errorsMessages.something_went_wrong.message,
         },
       }
@@ -67,8 +67,8 @@ export async function createTransferRequestReview(params: CreateTransferRequestR
   if (status === REQUIRES_CHANGES_STATUS) {
     if (!sanitizedNotes) {
       return {
-        status: 400,
         error: {
+          status: 400,
           message: errorsMessages.something_went_wrong.message,
         },
       }
@@ -87,8 +87,8 @@ export async function createTransferRequestReview(params: CreateTransferRequestR
   }
 
   return {
-    status: 400,
     error: {
+      status: 400,
       message: errorsMessages.error_status_is_not_supported.message,
     },
   }

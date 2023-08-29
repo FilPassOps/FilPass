@@ -54,10 +54,10 @@ export const TaxForm = ({ onFormSubmit }: TaxFormsProps) => {
         </div>
         <div>
           <SelectFormFileInput
-            isUSResident={isUSResident}
+            isUSResident={isUSResident as any}
             userFileId={userFileId}
-            setUserFileId={(value: string) => {
-              setValue('userFileId', value)
+            setUserFileId={(value: string | undefined) => {
+              setValue('userFileId', value as string)
               clearErrors('userFileId')
             }}
           />

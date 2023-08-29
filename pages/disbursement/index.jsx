@@ -24,6 +24,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
+import Head from 'next/head'
 
 export default function Disbursement({ initialData = [], programs = [], pageSize, totalItems, page, status }) {
   const router = useRouter()
@@ -167,6 +168,9 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
 
   return (
     <>
+      <Head>
+        <title>{`Disbursement - ${PLATFORM_NAME}`}</title>
+      </Head>
       {isPayment && paymentModalTransactions.length ? (
         <MetamaskPayment data={paymentModalTransactions} />
       ) : (
@@ -251,7 +255,7 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
 }
 
 Disbursement.getLayout = function getLayout(page) {
-  return <Layout title={`Disbursement - ${PLATFORM_NAME}`}>{page}</Layout>
+  return <Layout title="Disbursement">{page}</Layout>
 }
 
 export const getServerSideProps = withControllerSSR(async ({ query }) => {

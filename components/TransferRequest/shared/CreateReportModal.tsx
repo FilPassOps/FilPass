@@ -94,6 +94,7 @@ export const CreateReportModal = ({
               {...field}
               // @ts-ignore
               id="pageSelected"
+              name="pageSelected"
               options={pageSelectorItems}
               label="Select page"
               error={errors.pageSelected}

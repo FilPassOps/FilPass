@@ -38,8 +38,8 @@ export const ApproveTaxFormModal = ({ taxForms, open, onModalClosed }: ApproveTa
   const handleApprove = async () => {
     setIsLoading(true)
     const { data } = await api.post<ApiResult>('/files/approve', { taxFormIds: taxForms.map(taxForm => taxForm.id) })
-    if (data.error) {
-      setError(data.error.message)
+    if (data?.error) {
+      setError(data.error?.message)
       return
     }
     setIsLoading(false)

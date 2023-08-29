@@ -7,8 +7,8 @@ import { UserList } from 'components/SuperAdmin/UserList'
 import { PLATFORM_NAME } from 'system.config'
 import { findAllUsers } from 'domain/user/findAll'
 import { withSuperAdminSSR } from 'lib/ssr'
-import Head from 'next/head'
 import { ReactElement, useState } from 'react'
+import Head from 'next/head'
 
 interface UserSettingsProps {
   data: any[]
@@ -22,7 +22,7 @@ export default function UserSettings({ data = [], pageSize, totalItems }: UserSe
   return (
     <>
       <Head>
-        <title>User Settings - {PLATFORM_NAME}</title>
+        <title>{`User Settings - ${PLATFORM_NAME}`}</title>
       </Head>
       <div className="flex justify-between items-center pb-3">
         <p className="text-base font-bold text-gray-900">All users</p>
@@ -46,7 +46,7 @@ export default function UserSettings({ data = [], pageSize, totalItems }: UserSe
 }
 
 UserSettings.getLayout = function getLayout(page: ReactElement) {
-  return <Layout title={`User Settings - ${PLATFORM_NAME}`}>{page}</Layout>
+  return <Layout title="User Settings">{page}</Layout>
 }
 
 export const getServerSideProps = withSuperAdminSSR(async function getServerSideProps({ query, user }) {

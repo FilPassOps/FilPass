@@ -128,5 +128,5 @@ export async function createTransferRequest(params: CreateTransferRequestParams)
     expectedTransferDate,
   })
 
-  return transferRequest
+  return { data: transferRequest }
 }

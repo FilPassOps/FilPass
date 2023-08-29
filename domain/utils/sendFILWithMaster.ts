@@ -11,7 +11,9 @@ interface SendFILWithMasterRequestParams {
 export interface FilecoinApiResult {
   data?: any
   error?: {
+    message?: string
     status?: number
+    errors?: any
   }
 }
 

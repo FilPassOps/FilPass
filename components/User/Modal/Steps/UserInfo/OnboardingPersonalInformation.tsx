@@ -20,6 +20,12 @@ export const OnboardingPersonalInformation = ({ onBackClick, onFormSubmit }: Onb
   } = useForm<FormValue>({
     resolver: yupResolver(personalInformationCheckValidator),
     shouldFocusError: true,
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      dateOfBirth: undefined,
+      countryResidence: '',
+    }
   })
 
   return (

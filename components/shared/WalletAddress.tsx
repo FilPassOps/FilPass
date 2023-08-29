@@ -11,7 +11,7 @@ interface WalletAddressProps {
   enableVerifiedIcon?: boolean
   className?: string
   delegatedAddress?: string
-  label?: string
+  label?: string | null
 }
 
 export const WalletAddress = ({

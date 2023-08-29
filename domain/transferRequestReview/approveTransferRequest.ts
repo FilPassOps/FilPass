@@ -29,7 +29,7 @@ export async function approveTransferRequest(params: ApproverTransferRequestPara
     approverId,
   })
 
-  return approvedRequests[0] || failedRequests[0]
+  return { data: approvedRequests[0] || failedRequests[0] }
 }
 
 interface BatchApproveTransferRequestParams {
@@ -104,12 +104,12 @@ export async function batchApproveTransferRequest(params: BatchApproveTransferRe
 
     //old programs may not have an approver group - a group can be empty
     const numberOfProgramApproversGroups = program.userRoleProgramGroups.filter(
-      group => group.userRoleProgramGroupMembers.length > 0
+      group => group.userRoleProgramGroupMembers.length > 0,
     ).length
 
     try {
       const approverGroups = program.userRoleProgramGroups.filter(
-        group => group.userRoleProgramGroupMembers.filter(member => member.userRoleProgram.userRoleId === approverId).length > 0
+        group => group.userRoleProgramGroupMembers.filter(member => member.userRoleProgram.userRoleId === approverId).length > 0,
       )
       const alreadyApprovedByGroup =
         approverGroups.length &&

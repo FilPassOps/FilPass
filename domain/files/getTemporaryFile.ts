@@ -6,8 +6,8 @@ import { getTempFileValidator } from './validation'
 import { logger } from 'lib/logger'
 
 interface GetTemporaryFileParams {
-  publicId: string
-  uploaderId: number
+  publicId?: string
+  uploaderId?: number
 }
 
 export async function getTemporaryFile(params: GetTemporaryFileParams) {

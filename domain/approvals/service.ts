@@ -1,4 +1,4 @@
-import { UserRole } from '@prisma/client'
+import { Role, UserRole } from '@prisma/client'
 import { APPROVER_ROLE, COMPLIANCE_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
 import { findCompliancePrograms, findUserRolePrograms } from 'domain/programs/findAll'
 import { BLOCKED_STATUS, PAID_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
@@ -12,7 +12,10 @@ import { generateTeamHash } from 'lib/password'
 import prisma from 'lib/prisma'
 
 interface GetApprovalsByRoleParams {
-  roles: UserRole[]
+  roles: {
+    role: Role
+    id: number
+  }[]
   userId: number
   status?: string
   programId?: string
@@ -21,7 +24,7 @@ interface GetApprovalsByRoleParams {
   from?: Date
   to?: Date
   wallets?: string[]
-  size: number
+  size?: number
   sort?: 'number' | 'program' | 'create_date'
   order?: 'asc' | 'desc'
   page?: number

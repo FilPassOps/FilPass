@@ -297,7 +297,8 @@ const verifyWallet = async (data, prisma, propName) => {
   return { error: errors.length > 0 ? errors : null }
 }
 
-const verifyVesting = (program, records, vestingStartEpochPropName, vestingMonthsPropName) => {
+// previus params (program, records, vestingStartEpochPropName, vestingMonthsPropName)
+const verifyVesting = () => {
   //TODO MSIG 1 of 2
   // const vestginParams = records.filter(row => row[vestingStartEpochPropName] || row[vestingMonthsPropName])
 

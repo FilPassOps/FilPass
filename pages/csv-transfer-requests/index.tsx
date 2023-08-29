@@ -6,6 +6,7 @@ import { withApproverSSR } from 'lib/ssr'
 import { PageAlert } from '../../components/Layout/Alerts'
 import { PLATFORM_NAME } from 'system.config'
 import { ReactElement } from 'react'
+import Head from 'next/head'
 
 interface CSVTransferRequestsPageProps {
   approver: {
@@ -16,6 +17,9 @@ interface CSVTransferRequestsPageProps {
 export default function CSVTransferRequestsPage({ approver }: CSVTransferRequestsPageProps) {
   return (
     <>
+      <Head>
+        <title>{`Upload CSV - ${PLATFORM_NAME}`}</title>
+      </Head>
       <div className="my-6">
         <RequestorReceiver applyer={approver?.email} />
         <Divider className="my-8" />
@@ -34,7 +38,7 @@ export default function CSVTransferRequestsPage({ approver }: CSVTransferRequest
 
 CSVTransferRequestsPage.getLayout = function getLayout(page: ReactElement) {
   return (
-    <Layout title={`Upload CSV to Create Transfer Requests - ${PLATFORM_NAME}`} containerClass="bg-gray-50 min-h-screen">
+    <Layout title="Upload CSV to Create Transfer Requests" containerClass="bg-gray-50 min-h-screen">
       {page}
     </Layout>
   )

@@ -70,7 +70,7 @@ export default async function run() {
           },
           data: {
             status: 'FAILED',
-            notes: data.error,
+            notes: data?.error,
             isActive: false,
           },
         })
