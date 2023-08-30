@@ -75,7 +75,7 @@ const ethereum = {
   },
   rpcUrls: ['https://ethereum-sepolia.blockpi.network/v1/rpc/public'],
   blockExplorer: { name: 'Etherscan', url: 'https://sepolia.etherscan.io/tx' },
-  contractAddress: '',
+  contractAddress: '0xA6B0F90E96Ff8E6b79D859E2067afFA190AE8dB5',
 } //as const
 
 const polygon = {

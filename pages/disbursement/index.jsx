@@ -40,23 +40,22 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
   const [createReportModal, setCreateReportModal] = useState(false)
   const [data, setData] = useState(initialData)
 
-  useEffect(() => {
+  const handleRequestChecked = requestIndex => {
+    requestList[requestIndex].selected = !requestList[requestIndex].selected
+    setRequestList([...requestList])
     localStorage.setItem(
       'disbursement-selected',
       JSON.stringify(requestList.filter(request => request.selected).map(({ publicId }) => publicId)),
     )
-  }, [requestList])
-
-  const handleRequestChecked = requestIndex => {
-    requestList[requestIndex].selected = !requestList[requestIndex].selected
-    setRequestList([...requestList])
   }
 
   useEffect(() => {
     if (!data) {
       return
     }
-    const initialRequestList = data.map(request => ({ ...request, selected: false }))
+    const selectedRequests = JSON.parse(localStorage.getItem('disbursement-selected'))
+
+    const initialRequestList = data.map(request => ({ ...request, selected: selectedRequests.includes(request.publicId) }))
     setRequestList(initialRequestList)
   }, [data])
 
@@ -97,7 +96,7 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
   }
 
   const handlePayment = requestListData => {
-    localStorage.setItem('disbursement', JSON.stringify(requestListData.map(({ publicId }) => publicId)))
+    localStorage.setItem('disbursement', JSON.stringify(requestListData))
     setPaymentModalTransactions(requestListData)
     router.push('#payment')
   }

@@ -4,7 +4,7 @@ import { ExternalProvider } from '@ethersproject/providers'
 import filecoinAddress from '@glif/filecoin-address'
 import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
-import { TOKEN } from 'system.config'
+import { TOKEN, getChainByName } from 'system.config'
 import { MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
 import config from '../../chains.config'
 
@@ -12,18 +12,20 @@ declare const window: CustomWindow
 
 export const contractInterface = MultiForwarderFactory.createInterface()
 
-export const useContract = () => {
+export const useContract = (blockchainName: string) => {
   const { chainId, wallet, setBusy } = useMetaMask()
   const [provider, setProvider] = useState<ethers.providers.Web3Provider>()
   const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner>()
   const [multiForwarder, setMultiForwarder] = useState<MultiForwarder>()
 
-  const connectedToTargetChain = wallet && chainId === config.chain.chainId
+  const chain = getChainByName(blockchainName)
+
+  const connectedToTargetChain = wallet && chainId === chain.chainId
 
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum as ExternalProvider)
     const signer = provider.getSigner()
-    const multiForwarder = MultiForwarderFactory.connect(config.multiforwarder, signer)
+    const multiForwarder = MultiForwarderFactory.connect(chain.contractAddress, signer)
 
     setSigner(signer)
     setProvider(provider)
@@ -32,7 +34,7 @@ export const useContract = () => {
     return () => {
       multiForwarder.removeAllListeners()
     }
-  }, [])
+  }, [chain.contractAddress])
 
   /**
    * Forward FIL to up to 45 addresses of any type
@@ -116,6 +118,8 @@ export const useContract = () => {
 
   return { forwardAll: forwardAny, forwardNonBLS: forward }
 }
+
+export type ForwardNonBLS = ReturnType<typeof useContract>['forwardNonBLS']
 
 function zeroPad(bytes: Uint8Array) {
   const paddedAddress = new Uint8Array(32)

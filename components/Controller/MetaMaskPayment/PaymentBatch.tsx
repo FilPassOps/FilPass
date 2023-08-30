@@ -6,7 +6,7 @@ import { Button } from 'components/shared/Button'
 import Currency, { CryptoAmount } from 'components/shared/Table/Currency'
 import { WalletAddress } from 'components/shared/WalletAddress'
 import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
-import { contractInterface } from 'components/web3/useContract'
+import { ForwardNonBLS, contractInterface, useContract } from 'components/web3/useContract'
 import { USD } from 'domain/currency/constants'
 import { formatCrypto, formatCurrency } from 'lib/currency'
 import { getDelegatedAddress } from 'lib/getDelegatedAddress'
@@ -51,7 +51,7 @@ interface BatchProps {
   batchData: PaymentBatchData
   filecoin: any
   rate: number
-  forwardHandler: (batch: TransferRequest[]) => Promise<boolean>
+  forwardHandler: (batch: TransferRequest[], forwardFunction: ForwardNonBLS) => Promise<boolean>
   setIsBatchSent: (isBatchSent: boolean) => void
   setIsChunkHextMatch: (isChunkHextMatch: boolean) => void
   setHextMatch: (transferRequests: TransferRequest[]) => void
@@ -69,6 +69,7 @@ const PaymentBatch = ({
 }: BatchProps) => {
   const { data, isPaymentSent, isHexMatch, blockchainName } = batchData
   const [isOpen, setIsOpen] = useState(false)
+  const { forwardNonBLS } = useContract(blockchainName)
 
   let totalDollarAmount = 0
 
@@ -147,7 +148,7 @@ const PaymentBatch = ({
               className="w-full md:w-auto"
               targetChainId={getChainByName(blockchainName).chainId}
               onClick={async () => {
-                const sent = await forwardHandler(data)
+                const sent = await forwardHandler(data, forwardNonBLS)
                 setIsBatchSent(sent)
               }}
             >

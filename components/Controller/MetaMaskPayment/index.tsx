@@ -6,7 +6,7 @@ import { useCurrency } from 'components/Currency/Provider'
 import { useAlertDispatcher } from 'components/Layout/Alerts'
 import { Button } from 'components/shared/Button'
 import { useMetaMask } from 'components/web3/MetaMaskProvider'
-import { useContract } from 'components/web3/useContract'
+import { ForwardNonBLS } from 'components/web3/useContract'
 import { USD } from 'domain/currency/constants'
 import { api } from 'lib/api'
 import { formatCrypto, formatCurrency } from 'lib/currency'
@@ -51,7 +51,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
   const router = useRouter()
   const { filecoin } = useCurrency()
   const { dispatch, close } = useAlertDispatcher()
-  const { forwardAll, forwardNonBLS } = useContract()
+  // const { forwardAll, forwardNonBLS } = useContract()
   const { wallet } = useMetaMask()
 
   const [totalDollarAmount, setTotalDollarAmount] = useState(0)
@@ -120,7 +120,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
   const rate = filecoin?.rate || 1
   const updatedAt = DateTime.fromISO(filecoin?.updatedAt).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS)
 
-  const doForward = async (batch: TransferRequest[], forwardFunction: typeof forwardAll | typeof forwardNonBLS) => {
+  const doForward = async (batch: TransferRequest[], forwardFunction: ForwardNonBLS) => {
     if (!wallet) {
       dispatch({
         type: 'warning',
@@ -224,13 +224,13 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
     setPaymentBatchList(newPaymentBatchList)
   }
 
-  const handleForwardAll = async (batch: TransferRequest[]) => {
-    return doForward(batch, forwardAll)
-  }
+  // const handleForwardAll = async (batch: TransferRequest[]) => {
+  //   return doForward(batch, forwardAll)
+  // }
 
-  const handleForwardNonBLS = async (batch: TransferRequest[]) => {
-    return doForward(batch, forwardNonBLS)
-  }
+  // const handleForwardNonBLS = async (batch: TransferRequest[]) => {
+  //   return doForward(batch, forwardNonBLS)
+  // }
 
   const handlePaymentErrors = (error: any) => {
     if (error.code === 4001 || error.code === 'ACTION_REJECTED') {
@@ -291,7 +291,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
             batchData={currentBatch}
             filecoin={filecoin}
             rate={rate}
-            forwardHandler={handleForwardAll}
+            forwardHandler={doForward}
             setIsBatchSent={setIsBatchSent}
             setHextMatch={setHextMatch}
             setIsChunkHextMatch={setIsChunkHextMatch}
