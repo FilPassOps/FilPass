@@ -44,7 +44,6 @@ export const getServerSideProps = withUserSSR(async ({ user, query }) => {
     }
   }
 
-  delete data.sanctionReason
   delete data.receiver_is_banned
   delete data.ban_actioner_email
   delete data.banActionedBy

@@ -20,7 +20,6 @@ import { WalletAddress } from 'components/shared/WalletAddress'
 import { APPROVER_ROLE } from 'domain/auth/constants'
 import { REJECTED } from 'domain/transferRequestReview/constants'
 import { BannedUserReason } from './BannedUserReason'
-import { BlockedReason } from './BlockedReason'
 import { StatusNotes } from './StatusNotes'
 import { TransferRequestHistory } from './TransferRequestHistory'
 
@@ -75,7 +74,6 @@ export const ViewTransferRequest = ({ data, role, showLegacyWarning }) => {
           <div className="flex sm:ml-auto">{data?.status && <StatusBadge status={status} />}</div>
         </div>
         <StatusNotes changesRequested={data?.changesRequested} status={data?.status} notes={data?.notes} />
-        <BlockedReason status={data?.status} reason={data?.sanctionReason} />
         {data?.receiver_is_banned && <BannedUserReason bannedAuthor={data?.banActionedBy} />}
 
         <Divider className="my-8" />

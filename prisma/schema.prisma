@@ -14,7 +14,6 @@ enum Role {
   CONTROLLER
   SUPERADMIN
   ADDRESS_MANAGER
-  COMPLIANCE
   VIEWER
   FINANCE
 }
@@ -49,7 +48,6 @@ enum TransferRequestStatus {
   REJECTED_BY_CONTROLLER
   SUBMITTED_BY_APPROVER
   BLOCKED
-  REJECTED_BY_COMPLIANCE
 }
 
 enum FileType {
@@ -93,8 +91,6 @@ model User {
   lastName                      String?                @map("last_name")
   dateOfBirth                   String?                @map("date_of_birth")
   countryResidence              String?                @map("country_residence")
-  isSanctioned                  Boolean?               @map("is_sanctioned")
-  sanctionReason                String?                @map("sanction_reason")
   isUSResident                  Boolean?               @map("is_us_resident")
   isVerified                    Boolean                @default(false) @map("is_verified")
   isActive                      Boolean                @default(true) @map("is_active")
@@ -117,7 +113,6 @@ model User {
   temporaryFiles                TemporaryFile[]
   sessions                      Session[]
   isOnboarded                   Boolean                @default(false) @map("is_onboarded")
-  isReviewedByCompliance        Boolean                @default(false) @map("is_reviewed_compliance")
   isBanned                      Boolean                @default(false) @map("is_banned")
   banReason                     String?                @map("ban_reason")
   banActionedBy                 UserRole?              @relation("BannedUsers", fields: [banActionedById], references: [id])
@@ -307,10 +302,8 @@ model TransferRequest {
   dateOfBirth          String?                    @map("date_of_birth")
   countryResidence     String?                    @map("country_residence")
   isUSResident         Boolean?                   @map("is_us_resident")
-  isSanctioned         Boolean?                   @map("is_sanctioned")
   isLegacy             Boolean                    @default(false) @map("is_legacy")
   isActive             Boolean                    @default(true) @map("is_active")
-  sanctionReason       String?                    @map("sanction_reason")
   createdAt            DateTime                   @default(now()) @map("created_at")
   updatedAt            DateTime                   @updatedAt @map("updated_at")
   expectedTransferDate DateTime                   @updatedAt @map("expected_transfer_date")

@@ -69,7 +69,6 @@ npm run migrate
     - test-controller / 123
     - test-finance / 123
     - test-viewer / 123
-    - test-compliance / 123
     - test-super / 123
 
 ## Application Start Up

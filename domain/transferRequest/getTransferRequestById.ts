@@ -42,7 +42,6 @@ export async function getTransferRequestById(params: GetTransferRequestByIdParam
          filter.last_name                       last_name,
          filter.date_of_birth                   date_of_birth,
          filter.country_residence               country_residence,
-         filter.sanction_reason                 sanction_reason,
          filter.is_us_resident                  is_us_resident,
          filter.is_legacy                       is_legacy,
          filter.terms                           terms,
@@ -88,7 +87,6 @@ export async function getTransferRequestById(params: GetTransferRequestByIdParam
               transfer_request.last_name                    last_name,
               transfer_request.date_of_birth                date_of_birth,
               transfer_request.country_residence            country_residence,
-              transfer_request.sanction_reason              sanction_reason,
               transfer_request.is_us_resident               is_us_resident,
               transfer_request.is_legacy                    is_legacy,
               transfer_request.team                         team,
@@ -288,7 +286,7 @@ export async function getTransferRequestById(params: GetTransferRequestByIdParam
     return `${month.padStart(2, '0')}/${day.padStart(2, '0')}/${year}`
   }
 
-  const { first_name, last_name, date_of_birth, country_residence, sanction_reason, is_legacy, ...transferRequestData } = transferRequest
+  const { first_name, last_name, date_of_birth, country_residence, is_legacy, ...transferRequestData } = transferRequest
 
   return {
     data: {
@@ -299,7 +297,6 @@ export async function getTransferRequestById(params: GetTransferRequestByIdParam
       lastName: await decryptPII(last_name),
       dateOfBirth: date_of_birth ? await parseDateOfBirth(date_of_birth) : null,
       countryResidence: await decryptPII(country_residence),
-      sanctionReason: await decryptPII(sanction_reason),
       form_user_email: await decryptPII(transferRequest.form_user_email),
       form_uploader_email: await decryptPII(transferRequest.form_uploader_email),
       attachment_user_email: await decryptPII(transferRequest.attachment_user_email),

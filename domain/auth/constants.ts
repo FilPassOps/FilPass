@@ -1,12 +1,11 @@
 export const ADDRESS_MANAGER_ROLE = 'ADDRESS_MANAGER'
 export const CONTROLLER_ROLE = 'CONTROLLER'
 export const APPROVER_ROLE = 'APPROVER'
-export const COMPLIANCE_ROLE = 'COMPLIANCE'
 export const SUPERADMIN_ROLE = 'SUPERADMIN'
 export const USER_ROLE = 'USER'
 export const VIEWER_ROLE = 'VIEWER'
 export const FINANCE_ROLE = 'FINANCE'
 
-export type SystemRoles = 'ADDRESS_MANAGER' | 'CONTROLLER' | 'APPROVER' | 'COMPLIANCE' | 'SUPERADMIN' | 'USER' | 'VIEWER' | 'FINANCE'
+export type SystemRoles = 'ADDRESS_MANAGER' | 'CONTROLLER' | 'APPROVER' | 'SUPERADMIN' | 'USER' | 'VIEWER' | 'FINANCE'
 
 export const SYSTEM_USER_ROLE_ID = 1

@@ -111,9 +111,4 @@ const config: Record<string, { className: string; text: string; style: any }> = 
     text: 'Awaiting review',
     style: {},
   },
-  rejected_by_compliance: {
-    className: 'text-international-orange bg-light-red',
-    text: 'Rejected',
-    style: {},
-  },
 }

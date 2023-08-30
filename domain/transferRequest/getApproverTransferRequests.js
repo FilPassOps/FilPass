@@ -9,7 +9,6 @@ import {
   DRAFT_STATUS,
   PROCESSING_STATUS,
   REJECTED_BY_APPROVER_STATUS,
-  REJECTED_BY_COMPLIANCE_STATUS,
   REJECTED_BY_CONTROLLER_STATUS,
   REJECTED_STATUS,
   SUBMITTED_BY_APPROVER_STATUS,
@@ -114,7 +113,6 @@ export async function getApproverTransferRequests(params) {
     statusFilter = Prisma.sql`AND request.status::text IN (${Prisma.join([
       REJECTED_BY_CONTROLLER_STATUS,
       REJECTED_BY_APPROVER_STATUS,
-      REJECTED_BY_COMPLIANCE_STATUS,
     ])})`
   }
   if (status === SUBMITTED_STATUS) {

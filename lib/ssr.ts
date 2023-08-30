@@ -1,5 +1,5 @@
 import { Role } from '@prisma/client'
-import { ADDRESS_MANAGER_ROLE, APPROVER_ROLE, COMPLIANCE_ROLE, CONTROLLER_ROLE, FINANCE_ROLE, SUPERADMIN_ROLE } from 'domain/auth/constants'
+import { ADDRESS_MANAGER_ROLE, APPROVER_ROLE, CONTROLLER_ROLE, FINANCE_ROLE, SUPERADMIN_ROLE } from 'domain/auth/constants'
 import { getSession, invalidateSession } from 'domain/auth/session'
 import { findUserByIdAndEmail } from 'domain/user/findByIdAndEmail'
 import { IncomingMessage } from 'http'
@@ -14,8 +14,6 @@ interface User {
   id: number
   email: string
   isOnboarded: boolean
-  isSanctioned: boolean | null
-  isReviewedByCompliance: boolean | null
   roles: { id: number; role: Role }[]
 }
 
@@ -67,8 +65,6 @@ export function withUserSSR(
       id: data?.id,
       email: data?.email,
       isOnboarded: data?.isOnboarded,
-      isSanctioned: data?.isSanctioned,
-      isReviewedByCompliance: data?.isReviewedByCompliance,
       roles: data?.roles?.map(role => ({ id: role.id, role: role.role })),
     }
 
@@ -116,12 +112,6 @@ export function withApproverSSR(
   handler: (context: GetServerSidePropsContext & { user: User }) => Promise<GetServerSidePropsResult<{ [key: string]: unknown }>>,
 ) {
   return withRolesSSR([APPROVER_ROLE], handler)
-}
-
-export function withComplianceSSR(
-  handler: (context: GetServerSidePropsContext & { user: User }) => Promise<GetServerSidePropsResult<{ [key: string]: unknown }>>,
-) {
-  return withRolesSSR([COMPLIANCE_ROLE], handler)
 }
 
 export function withFinanceSSR(

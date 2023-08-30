@@ -1,6 +1,4 @@
-import { sendSanctionNotification } from 'domain/notifications/sendSanctionNotification'
 import { encryptPII } from 'lib/emissaryCrypto'
-import { SanctionCheckResult, checkSanction } from 'lib/emissarySanctionCheck'
 import prisma from 'lib/prisma'
 import yup from 'lib/yup'
 import { DateTime } from 'luxon'
@@ -18,10 +16,9 @@ interface Data {
 
 interface MountPiiProps {
   pii: PiiType
-  checkSanctionResult?: SanctionCheckResult
 }
 
-async function mountPii({ pii, checkSanctionResult }: MountPiiProps) {
+async function mountPii({ pii }: MountPiiProps) {
   const { firstName, lastName, dateOfBirth, countryResidence } = pii
   const dobIsoDate = DateTime.fromJSDate(dateOfBirth).toUTC().toISODate()
 
@@ -30,9 +27,6 @@ async function mountPii({ pii, checkSanctionResult }: MountPiiProps) {
     lastName: await encryptPII(lastName),
     dateOfBirth: dobIsoDate ? await encryptPII(dobIsoDate) : null,
     countryResidence: await encryptPII(countryResidence),
-    isSanctioned: checkSanctionResult?.isSanctioned,
-    sanctionReason: checkSanctionResult?.sanctionReason ? await encryptPII(checkSanctionResult.sanctionReason) : null,
-    isReviewedByCompliance: checkSanctionResult?.isSanctioned ? false : undefined,
     piiUpdatedAt: new Date(),
   }
 }
@@ -40,15 +34,12 @@ async function mountPii({ pii, checkSanctionResult }: MountPiiProps) {
 export async function updateUserById(userId: number, data: Data) {
   const { pii, terms, isOnboarded } = data
 
-  const checkSanctionResult = pii ? await checkSanction(pii) : undefined
-  const mountedPii = pii ? await mountPii({ pii, checkSanctionResult }) : undefined
+  const mountedPii = pii ? await mountPii({ pii }) : undefined
 
   const result = await prisma.user.update({
     select: {
-      isSanctioned: true,
       isOnboarded: true,
       piiUpdatedAt: true,
-      sanctionReason: true,
     },
     where: {
       id: userId,
@@ -59,10 +50,6 @@ export async function updateUserById(userId: number, data: Data) {
       isOnboarded,
     },
   })
-
-  if (checkSanctionResult?.isSanctioned && checkSanctionResult?.sanctionReason) {
-    await sendSanctionNotification({ userId, sanctionReason: checkSanctionResult.sanctionReason })
-  }
 
   return result
 }

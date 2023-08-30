@@ -1,5 +1,4 @@
 import { DocumentMagnifyingGlassIcon, DocumentTextIcon, PlusCircleIcon } from '@heroicons/react/24/solid'
-import { yupResolver } from '@hookform/resolvers/yup'
 import { Layout } from 'components/Layout'
 import { PageAlert, useAlertDispatcher } from 'components/Layout/Alerts'
 import { TaxForm } from 'components/ProfileSettings/TaxForm'
@@ -10,7 +9,6 @@ import { WalletList } from 'components/User/WalletList'
 import { Button } from 'components/shared/Button'
 import { StatusBadge } from 'components/shared/Status'
 import { findUserByIdAndEmail, findUserTaxForm } from 'domain/user'
-import { personalInformationCheckValidator } from 'domain/user/validation'
 import { api } from 'lib/api'
 import { classNames } from 'lib/classNames'
 import { fetcher } from 'lib/fetcher'
@@ -59,7 +57,6 @@ export default function UserSettings({ data, taxForm }: UserSettingsProps) {
     formState: { errors, isSubmitting, isDirty },
     reset,
   } = useForm<FormValuePersonal>({
-    resolver: yupResolver(personalInformationCheckValidator),
     defaultValues: {
       firstName: data?.firstName || '',
       lastName: data?.lastName || '',
@@ -284,17 +281,6 @@ UserSettings.getLayout = function getLayout(page: ReactElement) {
 }
 
 export const getServerSideProps = withUserSSR(async function getServerSideProps({ user }) {
-  const { isSanctioned, isReviewedByCompliance } = user
-
-  if (isReviewedByCompliance && isSanctioned) {
-    return {
-      redirect: {
-        destination: '/flagged-account',
-        permanent: false,
-      },
-    }
-  }
-
   const { data } = await findUserByIdAndEmail({ userId: user.id, email: user.email })
   const taxForm = await findUserTaxForm(user.id)
   const masterWallet = getMasterWallet()

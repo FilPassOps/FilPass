@@ -139,11 +139,6 @@ const formatStatus = ({ status, role }: FormatStatusProps) => {
       return 'On Hold' //ON_HOLD is an alias for BLOCKED
     case 'PROCESSING':
       return 'Processing'
-    case 'REJECTED_BY_COMPLIANCE':
-      if (role !== USER_ROLE) {
-        return 'Rejected by Compliance'
-      }
-      return 'Rejected'
     default:
       return status
   }

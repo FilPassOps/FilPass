@@ -2,7 +2,6 @@
 import {
   BanknotesIcon,
   DocumentTextIcon,
-  FlagIcon,
   FolderIcon,
   HomeIcon,
   IdentificationIcon,
@@ -22,7 +21,6 @@ import { SUPPORT_EMAIL } from 'system.config'
 import {
   ADDRESS_MANAGER_ROLE,
   APPROVER_ROLE,
-  COMPLIANCE_ROLE,
   CONTROLLER_ROLE,
   FINANCE_ROLE,
   SUPERADMIN_ROLE,
@@ -72,7 +70,7 @@ const navigation = [
     target: '/approvals',
     text: 'My Approvals',
     icon: DocumentTextIcon,
-    roles: [APPROVER_ROLE, COMPLIANCE_ROLE, VIEWER_ROLE],
+    roles: [APPROVER_ROLE, VIEWER_ROLE],
     items: [
       {
         filter: `status=${SUBMITTED_STATUS}`,
@@ -112,7 +110,7 @@ const navigation = [
       {
         filter: `status=${ON_HOLD_STATUS}`,
         text: 'On Hold',
-        roles: [APPROVER_ROLE, COMPLIANCE_ROLE],
+        roles: [APPROVER_ROLE],
       },
       {
         filter: `status=${DRAFT_STATUS}`,
@@ -173,34 +171,6 @@ const navigation = [
     text: 'User Address',
     icon: IdentificationIcon,
     roles: [ADDRESS_MANAGER_ROLE],
-  },
-  {
-    target: '/compliance',
-    text: 'Compliance',
-    icon: FlagIcon,
-    roles: [COMPLIANCE_ROLE],
-    items: [
-      {
-        filter: `status=FLAGGED`,
-        text: 'Flagged',
-        roles: [COMPLIANCE_ROLE],
-      },
-      {
-        filter: `status=BLOCKED`,
-        text: 'Blocked',
-        roles: [COMPLIANCE_ROLE],
-      },
-      {
-        filter: `status=UNBLOCKED`,
-        text: 'Unblocked',
-        roles: [COMPLIANCE_ROLE],
-      },
-      {
-        filter: `status=ALL`,
-        text: 'All users',
-        roles: [COMPLIANCE_ROLE],
-      },
-    ],
   },
   {
     target: '/tax-review',

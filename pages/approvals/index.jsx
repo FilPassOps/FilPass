@@ -13,7 +13,7 @@ import { PaginationWrapper, checkItemsPerPage } from 'components/shared/usePagin
 import { PLATFORM_NAME } from 'system.config'
 import { stringify } from 'csv-stringify/sync'
 import { getApprovalsByRole } from 'domain/approvals/service'
-import { APPROVER_ROLE, COMPLIANCE_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
+import { APPROVER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
 import { BLOCKED_STATUS, ON_HOLD_STATUS, SUBMITTED_BY_APPROVER_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
 import JsFileDownload from 'js-file-download'
 import { api } from 'lib/api'
@@ -295,7 +295,7 @@ Approvals.getLayout = function getLayout(page) {
   return <Layout title="My Approvals">{page}</Layout>
 }
 
-export const getServerSideProps = withRolesSSR([APPROVER_ROLE, COMPLIANCE_ROLE, VIEWER_ROLE], async ({ user: { id, roles }, query }) => {
+export const getServerSideProps = withRolesSSR([APPROVER_ROLE, VIEWER_ROLE], async ({ user: { id, roles }, query }) => {
   const pageSize = checkItemsPerPage(query.itemsPerPage) ? parseInt(query.itemsPerPage) : 100
   const page = parseInt(query.page) || 1
   const programId = query.programId || null

@@ -16,9 +16,8 @@ CREATE OR REPLACE FUNCTION getnextpublicidbigint() RETURNS TEXT
     END;
 $$;
 
-
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('USER', 'APPROVER', 'CONTROLLER', 'SUPERADMIN', 'ADDRESS_MANAGER', 'COMPLIANCE', 'VIEWER', 'FINANCE');
+CREATE TYPE "Role" AS ENUM ('USER', 'APPROVER', 'CONTROLLER', 'SUPERADMIN', 'ADDRESS_MANAGER', 'VIEWER', 'FINANCE');
 
 -- CreateEnum
 CREATE TYPE "TransferStatus" AS ENUM ('PENDING', 'SUCCESS', 'FAILED', 'REJECTED');
@@ -30,7 +29,7 @@ CREATE TYPE "TransferRequestReviewStatus" AS ENUM ('APPROVED', 'REJECTED', 'REQU
 CREATE TYPE "DeliveryMethod" AS ENUM ('ONE_TIME', 'LINEAR_VESTING');
 
 -- CreateEnum
-CREATE TYPE "TransferRequestStatus" AS ENUM ('SUBMITTED', 'VOIDED', 'APPROVED', 'PROCESSING', 'REJECTED_BY_APPROVER', 'REQUIRES_CHANGES', 'PAID', 'REJECTED_BY_CONTROLLER', 'SUBMITTED_BY_APPROVER', 'BLOCKED', 'REJECTED_BY_COMPLIANCE');
+CREATE TYPE "TransferRequestStatus" AS ENUM ('SUBMITTED', 'VOIDED', 'APPROVED', 'PROCESSING', 'REJECTED_BY_APPROVER', 'REQUIRES_CHANGES', 'PAID', 'REJECTED_BY_CONTROLLER', 'SUBMITTED_BY_APPROVER', 'BLOCKED');
 
 -- CreateEnum
 CREATE TYPE "FileType" AS ENUM ('W8_FORM', 'W9_FORM', 'ATTACHMENT');
@@ -60,8 +59,6 @@ CREATE TABLE "user" (
     "last_name" TEXT,
     "date_of_birth" TEXT,
     "country_residence" TEXT,
-    "is_sanctioned" BOOLEAN,
-    "sanction_reason" TEXT,
     "is_us_resident" BOOLEAN,
     "is_verified" BOOLEAN NOT NULL DEFAULT false,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
@@ -71,7 +68,6 @@ CREATE TABLE "user" (
     "pii_updated_at" TIMESTAMP(3),
     "terms" JSONB,
     "is_onboarded" BOOLEAN NOT NULL DEFAULT false,
-    "is_reviewed_compliance" BOOLEAN NOT NULL DEFAULT false,
     "is_banned" BOOLEAN NOT NULL DEFAULT false,
     "ban_reason" TEXT,
     "ban_actioned_by_id" INTEGER,
@@ -225,10 +221,8 @@ CREATE TABLE "transfer_request" (
     "date_of_birth" TEXT,
     "country_residence" TEXT,
     "is_us_resident" BOOLEAN,
-    "is_sanctioned" BOOLEAN,
     "is_legacy" BOOLEAN NOT NULL DEFAULT false,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
-    "sanction_reason" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "expected_transfer_date" TIMESTAMP(3) NOT NULL,
@@ -670,13 +664,3 @@ ALTER TABLE "auth_verification" ADD CONSTRAINT "auth_verification_user_id_fkey" 
 
 -- AddForeignKey
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- CURRENCIES
-INSERT INTO currency (id, name, rate, updated_at) VALUES (1, 'FIL', 1, now());
-INSERT INTO currency(id, name, rate, updated_at)  VALUES (2, 'USD', 0, now());
-
--- CURRENCY UNITS
-INSERT INTO currency_unit(id, currency_id, name, scale, updated_at) VALUES (1, 1, 'FIL', 0, now());
-INSERT INTO currency_unit(id, currency_id, name, scale, updated_at) VALUES (2, 1, 'NANOFIL', -9, now());
-INSERT INTO currency_unit(id, currency_id, name, scale, updated_at) VALUES (3, 1, 'ATTOFIL', -18, now());
-INSERT INTO currency_unit(id, currency_id, name, scale, updated_at) VALUES (4, 2, 'USD', 0, now());

@@ -34,17 +34,6 @@ CreateTransferRequest.getLayout = function getLayout(page: ReactElement) {
 }
 
 export const getServerSideProps = withUserSSR(async function getServerSideProps({ user, query }) {
-  const { isSanctioned, isReviewedByCompliance, roles } = user
-
-  if (isReviewedByCompliance && isSanctioned) {
-    return {
-      redirect: {
-        destination: '/flagged-account',
-        permanent: false,
-      },
-    }
-  }
-
   const { data: programs } = await findAllExternalPrograms()
   const masterWallet = getMasterWallet()
 

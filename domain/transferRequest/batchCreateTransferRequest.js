@@ -207,8 +207,6 @@ export async function buildTransferRequestData(requests, requesterId, approverRo
       lastName: (receiver.lastName && (await encryptPII(receiver.lastName))) || undefined,
       dateOfBirth: (receiver.dateOfBirth && (await encryptPII(receiver.dateOfBirth))) || undefined,
       countryResidence: (receiver.countryResidence && (await encryptPII(receiver.countryResidence))) || undefined,
-      isSanctioned: receiver.isSanctioned,
-      sanctionReason: receiver.isSanctioned && receiver.sanctionReason ? await encryptPII(receiver.sanctionReason) : undefined,
       status: SUBMITTED_BY_APPROVER_STATUS,
       userFileId: taxForm?.id,
       currencyUnitId: singleRequest.currencyUnitId,
