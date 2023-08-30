@@ -22,6 +22,8 @@ import yup from 'lib/yup'
 import { PLATFORM_NAME } from 'system.config'
 import { taxFormValidator } from 'domain/user/validation'
 import Head from 'next/head'
+import { personalInformationCheckValidator } from 'domain/user/validation'
+import { yupResolver } from '@hookform/resolvers/yup'
 
 type FormValuePersonal = PersonalInformationFieldGroupValues
 
@@ -57,6 +59,7 @@ export default function UserSettings({ data, taxForm }: UserSettingsProps) {
     formState: { errors, isSubmitting, isDirty },
     reset,
   } = useForm<FormValuePersonal>({
+    resolver: yupResolver(personalInformationCheckValidator),
     defaultValues: {
       firstName: data?.firstName || '',
       lastName: data?.lastName || '',

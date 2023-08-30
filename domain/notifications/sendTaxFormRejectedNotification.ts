@@ -30,8 +30,11 @@ export async function sendTaxFormRejectedNotification(params: SendTaxFormRejecte
     html: emailBody,
   }
   const fulfilledPromises = await sendBatchEmail(content)
+
   const rejecteds = fulfilledPromises?.filter(fulfilledPromise => fulfilledPromise.status === 'rejected') as PromiseRejectedResult[]
-  rejecteds.forEach(rejected => logger.error(`Failed to notify user - could not send email for email:${rejected.reason.email}`, rejected.reason.error))
+  rejecteds?.forEach(rejected =>
+    logger.error(`Failed to notify user - could not send email for email:${rejected.reason.email}`, rejected.reason.error),
+  )
 }
 
 const getBody = (rejectionReason: string) => {

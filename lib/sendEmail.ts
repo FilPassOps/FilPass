@@ -36,7 +36,7 @@ interface SendBatchEmailProps {
 }
 
 export const sendBatchEmail = async ({ recipients, subject, text = '', html = '' }: SendBatchEmailProps) => {
-  if (!recipients || recipients.length) return null
+  if (!recipients || !recipients.length) return null
 
   const recipientChunks = chunk(recipients, 1000)
   const sendEmailPromisses = recipientChunks.map(recipient => {
