@@ -1,6 +1,6 @@
 import { sendSubmittedNotification } from 'domain/notifications/sendSubmittedNotification'
 import { BLOCKED_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
-import { findUserTaxForm, isUserSanctioned } from 'domain/user'
+import { findUserTaxForm } from 'domain/user'
 import { encrypt, encryptPII } from 'lib/emissaryCrypto'
 import { TransactionError } from 'lib/errors'
 import { generateTeamHash } from 'lib/password'
@@ -41,13 +41,12 @@ export async function submitDraftTransferRequestById(params: SubmitDraftTransfer
 
   const { firstName, lastName, dateOfBirth: dateOfBirthString, countryResidence, terms, isUSResident } = user
   const dateOfBirth = dateOfBirthString ? new Date(dateOfBirthString) : null
-  const checkSanctionResult = await isUserSanctioned(userId)
   const formFile = await findUserTaxForm(userId)
 
   return await newPrismaTransaction(async fnPrisma => {
     let status: TransferRequestStatus = SUBMITTED_STATUS
 
-    if (checkSanctionResult === null || checkSanctionResult.isSanctioned || !formFile?.isApproved) {
+    if (!formFile?.isApproved) {
       status = BLOCKED_STATUS //BLOCKED and ON_HOLD mean the same
     }
 
@@ -77,11 +76,6 @@ export async function submitDraftTransferRequestById(params: SubmitDraftTransfer
         requesterId: applyerId,
         currencyUnitId,
         attachmentId: attachmentFile?.id,
-        isSanctioned: checkSanctionResult?.isSanctioned,
-        sanctionReason:
-          checkSanctionResult?.isSanctioned && checkSanctionResult?.sanctionReason
-            ? await encryptPII(checkSanctionResult?.sanctionReason)
-            : null,
         status,
       },
       include: {

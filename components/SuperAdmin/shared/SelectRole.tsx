@@ -3,7 +3,6 @@ import { MultipleSelectInput } from 'components/shared/FormInput'
 import {
   ADDRESS_MANAGER_ROLE,
   APPROVER_ROLE,
-  COMPLIANCE_ROLE,
   CONTROLLER_ROLE,
   FINANCE_ROLE,
   SUPERADMIN_ROLE,
@@ -41,7 +40,6 @@ export const SelectRoles = ({ user, scrolled }: SelectRolesProps) => {
     { value: CONTROLLER_ROLE, label: 'Controller', disabled: false, tooltip: undefined },
     { value: ADDRESS_MANAGER_ROLE, label: 'Address Manager', disabled: false, tooltip: undefined },
     { value: SUPERADMIN_ROLE, label: 'Superadmin', disabled: false, tooltip: undefined },
-    { value: COMPLIANCE_ROLE, label: 'Compliance' },
     { value: FINANCE_ROLE, label: 'Finance' },
     viewerOption,
   ]

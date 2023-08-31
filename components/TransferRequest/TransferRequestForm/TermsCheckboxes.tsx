@@ -29,7 +29,7 @@ export const TermsCheckboxes = ({ errors, terms, register, setValue }: TermsChec
     <div className="space-y-4">
       <CheckboxInput
         id="terms.transferAuthorization"
-        value={terms.transferAuthorization}
+        value={terms.transferAuthorization || ''}
         error={errors.terms?.transferAuthorization}
         {...register('terms.transferAuthorization', {
           onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -42,7 +42,7 @@ export const TermsCheckboxes = ({ errors, terms, register, setValue }: TermsChec
 
       <CheckboxInput
         id="terms.walletAddress"
-        value={terms.walletAddress}
+        value={terms.walletAddress || ''}
         {...register('terms.walletAddress', {
           onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
             onChange({ key: 'walletAddress', checked: e.target.checked, setValue, text: walletAddressText }),
@@ -55,7 +55,7 @@ export const TermsCheckboxes = ({ errors, terms, register, setValue }: TermsChec
 
       <CheckboxInput
         id="terms.soleControl"
-        value={terms.soleControl}
+        value={terms.soleControl || ''}
         {...register('terms.soleControl', {
           onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
             onChange({ key: 'soleControl', checked: e.target.checked, setValue, text: soleControlText }),
@@ -68,7 +68,7 @@ export const TermsCheckboxes = ({ errors, terms, register, setValue }: TermsChec
 
       <CheckboxInput
         id="terms.satisfactionOfObligations"
-        value={terms.satisfactionOfObligations}
+        value={terms.satisfactionOfObligations || ''}
         {...register('terms.satisfactionOfObligations', {
           onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
             onChange({ key: 'satisfactionOfObligations', checked: e.target.checked, setValue, text: satisfactionOfObligationsText }),
@@ -81,7 +81,7 @@ export const TermsCheckboxes = ({ errors, terms, register, setValue }: TermsChec
 
       <CheckboxInput
         id="terms.informedDecision"
-        value={terms.informedDecision}
+        value={terms.informedDecision || ''}
         {...register('terms.informedDecision', {
           onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
             onChange({ key: 'informedDecision', checked: e.target.checked, setValue, text: informedDecisionText }),
@@ -94,7 +94,7 @@ export const TermsCheckboxes = ({ errors, terms, register, setValue }: TermsChec
 
       <CheckboxInput
         id="terms.tax"
-        value={terms.tax}
+        value={terms.tax || ''}
         {...register('terms.tax', {
           onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
             onChange({ key: 'tax', checked: e.target.checked, setValue, text: taxText }),
@@ -107,7 +107,7 @@ export const TermsCheckboxes = ({ errors, terms, register, setValue }: TermsChec
 
       <CheckboxInput
         id="terms.release"
-        value={terms.release}
+        value={terms.release || ''}
         error={errors.terms?.release}
         {...register('terms.release', {
           onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -120,7 +120,7 @@ export const TermsCheckboxes = ({ errors, terms, register, setValue }: TermsChec
 
       <CheckboxInput
         id="terms.sanctions"
-        value={terms.sanctions}
+        value={terms.sanctions || ''}
         error={errors.terms?.sanctions}
         {...register('terms.sanctions', {
           onChange: (e: React.ChangeEvent<HTMLInputElement>) =>

@@ -71,7 +71,6 @@ export async function financeUserFileReview(params: FinanceUserFileReviewParams)
             ],
           },
       isActive: true,
-      isSanctioned: false,
     },
   })
 

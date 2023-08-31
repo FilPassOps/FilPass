@@ -22,8 +22,6 @@
 | `MAILGUN_DOMAIN`                | ` `                     | The Mailgun domain if using the default implementation.                                                                      |
 | `MAILGUN_API_KEY`               | ` `                     | The Mailgun API key if using the default implementation.                                                                     |
 | `MAILGUN_SENDER_EMAIL`          | `no-reply@example.com`  | The Mailgun sender email if using the default implementation.                                                                |
-| `SANCTION_EMAIL_RECEIVER`       | ` `                     | The email address that will receive emails when a user is marked as possible sanctioned.                                     |
-| `BYPASS_ALLOWED_DOMAINS`        | `@gmail.com`            | The domains that will bypass sanctioned checks and tax form validations when the approver creates transfer request in batch. |
 | `GOOGLE_CLIENT_SECRET`          | ` `                     | The Google client secret used to login with Google.                                                                          |
 | `NEXT_PUBLIC_GOOGLE_CLIENT_ID`  | ` `                     | The public google client id used to login with Google.                                                                       |
 | `LOTUS_LITE_NODE_API_ENDPOINT`  | ` `                     | The API key used to perform validations when using a Filecoin wallet                                                         |

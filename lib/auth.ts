@@ -1,7 +1,6 @@
 import {
   ADDRESS_MANAGER_ROLE,
   APPROVER_ROLE,
-  COMPLIANCE_ROLE,
   CONTROLLER_ROLE,
   FINANCE_ROLE,
   SUPERADMIN_ROLE,
@@ -16,7 +15,6 @@ export const RoleToRequestAttributeMap = {
   [ADDRESS_MANAGER_ROLE]: 'addressManagerId',
   [SUPERADMIN_ROLE]: 'superAdminId',
   [USER_ROLE]: 'userRoleId',
-  [COMPLIANCE_ROLE]: 'complianceId',
   [VIEWER_ROLE]: 'viewerId',
   [FINANCE_ROLE]: 'financeId',
 }

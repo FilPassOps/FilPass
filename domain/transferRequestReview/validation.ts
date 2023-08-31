@@ -44,17 +44,3 @@ export const batchRejectTransferRequestValidator = yup
     notes: yup.string().required(),
   })
   .required()
-
-export const userComplianceReviewValidator = yup
-  .object({
-    id: yup.number().required(),
-    complianceUserRoleId: yup
-      .number()
-      .integer()
-      .positive()
-      .max(MAX_INTEGER_VALUE)
-      .typeError(errorsMessages.required_field.message)
-      .required(),
-    isSanctioned: yup.boolean().required(),
-  })
-  .required()

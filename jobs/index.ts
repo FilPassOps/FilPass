@@ -1,8 +1,6 @@
 import Bottleneck from 'bottleneck'
-import checkSanctions from 'jobs/check-sanctions'
 import deactivateAllUsersTaxForms from 'jobs/deactivate-all-users-tax-form'
 import schedule from 'node-schedule'
-import { SANCTION_CHECK_ENABLED } from 'system.config'
 import blockchainWatcher from './blockchain-watcher'
 import checkAwaitingTaxFormReviewNotification from './check-awaiting-tax-form-review-notification'
 import checkPendingTransfer from './check-pending-transfer'
@@ -26,10 +24,6 @@ const job = (limiter: Bottleneck, job: () => Promise<void>) => {
       }
     }
   }
-}
-
-if (SANCTION_CHECK_ENABLED) {
-  schedule.scheduleJob('0 * * * *', checkSanctions)
 }
 
 schedule.scheduleJob('0 0 1 1 *', deactivateAllUsersTaxForms)

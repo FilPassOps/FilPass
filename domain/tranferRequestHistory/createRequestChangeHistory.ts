@@ -73,8 +73,6 @@ export const getFilteredObject = (request: any) => {
     lastName,
     dateOfBirth,
     countryResidence,
-    isSanctioned,
-    sanctionReason,
     createdAt,
     updatedAt,
     notifications,

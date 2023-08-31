@@ -62,17 +62,6 @@ EditTransferRequest.getLayout = function getLayout(page: ReactElement) {
 }
 
 export const getServerSideProps = withUserSSR(async ({ user, query }) => {
-  const { isSanctioned, isReviewedByCompliance } = user
-
-  if (isReviewedByCompliance && isSanctioned) {
-    return {
-      redirect: {
-        destination: '/flagged-account',
-        permanent: false,
-      },
-    }
-  }
-
   const { data, error: dataError } = await getUserTransferRequestById({
     transferRequestId: query.id as string,
     userId: user.id,

@@ -1,5 +1,5 @@
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
-import { ViewReasonModal } from 'components/Compliance/Modals/ViewReasonModal'
+import { ViewReasonModal } from 'components/shared/ViewReasonModal'
 import { Button } from 'components/shared/Button'
 import Sortable from 'components/shared/Sortable'
 import { Cell, Header, Table, TableBody, TableHead } from 'components/shared/Table'

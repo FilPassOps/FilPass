@@ -1,6 +1,6 @@
 import { sendCreatedNotification } from 'domain/notifications/sendCreatedNotification'
 import { findAllExternalPrograms } from 'domain/programs/findAll'
-import { findUserTaxForm, isUserSanctioned } from 'domain/user'
+import { findUserTaxForm } from 'domain/user'
 import { encrypt, encryptPII } from 'lib/emissaryCrypto'
 import { generateTeamHash } from 'lib/password'
 import prisma from 'lib/prisma'
@@ -74,11 +74,10 @@ export async function createTransferRequest(params: CreateTransferRequestParams)
   }
 
   const formFile = await findUserTaxForm(user.id)
-  const checkSanctionResult = await isUserSanctioned(user.id)
 
   let status: TransferRequestStatus = SUBMITTED_STATUS
 
-  if (checkSanctionResult === null || checkSanctionResult.isSanctioned || !formFile?.isApproved) {
+  if (!formFile?.isApproved) {
     status = BLOCKED_STATUS //BLOCKED and ON_HOLD mean the same
   }
 
@@ -105,11 +104,6 @@ export async function createTransferRequest(params: CreateTransferRequestParams)
       requesterId: user.id,
       currencyUnitId,
       attachmentId: userAttachmentId ? attachmentFile?.id : undefined,
-      isSanctioned: checkSanctionResult?.isSanctioned,
-      sanctionReason:
-        checkSanctionResult?.isSanctioned && checkSanctionResult.sanctionReason
-          ? await encryptPII(checkSanctionResult.sanctionReason)
-          : null,
       status,
     },
     include: {

@@ -56,13 +56,6 @@ export const getUserTransferRequestByIdValidator = yup
   })
   .required()
 
-export const getCompliaceTransferRequestByIdValidator = yup
-  .object({
-    transferRequestId: yup.string().required(),
-    status: yup.mixed().oneOf(Object.values(TransferRequestStatus)).optional(),
-  })
-  .required()
-
 export const getTransferRequestByIdValidator = yup
   .object({
     transferRequestId: yup.string().required(),
@@ -72,23 +65,6 @@ export const getTransferRequestByIdValidator = yup
 
 export const getViewerTransferRequestsValidator = yup.object({
   viewerId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).typeError(errorsMessages.required_field.message).required(),
-  programId: yup.array(yup.number().integer().positive().max(MAX_INTEGER_VALUE)).optional(),
-  requestNumber: yup.string().optional(),
-  teamHashes: yup.array(yup.string().required()).optional(),
-  from: yup.date().optional(),
-  to: yup.date().when('from', {
-    is: (from: Date) => !!from,
-    then: schema => schema.required(),
-    otherwise: schema => schema.optional(),
-  }),
-  wallets: yup.array(yup.string().required()).optional(),
-  page: yup.number().integer().positive().max(MAX_INTEGER_VALUE),
-  size: yup.number().integer().positive().max(MAX_INTEGER_VALUE),
-  sort: yup.mixed().oneOf(['number', 'program', 'create_date']),
-  order: yup.mixed().oneOf(['asc', 'desc']),
-})
-
-export const getComplianceTransferRequestsValidator = yup.object({
   programId: yup.array(yup.number().integer().positive().max(MAX_INTEGER_VALUE)).optional(),
   requestNumber: yup.string().optional(),
   teamHashes: yup.array(yup.string().required()).optional(),

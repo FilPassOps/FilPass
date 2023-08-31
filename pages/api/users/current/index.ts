@@ -13,7 +13,6 @@ export interface UpdateUserRequest {
 }
 
 export interface UpdateUserResponse {
-  isSanctioned: boolean
   isOnboarded: boolean
   piiUpdatedAt: Date
 }
@@ -58,8 +57,6 @@ const handler: NextApiHandlerWithUser<UpdateUserResponse | unknown, ExtendedRequ
 
   await updateUserOnHoldTranferRequests({
     userId: user.id,
-    isSanctioned: result.isSanctioned ?? true,
-    sanctionReason: result.sanctionReason,
   })
 
   return res.status(200).json(result)

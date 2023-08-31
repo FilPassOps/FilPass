@@ -12,10 +12,6 @@ CRYPTO_SECRET_KEY="<Random 256 bit 32 Byte Hex>"
 CRYPTO_SECRET_KEY_PII="<Random 256 bit 32 Byte Hex>"
 ```
 
-### Breaking changes
-
-- `OFAC_SANCTION_EMAIL_RECEIVER` changed to `SANCTION_EMAIL_RECEIVER`
-
 ## Version 2.0.0
 
 ### New ENV vars:

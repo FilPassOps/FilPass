@@ -1,5 +1,5 @@
 import { getApprovalsByRole } from 'domain/approvals/service'
-import { APPROVER_ROLE, COMPLIANCE_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
+import { APPROVER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
 import { BLOCKED_STATUS, ON_HOLD_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
 import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { getEthereumAddress } from 'lib/getEthereumAddress'
@@ -56,4 +56,4 @@ const handler = async (req, res) => {
   return res.status(200).json(data)
 }
 
-export default newHandler(withRoles([APPROVER_ROLE, COMPLIANCE_ROLE, VIEWER_ROLE], withMethods(['GET'], handler)))
+export default newHandler(withRoles([APPROVER_ROLE, VIEWER_ROLE], withMethods(['GET'], handler)))

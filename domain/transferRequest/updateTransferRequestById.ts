@@ -1,7 +1,7 @@
 import { APPROVER_ROLE, USER_ROLE } from 'domain/auth/constants'
 import { findAllExternalPrograms } from 'domain/programs/findAll'
 import { createRequestChangeHistory } from 'domain/tranferRequestHistory/createRequestChangeHistory'
-import { findUserTaxForm, isUserSanctioned } from 'domain/user'
+import { findUserTaxForm } from 'domain/user'
 import { encrypt, encryptPII } from 'lib/emissaryCrypto'
 import { TransactionError } from 'lib/errors'
 import prisma, { newPrismaTransaction } from 'lib/prisma'
@@ -127,9 +127,7 @@ export async function updateTransferRequestById(params: UpdateTransferRequestPar
       where: { publicId: userAttachmentId, OR: [{ uploaderId: userId }, { userId }] },
     })
 
-    const checkSanctionResult = await isUserSanctioned(user.id)
-
-    if (checkSanctionResult === null || checkSanctionResult.isSanctioned || !formFile?.isApproved) {
+    if (!formFile?.isApproved) {
       nextStatus = BLOCKED_STATUS //BLOCKED and ON_HOLD mean the same
     }
 
@@ -152,11 +150,6 @@ export async function updateTransferRequestById(params: UpdateTransferRequestPar
         status: nextStatus,
         currencyUnitId,
         attachmentId: userAttachmentId ? attachmentFile.id : null,
-        isSanctioned: checkSanctionResult?.isSanctioned,
-        sanctionReason:
-          checkSanctionResult?.isSanctioned && checkSanctionResult.sanctionReason
-            ? await encryptPII(checkSanctionResult?.sanctionReason)
-            : null,
       },
       include: {
         wallet: true,

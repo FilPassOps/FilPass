@@ -11,14 +11,13 @@ const parseDateOfBirth = async dateOfBirth => {
   return `${month.padStart(2, '0')}/${day.padStart(2, '0')}/${year}`
 }
 
-const decryptUser = async ({ email, firstName, lastName, dateOfBirth, countryResidence, sanctionReason, ...rest }) => ({
+const decryptUser = async ({ email, firstName, lastName, dateOfBirth, countryResidence, ...rest }) => ({
   ...rest,
   ...(email && { email: await decryptPII(email) }),
   ...(firstName && { firstName: await decryptPII(firstName) }),
   ...(lastName && { lastName: await decryptPII(lastName) }),
   ...(dateOfBirth && { dateOfBirth: await parseDateOfBirth(dateOfBirth) }),
   ...(countryResidence && { countryResidence: await decryptPII(countryResidence) }),
-  ...(sanctionReason && { sanctionReason: await decryptPII(sanctionReason) }),
 })
 
 const userMiddleware = async (params, next) => {
@@ -37,7 +36,7 @@ const userMiddleware = async (params, next) => {
   return await next(params)
 }
 
-const decryptTransferRequest = async ({ amount, team, firstName, lastName, dateOfBirth, countryResidence, sanctionReason, ...rest }) => ({
+const decryptTransferRequest = async ({ amount, team, firstName, lastName, dateOfBirth, countryResidence, ...rest }) => ({
   ...rest,
   ...(amount && { amount: await decrypt(amount) }),
   ...(team && { team: await decryptPII(team) }),
@@ -45,7 +44,6 @@ const decryptTransferRequest = async ({ amount, team, firstName, lastName, dateO
   ...(lastName && { lastName: await decryptPII(lastName) }),
   ...(dateOfBirth && { dateOfBirth: await parseDateOfBirth(dateOfBirth) }),
   ...(countryResidence && { countryResidence: await decryptPII(countryResidence) }),
-  ...(sanctionReason && { sanctionReason: await decryptPII(sanctionReason) }),
 })
 
 const transferRequestMiddleware = async (params, next) => {
