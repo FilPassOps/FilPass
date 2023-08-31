@@ -13,7 +13,7 @@ import { formatCrypto, formatCurrency } from 'lib/currency'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { TOKEN } from 'system.config'
+import { TOKEN, getChainByName } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { ErrorAlert, SuccessAlert } from './Alerts'
 import PaymentBatch from './PaymentBatch'
@@ -120,7 +120,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
   const rate = filecoin?.rate || 1
   const updatedAt = DateTime.fromISO(filecoin?.updatedAt).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS)
 
-  const doForward = async (batch: TransferRequest[], forwardFunction: ForwardNonBLS) => {
+  const doForward = async (batch: TransferRequest[], forwardFunction: ForwardNonBLS, blockchainName: string) => {
     if (!wallet) {
       dispatch({
         type: 'warning',
@@ -184,7 +184,9 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
         config: {
           closeable: true,
         },
-        body: () => <SuccessAlert hash={hash} handleClose={() => close()} />,
+        body: () => (
+          <SuccessAlert hash={hash} blockExplorerUrl={getChainByName(blockchainName).blockExplorer.url} handleClose={() => close()} />
+        ),
       })
       return true
     } catch (error: any) {

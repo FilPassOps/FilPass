@@ -1,5 +1,6 @@
 import MetaMaskOnboarding from '@metamask/onboarding'
 import { Button, ButtonProps } from 'components/shared/Button'
+import { useRouter } from 'next/router'
 import { Dispatch, MouseEventHandler, ReactNode, SetStateAction, createContext, useContext, useEffect, useRef, useState } from 'react'
 import { CONFIG, getMetamaskParam } from 'system.config'
 
@@ -78,6 +79,7 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode | undefined
   const [wallet, setWallet] = useState<string>()
   const [chainId, setChainId] = useState<string>()
   const [busy, setBusy] = useState(false)
+  const { asPath } = useRouter()
 
   const handleNewAccounts = async ([wallet]: Array<string>) => {
     setWallet(wallet)
@@ -108,8 +110,11 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode | undefined
 
   useEffect(() => {
     if (MetaMaskOnboarding.isMetaMaskInstalled()) {
-      const onChainChanged = () => {
-        window.location.reload()
+      const onChainChanged = (chainId: string) => {
+        setChainId(chainId)
+        if (asPath.includes('/disbursement')) {
+          window.location.reload()
+        }
       }
       window.ethereum.on('chainChanged', onChainChanged)
 
@@ -117,7 +122,7 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode | undefined
         window.ethereum.removeListener('chainChanged', onChainChanged)
       }
     }
-  }, [])
+  }, [asPath])
 
   useEffect(() => {
     if (MetaMaskOnboarding.isMetaMaskInstalled()) {

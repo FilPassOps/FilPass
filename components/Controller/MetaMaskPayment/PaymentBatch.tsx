@@ -51,7 +51,7 @@ interface BatchProps {
   batchData: PaymentBatchData
   filecoin: any
   rate: number
-  forwardHandler: (batch: TransferRequest[], forwardFunction: ForwardNonBLS) => Promise<boolean>
+  forwardHandler: (batch: TransferRequest[], forwardFunction: ForwardNonBLS, blockchainName: string) => Promise<boolean>
   setIsBatchSent: (isBatchSent: boolean) => void
   setIsChunkHextMatch: (isChunkHextMatch: boolean) => void
   setHextMatch: (transferRequests: TransferRequest[]) => void
@@ -148,7 +148,7 @@ const PaymentBatch = ({
               className="w-full md:w-auto"
               targetChainId={getChainByName(blockchainName).chainId}
               onClick={async () => {
-                const sent = await forwardHandler(data, forwardNonBLS)
+                const sent = await forwardHandler(data, forwardNonBLS, blockchainName)
                 setIsBatchSent(sent)
               }}
             >
