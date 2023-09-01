@@ -1,4 +1,3 @@
-import config from 'chains.config'
 import { Button } from 'components/shared/Button'
 import { useState } from 'react'
 
@@ -37,12 +36,16 @@ export const ErrorAlert: React.FC<React.PropsWithChildren<ErrorAlertProps>> = ({
   )
 }
 
-export const SuccessAlert: React.FC<React.PropsWithChildren<{ hash: string; handleClose: () => void }>> = ({ hash, handleClose }) => (
+export const SuccessAlert: React.FC<React.PropsWithChildren<{ hash: string; handleClose: () => void; blockExplorerUrl: string }>> = ({
+  hash,
+  handleClose,
+  blockExplorerUrl,
+}) => (
   <>
     <p className="text-sm text-gray-500 mb-4 text-center">Your payment has been successfully sent.</p>
     <div className="mt-4 text-sm text-gray-500 text-center mb-4">
       <a
-        href={`${config.chain.blockExplorerUrls[0]}/${hash}`}
+        href={`${blockExplorerUrl}/${hash}`}
         onClick={() => handleClose()}
         rel="noreferrer"
         target="_blank"

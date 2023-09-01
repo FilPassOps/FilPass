@@ -8,6 +8,7 @@ import { useRouter } from 'next/router'
 import { DetailedHTMLProps, Dispatch, Fragment, LabelHTMLAttributes, SetStateAction, forwardRef, useEffect, useRef, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
+import { CONFIG } from 'system.config'
 import { StatusFilterOption, statusFilterLabel, statusFilterOptions } from './constants'
 
 interface SelectOption {
@@ -26,6 +27,15 @@ export const Filters = ({ programs, statusOptions, teams, dateFilterLabel = 'Cre
   const { query, push } = useRouter()
   const [filtersModalOpen, setFiltersModalOpen] = useState(false)
   let selectedFilters = 0
+
+  const networks = query.network
+    ?.toString()
+    .split(',')
+    .map(network => network)
+
+  const initialNetworkFilter: SelectOption[] = CONFIG.chains
+    .filter(chain => networks?.includes(chain.name))
+    .map(chain => ({ value: chain.name, label: chain.name }))
 
   const programIds = query.programId
     ?.toString()
@@ -52,6 +62,7 @@ export const Filters = ({ programs, statusOptions, teams, dateFilterLabel = 'Cre
 
   const initialWalletAddress = query.wallet?.toString()?.toLowerCase() ?? ''
 
+  const [selectedNetwork, setSelectedNetwork] = useState<SelectOption[]>(initialNetworkFilter || [])
   const [selectedPrograms, setSelectedPrograms] = useState<SelectOption[]>(initialProgramsFilter || [])
   const [requestNumber, setRequestNumber] = useState(initialRequestNumberFilter)
   const [selectedStatus, setSelectedStatus] = useState<StatusFilterOption | undefined>(initialStatusFilter)
@@ -69,6 +80,11 @@ export const Filters = ({ programs, statusOptions, teams, dateFilterLabel = 'Cre
   }, [query.status, statusOptions, pageStatus])
 
   const handleFilterApply = () => {
+    if (selectedNetwork.length > 0) {
+      query.network = selectedNetwork.map(({ value }) => value).join(',')
+    } else {
+      delete query.network
+    }
     if (selectedPrograms.length > 0) {
       query.programId = selectedPrograms.map(({ value }) => value).join(',')
     } else {
@@ -108,6 +124,7 @@ export const Filters = ({ programs, statusOptions, teams, dateFilterLabel = 'Cre
   }
 
   const handleFilterClear = () => {
+    setSelectedNetwork([])
     setSelectedPrograms([])
     setRequestNumber('')
     setSelectedStatus(undefined)
@@ -116,6 +133,7 @@ export const Filters = ({ programs, statusOptions, teams, dateFilterLabel = 'Cre
     setWalletAdress('')
   }
 
+  if (selectedNetwork.length > 0) selectedFilters++
   if (selectedPrograms.length > 0) selectedFilters++
   if (requestNumber) selectedFilters++
   if (selectedStatus) selectedFilters++
@@ -224,6 +242,17 @@ export const Filters = ({ programs, statusOptions, teams, dateFilterLabel = 'Cre
                   setSelectedOptions={setSelectedPrograms}
                 />
               </div>
+              <div>
+                <FilterLabel htmlFor="network">Blockchain network:</FilterLabel>
+                <Select
+                  name="network"
+                  placeholder="Filter and select network"
+                  options={CONFIG.chains.map(chain => ({ value: chain.name, label: chain.name }))}
+                  onChange={selected => setSelectedNetwork(selected)}
+                  selectedOptions={selectedNetwork}
+                  setSelectedOptions={setSelectedNetwork}
+                />
+              </div>
               {teams && (
                 <div>
                   <FilterLabel htmlFor="team">Name:</FilterLabel>
@@ -302,7 +331,7 @@ const CustomDatepickInput = forwardRef<any, any>(({ value, onClick, onClear }, r
     <button
       id="create-date"
       name="create-date"
-      className="appearance-none w-full focus:ring-1 focus:ring-indigo-600 focus:border-indigo-600 border-gray-300 border shadow-sm rounded-md px-3 py-2 text-left text-sm bg-white"
+      className="appearance-none w-full focus:ring-1 focus:ring-indigo-600 focus:border-indigo-600 border-gray-300 border shadow-sm rounded-md px-3 py-2 text-left text-sm bg-white pr-10"
       onClick={onClick}
       ref={ref}
     >

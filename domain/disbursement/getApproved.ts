@@ -3,6 +3,7 @@ import { Transfer } from 'aws-sdk'
 import { APPROVED } from 'domain/transferRequestReview/constants'
 import prisma from 'lib/prisma'
 export interface GetApprovedParams {
+  networks?: string[]
   programId?: number[]
   requestNumber?: string
   teamHashes?: string[]
@@ -36,7 +37,19 @@ export interface GetApprovedResponse {
 }
 
 export const getApproved = async (params: GetApprovedParams): Promise<GetApprovedResponse> => {
-  const { programId, teamHashes, size = 100, page = 1, sort = 'createdAt', order = 'asc', requestNumber, from, to, wallets } = params || {}
+  const {
+    networks,
+    programId,
+    teamHashes,
+    size = 100,
+    page = 1,
+    sort = 'createdAt',
+    order = 'asc',
+    requestNumber,
+    from,
+    to,
+    wallets,
+  } = params || {}
   const currentPage = page - 1 < 0 ? 0 : page - 1
 
   const total = await prisma.transferRequest.count({
@@ -59,6 +72,11 @@ export const getApproved = async (params: GetApprovedParams): Promise<GetApprove
           status: 'PENDING',
           txHash: { not: null },
           isActive: true,
+        },
+      },
+      program: {
+        blockchain: {
+          name: networks?.length ? { in: networks } : undefined,
         },
       },
     },
@@ -84,6 +102,11 @@ export const getApproved = async (params: GetApprovedParams): Promise<GetApprove
           status: 'PENDING',
           isActive: true,
           txHash: { not: null },
+        },
+      },
+      program: {
+        blockchain: {
+          name: networks?.length ? { in: networks } : undefined,
         },
       },
     },

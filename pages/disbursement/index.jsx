@@ -278,6 +278,7 @@ export const getServerSideProps = withControllerSSR(async ({ query }) => {
   const pageSize = checkItemsPerPage(query.itemsPerPage) ? parseInt(query.itemsPerPage) : 100
   const page = parseInt(query.page) || 1
   const status = query.status || APPROVED_STATUS
+  const networks = query.network?.length ? query.network.split(',') : []
   const programId = query.programId?.length ? query.programId.split(',') : []
   const requestNumber = query.number
   const wallet = query.wallet
@@ -297,6 +298,7 @@ export const getServerSideProps = withControllerSSR(async ({ query }) => {
     error,
   } = await getAll({
     status,
+    networks,
     programId,
     requestNumber,
     team,
