@@ -82,7 +82,7 @@ export const useContract = (blockchainName: string) => {
    * @throws if dependencies are not set / if the transaction fails
    * @returns
    */
-  const forward = async (id: string, destinations: string[], amounts: string[]) => {
+  const forward = async (blockchainName: string, id: string, destinations: string[], amounts: string[]) => {
     if (!multiForwarder || !signer || !provider || !destinations || !amounts) {
       throw new Error('Missing dependencies')
     }
@@ -97,7 +97,7 @@ export const useContract = (blockchainName: string) => {
       const weiTotal = weiValues.reduce((a, b) => a.add(b), ethers.BigNumber.from(0))
 
       const addresses = destinations.map(destination => {
-        if (TOKEN.name !== 'Filecoin') {
+        if (blockchainName !== 'Filecoin') {
           const bytes = ethers.utils.arrayify(destination)
           return zeroPad(bytes)
         }

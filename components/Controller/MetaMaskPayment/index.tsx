@@ -10,6 +10,7 @@ import { ForwardNonBLS } from 'components/web3/useContract'
 import { USD } from 'domain/currency/constants'
 import { api } from 'lib/api'
 import { formatCrypto, formatCurrency } from 'lib/currency'
+import _ from 'lodash'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -75,36 +76,11 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
 
     setTotalDollarAmount(totalDollarAmount)
 
-    const blockchainMap = new Map<string, TransferRequest[]>()
-
-    for (const item of data) {
-      const chain = item.program.blockchain.name
-
-      let list = blockchainMap.get(chain)
-
-      if (!list) {
-        list = []
-        blockchainMap.set(chain, list)
-      }
-
-      list.push(item)
-    }
-
-    const chunks = []
-
-    for (const [chain, items] of blockchainMap) {
-      const chainChunks = []
-      for (let i = 0; i < items.length; i += 10) {
-        chainChunks.push({
-          blockchainName: chain,
-          isPaymentSent: false,
-          data: items.slice(i, i + 10),
-        })
-      }
-      chunks.push(chainChunks)
-    }
-
-    const finalList = chunks.flat()
+    const finalList = _.chunk(data, 10).map(chunk => ({
+      blockchainName: chunk[0].program.blockchain.name,
+      isPaymentSent: false,
+      data: chunk,
+    }))
 
     setPaymentBatchList(finalList)
   }, [data, filecoin])
@@ -169,7 +145,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
         amounts.push(amount.toString())
       }
 
-      const { hash, from, to } = await forwardFunction(uuid, addresses, amounts)
+      const { hash, from, to } = await forwardFunction(batch[0].program.blockchain.name, uuid, addresses, amounts)
 
       await api.post('/transfers/payment-sent', {
         requests: requestIds,

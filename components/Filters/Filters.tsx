@@ -232,17 +232,6 @@ export const Filters = ({ programs, statusOptions, teams, dateFilterLabel = 'Cre
                 </div>
               )}
               <div>
-                <FilterLabel htmlFor="program">Program:</FilterLabel>
-                <Select
-                  name="program"
-                  placeholder="Filter and select program(s)"
-                  options={programs.map(program => ({ value: program.id, label: program.name }))}
-                  onChange={selected => setSelectedPrograms(selected)}
-                  selectedOptions={selectedPrograms}
-                  setSelectedOptions={setSelectedPrograms}
-                />
-              </div>
-              <div>
                 <FilterLabel htmlFor="network">Blockchain network:</FilterLabel>
                 <Select
                   name="network"
@@ -251,6 +240,17 @@ export const Filters = ({ programs, statusOptions, teams, dateFilterLabel = 'Cre
                   onChange={selected => setSelectedNetwork(selected)}
                   selectedOptions={selectedNetwork}
                   setSelectedOptions={setSelectedNetwork}
+                />
+              </div>
+              <div>
+                <FilterLabel htmlFor="program">Program:</FilterLabel>
+                <Select
+                  name="program"
+                  placeholder="Filter and select program(s)"
+                  options={programs.map(program => ({ value: program.id, label: program.name }))}
+                  onChange={selected => setSelectedPrograms(selected)}
+                  selectedOptions={selectedPrograms}
+                  setSelectedOptions={setSelectedPrograms}
                 />
               </div>
               {teams && (
