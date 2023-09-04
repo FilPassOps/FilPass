@@ -69,7 +69,6 @@ export async function createFile(params: CreateFileParams) {
       publicId: true,
       filename: true,
       type: true,
-      isApproved: true,
     },
   })
 

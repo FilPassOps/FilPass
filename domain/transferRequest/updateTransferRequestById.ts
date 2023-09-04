@@ -1,17 +1,16 @@
 import { APPROVER_ROLE, USER_ROLE } from 'domain/auth/constants'
 import { findAllExternalPrograms } from 'domain/programs/findAll'
 import { createRequestChangeHistory } from 'domain/tranferRequestHistory/createRequestChangeHistory'
-import { findUserTaxForm } from 'domain/user'
 import { encrypt, encryptPII } from 'lib/emissaryCrypto'
 import { TransactionError } from 'lib/errors'
 import prisma, { newPrismaTransaction } from 'lib/prisma'
-import { validate } from 'lib/yup'
-import { DateTime } from 'luxon'
+import yup, { validate } from 'lib/yup'
 import { sendSubmittedNotification } from '../notifications/sendSubmittedNotification'
-import { BLOCKED_STATUS, REQUIRES_CHANGES_STATUS, SUBMITTED_STATUS } from './constants'
+import { REQUIRES_CHANGES_STATUS, SUBMITTED_STATUS } from './constants'
 import { isEditable } from './shared'
 import { updateTransferRequestValidator } from './validation'
 import { TransferRequest } from '@prisma/client'
+import { termsValidator } from 'domain/user/validation'
 
 interface UpdateTransferRequestParams {
   userId: number
@@ -25,12 +24,8 @@ interface UpdateTransferRequestParams {
   currencyUnitId: number
   user: {
     id: number
-    firstName: string
-    lastName: string
-    dateOfBirth: string
-    countryResidence: string
-    isUSResident: boolean
     email: string
+    terms: yup.Asserts<typeof termsValidator>
   }
 }
 
@@ -52,9 +47,6 @@ export async function updateTransferRequestById(params: UpdateTransferRequestPar
 
   const { userId, transferRequestId, amount, programId, userWalletId, team, expectedTransferDate, currencyUnitId, userAttachmentId } =
     fields
-
-  const { firstName, lastName, dateOfBirth: dateOfBirthString, countryResidence, isUSResident } = user
-  const dateOfBirth = new Date(dateOfBirthString)
 
   const { data, error } = await newPrismaTransaction(async fnPrisma => {
     const [userPermissions, transferRequests] = await Promise.all([
@@ -121,15 +113,9 @@ export async function updateTransferRequestById(params: UpdateTransferRequestPar
       nextStatus = SUBMITTED_STATUS
     }
 
-    const formFile = await findUserTaxForm(userId)
-
     const [attachmentFile] = await fnPrisma.userFile.findMany({
       where: { publicId: userAttachmentId, OR: [{ uploaderId: userId }, { userId }] },
     })
-
-    if (!formFile?.isApproved) {
-      nextStatus = BLOCKED_STATUS //BLOCKED and ON_HOLD mean the same
-    }
 
     const updatedIteration = await fnPrisma.transferRequest.update({
       where: {
@@ -138,14 +124,8 @@ export async function updateTransferRequestById(params: UpdateTransferRequestPar
       data: {
         amount: await encrypt(amount.toString()),
         team: await encryptPII(team),
-        userFileId: formFile?.id,
         programId,
         userWalletId,
-        firstName: await encryptPII(firstName),
-        lastName: await encryptPII(lastName),
-        dateOfBirth: dateOfBirth && (await encryptPII(DateTime.fromJSDate(dateOfBirth).toISO() as string)),
-        countryResidence: await encryptPII(countryResidence),
-        isUSResident,
         expectedTransferDate,
         status: nextStatus,
         currencyUnitId,
@@ -159,11 +139,9 @@ export async function updateTransferRequestById(params: UpdateTransferRequestPar
     const newTransferRequestValue = {
       ...currentIteration,
       amount,
-      userFileId: formFile?.id,
       programId,
       userWalletId,
       team,
-      isUSResident,
       expectedTransferDate,
       status: nextStatus,
       currencyUnitId,

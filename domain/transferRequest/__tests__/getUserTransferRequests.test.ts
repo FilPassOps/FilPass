@@ -10,7 +10,7 @@ const team = 'Test Team X'
 
 beforeAll(async () => {
   await clearDatabase()
-  const { user: newUser, w9, wallets } = await createUser(userEmail)
+  const { user: newUser, wallets } = await createUser(userEmail)
   const programA = await createOneTimeProgram('PROGRAM A')
   const programB = await createOneTimeProgram('PROGRAM B')
   user = newUser
@@ -20,7 +20,6 @@ beforeAll(async () => {
     createTransferRequest({
       receiverId: user.id,
       requesterId: user.id,
-      userFileId: w9[0].id,
       program: programB,
       userWalletId: wallets[0].id,
       team,
@@ -38,7 +37,6 @@ beforeAll(async () => {
     createTransferRequest({
       receiverId: user.id,
       requesterId: user.id,
-      userFileId: w9[0].id,
       program: programA,
       userWalletId: wallets[0].id,
       team,

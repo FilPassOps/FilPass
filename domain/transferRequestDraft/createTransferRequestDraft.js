@@ -5,7 +5,7 @@ import { encrypt, encryptPII } from 'lib/emissaryCrypto'
 import { TransactionError } from 'lib/errors'
 import { moveFileS3 } from 'lib/fileUpload'
 import { generateEmailHash, generateTeamHash } from 'lib/password'
-import { getPrismaClient, newPrismaTransaction } from 'lib/prisma'
+import prisma, { newPrismaTransaction } from 'lib/prisma'
 import { validate } from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
@@ -34,11 +34,9 @@ export async function createTransferRequestDraft(params) {
 }
 
 async function validateAndCreateUsers(requests) {
-  const prismaClient = await getPrismaClient()
-
   const emailHashes = await Promise.all(requests.map(async request => generateEmailHash(request.receiverEmail)))
 
-  let users = await prismaClient.user.findMany({
+  let users = await prisma.user.findMany({
     where: {
       isActive: true,
       emailHash: { in: emailHashes },
@@ -100,7 +98,6 @@ async function validateAndCreateUsers(requests) {
 }
 
 async function buildTransferRequestDraftData(users, requests, approverRoleId, requesterId) {
-  const prisma = await getPrismaClient()
   const programs = await prisma.userRoleProgram.findMany({
     where: {
       userRoleId: approverRoleId,

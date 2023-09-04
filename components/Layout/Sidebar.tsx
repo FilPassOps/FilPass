@@ -2,7 +2,6 @@
 import {
   BanknotesIcon,
   DocumentTextIcon,
-  FolderIcon,
   HomeIcon,
   IdentificationIcon,
   LifebuoyIcon,
@@ -13,7 +12,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/solid'
 
-import { useAuth, UserMeType } from 'components/Authentication/Provider'
+import { useAuth } from 'components/Authentication/Provider'
 import { TokenPrice } from 'components/Controller/TokenPrice'
 import { LinkButton } from 'components/shared/Button'
 import { RoleComponent } from 'components/shared/RoleComponent'
@@ -22,7 +21,6 @@ import {
   ADDRESS_MANAGER_ROLE,
   APPROVER_ROLE,
   CONTROLLER_ROLE,
-  FINANCE_ROLE,
   SUPERADMIN_ROLE,
   USER_ROLE,
   VIEWER_ROLE,
@@ -46,6 +44,7 @@ import { useRouter } from 'next/router'
 import { BatchActionsButton } from 'pages/approvals'
 import projectVersion from 'project-version'
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
+import { UserResult } from 'domain/user'
 
 const navigation = [
   {
@@ -173,29 +172,6 @@ const navigation = [
     roles: [ADDRESS_MANAGER_ROLE],
   },
   {
-    target: '/tax-review',
-    text: 'Tax Review',
-    icon: FolderIcon,
-    roles: [FINANCE_ROLE],
-    items: [
-      {
-        filter: `status=UNREVIEWED`,
-        text: 'Unreviewed',
-        roles: [FINANCE_ROLE],
-      },
-      {
-        filter: `status=APPROVED`,
-        text: 'Approved',
-        roles: [FINANCE_ROLE],
-      },
-      {
-        filter: `status=REJECTED`,
-        text: 'Blocked',
-        roles: [FINANCE_ROLE],
-      },
-    ],
-  },
-  {
     target: '/profile-settings',
     text: 'Profile & Settings',
     icon: UserIcon,
@@ -285,7 +261,7 @@ const NavItem = ({
   setSidebarToggle,
 }: {
   navItem: (typeof navigation)[number]
-  user: UserMeType
+  user: UserResult
   toggle: boolean
   setSidebarToggle: Dispatch<SetStateAction<boolean>>
 }) => {

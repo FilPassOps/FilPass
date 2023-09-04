@@ -1,23 +1,10 @@
 const { decryptPII, decrypt } = require('lib/emissaryCrypto')
-const { DateTime } = require('luxon')
 
 const isFind = action => action === 'findOne' || action === 'findUnique' || action === 'findMany' || action === 'findFirst'
 
-const parseDateOfBirth = async dateOfBirth => {
-  const isoDateOfBirth = DateTime.fromISO(await decryptPII(dateOfBirth)).toUTC()
-  const month = isoDateOfBirth.month.toString()
-  const day = isoDateOfBirth.day.toString()
-  const year = isoDateOfBirth.year.toString()
-  return `${month.padStart(2, '0')}/${day.padStart(2, '0')}/${year}`
-}
-
-const decryptUser = async ({ email, firstName, lastName, dateOfBirth, countryResidence, ...rest }) => ({
+const decryptUser = async ({ email, ...rest }) => ({
   ...rest,
   ...(email && { email: await decryptPII(email) }),
-  ...(firstName && { firstName: await decryptPII(firstName) }),
-  ...(lastName && { lastName: await decryptPII(lastName) }),
-  ...(dateOfBirth && { dateOfBirth: await parseDateOfBirth(dateOfBirth) }),
-  ...(countryResidence && { countryResidence: await decryptPII(countryResidence) }),
 })
 
 const userMiddleware = async (params, next) => {
@@ -36,14 +23,8 @@ const userMiddleware = async (params, next) => {
   return await next(params)
 }
 
-const decryptTransferRequest = async ({ amount, team, firstName, lastName, dateOfBirth, countryResidence, ...rest }) => ({
-  ...rest,
-  ...(amount && { amount: await decrypt(amount) }),
-  ...(team && { team: await decryptPII(team) }),
-  ...(firstName && { firstName: await decryptPII(firstName) }),
-  ...(lastName && { lastName: await decryptPII(lastName) }),
-  ...(dateOfBirth && { dateOfBirth: await parseDateOfBirth(dateOfBirth) }),
-  ...(countryResidence && { countryResidence: await decryptPII(countryResidence) }),
+const decryptTransferRequest = async transferRequest => ({
+  ...transferRequest,
 })
 
 const transferRequestMiddleware = async (params, next) => {
@@ -73,7 +54,7 @@ const transferMiddleware = async (params, next) => {
         await result.map(async data => ({
           ...data,
           amount: await decrypt(data.amount),
-        }))
+        })),
       )
     }
 

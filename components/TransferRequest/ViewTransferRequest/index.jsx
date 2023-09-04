@@ -1,7 +1,6 @@
-import { DocumentTextIcon, PhotoIcon } from '@heroicons/react/24/outline'
+import { PhotoIcon } from '@heroicons/react/24/outline'
 import { Divider } from 'components/shared/Divider'
 import { NumberInput, SelectInput, TextInput } from 'components/shared/FormInput'
-import { LoadingIndicator } from 'components/shared/LoadingIndicator'
 import { StatusBadge } from 'components/shared/Status'
 import {
   REJECTED_BY_APPROVER_STATUS,
@@ -9,9 +8,7 @@ import {
   SUBMITTED_BY_APPROVER_STATUS,
   SUBMITTED_STATUS,
 } from 'domain/transferRequest/constants'
-import { classNames } from 'lib/classNames'
 import { DateTime } from 'luxon'
-import { FormTooltip } from '../shared/FormTooltip'
 import { ProgramInfo } from '../shared/ProgramInfo'
 import { RequestorReceiver } from '../shared/RequestorReceiver'
 import { useDownloadFile } from '../shared/useDownloadFile'
@@ -28,8 +25,7 @@ import { shortenAddress } from 'lib/shortenAddress'
 
 const SHORT_WITH_DOTS = WalletSize.SHORT + 3
 
-export const ViewTransferRequest = ({ data, role, showLegacyWarning }) => {
-  const { loadingFile, fileError, handleDownloadFile } = useDownloadFile({ fileId: data?.form_id, fileName: data?.form_filename })
+export const ViewTransferRequest = ({ data, role }) => {
   const { approversGroup, status } = data
 
   const hasGroupApproval = approversGroup?.some(group => group.approved)
@@ -146,34 +142,6 @@ export const ViewTransferRequest = ({ data, role, showLegacyWarning }) => {
             selectedProgram={{ deliveryMethod: data?.program_delivery_method }}
             expectedTransferDate={data?.expected_transfer_date || DateTime.now().plus({ days: 30 }).toISO()}
           />
-          {data?.form_type && data?.form_filename && (
-            <div>
-              <div className="flex space-x-1">
-                <p className="text-sm font-medium leading-5 text-gray-700">Form {data?.form_type === 'W9_FORM' ? 'W9' : 'W8'}</p>
-                <FormTooltip type={data?.form_type} />
-              </div>
-
-              <div className="flex items-center justify-between mt-2.5">
-                <div className="flex items-center">
-                  <DocumentTextIcon className="w-6 h-6 mr-2 shrink-0" />
-                  <button
-                    className={classNames(
-                      'text-sm text-indigo-500 font-bold hover:underline cursor-pointer',
-                      loadingFile && 'opacity-50 cursor-wait'
-                    )}
-                    disabled={loadingFile}
-                    onClick={handleDownloadFile}
-                  >
-                    {data?.form_filename}
-                  </button>
-                  {loadingFile && <LoadingIndicator className="text-indigo-500 ml-2" />}
-                </div>
-                <p className="text-gray-500 text-sm">Uploaded by: {data?.form_uploader_email || data?.form_user_email}</p>
-              </div>
-              {fileError && <p className="text-red-500 text-sm">Failed to load file. Please, try again.</p>}
-            </div>
-          )}
-          {showLegacyWarning && <StatusNotes status="LEGACY" />}
           {isApprover && (
             <div className="p-4 text-sm rounded-lg text-gamboge-orange bg-papaya-whip">
               Please double-check the requestor&apos;s email address to make sure that this is not an impersonated email address

@@ -23,7 +23,6 @@ interface TransferRequestViewProps {
   data: {
     id: string
     status: string
-    isLegacy: boolean
     history: {
       field: string
       old_value: string
@@ -74,7 +73,7 @@ export const TransferRequestView = ({ data }: TransferRequestViewProps) => {
 
   return (
     <>
-      <ViewTransferRequest data={data} role={APPROVER_ROLE} showLegacyWarning={(showApprovalOptions || showApprove) && data.isLegacy} />
+      <ViewTransferRequest data={data} role={APPROVER_ROLE} />
       <div className="flex mt-6 space-x-3 max-w-max mx-auto">
         {showApprovalOptions && (
           <Button variant="outline" className="whitespace-nowrap" onClick={() => setRequireChangeModalOpen(true)}>

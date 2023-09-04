@@ -51,7 +51,7 @@ describe('getUserTransferRequestById', () => {
   })
 
   it('it should call getTransferRequestById with correct transfer request public id', async () => {
-    const { user, w9, wallets } = createdUser
+    const { user, wallets } = createdUser
 
     const amount = '1000'
     const team = 'Test Team'
@@ -59,7 +59,6 @@ describe('getUserTransferRequestById', () => {
     const transferRequest = await createTransferRequest({
       receiverId: user.id,
       requesterId: user.id,
-      userFileId: w9[0].id,
       program,
       userWalletId: wallets[0].id,
       team,
@@ -93,12 +92,11 @@ describe('getUserTransferRequestById', () => {
   })
 
   it('should return error for inactive transfer request', async () => {
-    const { user, w9, wallets } = createdUser
+    const { user, wallets } = createdUser
 
     const transferRequest = await createTransferRequest({
       receiverId: user.id,
       requesterId: user.id,
-      userFileId: w9[0].id,
       program,
       userWalletId: wallets[0].id,
       isActive: false,
@@ -115,13 +113,12 @@ describe('getUserTransferRequestById', () => {
   })
 
   it('should return not found when user is different', async () => {
-    const { user, w9, wallets } = await createUser('user@email.com')
+    const { user, wallets } = await createUser('user@email.com')
     const { user: defaultUser } = createdUser
 
     const transferRequest = await createTransferRequest({
       receiverId: user.id,
       requesterId: user.id,
-      userFileId: w9[0].id,
       program,
       userWalletId: wallets[0].id,
     })

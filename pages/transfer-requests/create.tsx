@@ -34,6 +34,8 @@ CreateTransferRequest.getLayout = function getLayout(page: ReactElement) {
 }
 
 export const getServerSideProps = withUserSSR(async function getServerSideProps({ user, query }) {
+  const { roles } = user
+
   const { data: programs } = await findAllExternalPrograms()
   const masterWallet = getMasterWallet()
 

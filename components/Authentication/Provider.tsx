@@ -1,26 +1,22 @@
 import { UserResult } from 'domain/user'
 import { fetcher } from 'lib/fetcher'
-import { createContext, ReactChild, useContext } from 'react'
+import { createContext, ReactNode, useContext } from 'react'
 import useSWR, { KeyedMutator } from 'swr'
 
-export interface UserMeType extends UserResult {
-  isTaxFormActive: boolean
-}
-
 type AuthContextType = {
-  user: UserMeType | undefined
-  refresh: KeyedMutator<UserMeType>
+  user: UserResult | undefined
+  refresh: KeyedMutator<UserResult>
 }
 
 export const AuthContext = createContext({} as AuthContextType)
 
 interface AuthPoviderParams {
-  children: ReactChild
+  children: ReactNode
 }
 
 // Check for possible issues here with data being null/undefined as its not waiting for loading to finish
 export const AuthProvider = ({ children }: AuthPoviderParams) => {
-  const { data: user, mutate, isLoading } = useSWR<UserMeType>('/auth/me', fetcher, {
+  const { data: user, mutate, isLoading } = useSWR<UserResult>('/auth/me', fetcher, {
     revalidateOnMount: true,
     revalidateOnFocus: true,
     revalidateOnReconnect: true,

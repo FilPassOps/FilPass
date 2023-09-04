@@ -1,4 +1,4 @@
-import { FileType, Prisma } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import { APPROVER_ROLE } from 'domain/auth/constants'
 import { generateEmailHash } from 'lib/password'
 import prisma from 'lib/prisma'
@@ -14,13 +14,7 @@ interface GetUserByIdAndEmailParams {
 const select = {
   id: true,
   email: true,
-  firstName: true,
-  lastName: true,
-  dateOfBirth: true,
-  countryResidence: true,
   isOnboarded: true,
-  piiUpdatedAt: true,
-  isUSResident: true,
   terms: true,
   isBanned: true,
   roles: {
@@ -66,17 +60,6 @@ const select = {
     },
     orderBy: {
       createdAt: Prisma.SortOrder.asc,
-    },
-  },
-  files: {
-    where: {
-      isActive: true,
-      type: {
-        in: [FileType.W8_FORM, FileType.W9_FORM],
-      },
-    },
-    select: {
-      id: true,
     },
   },
 }
@@ -129,7 +112,6 @@ export async function findUserByIdAndEmail(params: GetUserByIdAndEmailParams) {
     data: {
       ...user,
       files: undefined,
-      isTaxFormActive: !!user.files[0],
       approverPrograms: getApproverPrograms(),
     },
   }

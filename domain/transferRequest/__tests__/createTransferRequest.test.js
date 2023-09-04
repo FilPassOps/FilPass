@@ -89,7 +89,6 @@ describe('createTransferRequest', () => {
       programId: 3,
       userWalletId: 4,
       team: 'Team',
-      isUSResident: true,
       terms: {},
       expectedTransferDate: 'expectedDate',
       currencyUnitId: 7,
@@ -133,7 +132,6 @@ describe('createTransferRequest', () => {
         expect(data.programId).toEqual(3)
         expect(data.userWalletId).toEqual(4)
         expect(data.team).toEqual('Encrypted team')
-        expect(data.isUSResident).toEqual(true)
         expect(data.terms).toEqual({})
         expect(data.expectedTransferDate).toEqual('expectedDate')
         expect(data.currencyUnitId).toEqual(7)
@@ -170,7 +168,6 @@ describe('createTransferRequest', () => {
       programId: 3,
       userWalletId: 4,
       team: 'Team',
-      isUSResident: true,
       terms: {},
       expectedTransferDate: 'expectedDate',
       currencyUnitId: 7,
@@ -192,11 +189,6 @@ describe('createTransferRequest', () => {
 
     const response = await createTransferRequest(requestParams)
     expect(response).toEqual(expectedData)
-    expect(mockLogChanges).toBeCalledWith({
-      requestId: 10,
-      oldAddress: '-',
-      newAddress: 'wallet_address',
-    })
   })
 
   it('should return created request without user attachment', async () => {
@@ -225,7 +217,6 @@ describe('createTransferRequest', () => {
         expect(data.programId).toEqual(3)
         expect(data.userWalletId).toEqual(4)
         expect(data.team).toEqual('Encrypted team')
-        expect(data.isUSResident).toEqual(true)
         expect(data.terms).toEqual({})
         expect(data.expectedTransferDate).toEqual('expectedDate')
         expect(data.currencyUnitId).toEqual(7)
@@ -262,7 +253,6 @@ describe('createTransferRequest', () => {
       programId: 3,
       userWalletId: 4,
       team: 'Team',
-      isUSResident: true,
       terms: {},
       expectedTransferDate: 'expectedDate',
       currencyUnitId: 7,
@@ -283,10 +273,5 @@ describe('createTransferRequest', () => {
 
     const response = await createTransferRequest(requestParams)
     expect(response).toEqual(expectedData)
-    expect(mockLogChanges).toBeCalledWith({
-      requestId: 10,
-      oldAddress: '-',
-      newAddress: 'wallet_address',
-    })
   })
 })

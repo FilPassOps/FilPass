@@ -69,10 +69,6 @@ export const createRequestChangeHistory = async (
 // TODO: type this properly
 export const getFilteredObject = (request: any) => {
   const {
-    firstName,
-    lastName,
-    dateOfBirth,
-    countryResidence,
     createdAt,
     updatedAt,
     notifications,

@@ -62,7 +62,7 @@ describe('getApproverTransferRequestById', () => {
   })
 
   it('it should call getTransferRequestById with correct transfer request public id where the user is a program approver', async () => {
-    const { user, w9, wallets } = createdUser
+    const { user, wallets } = createdUser
 
     const amount = '1000'
     const team = 'Test Team'
@@ -70,7 +70,6 @@ describe('getApproverTransferRequestById', () => {
     const linearTransferRequest = await createTransferRequest({
       receiverId: user.id,
       requesterId: user.id,
-      userFileId: w9[0].id,
       program: linearProgram,
       userWalletId: wallets[0].id,
       team,
@@ -112,12 +111,11 @@ describe('getApproverTransferRequestById', () => {
   })
 
   it('it should return not found if user is not program approver', async () => {
-    const { user, w9, wallets } = createdUser
+    const { user, wallets } = createdUser
 
     const linearTransferRequest = await createTransferRequest({
       receiverId: user.id,
       requesterId: user.id,
-      userFileId: w9[0].id,
       program: linearProgram,
       userWalletId: wallets[0].id,
       isActive: false,

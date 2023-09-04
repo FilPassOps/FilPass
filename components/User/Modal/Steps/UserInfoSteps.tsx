@@ -5,8 +5,6 @@ import { api } from 'lib/api'
 import _ from 'lodash'
 import { UpdateUserResponse } from 'pages/api/users/current'
 import { Fragment, ReactNode, useEffect, useState } from 'react'
-import { OnboardingPersonalInformation, FormValue as PiiData } from './UserInfo/OnboardingPersonalInformation'
-import { OnboardingTaxForms, FormValue as TaxData } from './UserInfo/OnboardingTaxForms'
 import { OnboardingTermsAndConditions, FormValue as TermsAndConditionsData } from './UserInfo/OnboardingTermsAndConditions'
 
 export interface UserInfoStepsProps {
@@ -18,17 +16,13 @@ export interface UserInfoStepsProps {
 export const UserInfoSteps = ({ toBeginning, toEnd, totalSteps }: UserInfoStepsProps) => {
   const { user } = useAuth()
   const [activeStep, setActiveStep] = useState(0)
-  const [pii, setPii] = useState<PiiData>()
   const [termsAndConditions, setTermsAndConditions] = useState<TermsAndConditionsData>()
-  const [taxForm, setTaxForm] = useState<TaxData>()
 
   useEffect(() => {
     async function sendData() {
       try {
         const result = await api.post<UpdateUserResponse>('/users/current', {
-          pii,
           terms: termsAndConditions?.terms,
-          taxForm,
           isOnboarded: true,
         })
         if (result.status !== 200) {
@@ -45,7 +39,7 @@ export const UserInfoSteps = ({ toBeginning, toEnd, totalSteps }: UserInfoStepsP
     if (totalSteps === activeStep) {
       sendData()
     }
-  }, [activeStep, pii, taxForm, termsAndConditions, toEnd, totalSteps])
+  }, [activeStep, termsAndConditions, toEnd, totalSteps])
 
   const handleBackClick = () => {
     if (activeStep === 0) {
@@ -59,39 +53,15 @@ export const UserInfoSteps = ({ toBeginning, toEnd, totalSteps }: UserInfoStepsP
     setActiveStep(curr => ++curr)
   }
 
-  const onPiiSubmit = (values: PiiData) => {
-    setPii(values)
-    handleNextStep()
-  }
-
   const onTermsAndConditionsSubmit = (values: TermsAndConditionsData) => {
     setTermsAndConditions(values)
     handleNextStep()
   }
 
-  const onTaxFormsSubmit = async (values: TaxData) => {
-    setTaxForm(values)
-    handleNextStep()
-  }
-
   const steps = [
-    {
-      show: !user?.piiUpdatedAt,
-      widget: <OnboardingPersonalInformation onBackClick={handleBackClick} onFormSubmit={onPiiSubmit} />,
-    },
     {
       show: !user?.terms,
       widget: <OnboardingTermsAndConditions onBackClick={handleBackClick} onFormSubmit={onTermsAndConditionsSubmit} />,
-    },
-    {
-      show: !user?.isTaxFormActive,
-      widget: (
-        <OnboardingTaxForms
-          onBackClick={handleBackClick}
-          onFormSubmit={onTaxFormsSubmit}
-          isUpdateTaxFormModal={user?.isOnboarded && !user?.isTaxFormActive}
-        />
-      ),
     },
   ]
 

@@ -28,8 +28,6 @@ const errorsMessages = {
   error_rejecting_blocked_transfer_request: { message: 'Error rejecting blocked transfer request.' },
   error_blocking_user: { message: 'Error blocking user.' },
   error_unblocking_user: { message: 'Error unblocking user.' },
-  error_approving_tax_form: { message: 'Error approving tax form.' },
-  error_rejecting_tax_form: { message: 'Error rejecting tax form.' },
   transfer_request_not_found: { message: 'Error transfer request not found.' },
   error_archiving_program: { message: 'Error archiving program.' },
   error_status_is_not_supported: { message: 'Status is not supported.' },

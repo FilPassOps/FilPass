@@ -39,7 +39,6 @@ export async function deleteTemporaryFile(params: DeleteTemporaryFileParams) {
       publicId: true,
       filename: true,
       type: true,
-      isApproved: true,
     },
   })
 

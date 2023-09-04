@@ -63,7 +63,6 @@ export async function deleteFile(params:DeleteFileParams, user: User) {
       publicId: true,
       filename: true,
       type: true,
-      isApproved: true,
     },
   })
 

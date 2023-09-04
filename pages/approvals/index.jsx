@@ -117,7 +117,6 @@ export default function Approvals({
               create_date,
               status,
               is_us_resident,
-              file_id,
               transfer_hash,
             }) => {
               const row = []
@@ -133,7 +132,6 @@ export default function Approvals({
               columns.paidFilAmount && row.push(transfer_amount_currency_unit)
               columns.status && row.push(status)
               columns.residency && row.push(is_us_resident ? 'US' : 'Non-US')
-              columns.taxForm && row.push(`${window?.location.origin}/api/files/${file_id}/view`)
               columns.filfoxLink && row.push(`${config.chain.blockExplorerUrls[0]}/message/${transfer_hash}`)
               return row
             },

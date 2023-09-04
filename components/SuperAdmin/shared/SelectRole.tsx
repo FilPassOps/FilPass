@@ -4,7 +4,6 @@ import {
   ADDRESS_MANAGER_ROLE,
   APPROVER_ROLE,
   CONTROLLER_ROLE,
-  FINANCE_ROLE,
   SUPERADMIN_ROLE,
   VIEWER_ROLE,
 } from 'domain/auth/constants'
@@ -40,7 +39,6 @@ export const SelectRoles = ({ user, scrolled }: SelectRolesProps) => {
     { value: CONTROLLER_ROLE, label: 'Controller', disabled: false, tooltip: undefined },
     { value: ADDRESS_MANAGER_ROLE, label: 'Address Manager', disabled: false, tooltip: undefined },
     { value: SUPERADMIN_ROLE, label: 'Superadmin', disabled: false, tooltip: undefined },
-    { value: FINANCE_ROLE, label: 'Finance' },
     viewerOption,
   ]
 

@@ -46,7 +46,7 @@ export const useFormSubmit = ({ errors, data, isEditable = false }: UseFormSubmi
       return
     }
 
-    if (!user?.piiUpdatedAt || !user.terms || !user.isTaxFormActive) {
+    if (!user?.terms) {
       setOpenOnboardingModal(true)
       return
     }
