@@ -9,5 +9,3 @@ export const PAID_STATUS = 'PAID'
 export const REJECTED_BY_CONTROLLER_STATUS = 'REJECTED_BY_CONTROLLER'
 export const REJECTED_STATUS = 'REJECTED'
 export const DRAFT_STATUS = 'DRAFT'
-export const BLOCKED_STATUS = 'BLOCKED'
-export const ON_HOLD_STATUS = 'ON_HOLD' // an alias for BLOCKED_STATUS

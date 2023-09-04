@@ -4,7 +4,6 @@ import { ViewTransferRequest } from 'components/TransferRequest/ViewTransferRequ
 import { APPROVER_ROLE } from 'domain/auth/constants'
 import {
   APPROVED_STATUS,
-  BLOCKED_STATUS,
   DRAFT_STATUS,
   PROCESSING_STATUS,
   REJECTED_BY_APPROVER_STATUS,
@@ -56,11 +55,7 @@ export const TransferRequestView = ({ data }: TransferRequestViewProps) => {
   const showApprovalOptions = data.status === SUBMITTED_STATUS || (data.status === PROCESSING_STATUS && !approvedByYou)
   const showApprove =
     [SUBMITTED_STATUS, SUBMITTED_BY_APPROVER_STATUS].includes(data.status) || (data.status === PROCESSING_STATUS && !approvedByYou)
-  const showDeleteButton =
-    data.status === DRAFT_STATUS ||
-    data.status === SUBMITTED_BY_APPROVER_STATUS ||
-    (data.applyer_id === user?.id && data.status === BLOCKED_STATUS && hasApproverRole)
-  const showRejectButton = data.status === BLOCKED_STATUS && hasApproverRole
+  const showDeleteButton = data.status === DRAFT_STATUS || data.status === SUBMITTED_BY_APPROVER_STATUS
 
   const showWithdrawButton = (data.status === APPROVED_STATUS || (data.status === PROCESSING_STATUS && approvedByYou)) && hasApproverRole
   const showWithdrawRejectionButton = data.status === REJECTED_BY_APPROVER_STATUS && hasApproverRole
@@ -81,7 +76,7 @@ export const TransferRequestView = ({ data }: TransferRequestViewProps) => {
           </Button>
         )}
 
-        {(showApprovalOptions || showRequiresChangeActions || showRejectButton) && (
+        {(showApprovalOptions || showRequiresChangeActions) && (
           <Button className="flex-1" variant="primary-lighter" onClick={() => setRejectModalOpen(true)}>
             Reject
           </Button>

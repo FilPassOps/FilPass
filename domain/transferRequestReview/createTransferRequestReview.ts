@@ -1,15 +1,8 @@
-import {
-  APPROVED_STATUS,
-  BLOCKED_STATUS,
-  REJECTED_BY_APPROVER_STATUS,
-  REQUIRES_CHANGES_STATUS,
-  SUBMITTED_STATUS,
-} from 'domain/transferRequest/constants'
+import { APPROVED_STATUS, REJECTED_BY_APPROVER_STATUS, REQUIRES_CHANGES_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
 import { sanitizeText } from 'lib/sanitizeText'
 import { validate } from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { approveTransferRequest } from './approveTransferRequest'
-import { onHoldTransferRequest } from './onHoldTransferRequest'
 import { rejectTransferRequest } from './rejectTransferRequest'
 import { requireChangeTransferRequest } from './requireChangeTransferRequest'
 import { submittedTransferRequest } from './submittedTransferRequest'
@@ -35,7 +28,7 @@ export async function createTransferRequestReview(params: CreateTransferRequestR
 
   const { transferRequestId, approverId, status, notes } = fields
 
-  const sanitizedNotes = notes ? sanitizeText(notes) : null as string | null
+  const sanitizedNotes = notes ? sanitizeText(notes) : (null as string | null)
 
   if (status === APPROVED_STATUS) {
     return await approveTransferRequest({
@@ -54,12 +47,6 @@ export async function createTransferRequestReview(params: CreateTransferRequestR
     }
     return await rejectTransferRequest({
       notes: sanitizedNotes,
-      approverId,
-      transferRequestId,
-    })
-  }
-  if (status === BLOCKED_STATUS) {
-    return await onHoldTransferRequest({
       approverId,
       transferRequestId,
     })

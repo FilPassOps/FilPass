@@ -1,4 +1,4 @@
-import { updateUserById, updateUserOnHoldTranferRequests } from 'domain/user'
+import { updateUserById } from 'domain/user'
 import { onboardingValidator, termsValidator } from 'domain/user/validation'
 import { newHandler, NextApiHandlerWithUser, NextApiRequestWithSession, withMethods, withUser } from 'lib/middleware'
 import yup, { validate } from 'lib/yup'
@@ -30,10 +30,6 @@ const handler: NextApiHandlerWithUser<UpdateUserResponse | unknown, ExtendedRequ
   const { terms, isOnboarded } = fields
 
   const result = await updateUserById(user.id, { terms, isOnboarded })
-
-  await updateUserOnHoldTranferRequests({
-    userId: user.id,
-  })
 
   return res.status(200).json(result)
 }

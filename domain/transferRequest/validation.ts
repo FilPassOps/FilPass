@@ -7,7 +7,6 @@ import errorsMessages from 'wordings-and-errors/errors-messages'
 import { MAX_INTEGER_VALUE } from '../constants'
 import {
   APPROVED_STATUS,
-  BLOCKED_STATUS,
   DRAFT_STATUS,
   PAID_STATUS,
   PROCESSING_STATUS,
@@ -88,7 +87,6 @@ export const getApproverTransferRequestsValidator = yup.object({
       REQUIRES_CHANGES_STATUS,
       VOIDED_STATUS,
       DRAFT_STATUS,
-      BLOCKED_STATUS,
       PROCESSING_STATUS,
     ])
     .required(),

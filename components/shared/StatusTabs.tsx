@@ -1,4 +1,3 @@
-import { BLOCKED_STATUS, ON_HOLD_STATUS } from 'domain/transferRequest/constants'
 import { classNames } from 'lib/classNames'
 import debounce from 'lodash/debounce'
 import { useRouter } from 'next/router'
@@ -11,9 +10,6 @@ interface StatusTabsProps {
 export const StatusTabs = ({ tabs = [], status }: StatusTabsProps) => {
   const { push, query } = useRouter()
 
-  if (status === BLOCKED_STATUS) {
-    status = ON_HOLD_STATUS //ON_HOLD is an alias for BLOCKED
-  }
   return (
     <div>
       <div className="hidden sm:block">

@@ -19,11 +19,6 @@ export const submittedTransferRequestValidator = yup.object({
   approverId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).typeError(errorsMessages.required_field.message).required(),
 })
 
-export const onHoldTransferRequestValidator = yup.object({
-  transferRequestId: yup.string().required(),
-  approverId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).typeError(errorsMessages.required_field.message).required(),
-})
-
 export const batchApproveTransferRequestValidator = yup.object({
   requests: yup.array(yup.string().required()).min(1).max(50, 'Must have less than or equal to 50 items').required(),
   approverId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).typeError(errorsMessages.required_field.message).required(),

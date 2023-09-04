@@ -131,8 +131,6 @@ const formatStatus = ({ status, role }: FormatStatusProps) => {
       return 'Paid'
     case 'REJECTED':
       return 'Rejected'
-    case 'BLOCKED':
-      return 'On Hold' //ON_HOLD is an alias for BLOCKED
     case 'PROCESSING':
       return 'Processing'
     default:

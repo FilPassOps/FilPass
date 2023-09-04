@@ -17,19 +17,11 @@ import { TokenPrice } from 'components/Controller/TokenPrice'
 import { LinkButton } from 'components/shared/Button'
 import { RoleComponent } from 'components/shared/RoleComponent'
 import { SUPPORT_EMAIL } from 'system.config'
-import {
-  ADDRESS_MANAGER_ROLE,
-  APPROVER_ROLE,
-  CONTROLLER_ROLE,
-  SUPERADMIN_ROLE,
-  USER_ROLE,
-  VIEWER_ROLE,
-} from 'domain/auth/constants'
+import { ADDRESS_MANAGER_ROLE, APPROVER_ROLE, CONTROLLER_ROLE, SUPERADMIN_ROLE, USER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
 import { ACTIVE_STATUS, ARCHIVED_STATUS } from 'domain/programs/constants'
 import {
   APPROVED_STATUS,
   DRAFT_STATUS,
-  ON_HOLD_STATUS,
   PAID_STATUS,
   PROCESSING_STATUS,
   REJECTED_BY_CONTROLLER_STATUS,
@@ -104,11 +96,6 @@ const navigation = [
       {
         filter: `status=${VOIDED_STATUS}`,
         text: 'Voided',
-        roles: [APPROVER_ROLE],
-      },
-      {
-        filter: `status=${ON_HOLD_STATUS}`,
-        text: 'On Hold',
         roles: [APPROVER_ROLE],
       },
       {
@@ -189,7 +176,7 @@ export const Sidebar = ({ toggle = false, setSidebarToggle }: SidebarProps) => {
 
   const filteredNavigationList = useMemo(
     () => navigation.filter(item => item.roles.length === 0 || user?.roles?.some(userRole => item.roles.includes(userRole.role))),
-    [user]
+    [user],
   )
 
   if (!user) return null
@@ -199,13 +186,8 @@ export const Sidebar = ({ toggle = false, setSidebarToggle }: SidebarProps) => {
       {/* Sidebar component, swap this element with another sidebar if you like */}
       <div className="flex flex-col flex-grow bg-indigo-700 overflow-y-auto md:pt-5">
         <div className="hidden md:flex items-center shrink-0 px-4">
-          <Link
-            href="/my-transfer-requests"
-            passHref
-            className="h-7 w-full relative outline-offset-8">
-
+          <Link href="/my-transfer-requests" passHref className="h-7 w-full relative outline-offset-8">
             <img className={`object-fill h-full ${toggleClasses(toggle, 'block')}`} src="/logo-white.svg" alt="Logo" />
-
           </Link>
         </div>
         <div className="md:mt-5 flex-1 flex flex-col">
@@ -251,7 +233,7 @@ export const Sidebar = ({ toggle = false, setSidebarToggle }: SidebarProps) => {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 const NavItem = ({
@@ -282,27 +264,26 @@ const NavItem = ({
 
   if (!navItem.items) {
     return (
-      (<Link
+      <Link
         key={navItem.target}
         href={navItem.target}
         passHref
         className={classNames(
           isItemSelected ? 'bg-indigo-900 text-indigo-50' : 'text-indigo-100',
-          'flex items-center gap-2 leading-5 text-sm font-medium p-2 rounded-md focus-within:bg-indigo-900 focus-within:text-white hover:bg-indigo-900 hover:text-indigo-50'
-        )}>
-
+          'flex items-center gap-2 leading-5 text-sm font-medium p-2 rounded-md focus-within:bg-indigo-900 focus-within:text-white hover:bg-indigo-900 hover:text-indigo-50',
+        )}
+      >
         <navItem.icon className="h-6 w-6" aria-hidden="true" />
         <span className={toggleClasses(toggle, 'inline')}>{navItem.text}</span>
-
-      </Link>)
-    );
+      </Link>
+    )
   }
 
   return (
     <div
       className={classNames(
         isItemSelected ? 'bg-indigo-900 text-white' : 'text-indigo-100',
-        'leading-5 text-sm font-medium p-2 rounded-md focus-within:bg-indigo-900 focus-within:text-white hover:bg-indigo-900 hover:text-white'
+        'leading-5 text-sm font-medium p-2 rounded-md focus-within:bg-indigo-900 focus-within:text-white hover:bg-indigo-900 hover:text-white',
       )}
     >
       <button className="w-full flex items-center justify-between outline-offset-8 leading-5 " onClick={onNavItemClick}>
@@ -321,7 +302,6 @@ const NavItem = ({
           return (
             <li key={target} className="py-2 hover:font-extrabold">
               <Link href={target} passHref className="flex items-center outline-offset-4">
-
                 <div className="w-8">
                   {router.asPath.startsWith(target) && (
                     <svg className="ml-2" height="8" width="8">
@@ -330,14 +310,13 @@ const NavItem = ({
                   )}
                 </div>
                 <div>{subItem.text}</div>
-
               </Link>
             </li>
-          );
+          )
         })}
       </ul>
     </div>
-  );
+  )
 }
 
 function toggleClasses(toggle: boolean, classNames: string) {

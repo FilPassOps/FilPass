@@ -91,16 +91,6 @@ const config: Record<string, { className: string; text: string; style: any }> = 
     text: 'Draft',
     style: {},
   },
-  blocked: {
-    className: 'text-international-orange bg-light-red',
-    text: 'On Hold', //ON_HOLD is an alias for BLOCKED
-    style: {},
-  },
-  on_hold: {
-    className: 'text-international-orange bg-light-red',
-    text: 'On Hold', //ON_HOLD is an alias for BLOCKED
-    style: {},
-  },
   processing: {
     className: 'text-heliotrope-magenta bg-pink-lace',
     text: 'Processing',
