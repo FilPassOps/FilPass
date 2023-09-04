@@ -93,8 +93,6 @@ UserSettings.getLayout = function getLayout(page: ReactElement) {
 export const getServerSideProps = withUserSSR(async function getServerSideProps({ user }) {
   const { data } = await findUserByIdAndEmail({ userId: user.id, email: user.email })
   const masterWallet = getMasterWallet()
-console.log('data', data)
-
 
   return {
     props: {

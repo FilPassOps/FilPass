@@ -25,6 +25,8 @@ const userMiddleware = async (params, next) => {
 
 const decryptTransferRequest = async transferRequest => ({
   ...transferRequest,
+  ...(transferRequest.amount && { amount: await decrypt(transferRequest.amount) }),
+  ...(transferRequest.team && { team: await decryptPII(transferRequest.team) }),
 })
 
 const transferRequestMiddleware = async (params, next) => {

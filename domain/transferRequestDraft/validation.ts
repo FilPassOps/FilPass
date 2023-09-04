@@ -45,8 +45,6 @@ export const createTransferRequestDraftFormValidator = yup
 export const createTransferRequestSubmittedFormValidator = yup
   .object({
     isBatchCsv: yup.boolean(),
-    approverRoleId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
-    requesterId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
     requests: yup
       .array(
         yup
