@@ -3,7 +3,6 @@ import {
   ADDRESS_MANAGER_ROLE,
   APPROVER_ROLE,
   CONTROLLER_ROLE,
-  FINANCE_ROLE,
   SUPERADMIN_ROLE,
   SystemRoles,
 } from 'domain/auth/constants'
@@ -151,11 +150,6 @@ export function withUser<T>(handler: NextApiHandlerWithUser<T>): NextApiHandlerW
       id: data.id,
       email: data.email,
       isOnboarded: data.isOnboarded,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      dateOfBirth: data.dateOfBirth,
-      countryResidence: data.countryResidence,
-      isUSResident: data.isUSResident,
       roles: data.roles?.map(role => ({ id: role.id, role: role.role })),
       terms: data.terms,
     }
@@ -167,7 +161,6 @@ export function withUser<T>(handler: NextApiHandlerWithUser<T>): NextApiHandlerW
     req.superAdminId = extractedRoles.superAdminId
     req.userRoleId = extractedRoles.userRoleId
     req.viewerId = extractedRoles.viewerId
-    req.financeId = extractedRoles.financeId
 
     return handler(req, res)
   })
@@ -194,8 +187,6 @@ export const withAddressManager = (handler: NextApiHandlerWithUser) => withRoles
 export const withController = (handler: NextApiHandlerWithUser) => withRoles([CONTROLLER_ROLE], handler)
 
 export const withApprover = (handler: NextApiHandlerWithUser) => withRoles([APPROVER_ROLE], handler)
-
-export const withFinance = (handler: NextApiHandlerWithUser) => withRoles([FINANCE_ROLE], handler)
 
 export const withSuperAdmin = (handler: NextApiHandlerWithUser) => withRoles([SUPERADMIN_ROLE], handler)
 

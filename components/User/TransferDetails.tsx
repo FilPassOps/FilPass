@@ -22,7 +22,7 @@ export const TransferDetails = ({ data }: TransferDetailsProps) => {
   return (
     <>
       <div className="max-w-3xl mx-auto">
-        <ViewTransferRequest data={data} role={undefined} showLegacyWarning={undefined} />
+        <ViewTransferRequest data={data} role={undefined}/>
         <div className="flex justify-center space-x-3">
           <div>
             <LinkButton href="/my-transfer-requests" variant="outline">

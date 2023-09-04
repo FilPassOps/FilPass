@@ -7,7 +7,6 @@ import errorsMessages from 'wordings-and-errors/errors-messages'
 import { MAX_INTEGER_VALUE } from '../constants'
 import {
   APPROVED_STATUS,
-  BLOCKED_STATUS,
   DRAFT_STATUS,
   PAID_STATUS,
   PROCESSING_STATUS,
@@ -38,12 +37,7 @@ export const createTransferRequestValidatorBackend = yup.object({
   currencyUnitId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
   user: yup.object({
     id: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
-    firstName: yup.string().required(),
-    lastName: yup.string().required(),
     email: yup.string().required(),
-    dateOfBirth: yup.string().required(),
-    countryResidence: yup.string().required(),
-    isUSResident: yup.boolean().required(),
     terms: termsValidator,
   }),
 })
@@ -93,7 +87,6 @@ export const getApproverTransferRequestsValidator = yup.object({
       REQUIRES_CHANGES_STATUS,
       VOIDED_STATUS,
       DRAFT_STATUS,
-      BLOCKED_STATUS,
       PROCESSING_STATUS,
     ])
     .required(),
@@ -215,7 +208,6 @@ export const createReportValidator = yup.object({
       status: yup.boolean().required(),
       receiverEmail: yup.boolean().required(),
       residency: yup.boolean().required(),
-      taxForm: yup.boolean().required(),
       filfoxLink: yup.boolean().required(),
     })
     .test('oneColumnRequired', 'Select at least one column', value => Object.values(value).includes(true)),

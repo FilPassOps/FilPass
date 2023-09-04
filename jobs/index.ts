@@ -1,8 +1,6 @@
 import Bottleneck from 'bottleneck'
-import deactivateAllUsersTaxForms from 'jobs/deactivate-all-users-tax-form'
 import schedule from 'node-schedule'
 import blockchainWatcher from './blockchain-watcher'
-import checkAwaitingTaxFormReviewNotification from './check-awaiting-tax-form-review-notification'
 import checkPendingTransfer from './check-pending-transfer'
 import requiresChangeNotification from './requires-change-notification'
 import { logger } from 'lib/logger'
@@ -26,10 +24,7 @@ const job = (limiter: Bottleneck, job: () => Promise<void>) => {
   }
 }
 
-schedule.scheduleJob('0 0 1 1 *', deactivateAllUsersTaxForms)
-
 schedule.scheduleJob('0 6 * * *', requiresChangeNotification)
-schedule.scheduleJob('0 16 * * *', checkAwaitingTaxFormReviewNotification)
 
 schedule.scheduleJob('* * * * *', job(blockchainWatcherLimiter, blockchainWatcher))
 schedule.scheduleJob('*/2 * * * *', job(checkPendingTransferLimiter, checkPendingTransfer))

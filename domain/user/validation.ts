@@ -1,7 +1,4 @@
-import { Countries } from 'domain/transferRequest/countries'
-import { TODAY, nameRegex } from 'domain/utils'
 import yup from 'lib/yup'
-import { DateTime } from 'luxon'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { MAX_INTEGER_VALUE } from '../constants'
 
@@ -49,44 +46,7 @@ export const termsValidator = yup.object({
   sanctionsText: yup.string().required(),
 })
 
-export const taxFormValidator = yup.object({
-  userFileId: yup.string().max(40).typeError(errorsMessages.required_field.message).required(),
-  isUSResident: yup
-    .boolean()
-    .transform(value => (value === 'Yes' ? true : value === 'No' ? false : value))
-    .required(),
-})
-
-export const personalInformationCheckValidator = yup
-  .object({
-    firstName: yup.string().min(2, 'Minimum 2 characters').trim().matches(nameRegex, 'No special characters allowed').required(),
-    lastName: yup.string().min(2, 'Minimum 2 characters').trim().matches(nameRegex, 'No special characters allowed').required(),
-    dateOfBirth: yup
-      .date()
-      .transform(function (value, originalValue) {
-        if (this.isType(originalValue)) return originalValue
-
-        const dateTimeFromIso = DateTime.fromISO(originalValue)
-        if (dateTimeFromIso.isValid) return dateTimeFromIso.toJSDate()
-
-        const dateTime = DateTime.fromFormat(originalValue, 'MM/dd/yyyy')
-        return dateTime.isValid ? dateTime.toJSDate() : new Date('')
-      })
-      .max(TODAY)
-      .required(),
-    countryResidence: yup
-      .string()
-      .oneOf(
-        Countries.map(country => country.value),
-        'Insert a valid country'
-      )
-      .required(),
-  })
-  .required()
-
 export const onboardingValidator = yup.object({
-  pii: personalInformationCheckValidator.default(undefined).nullable().notRequired(),
   terms: termsValidator.default(undefined).nullable().notRequired(),
-  taxForm: taxFormValidator.default(undefined).nullable().notRequired(),
   isOnboarded: yup.boolean(),
 })

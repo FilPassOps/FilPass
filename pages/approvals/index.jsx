@@ -14,7 +14,7 @@ import { PLATFORM_NAME } from 'system.config'
 import { stringify } from 'csv-stringify/sync'
 import { getApprovalsByRole } from 'domain/approvals/service'
 import { APPROVER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
-import { BLOCKED_STATUS, ON_HOLD_STATUS, SUBMITTED_BY_APPROVER_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
+import { SUBMITTED_BY_APPROVER_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
 import JsFileDownload from 'js-file-download'
 import { api } from 'lib/api'
 import { getDelegatedAddress } from 'lib/getDelegatedAddress'
@@ -117,7 +117,6 @@ export default function Approvals({
               create_date,
               status,
               is_us_resident,
-              file_id,
               transfer_hash,
             }) => {
               const row = []
@@ -133,7 +132,6 @@ export default function Approvals({
               columns.paidFilAmount && row.push(transfer_amount_currency_unit)
               columns.status && row.push(status)
               columns.residency && row.push(is_us_resident ? 'US' : 'Non-US')
-              columns.taxForm && row.push(`${window?.location.origin}/api/files/${file_id}/view`)
               columns.filfoxLink && row.push(`${config.chain.blockExplorerUrls[0]}/message/${transfer_hash}`)
               return row
             },
@@ -306,8 +304,7 @@ export const getServerSideProps = withRolesSSR([APPROVER_ROLE, VIEWER_ROLE], asy
   const isViewer = roles.some(({ role }) => role === VIEWER_ROLE)
   const isApprover = roles.some(({ role }) => role === APPROVER_ROLE)
 
-  // ON_HOLD is an alias for BLOCKED
-  const status = query.status === ON_HOLD_STATUS ? BLOCKED_STATUS : query.status
+  const status = query.status
 
   let fromDate, toDate
 

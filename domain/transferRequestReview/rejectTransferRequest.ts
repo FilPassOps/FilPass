@@ -1,7 +1,6 @@
 import { PROGRAM_TYPE_INTERNAL } from 'domain/programs/constants'
 import { createRequestChangeHistory } from 'domain/tranferRequestHistory/createRequestChangeHistory'
 import {
-  BLOCKED_STATUS,
   PROCESSING_STATUS,
   REJECTED_BY_APPROVER_STATUS,
   REQUIRES_CHANGES_STATUS,
@@ -53,7 +52,7 @@ export async function rejectTransferRequest(params: RejectTransferRequestParams)
         where: {
           publicId: transferRequestId,
           status: {
-            in: [SUBMITTED_STATUS, PROCESSING_STATUS, REQUIRES_CHANGES_STATUS, BLOCKED_STATUS],
+            in: [SUBMITTED_STATUS, PROCESSING_STATUS, REQUIRES_CHANGES_STATUS],
           },
           isActive: true,
         },

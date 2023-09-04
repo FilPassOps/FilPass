@@ -1,6 +1,5 @@
 import { Role } from '@prisma/client'
 import { createTransferRequestSubmittedFormValidator } from 'domain/transferRequestDraft/validation'
-import { findUserTaxForm } from 'domain/user'
 import { batchCreateWallet } from 'domain/wallet/batchCreateWallet'
 import { encrypt, encryptPII } from 'lib/emissaryCrypto'
 import { TransactionError } from 'lib/errors'
@@ -191,8 +190,6 @@ export async function buildTransferRequestData(requests, requesterId, approverRo
 
     const { receiver } = singleRequest
 
-    const taxForm = await findUserTaxForm(receiver.id)
-
     return {
       requesterId,
       programId: singleRequest.programId,
@@ -203,12 +200,7 @@ export async function buildTransferRequestData(requests, requesterId, approverRo
       team: (singleRequest.team && (await encryptPII(singleRequest.team))) || '',
       teamHash: (singleRequest.team && (await generateTeamHash(singleRequest.team))) || '',
       amount: (singleRequest.amount && (await encrypt(singleRequest.amount))) || '',
-      firstName: (receiver.firstName && (await encryptPII(receiver.firstName))) || undefined,
-      lastName: (receiver.lastName && (await encryptPII(receiver.lastName))) || undefined,
-      dateOfBirth: (receiver.dateOfBirth && (await encryptPII(receiver.dateOfBirth))) || undefined,
-      countryResidence: (receiver.countryResidence && (await encryptPII(receiver.countryResidence))) || undefined,
       status: SUBMITTED_BY_APPROVER_STATUS,
-      userFileId: taxForm?.id,
       currencyUnitId: singleRequest.currencyUnitId,
       terms: receiver?.terms ?? undefined,
       expectedTransferDate: DateTime.now().plus({ days: 30 }).toISO(),

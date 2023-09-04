@@ -2,7 +2,6 @@ import {
   ADDRESS_MANAGER_ROLE,
   APPROVER_ROLE,
   CONTROLLER_ROLE,
-  FINANCE_ROLE,
   SUPERADMIN_ROLE,
   USER_ROLE,
   VIEWER_ROLE,
@@ -16,7 +15,6 @@ export const RoleToRequestAttributeMap = {
   [SUPERADMIN_ROLE]: 'superAdminId',
   [USER_ROLE]: 'userRoleId',
   [VIEWER_ROLE]: 'viewerId',
-  [FINANCE_ROLE]: 'financeId',
 }
 
 export function extractRoles(roles: UserResult['roles'] = []) {

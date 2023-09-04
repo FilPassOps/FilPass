@@ -4,8 +4,7 @@ export const APPROVER_ROLE = 'APPROVER'
 export const SUPERADMIN_ROLE = 'SUPERADMIN'
 export const USER_ROLE = 'USER'
 export const VIEWER_ROLE = 'VIEWER'
-export const FINANCE_ROLE = 'FINANCE'
 
-export type SystemRoles = 'ADDRESS_MANAGER' | 'CONTROLLER' | 'APPROVER' | 'SUPERADMIN' | 'USER' | 'VIEWER' | 'FINANCE'
+export type SystemRoles = 'ADDRESS_MANAGER' | 'CONTROLLER' | 'APPROVER' | 'SUPERADMIN' | 'USER' | 'VIEWER'
 
 export const SYSTEM_USER_ROLE_ID = 1

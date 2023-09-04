@@ -1,12 +1,11 @@
 import { Button } from 'components/shared/Button'
 import { Modal } from 'components/shared/Modal'
-import { BLOCKED_STATUS, DRAFT_STATUS, SUBMITTED_BY_APPROVER_STATUS } from 'domain/transferRequest/constants'
+import { DRAFT_STATUS, SUBMITTED_BY_APPROVER_STATUS } from 'domain/transferRequest/constants'
 import { api } from 'lib/api'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import Link from 'next/link'
 import qs from 'qs'
-import { useAuth } from 'components/Authentication/Provider'
 import { ParamsSerializerOptions } from 'axios'
 import { FilecoinApiResult } from 'domain/utils/sendFILWithMaster'
 
@@ -21,7 +20,6 @@ export const DeleteModal = ({ onModalClosed, open, data, redirectTo }: DeleteMod
   const { push } = useRouter()
   const [error, setError] = useState<any>()
   const [isLoading, setIsLoading] = useState(false)
-  const { user } = useAuth()
 
   const handleDelete = async () => {
     setIsLoading(true)
@@ -31,23 +29,6 @@ export const DeleteModal = ({ onModalClosed, open, data, redirectTo }: DeleteMod
 
       if (error) {
         return setError(error?.message || error?.errors)
-      }
-    }
-
-    if (data.status === BLOCKED_STATUS && data.applyer_id === user?.id && data.status) {
-      const { error } = (await api.delete(`/transfer-requests`, {
-        params: {
-          requests: [data.id].join(','),
-        },
-        paramsSerializer: qs.stringify as ParamsSerializerOptions,
-      })) as FilecoinApiResult
-      setIsLoading(false)
-
-      if (error) {
-        if (error.errors) {
-          return setError(error?.errors.requests)
-        }
-        return setError(error)
       }
     }
 

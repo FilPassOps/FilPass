@@ -1,5 +1,5 @@
 import { Prisma, UserFile } from '@prisma/client'
-import { APPROVER_ROLE, CONTROLLER_ROLE, FINANCE_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
+import { APPROVER_ROLE, CONTROLLER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
 import { getFile, getReadStream } from 'lib/fileUpload'
 import { SessionUser } from 'lib/middleware'
 import prisma from 'lib/prisma'
@@ -132,7 +132,7 @@ async function getFileDetails(params: GetUserFileParams) {
     SELECT uf.* FROM user_file uf WHERE uf.public_id = ${filePublicId}
     LIMIT 1;
     `
-  } else if (roles.some(({ role }) => role === CONTROLLER_ROLE || role === FINANCE_ROLE)) {
+  } else if (roles.some(({ role }) => role === CONTROLLER_ROLE)) {
     query = Prisma.sql`SELECT * FROM user_file uf WHERE public_id = ${filePublicId}`
   }
 

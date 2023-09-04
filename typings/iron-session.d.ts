@@ -8,11 +8,6 @@ declare module 'iron-session' {
       id: number
       email: string
       isOnboarded: boolean
-      isUSResident: boolean | null
-      firstName: string | null
-      lastName: string | null
-      dateOfBirth: string | null
-      countryResidence: string | null
       roles: {
         id: number
         role: Role
@@ -25,6 +20,5 @@ declare module 'iron-session' {
     superAdminId?: number
     userRoleId?: number
     viewerId?: number
-    financeId?: number
   }
 }

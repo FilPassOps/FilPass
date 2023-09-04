@@ -17,7 +17,7 @@ CREATE OR REPLACE FUNCTION getnextpublicidbigint() RETURNS TEXT
 $$;
 
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('USER', 'APPROVER', 'CONTROLLER', 'SUPERADMIN', 'ADDRESS_MANAGER', 'VIEWER', 'FINANCE');
+CREATE TYPE "Role" AS ENUM ('USER', 'APPROVER', 'CONTROLLER', 'SUPERADMIN', 'ADDRESS_MANAGER', 'VIEWER');
 
 -- CreateEnum
 CREATE TYPE "TransferStatus" AS ENUM ('PENDING', 'SUCCESS', 'FAILED', 'REJECTED');
@@ -32,7 +32,7 @@ CREATE TYPE "DeliveryMethod" AS ENUM ('ONE_TIME', 'LINEAR_VESTING');
 CREATE TYPE "TransferRequestStatus" AS ENUM ('SUBMITTED', 'VOIDED', 'APPROVED', 'PROCESSING', 'REJECTED_BY_APPROVER', 'REQUIRES_CHANGES', 'PAID', 'REJECTED_BY_CONTROLLER', 'SUBMITTED_BY_APPROVER', 'BLOCKED');
 
 -- CreateEnum
-CREATE TYPE "FileType" AS ENUM ('W8_FORM', 'W9_FORM', 'ATTACHMENT');
+CREATE TYPE "FileType" AS ENUM ('ATTACHMENT');
 
 -- CreateEnum
 CREATE TYPE "ProgramCurrencyType" AS ENUM ('REQUEST', 'PAYMENT');
@@ -55,17 +55,11 @@ CREATE TABLE "user" (
     "email" TEXT NOT NULL,
     "emailHash" TEXT,
     "password" TEXT,
-    "first_name" TEXT,
-    "last_name" TEXT,
-    "date_of_birth" TEXT,
-    "country_residence" TEXT,
-    "is_us_resident" BOOLEAN,
     "is_verified" BOOLEAN NOT NULL DEFAULT false,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
     "is_draft" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
-    "pii_updated_at" TIMESTAMP(3),
     "terms" JSONB,
     "is_onboarded" BOOLEAN NOT NULL DEFAULT false,
     "is_banned" BOOLEAN NOT NULL DEFAULT false,
@@ -126,11 +120,9 @@ CREATE TABLE "user_file" (
     "key" TEXT NOT NULL,
     "filename" TEXT NOT NULL,
     "type" "FileType" NOT NULL,
-    "is_approved" BOOLEAN,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
-    "rejection_reason" TEXT,
 
     CONSTRAINT "user_file_pkey" PRIMARY KEY ("id")
 );
@@ -143,7 +135,6 @@ CREATE TABLE "temporary_file" (
     "key" TEXT NOT NULL,
     "filename" TEXT NOT NULL,
     "type" "FileType" NOT NULL,
-    "is_approved" BOOLEAN NOT NULL DEFAULT false,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -208,7 +199,6 @@ CREATE TABLE "transfer_request" (
     "requester_id" INTEGER NOT NULL,
     "program_id" INTEGER NOT NULL,
     "user_wallet_id" INTEGER NOT NULL,
-    "user_file_id" INTEGER,
     "receiver_id" INTEGER NOT NULL,
     "team" TEXT NOT NULL,
     "team_hash" TEXT,
@@ -216,12 +206,7 @@ CREATE TABLE "transfer_request" (
     "amount" TEXT NOT NULL,
     "currency_unit_id" INTEGER NOT NULL,
     "terms" JSONB,
-    "first_name" TEXT,
-    "last_name" TEXT,
-    "date_of_birth" TEXT,
-    "country_residence" TEXT,
-    "is_us_resident" BOOLEAN,
-    "is_legacy" BOOLEAN NOT NULL DEFAULT false,
+    "user_file_id" INTEGER,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -592,9 +577,6 @@ ALTER TABLE "transfer_request" ADD CONSTRAINT "transfer_request_program_id_fkey"
 
 -- AddForeignKey
 ALTER TABLE "transfer_request" ADD CONSTRAINT "transfer_request_user_wallet_id_fkey" FOREIGN KEY ("user_wallet_id") REFERENCES "user_wallet"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "transfer_request" ADD CONSTRAINT "transfer_request_user_file_id_fkey" FOREIGN KEY ("user_file_id") REFERENCES "user_file"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "transfer_request" ADD CONSTRAINT "transfer_request_receiver_id_fkey" FOREIGN KEY ("receiver_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

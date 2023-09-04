@@ -83,8 +83,6 @@ const formatFieldName = (field: string) => {
       return 'Name'
     case 'amount':
       return 'Requested amount'
-    case 'isUSResident':
-      return 'Is US Resident'
     case 'programId':
       return 'Program'
     case 'userWalletId':
@@ -100,8 +98,6 @@ const formatFieldName = (field: string) => {
 
 const formatFieldValue = ({ field, value, role }: FormatFieldValueProps) => {
   switch (field) {
-    case 'isUSResident':
-      return value === 'true' ? 'Yes' : 'No'
     case 'status':
       return formatStatus({ status: value, role })
     default:
@@ -135,8 +131,6 @@ const formatStatus = ({ status, role }: FormatStatusProps) => {
       return 'Paid'
     case 'REJECTED':
       return 'Rejected'
-    case 'BLOCKED':
-      return 'On Hold' //ON_HOLD is an alias for BLOCKED
     case 'PROCESSING':
       return 'Processing'
     default:

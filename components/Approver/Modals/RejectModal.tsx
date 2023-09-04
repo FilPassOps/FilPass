@@ -1,7 +1,7 @@
 import { Button } from 'components/shared/Button'
 import { TextArea } from 'components/shared/FormInput'
 import { Modal } from 'components/shared/Modal'
-import { BLOCKED_STATUS, REJECTED_BY_APPROVER_STATUS } from 'domain/transferRequest/constants'
+import { REJECTED_BY_APPROVER_STATUS } from 'domain/transferRequest/constants'
 import { api } from 'lib/api'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -67,7 +67,7 @@ export const RejectModal = ({ data, open, onModalClosed, isBatch = false }: Requ
       return setError(error)
     }
 
-    const goBackRoute = !Array.isArray(data) && data.status === BLOCKED_STATUS ? '/approvals?status=ON_HOLD' : '/approvals?status=SUBMITTED'
+    const goBackRoute = !Array.isArray(data) ? '/approvals?status=SUBMITTED' : '/approvals'
 
     onModalClosed()
     return push(goBackRoute)

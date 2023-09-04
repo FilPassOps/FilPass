@@ -29,8 +29,8 @@ export const StatusNotes = ({ notes, status, changesRequested = [] }: StatusNote
     status === REJECTED_BY_APPROVER_STATUS ||
     status === REJECTED_BY_CONTROLLER_STATUS ||
     status === DRAFT_STATUS ||
-    status === 'LEGACY' ||
-    (status === SUBMITTED_STATUS && (notes || changesRequested.length > 0))
+    (status === SUBMITTED_STATUS && notes) ||
+    changesRequested.length > 0
 
   return (
     <>
@@ -94,10 +94,5 @@ const config: Record<string, { style: string; text: string; description?: string
   [DRAFT_STATUS]: {
     style: 'text-heliotrope-magenta bg-pink-lace',
     text: 'This Request Is A Draft',
-  },
-  LEGACY: {
-    style: 'text-gamboge-orange bg-papaya-whip',
-    text: '',
-    description: `Please make sure you review the tax document in this request. If the tax document needs a change, select  ‘Requires Change.’`,
   },
 }
