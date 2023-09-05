@@ -1,9 +1,9 @@
-export const deliveryMethod = {
+export const deliveryMethod: Record<string, string> = {
   ONE_TIME: 'One-time',
   LINEAR_VESTING: 'Linear-vesting',
 }
 
-export const visibility = {
+export const visibility: Record<string, string> = {
   INTERNAL: 'Internal',
   EXTERNAL: 'External',
 }

@@ -1,6 +1,6 @@
 import { getApprovalsByRole } from 'domain/approvals/service'
-import { APPROVER_ROLE, COMPLIANCE_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
-import { BLOCKED_STATUS, ON_HOLD_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
+import { APPROVER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
+import { SUBMITTED_STATUS } from 'domain/transferRequest/constants'
 import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { getEthereumAddress } from 'lib/getEthereumAddress'
 import { newHandler, withMethods, withRoles } from 'lib/middleware'
@@ -9,7 +9,7 @@ const handler = async (req, res) => {
   const userId = req.user.id
   const roles = req.user.roles
   const query = req.query
-  const status = query.status === ON_HOLD_STATUS ? BLOCKED_STATUS : query.status || SUBMITTED_STATUS // ON_HOLD is an alias for BLOCKED
+  const status =  query.status || SUBMITTED_STATUS
   const requestNumber = query.number
   const team = query.team?.toString().split(',')
 
@@ -56,4 +56,4 @@ const handler = async (req, res) => {
   return res.status(200).json(data)
 }
 
-export default newHandler(withRoles([APPROVER_ROLE, COMPLIANCE_ROLE, VIEWER_ROLE], withMethods(['GET'], handler)))
+export default newHandler(withRoles([APPROVER_ROLE, VIEWER_ROLE], withMethods(['GET'], handler)))

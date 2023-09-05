@@ -3,8 +3,8 @@ import { validate } from 'lib/yup'
 import { getWalletVerificationsValidator } from './validation'
 
 interface GetWalletVerificationsParams {
-  address: string
-  userId: number
+  address?: string
+  userId?: number
 }
 
 export async function getWalletVerifications(params: GetWalletVerificationsParams) {

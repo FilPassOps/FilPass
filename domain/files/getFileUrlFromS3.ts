@@ -6,8 +6,8 @@ import { getFileUrlFromS3Validator } from './validation'
 import { logger } from 'lib/logger'
 
 interface GetFileUrlFromS3Params {
-  transferRequestId: string
-  userId: number
+  transferRequestId?: string
+  userId?: number
 }
 
 interface FileResult {

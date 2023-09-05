@@ -8,5 +8,3 @@ export const PLATFORM_NAME = 'Emissary'
 export const TOKEN_NAME = 'Filecoin' as const
 export const TOKEN_SYMBOL = 'FIL' as const
 export const TOKEN_COIN_MARKET_API_CODE = '2280' as const // from https://pro-api.coinmarketcap.com/v1/cryptocurrency/map
-
-export const SANCTION_CHECK_ENABLED = true

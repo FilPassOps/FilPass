@@ -280,30 +280,6 @@ export async function findUserRolePrograms(userId: number) {
   }
 }
 
-export async function findCompliancePrograms() {
-  return await prisma.program.findMany({
-    where: {
-      isActive: true,
-      transferRequests: {
-        some: {
-          status: 'BLOCKED',
-        },
-      },
-    },
-    include: {
-      programCurrency: {
-        select: {
-          currency: true,
-          type: true,
-        },
-      },
-    },
-    orderBy: {
-      name: 'asc',
-    },
-  })
-}
-
 interface UserRoleProgramQueryResult {
   isActive: boolean
   id: number

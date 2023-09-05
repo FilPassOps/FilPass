@@ -3,7 +3,6 @@ import { hash } from 'bcrypt'
 
 import { loadEnvConfig } from '@next/env'
 import { PrismaClient } from '@prisma/client'
-import { DateTime } from 'luxon'
 import { encrypt, encryptPII } from '../lib/emissaryCrypto'
 loadEnvConfig(process.cwd(), true)
 
@@ -26,15 +25,6 @@ const teamNames = [
   'First approver team',
 ]
 
-const usersInfoData = [
-  {
-    firstName: 'John',
-    lastName: 'Doe',
-    country: 'CUB',
-    dateOfBirth: DateTime.fromJSDate(new Date(754149600000)).toISO(),
-  },
-]
-
 interface Teams {
   [key: string]: {
     hash: string
@@ -42,17 +32,7 @@ interface Teams {
   }
 }
 
-interface UserInfo {
-  [key: string]: {
-    firstName: string
-    lastName: string
-    country: string
-    dateOfBirth: string
-  }
-}
-
 const teams: Teams = {}
-const usersInfo: UserInfo = {}
 
 const defaultTerms = {
   tax: true,
@@ -66,8 +46,6 @@ const defaultTerms = {
 
 async function main() {
   await createSuperAdmin()
-  await createCompliance()
-  await createFinance()
 
   const [approver, approverRole] = await createApprover()
   const [controller, controllerRole] = await createController()
@@ -111,23 +89,12 @@ async function main() {
     }
   }
 
-  for await (const userInfo of usersInfoData) {
-    usersInfo[userInfo.firstName] = {
-      firstName: await encryptPII(userInfo.firstName),
-      lastName: await encryptPII(userInfo.lastName),
-      country: await encryptPII(userInfo.country),
-      dateOfBirth: userInfo.dateOfBirth ? await encryptPII(userInfo.dateOfBirth) : '',
-    }
-  }
-
   for (let i = 0; i < 150; i++) {
-    const { user, w9, w8, t1Wallet, t3Wallet, userRole } = await createUser(i)
+    const { user, t1Wallet, t3Wallet, userRole } = await createUser(i)
     await createTransferRequest({
       receiverId: user.id,
       requesterId: userRole.userId,
       amount: 0.1,
-      isUSResident: true,
-      userFileId: w9.id,
       program: oneTimeProgram,
       team: 'First team',
       userWalletId: t1Wallet.id,
@@ -137,8 +104,6 @@ async function main() {
       receiverId: user.id,
       requesterId: user.id,
       amount: 0.2,
-      isUSResident: true,
-      userFileId: w9.id,
       program: oneTimeProgram,
       team: 'Second team',
       userWalletId: t1Wallet.id,
@@ -149,8 +114,6 @@ async function main() {
       receiverId: user.id,
       requesterId: user.id,
       amount: 0.3,
-      isUSResident: true,
-      userFileId: w9.id,
       program: oneTimeProgram,
       team: 'Third team',
       userWalletId: t1Wallet.id,
@@ -165,8 +128,6 @@ async function main() {
       receiverId: user.id,
       requesterId: user.id,
       amount: 0.3,
-      isUSResident: true,
-      userFileId: w9.id,
       program: oneTimeProgram,
       team: 'Third team',
       userWalletId: t1Wallet.id,
@@ -181,8 +142,6 @@ async function main() {
       receiverId: user.id,
       requesterId: user.id,
       amount: 0.32,
-      isUSResident: true,
-      userFileId: w9.id,
       program: oneTimeProgram,
       team: 'Third team',
       userWalletId: t3Wallet.id,
@@ -197,8 +156,6 @@ async function main() {
       receiverId: user.id,
       requesterId: user.id,
       amount: 0.4,
-      isUSResident: true,
-      userFileId: w9.id,
       program: oneTimeProgram,
       team: 'Fourth team',
       userWalletId: t1Wallet.id,
@@ -214,8 +171,6 @@ async function main() {
       receiverId: user.id,
       requesterId: user.id,
       amount: 0.5,
-      isUSResident: true,
-      userFileId: w9.id,
       program: oneTimeProgram,
       team: 'Fifth team',
       userWalletId: t1Wallet.id,
@@ -231,8 +186,6 @@ async function main() {
       receiverId: user.id,
       requesterId: user.id,
       amount: 0.6,
-      isUSResident: true,
-      userFileId: w9.id,
       program: oneTimeProgram,
       team: 'Sixth team',
       userWalletId: t1Wallet.id,
@@ -252,8 +205,6 @@ async function main() {
       receiverId: user.id,
       requesterId: user.id,
       amount: 0.6,
-      isUSResident: true,
-      userFileId: w9.id,
       program: oneTimeProgram,
       team: 'Seventh team',
       userWalletId: t1Wallet.id,
@@ -274,8 +225,6 @@ async function main() {
       receiverId: user.id,
       requesterId: approver.id,
       amount: 0.1,
-      isUSResident: true,
-      userFileId: w9.id,
       program: oneTimeProgram,
       team: 'First approver team',
       userWalletId: t1Wallet.id,
@@ -285,8 +234,6 @@ async function main() {
       receiverId: user.id,
       requesterId: controller.id,
       amount: 0.1,
-      isUSResident: true,
-      userFileId: w9.id,
       program: linearVestingProgram,
       team: 'First controller team',
       userWalletId: t1Wallet.id,
@@ -298,54 +245,6 @@ async function main() {
       amount: 0.1,
       team: 'Draft team',
       program: oneTimeProgram,
-    })
-
-    await createTransferRequest({
-      receiverId: user.id,
-      requesterId: user.id,
-      amount: 0.1,
-      isUSResident: false,
-      userFileId: w8.id,
-      program: oneTimeProgram,
-      team: 'First team',
-      userWalletId: t1Wallet.id,
-      status: 'BLOCKED',
-      firstName: 'John',
-      sanctionReason: 'Country of residence is sanctioned',
-      isSanctioned: true,
-    })
-
-    await createTransferRequest({
-      receiverId: user.id,
-      requesterId: user.id,
-      amount: 0.1,
-      isUSResident: false,
-      userFileId: w8.id,
-      program: oneTimeProgram,
-      team: 'Second team',
-      userWalletId: t1Wallet.id,
-      status: 'BLOCKED',
-      firstName: 'John',
-      sanctionReason: 'Country of residence is sanctioned',
-      isSanctioned: true,
-    })
-
-    await createTransferRequest({
-      receiverId: user.id,
-      requesterId: user.id,
-      amount: 0.1,
-      isUSResident: false,
-      userFileId: w8.id,
-      program: oneTimeProgram,
-      team: 'Third team',
-      userWalletId: t1Wallet.id,
-      status: 'BLOCKED',
-      firstName: 'John',
-      sanctionReason: `
-      SDNT(Specially Designated Narcotics Traffickers).<br/>
-      Entity Number: 1234; Sanctioned Since: 11-9-2005; DOB 24-11-1993; POB Armenia, Quindio, Colombia; POB Roldanillo, Valle, Colombia;
-      Cedula No. 123456789 (Colombia); Cedula No. 123456789 (Colombia); Citizenship Colombia; Passport AB12345 (Colombia)`,
-      isSanctioned: true,
     })
   }
 }
@@ -362,10 +261,8 @@ interface CreateTransferRequestType {
     }[]
   }
   userWalletId: number
-  userFileId: number
   team: string
   amount: number
-  isUSResident: boolean
   review?: {
     approverId: number
     status: TransferRequestReviewStatus
@@ -378,9 +275,6 @@ interface CreateTransferRequestType {
     transferRef?: string
     txHash?: string
   }
-  firstName?: string
-  isSanctioned?: boolean
-  sanctionReason?: string
 }
 
 async function createTransferRequest({
@@ -389,15 +283,10 @@ async function createTransferRequest({
   requesterId,
   program,
   userWalletId,
-  userFileId,
   team,
   amount,
-  isUSResident,
   review,
   payment,
-  firstName,
-  isSanctioned,
-  sanctionReason,
 }: CreateTransferRequestType) {
   const request = await prisma.transferRequest.create({
     data: {
@@ -422,22 +311,9 @@ async function createTransferRequest({
           id: userWalletId,
         },
       },
-      form: {
-        connect: {
-          id: userFileId,
-        },
-      },
       team: teams[team].pii,
       teamHash: teams[team].hash,
       amount: await encrypt(amount.toString()),
-      dateOfBirth: firstName && usersInfo[firstName].dateOfBirth,
-      firstName: firstName && usersInfo[firstName].firstName,
-      lastName: firstName && usersInfo[firstName].lastName,
-      countryResidence: firstName && usersInfo[firstName].country,
-      sanctionReason: sanctionReason ? await encryptPII(sanctionReason) : null,
-      isUSResident,
-      isSanctioned,
-      isLegacy: true,
       expectedTransferDate: new Date(),
       terms: defaultTerms,
       currency: {
@@ -617,29 +493,6 @@ async function createUser(index: number) {
     },
   })
 
-  const [w8, w9] = await Promise.all([
-    prisma.userFile.create({
-      data: {
-        type: 'W8_FORM',
-        userId: user.id,
-        isApproved: false,
-        isActive: false,
-        filename: 'w8-form.pdf',
-        key: `w8.pdf`,
-      },
-    }),
-    prisma.userFile.create({
-      data: {
-        type: 'W9_FORM',
-        userId: user.id,
-        isApproved: false,
-        isActive: false,
-        filename: 'w9-form.pdf',
-        key: `w9.pdf`,
-      },
-    }),
-  ])
-
   const userRole = await prisma.userRole.create({
     data: {
       userId: user.id,
@@ -647,7 +500,7 @@ async function createUser(index: number) {
     },
   })
 
-  return { user, userRole, w8, w9, t1Wallet, t3Wallet }
+  return { user, userRole, t1Wallet, t3Wallet }
 }
 
 async function createController() {
@@ -704,62 +557,6 @@ async function createViewer() {
   })
 
   return viewerRole
-}
-
-async function createCompliance() {
-  const compliance = await prisma.user.create({
-    data: {
-      email: await encryptPII(`test-compliance${EMAIL_DOMAIN}`),
-      emailHash: await hash(`test-compliance${EMAIL_DOMAIN}`, salt),
-      isActive: true,
-      isVerified: true,
-      password: '$2b$10$JNEr1LRmoUgPWzbt8ve/a.ZcDIpMQK9II2OCj42kjNdWkG0.yluky',
-    },
-  })
-
-  await prisma.userRole.create({
-    data: {
-      userId: compliance.id,
-      role: 'USER',
-    },
-  })
-
-  const complianceRole = await prisma.userRole.create({
-    data: {
-      userId: compliance.id,
-      role: 'COMPLIANCE',
-    },
-  })
-
-  return [compliance, complianceRole]
-}
-
-async function createFinance() {
-  const finance = await prisma.user.create({
-    data: {
-      email: await encryptPII(`test-finance${EMAIL_DOMAIN}`),
-      emailHash: await hash(`test-finance${EMAIL_DOMAIN}`, salt),
-      isActive: true,
-      isVerified: true,
-      password: '$2b$10$JNEr1LRmoUgPWzbt8ve/a.ZcDIpMQK9II2OCj42kjNdWkG0.yluky',
-    },
-  })
-
-  await prisma.userRole.create({
-    data: {
-      userId: finance.id,
-      role: 'USER',
-    },
-  })
-
-  const financeRole = await prisma.userRole.create({
-    data: {
-      userId: finance.id,
-      role: 'FINANCE',
-    },
-  })
-
-  return [finance, financeRole]
 }
 
 async function createApprover() {

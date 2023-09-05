@@ -319,7 +319,6 @@ describe('updateTransferRequestById', () => {
         userFileId: 1,
         programId: 2,
         userWalletId: 3,
-        isUSResident: true,
         terms: 'terms',
         expectedTransferDate: 'date',
         createdAt: 'created',
@@ -369,7 +368,6 @@ describe('updateTransferRequestById', () => {
       userFileId: 1,
       programId: 2,
       userWalletId: 3,
-      isUSResident: true,
       terms: 'terms',
       expectedTransferDate: 'date',
       createdAt: 'created',
@@ -384,7 +382,6 @@ describe('updateTransferRequestById', () => {
       userFileId: 1,
       programId: 2,
       userWalletId: 3,
-      isUSResident: true,
       expectedTransferDate: 'date',
       currencyUnitId: 4,
       requesterId: 9,
@@ -441,7 +438,6 @@ describe('updateTransferRequestById', () => {
         userFileId: 1,
         programId: 2,
         userWalletId: 2,
-        isUSResident: true,
         terms: 'terms',
         expectedTransferDate: 'date',
         createdAt: 'created',
@@ -488,7 +484,6 @@ describe('updateTransferRequestById', () => {
       userFileId: 1,
       programId: 2,
       userWalletId: 2,
-      isUSResident: true,
       terms: 'terms',
       expectedTransferDate: 'date',
       createdAt: 'created',
@@ -504,7 +499,6 @@ describe('updateTransferRequestById', () => {
       userFileId: 1,
       programId: 2,
       userWalletId: 2,
-      isUSResident: true,
       expectedTransferDate: 'date',
       currencyUnitId: 4,
       requesterId: 9,
@@ -542,10 +536,5 @@ describe('updateTransferRequestById', () => {
       userRoleId: 20,
     })
     expect(mockNotification).toBeCalledWith({ programId: 2, transferRequestId: 99 })
-    expect(mockLogChanges).toBeCalledWith({
-      requestId: 10,
-      oldAddress: 'old_wallet_address',
-      newAddress: 'new_wallet_address',
-    })
   })
 })

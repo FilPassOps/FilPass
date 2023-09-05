@@ -7,7 +7,6 @@ import errorsMessages from 'wordings-and-errors/errors-messages'
 import { MAX_INTEGER_VALUE } from '../constants'
 import {
   APPROVED_STATUS,
-  BLOCKED_STATUS,
   DRAFT_STATUS,
   PAID_STATUS,
   PROCESSING_STATUS,
@@ -38,12 +37,7 @@ export const createTransferRequestValidatorBackend = yup.object({
   currencyUnitId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
   user: yup.object({
     id: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
-    firstName: yup.string().required(),
-    lastName: yup.string().required(),
     email: yup.string().required(),
-    dateOfBirth: yup.string().required(),
-    countryResidence: yup.string().required(),
-    isUSResident: yup.boolean().required(),
     terms: termsValidator,
   }),
 })
@@ -52,13 +46,6 @@ export const getUserTransferRequestByIdValidator = yup
   .object({
     transferRequestId: yup.string().required(),
     userId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
-    status: yup.mixed().oneOf(Object.values(TransferRequestStatus)).optional(),
-  })
-  .required()
-
-export const getCompliaceTransferRequestByIdValidator = yup
-  .object({
-    transferRequestId: yup.string().required(),
     status: yup.mixed().oneOf(Object.values(TransferRequestStatus)).optional(),
   })
   .required()
@@ -88,23 +75,6 @@ export const getViewerTransferRequestsValidator = yup.object({
   order: yup.mixed().oneOf(['asc', 'desc']),
 })
 
-export const getComplianceTransferRequestsValidator = yup.object({
-  programId: yup.array(yup.number().integer().positive().max(MAX_INTEGER_VALUE)).optional(),
-  requestNumber: yup.string().optional(),
-  teamHashes: yup.array(yup.string().required()).optional(),
-  from: yup.date().optional(),
-  to: yup.date().when('from', {
-    is: (from: Date) => !!from,
-    then: schema => schema.required(),
-    otherwise: schema => schema.optional(),
-  }),
-  wallets: yup.array(yup.string().required()).optional(),
-  page: yup.number().integer().positive().max(MAX_INTEGER_VALUE),
-  size: yup.number().integer().positive().max(MAX_INTEGER_VALUE),
-  sort: yup.mixed().oneOf(['number', 'program', 'create_date']),
-  order: yup.mixed().oneOf(['asc', 'desc']),
-})
-
 export const getApproverTransferRequestsValidator = yup.object({
   approverId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).typeError(errorsMessages.required_field.message).required(),
   status: yup
@@ -117,7 +87,6 @@ export const getApproverTransferRequestsValidator = yup.object({
       REQUIRES_CHANGES_STATUS,
       VOIDED_STATUS,
       DRAFT_STATUS,
-      BLOCKED_STATUS,
       PROCESSING_STATUS,
     ])
     .required(),
@@ -239,7 +208,6 @@ export const createReportValidator = yup.object({
       status: yup.boolean().required(),
       receiverEmail: yup.boolean().required(),
       residency: yup.boolean().required(),
-      taxForm: yup.boolean().required(),
       filfoxLink: yup.boolean().required(),
     })
     .test('oneColumnRequired', 'Select at least one column', value => Object.values(value).includes(true)),

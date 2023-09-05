@@ -89,13 +89,3 @@ export const sendWalletVerificationNotificationValidator = yup.object({
   email: yup.string().email().required(),
   userId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
 })
-
-export const sendSanctionNotificationValidator = yup.object({
-  userId: yup.number().required(),
-  sanctionReason: yup.string().required(),
-})
-
-export const sendTaxFormRejectedNotificationValidator = yup.object({
-  emails: yup.array(yup.string().required()).min(1).required(),
-  rejectionReason: yup.string().required(),
-})

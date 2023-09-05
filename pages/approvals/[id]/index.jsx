@@ -1,13 +1,18 @@
 import { TransferRequestView } from 'components/Approver/TransferRequestView'
 import { Layout } from 'components/Layout'
 import { getApprovalDetailsByRole } from 'domain/approvals/service'
-import { APPROVER_ROLE, COMPLIANCE_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
+import { APPROVER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
 import { withRolesSSR } from 'lib/ssr'
 import { PLATFORM_NAME } from 'system.config'
 
 export default function ApproverViewAwaiting({ data }) {
   return (
     <>
+      <Head>
+        <title>
+          {`Approval #${data?.id} - ${PLATFORM_NAME}`}
+        </title>
+      </Head>
       <TransferRequestView data={data} />
     </>
   )
@@ -23,7 +28,7 @@ ApproverViewAwaiting.getLayout = function getLayout(page) {
   )
 }
 
-export const getServerSideProps = withRolesSSR([APPROVER_ROLE, VIEWER_ROLE, COMPLIANCE_ROLE], async ({ user, query }) => {
+export const getServerSideProps = withRolesSSR([APPROVER_ROLE, VIEWER_ROLE], async ({ user, query }) => {
   const { id, roles } = user
 
   const { data, error } = await getApprovalDetailsByRole({ transferRequestId: query.id, roles, userId: id })

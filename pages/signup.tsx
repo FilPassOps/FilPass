@@ -18,7 +18,7 @@ export default function SignUp() {
   return (
     <>
       <Head>
-        <title>Sign Up - {PLATFORM_NAME}</title>
+        <title key='sign-up'>{`Sign Up - ${PLATFORM_NAME}`}</title>
       </Head>
       <SignUpComponent />
     </>

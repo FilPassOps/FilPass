@@ -4,7 +4,7 @@ import { validate } from 'lib/yup'
 import { programAssociatedRequestsValidator } from './validation'
 
 interface ProgramAssociatedRequestsParams {
-  programId: number
+  programId?: number
 }
 
 export async function programAssociatedRequests(params: ProgramAssociatedRequestsParams) {

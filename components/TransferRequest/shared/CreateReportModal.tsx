@@ -72,7 +72,6 @@ export const CreateReportModal = ({
         receiverEmail: isDisbursement && showPaidStatusColumns,
         residency: showPaidStatusColumns,
         paidFilAmount: showPaidStatusColumns,
-        taxForm: showPaidStatusColumns,
         filfoxLink: showPaidStatusColumns,
       },
     },
@@ -94,6 +93,7 @@ export const CreateReportModal = ({
               {...field}
               // @ts-ignore
               id="pageSelected"
+              name="pageSelected"
               options={pageSelectorItems}
               label="Select page"
               error={errors.pageSelected}
@@ -150,10 +150,6 @@ export const CreateReportModal = ({
               {/* @ts-ignore */}
               <CheckboxInput className="items-center" id="filAmount" {...register('columns.paidFilAmount')}>
                 <span className="text-gray-700 font-medium text-sm">Paid FIL Amount</span>
-              </CheckboxInput>
-              {/* @ts-ignore */}
-              <CheckboxInput className="items-center" id="taxForm" {...register('columns.taxForm')}>
-                <span className="text-gray-700 font-medium text-sm">Tax form</span>
               </CheckboxInput>
               {/* @ts-ignore */}
               <CheckboxInput className="items-center" id="filfoxLink" {...register('columns.filfoxLink')}>

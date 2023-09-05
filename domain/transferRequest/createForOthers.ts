@@ -18,6 +18,8 @@ interface Result {
   data: any[]
 }
 
+
+// TODO: add validator?
 export const createForOthers = async ({ requests, requesterId, approverRoleId, isBatchCsv = false, approver }: CreateForOthersParams) => {
   const containsApproverError = payloadContainsRequesterEmail(requests, approver)
 

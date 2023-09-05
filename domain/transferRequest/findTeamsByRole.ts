@@ -3,25 +3,6 @@ import { statusFilterMapping, StatusFilterOption } from 'components/Filters/cons
 import prisma from 'lib/prisma'
 import { DRAFT_STATUS } from './constants'
 
-export const findComplianceTeams = async () => {
-  const teams = await prisma.transferRequest.findMany({
-    select: {
-      team: true,
-    },
-    where: {
-      status: 'BLOCKED',
-    },
-  })
-
-  const uniqueResults = new Set<string>()
-
-  for (const { team } of teams) {
-    uniqueResults.add(team)
-  }
-
-  return Array.from(uniqueResults)
-}
-
 export const findUserRoleTeams = async (userId: number, requestStatus: StatusFilterOption) => {
   const uniqueResults = new Set<string>()
 

@@ -23,7 +23,7 @@ api.interceptors.request.use(
 
 api.interceptors.response.use(
   response => {
-    if (response.data.error) {
+    if (response.data?.error) {
       return Promise.reject({
         error: {
           status: 400,

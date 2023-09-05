@@ -1,13 +1,13 @@
 import { newPrismaTransaction } from 'lib/prisma'
 import { validate } from 'lib/yup'
 import { deleteTransferRequestValidator } from './validation'
-import { User } from '@prisma/client'
+import { SessionUser } from 'lib/middleware'
 
 interface DeleteTransferRequestByIdParams {
   requests: string[]
 }
 
-export async function deleteTransferRequestById(params: DeleteTransferRequestByIdParams, user: User) {
+export async function deleteTransferRequestById(params: DeleteTransferRequestByIdParams, user: SessionUser) {
   const { id: requesterId } = user
   const { fields, errors } = await validate(deleteTransferRequestValidator, params)
 

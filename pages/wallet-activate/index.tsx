@@ -15,7 +15,7 @@ export default function WalletActivate({ error }: { error?: { message: string } 
   return (
     <>
       <Head>
-        <title>Activate Account - {PLATFORM_NAME}</title>
+        <title key='activate-account'>{`Activate Account - ${PLATFORM_NAME}`}</title>
       </Head>
       {error ? (
         <div className="flex flex-col h-screen items-center justify-center">

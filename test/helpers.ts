@@ -7,7 +7,6 @@ import {
   TransferRequestDraft,
   TransferRequestReview,
   User,
-  UserFile,
   UserRole,
   UserWallet,
 } from '@prisma/client'
@@ -33,13 +32,12 @@ interface ProgramWithCurrency extends Program {
 }
 
 type CreateTransferRequestProps = Partial<
-  Pick<TransferRequest, 'status' | 'team' | 'amount' | 'isUSResident' | 'isActive' | 'vestingMonths' | 'vestingStartEpoch' | 'createdAt'>
+  Pick<TransferRequest, 'status' | 'team' | 'amount' | 'isActive' | 'vestingMonths' | 'vestingStartEpoch' | 'createdAt'>
 > &
   Pick<TransferRequest, 'receiverId' | 'requesterId' | 'userWalletId'> & {
     program: ProgramWithCurrency
     review?: Pick<TransferRequestReview, 'status' | 'approverId' | 'notes'>
     payment?: Transfer
-    userFileId: number
   }
 
 export async function createTransferRequest({
@@ -48,10 +46,8 @@ export async function createTransferRequest({
   requesterId,
   program,
   userWalletId,
-  userFileId,
   team = 'The Test Team',
   amount = '1000',
-  isUSResident = true,
   review,
   payment,
   isActive = true,
@@ -82,15 +78,9 @@ export async function createTransferRequest({
           id: userWalletId,
         },
       },
-      form: {
-        connect: {
-          id: userFileId,
-        },
-      },
       team: await encryptPII(team),
       teamHash: await hash(team, teamSalt),
       amount: await encrypt(amount),
-      isUSResident,
       expectedTransferDate: new Date(),
       terms: defaultTerms,
       currency: {
@@ -140,10 +130,8 @@ export async function createMultisigTransferRequest({
   requesterId,
   program,
   userWalletId,
-  userFileId,
   team = 'The Test Team',
   amount = '1000',
-  isUSResident = true,
   review,
   payment,
   isActive = true,
@@ -174,15 +162,9 @@ export async function createMultisigTransferRequest({
           id: userWalletId,
         },
       },
-      form: {
-        connect: {
-          id: userFileId,
-        },
-      },
       team: await encryptPII(team),
       teamHash: await hash(team, teamSalt),
       amount: await encrypt(amount),
-      isUSResident,
       expectedTransferDate: new Date(),
       terms: defaultTerms,
       robustAddress: 'bafy2bzaceamyexftc2r2vrpfvkg3gicktkelm6e6xpizxh2hbp27eutjbbpec',
@@ -369,8 +351,6 @@ export async function createOneTimeProgram(name: string | undefined = 'FIL ONE T
 export interface CreateUserResult {
   user: User
   userRole: UserRole
-  w8: [UserFile, UserFile]
-  w9: [UserFile, UserFile]
   wallets: [UserWallet]
 }
 
@@ -391,8 +371,6 @@ export async function createUser(email: string): Promise<CreateUserResult> {
     },
   })
 
-  const fileKey = Date.now()
-
   const wallets = await Promise.all([
     prisma.userWallet.create({
       data: {
@@ -404,46 +382,6 @@ export async function createUser(email: string): Promise<CreateUserResult> {
     }),
   ])
 
-  const w8 = await Promise.all([
-    prisma.userFile.create({
-      data: {
-        type: 'W8_FORM',
-        userId: user.id,
-        filename: 'w8 not approved',
-        key: `w8 not approved ${fileKey}`,
-      },
-    }),
-    prisma.userFile.create({
-      data: {
-        type: 'W8_FORM',
-        userId: user.id,
-        isApproved: true,
-        filename: 'w8 approved yay',
-        key: `w8 approved yay ${fileKey}`,
-      },
-    }),
-  ])
-
-  const w9 = await Promise.all([
-    prisma.userFile.create({
-      data: {
-        type: 'W9_FORM',
-        userId: user.id,
-        isApproved: true,
-        filename: 'w9 approved1 yay',
-        key: `w9 approved1 yay ${fileKey}`,
-      },
-    }),
-    prisma.userFile.create({
-      data: {
-        type: 'W9_FORM',
-        userId: user.id,
-        isApproved: true,
-        filename: 'w9 approved2 yay',
-        key: `w9 approved2 yay ${fileKey}`,
-      },
-    }),
-  ])
 
   const userRole = await prisma.userRole.create({
     data: {
@@ -453,7 +391,7 @@ export async function createUser(email: string): Promise<CreateUserResult> {
   })
   await prisma.$disconnect()
 
-  return { user, userRole, w8, w9, wallets }
+  return { user, userRole, wallets }
 }
 
 export async function createController(): Promise<[User, UserRole]> {

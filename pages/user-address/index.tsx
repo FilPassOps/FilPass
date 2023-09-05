@@ -5,6 +5,7 @@ import { PLATFORM_NAME } from 'system.config'
 import { findAllWithWallets } from 'domain/user/findAllWithWallets'
 import { withAddressManagerSSR } from 'lib/ssr'
 import { ReactElement } from 'react'
+import Head from 'next/head'
 
 interface Wallet {
   user: {
@@ -30,6 +31,9 @@ interface UserAddressProps {
 export default function UserAddress({ data = [], pageSize, totalItems }: UserAddressProps) {
   return (
     <>
+      <Head>
+        <title>{`User Address - ${PLATFORM_NAME}`}</title>
+      </Head>
       <PaginationWrapper totalItems={totalItems} pageSize={pageSize} childrenContainerClass="overflow-x-auto overflow-y-hidden">
         <UserWalletList data={data} totalItems={totalItems} />
       </PaginationWrapper>
@@ -38,7 +42,7 @@ export default function UserAddress({ data = [], pageSize, totalItems }: UserAdd
 }
 
 UserAddress.getLayout = function getLayout(page: ReactElement) {
-  return <Layout title={`User Address - ${PLATFORM_NAME}`}>{page}</Layout>
+  return <Layout title="User Address">{page}</Layout>
 }
 export const getServerSideProps = withAddressManagerSSR(async function getServerSideProps({ user, query }) {
   const pageSize = getItemsPerPage(query.itemsPerPage)

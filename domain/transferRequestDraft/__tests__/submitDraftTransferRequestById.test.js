@@ -79,7 +79,6 @@ describe('submitDraftTransferRequestById', () => {
         programId: 1,
         userWalletId: 1,
         team: 'team',
-        isUSResident: true,
         terms: {},
         expectedTransferDate: '2020-01-01',
         currencyUnitId: 1,
@@ -117,7 +116,6 @@ describe('submitDraftTransferRequestById', () => {
       programId: 1,
       userWalletId: 1,
       team: 'team',
-      isUSResident: true,
       terms: {},
       expectedTransferDate: '2020-01-01',
       currencyUnitId: 1,
@@ -138,7 +136,6 @@ describe('submitDraftTransferRequestById', () => {
         programId: 1,
         userWalletId: 1,
         team: 'team',
-        isUSResident: true,
         terms: {},
         expectedTransferDate: '2020-01-01',
         currencyUnitId: 1,
@@ -180,7 +177,6 @@ describe('submitDraftTransferRequestById', () => {
       programId: 1,
       userWalletId: 1,
       team: 'team',
-      isUSResident: true,
       terms: {},
       expectedTransferDate: '2020-01-01',
       currencyUnitId: 1,
@@ -201,7 +197,6 @@ describe('submitDraftTransferRequestById', () => {
         programId: 1,
         userWalletId: 1,
         team: 'team',
-        isUSResident: true,
         terms: {},
         expectedTransferDate: '2020-01-01',
         currencyUnitId: 1,
@@ -242,7 +237,6 @@ describe('submitDraftTransferRequestById', () => {
       programId: 1,
       userWalletId: 1,
       team: 'team',
-      isUSResident: true,
       terms: {},
       expectedTransferDate: '2020-01-01',
       currencyUnitId: 1,
@@ -251,10 +245,5 @@ describe('submitDraftTransferRequestById', () => {
     expect(data).toBeDefined()
     expect(error).toBeUndefined()
     expect(mockPrismaTransaction).toBeCalled()
-    expect(mockLogChanges).toBeCalledWith({
-      requestId: 123,
-      oldAddress: '-',
-      newAddress: 'wallet_address',
-    })
   })
 })

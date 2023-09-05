@@ -8,22 +8,21 @@ import { findAllExternalPrograms } from 'domain/programs/findAll'
 import { getMasterWallet } from 'lib/filecoin'
 import { withUserSSR } from 'lib/ssr'
 import { ReactElement } from 'react'
+import Head from 'next/head'
 
 interface CreateTransferRequestProps {
   programs: any[]
-  masterAddress: string
   applyingForSomeone: boolean
 }
 
-export default function CreateTransferRequest({ programs, masterAddress, applyingForSomeone }: CreateTransferRequestProps) {
+export default function CreateTransferRequest({ programs, applyingForSomeone }: CreateTransferRequestProps) {
   return (
     <>
+      <Head>
+        <title>{`New Transfer Request - ${PLATFORM_NAME}`}</title>
+      </Head>
       <div className="max-w-3xl mx-auto">
-        {applyingForSomeone ? (
-          <ApplyForSomeoneForm />
-        ) : (
-          <TransferRequestForm programs={programs} masterAddress={masterAddress} />
-        )}
+        {applyingForSomeone ? <ApplyForSomeoneForm /> : <TransferRequestForm programs={programs}/>}
       </div>
       <GoBackConfirmationWithRouter />
     </>
@@ -31,20 +30,11 @@ export default function CreateTransferRequest({ programs, masterAddress, applyin
 }
 
 CreateTransferRequest.getLayout = function getLayout(page: ReactElement) {
-  return <Layout title={`New Transfer Request - ${PLATFORM_NAME}`}>{page}</Layout>
+  return <Layout title="New Transfer Request">{page}</Layout>
 }
 
 export const getServerSideProps = withUserSSR(async function getServerSideProps({ user, query }) {
-  const { isSanctioned, isReviewedByCompliance, roles } = user
-
-  if (isReviewedByCompliance && isSanctioned) {
-    return {
-      redirect: {
-        destination: '/flagged-account',
-        permanent: false
-      },
-    }
-  }
+  const { roles } = user
 
   const { data: programs } = await findAllExternalPrograms()
   const masterWallet = getMasterWallet()
