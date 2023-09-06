@@ -1,23 +1,23 @@
-import config from 'chains.config'
 import { transferPaymentConfirm } from 'domain/transfer/transfers-payment-confirm'
 import { ethers } from 'ethers'
 import { logger } from 'lib/logger'
-import { MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
+import { CONFIG } from 'system.config'
+import { MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
 
-const provider = new ethers.providers.JsonRpcProvider(config.chain.rpcUrls[0])
-const signer = provider.getSigner()
-const multiForwarder = MultiForwarderFactory.connect(config.multiforwarder, signer)
-const filterAny = multiForwarder.filters.ForwardAny()
-const filter = multiForwarder.filters.Forward()
+const map = new Map<string, MultiForwarder>()
 
-multiForwarder.on(filterAny, (id, from, to, value, _total, event) => {
-  logger.info('ForwardAny', event.transactionHash)
-  transferPaymentConfirm({ id, from, to, value, transactionHash: event.transactionHash })
+CONFIG.chains.forEach(chain => {
+  const provider = new ethers.providers.JsonRpcProvider(chain.rpcUrls[0])
+  const signer = provider.getSigner()
+  map.set(chain.name, MultiForwarderFactory.connect(chain.contractAddress, signer))
 })
 
-multiForwarder.on(filter, (id, from, to, value, _total, event) => {
-  logger.info('Forward', event.transactionHash)
-  transferPaymentConfirm({ id, from, to, value, transactionHash: event.transactionHash })
-})
+for (const [chainName, contract] of map.entries()) {
+  const filter = contract.filters.Forward()
+  contract.on(filter, (id, from, to, value, _total, event) => {
+    logger.info('Forward', event.transactionHash)
+    transferPaymentConfirm({ chainName, id, from, to, value, transactionHash: event.transactionHash })
+  })
+}
 
 logger.info('> Listening for events...')
