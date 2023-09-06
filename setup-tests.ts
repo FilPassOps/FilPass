@@ -1,10 +1,11 @@
-const { TextDecoder, TextEncoder } = require('util')
-global.TextDecoder = TextDecoder
+import { TextDecoder, TextEncoder } from 'util'
+
+global.TextDecoder = TextDecoder as any
 global.TextEncoder = TextEncoder
 
 process.env.APP_URL = 'http://localhost:3000'
 process.env.APP_SECRET = 'APP_SECRET'
-process.env.ENABLE_BLOCKCHAIN_INTERACTION = 1
+process.env.ENABLE_BLOCKCHAIN_INTERACTION = '1'
 
 //HASHING
 process.env.EMAIL_KEY = '$2b$10$.J0sdgSE.in0MgyMhnS/q.'

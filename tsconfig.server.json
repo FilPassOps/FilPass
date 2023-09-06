@@ -18,5 +18,5 @@
     }
   },
   "include": ["server/**/*.ts", "jobs/**/*.ts", "typings/**/*.d.ts"],
-  "exclude": ["node_modules", "dist", ".next", "out", "next.config.js"]
+  "exclude": ["node_modules", "dist", ".next", "out", "next.config.mjs"]
 }

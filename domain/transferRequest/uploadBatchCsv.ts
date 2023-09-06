@@ -7,24 +7,40 @@ import prisma from 'lib/prisma'
 import yup, { validate } from 'lib/yup'
 import { sortedUniq } from 'lodash'
 import errorsMessages from 'wordings-and-errors/errors-messages'
-import { uploadBatchCsvValidator } from './validation'
+import { csvSchemaV1, csvSchemaV2, uploadBatchCsvValidator } from './validation'
+import { Prisma } from '@prisma/client'
 
-const csvSchemaV1 = yup.object().shape({
-  Email: yup.string().defined(),
-  Amount: yup.string().defined(),
-})
+interface UploadBatchCsvParams {
+  programId: number
+  approverId: number
+  file: {
+    fieldname: string
+    originalname: string
+    encoding: string
+    mimetype: string
+    destination: string
+    filename: string
+    path: string
+    size: number
+  }
+}
 
-const csvSchemaV2 = yup.object().shape({
-  Email: yup.string().defined(),
-  Amount: yup.string().defined(),
-  ApprovalForTransfer: yup.string().defined(),
-  Custodian: yup.string().required(),
-})
+interface VerifyCsvParams {
+  file: UploadBatchCsvParams['file']
+  prisma: Prisma.TransactionClient
+  approverId: number
+}
 
-export async function uploadBatchCsv(params) {
+interface Row {
+  Amount: number
+  Email: string
+  [key: string]: any
+}
+
+export async function uploadBatchCsv(params: UploadBatchCsvParams) {
   const { fields, errors } = await validate(uploadBatchCsvValidator, params)
 
-  if (errors) {
+  if (errors || !fields) {
     return {
       error: {
         status: 400,
@@ -33,37 +49,38 @@ export async function uploadBatchCsv(params) {
     }
   }
 
-  const { file, programId, approverId } = fields
+  const { file, approverId } = fields
 
-  const program = await prisma.program.findUnique({ where: { id: programId } })
+  // const program = await prisma.program.findUnique({ where: { id: programId } })
 
-  const {
-    data: requests,
-    file: fileData,
-    errors: verifyErrors,
-    hasCustodian = false,
-  } = await verifyCsv({
+  // {
+  //   data: requests,
+  //   file: fileData,
+  //   errors: verifyErrors,
+  //   hasCustodian = false,
+  // }
+
+  const verifyResult = await verifyCsv({
     file,
     prisma,
-    program,
     approverId,
   })
 
-  if (verifyErrors.length > 0) {
+  if (verifyResult.errors.length > 0) {
     return {
       error: {
         status: 400,
-        errors: verifyErrors,
+        errors: verifyResult.errors,
       },
     }
   }
 
   return {
-    data: { requests, file: { ...file, data: fileData }, hasCustodian },
+    data: { requests: verifyResult.data, file: { ...file, data: verifyResult.file }, hasCustodian: verifyResult.hasCustodian },
   }
 }
 
-const verifyCsv = async ({ file, prisma, program, approverId }) => {
+const verifyCsv = async ({ file, prisma, approverId }: VerifyCsvParams) => {
   const fileData = fs.readFileSync(file.path, 'utf8')
   let records
   try {
@@ -74,23 +91,22 @@ const verifyCsv = async ({ file, prisma, program, approverId }) => {
     })
   } catch (error) {
     const errors = [{ message: 'CSV is not formatted correctly.' }]
-    return { errors, data: records, file: fileData }
+    return { errors, data: records, file: fileData, hasCustodian: undefined }
   }
 
   if (records.length === 0) {
     const errors = [{ message: 'No data found in CSV file.' }]
-    return { errors, data: records, file: fileData }
+    return { errors, data: records, file: fileData, hasCustodian: undefined }
   }
 
   if (records.length > 500) {
     const errors = [{ message: 'Error: 500+ detected. Maximum = 500 entries.' }]
-    return { errors, data: records, file: fileData }
+    return { errors, data: records, file: fileData, hasCustodian: undefined }
   }
 
   const validationObject = {
     records,
     prisma,
-    program,
     fileData,
   }
 
@@ -101,17 +117,20 @@ const verifyCsv = async ({ file, prisma, program, approverId }) => {
 
   const isV1 = csvSchemaV1.isValidSync(records[0])
   if (isV1) {
-    return await validateV1SchemaFile(validationObject)
+    return { ...(await validateV1SchemaFile(validationObject)), hasCustodian: undefined }
   }
 
-  const errors = [{ message: 'Unkown CSV template' }]
-  return { errors, data: records, file: fileData }
+  const errors = [{ message: 'Unknown CSV template' }]
+  return { errors, data: records, file: fileData, hasCustodian: undefined }
 }
 
-const validateV1SchemaFile = async validationObject => {
-  const { records, prisma, program, fileData } = validationObject
-  let errors = []
-  const vestingVerify = verifyVesting(program, records, 'Vesting Start Epoch', 'Vesting Months')
+const validateV1SchemaFile = async (validationObject: { records: any; prisma: Prisma.TransactionClient; fileData: string }) => {
+  const { records, prisma, fileData } = validationObject
+  let errors: any[] = []
+
+  // TODO: Check vesting later
+  // verifyVesting(program, records, 'Vesting Start Epoch', 'Vesting Months')
+  const vestingVerify = false
 
   if (vestingVerify) {
     errors.push(vestingVerify)
@@ -141,12 +160,17 @@ const validateV1SchemaFile = async validationObject => {
   return { errors, data: records, file: fileData }
 }
 
-const validateV2SchemaFile = async (validationObject, approverId) => {
-  const { records, prisma, program, fileData } = validationObject
+const validateV2SchemaFile = async (
+  validationObject: { records: any; prisma: Prisma.TransactionClient; fileData: string },
+  approverId: number,
+) => {
+  const { records, prisma, fileData } = validationObject
 
-  let errors = []
+  let errors: any = []
 
-  const vestingVerify = verifyVesting(program, records, 'VestingStartEpoch', 'VestingMonths')
+  // TODO: Check vesting later
+  // verifyVesting(program, records, 'VestingStartEpoch', 'VestingMonths')
+  const vestingVerify = false
 
   if (vestingVerify) {
     errors.push(vestingVerify)
@@ -187,10 +211,11 @@ const validateV2SchemaFile = async (validationObject, approverId) => {
   return { errors, data: records, file: fileData, hasCustodian }
 }
 
-const verifyAmount = data => {
-  let errors = []
+const verifyAmount = (data: any[]) => {
+  const errors = []
 
   const amounts = data.map((row, index) => ({ amount: row.Amount, row: index + 2 }))
+
   const invalidAmounts = amounts.filter(({ amount }) => !yup.number().moreThan(0).isValidSync(amount))
   const requiredAmounts = amounts.filter(({ amount }) => !yup.number().required().isValidSync(amount))
 
@@ -215,8 +240,8 @@ const verifyAmount = data => {
   return { error: errors.length > 0 ? errors : null }
 }
 
-const verifyEmail = data => {
-  let errors = []
+const verifyEmail = (data: Row[]) => {
+  const errors: any[] = []
   const emails = data.map((row, index) => ({ email: row.Email, row: index + 2 }))
   const invalidEmails = emails.filter(email => !yup.string().email().isValidSync(email.email))
   const requiredEmails = emails.filter(email => !yup.string().email().required().isValidSync(email.email))
@@ -238,15 +263,15 @@ const verifyEmail = data => {
   return { error: errors.length > 0 ? errors : null }
 }
 
-const verifyWallet = async (data, prisma, propName) => {
-  let errors = []
+const verifyWallet = async (data: Row[], prisma: Prisma.TransactionClient, propName: string) => {
+  const errors: any[] = []
 
   const walletsWithEmails = await Promise.all(
     data.map(async (row, index) => ({
       wallet: row[propName],
       email: await generateEmailHash(row['Email']),
       row: index + 2,
-    }))
+    })),
   )
 
   const emailsArray = walletsWithEmails.map(({ email }) => email)
@@ -291,26 +316,26 @@ const verifyWallet = async (data, prisma, propName) => {
           errors.push({ message: `Invalid wallet address on row ${row - 1}` })
         }
       }
-    })
+    }),
   )
 
   return { error: errors.length > 0 ? errors : null }
 }
 
+//TODO MSIG 1 of 2
 // previus params (program, records, vestingStartEpochPropName, vestingMonthsPropName)
-const verifyVesting = () => {
-  //TODO MSIG 1 of 2
-  // const vestginParams = records.filter(row => row[vestingStartEpochPropName] || row[vestingMonthsPropName])
+// const verifyVesting = () => {
+// const vestginParams = records.filter(row => row[vestingStartEpochPropName] || row[vestingMonthsPropName])
 
-  // if (vestginParams.length > 0 && program.deliveryMethod !== MULTISIG_1_OF_2) {
-  //   return errorsMessages.program_vesting_not_supported
-  // }
+// if (vestginParams.length > 0 && program.deliveryMethod !== MULTISIG_1_OF_2) {
+//   return errorsMessages.program_vesting_not_supported
+// }
 
-  return false
-}
+// return false
+// }
 
-const verifyVestingMonthRange = (records, propName) => {
-  const errors = []
+const verifyVestingMonthRange = (records: Row[], propName: string) => {
+  const errors: any[] = []
   records.forEach((row, index) => {
     const vestingMonth = row[propName]
     if (vestingMonth && (vestingMonth < 0 || vestingMonth > 200)) {
@@ -321,8 +346,8 @@ const verifyVestingMonthRange = (records, propName) => {
   return errors
 }
 
-const verifyApprovalForTransfer = records => {
-  const errors = []
+const verifyApprovalForTransfer = (records: Row[]) => {
+  const errors: any[] = []
   records.forEach((row, index) => {
     const approval = row['ApprovalForTransfer']
     if (approval?.toLowerCase() !== 'true') {
@@ -332,8 +357,8 @@ const verifyApprovalForTransfer = records => {
   return { error: errors.length > 0 ? errors : null }
 }
 
-const verifyCustodian = async (records, approverId, prisma) => {
-  const returnValue = { error: [], hasCustodian: false }
+const verifyCustodian = async (records: Row[], approverId: number, prisma: Prisma.TransactionClient) => {
+  const returnValue = { error: [] as any[], hasCustodian: false }
 
   const allPrograms = sortedUniq(records.map(row => row['Custodian']))
   const programs = await prisma.program.findMany({
@@ -373,7 +398,7 @@ const verifyCustodian = async (records, approverId, prisma) => {
       }
 
       returnValue.error.push({ message: `Custodian not defined on line ${index + 2}` })
-    })
+    }),
   )
 
   return returnValue

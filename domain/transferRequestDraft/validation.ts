@@ -17,7 +17,7 @@ export const createTransferRequestDraftValidator = yup
             temporaryFileId: yup.string().max(40),
             currencyUnitId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
           })
-          .required()
+          .required(),
       )
       .required(),
   })
@@ -36,7 +36,7 @@ export const createTransferRequestDraftFormValidator = yup
             userAttachmentId: yup.string().max(40),
             currencyUnitId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
           })
-          .required()
+          .required(),
       )
       .required(),
   })
@@ -45,6 +45,8 @@ export const createTransferRequestDraftFormValidator = yup
 export const createTransferRequestSubmittedFormValidator = yup
   .object({
     isBatchCsv: yup.boolean(),
+    approverRoleId: yup.number().positive().max(MAX_INTEGER_VALUE).optional(),
+    requesterId: yup.number().positive().max(MAX_INTEGER_VALUE).optional(),
     requests: yup
       .array(
         yup
@@ -60,7 +62,7 @@ export const createTransferRequestSubmittedFormValidator = yup
             vestingMonths: yup.number(),
             skipWalletCreation: yup.boolean(),
           })
-          .required()
+          .required(),
       )
       .required(),
   })

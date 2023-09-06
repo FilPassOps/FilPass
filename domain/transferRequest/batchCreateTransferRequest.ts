@@ -12,9 +12,49 @@ import errorsMessages from 'wordings-and-errors/errors-messages'
 import { SUBMITTED_BY_APPROVER_STATUS } from './constants'
 import { logger } from 'lib/logger'
 
-export async function batchCreateTransferRequest(params) {
+interface BatchCreateTransferRequestParams {
+  approverRoleId?: number,
+  requesterId?: number
+  isBatchCsv: boolean
+  requests: {
+    receiverEmail: string
+    programId: number
+    team: string
+    amount: string
+    temporaryFileId?: string
+    currencyUnitId: number
+    wallet?: string
+    vestingStartEpoch?: number
+    vestingMonths?: number
+    skipWalletCreation?: boolean
+  }[]
+}
+
+interface CompletedRequest extends BatchCreateTransferRequestParams {
+  receiverEmail: string
+  programId: number
+  team: string
+  amount: string
+  temporaryFileId?: string
+  currencyUnitId: number
+  vestingStartEpoch?: number
+  vestingMonths?: number
+  skipWalletCreation?: boolean
+  receiver: {
+    id: string
+    terms: string
+  }
+  wallet: {
+    id: number
+    address: string
+  }
+}
+
+type Requests = BatchCreateTransferRequestParams['requests']
+
+export async function batchCreateTransferRequest(params: BatchCreateTransferRequestParams) {
   const { fields, errors } = await validate(createTransferRequestSubmittedFormValidator, params)
-  if (errors) {
+  if (errors || !fields) {
     return {
       error: {
         status: 400,
@@ -31,13 +71,20 @@ export async function batchCreateTransferRequest(params) {
     return { error: usersError }
   }
 
-  const { data: completeRequests, error: walletError } = await batchCreateWallet(requests, users, isBatchCsv)
+  const { data: completeRequests, error: walletError } = (await batchCreateWallet({ requests, users, isBatchCsv })) as {
+    data: CompletedRequest[]
+    error: any
+  }
 
   if (walletError) {
     return { error: walletError }
   }
 
-  const { data, error: transferRequesterror } = await prismaCreateTransferRequest(completeRequests, requesterId, approverRoleId)
+  const { data, error: transferRequesterror } = await prismaCreateTransferRequest(
+    completeRequests,
+    requesterId as number,
+    approverRoleId as number,
+  )
   if (transferRequesterror) {
     return { error: transferRequesterror }
   }
@@ -45,10 +92,10 @@ export async function batchCreateTransferRequest(params) {
   return { data }
 }
 
-export async function prismaCreateUser(requests) {
+export async function prismaCreateUser(requests: Requests) {
   const emailHashes = await Promise.all(requests.map(async request => generateEmailHash(request.receiverEmail)))
 
-  let users = await prisma.user.findMany({
+  const users = await prisma.user.findMany({
     where: {
       isActive: true,
       emailHash: { in: emailHashes },
@@ -66,13 +113,13 @@ export async function prismaCreateUser(requests) {
     }
 
     return emailList
-  }, [])
+  }, [] as string[])
 
   if (!newUsers.length) {
     return { users }
   }
 
-  const { data = [], error } = await newPrismaTransaction(async prisma => {
+  const { data = [], error } = (await newPrismaTransaction(async prisma => {
     const createUserPromiseList = newUsers.map(async userEmail => {
       const newUser = await prisma.user.create({
         data: {
@@ -93,17 +140,21 @@ export async function prismaCreateUser(requests) {
     })
 
     const createdUsers = await Promise.allSettled(createUserPromiseList)
-    const values = createdUsers.map(({ value }) => value)
-    if (createdUsers.find(req => req.status === 'rejected')) {
-      logger.error('Error while creating users', createdUsers)
-      throw new TransactionError('Error while creating users', { status: 500 })
-    }
+
+    const values = createdUsers.map(result => {
+      if (result.status === 'rejected') {
+        logger.error('Error while creating users', createdUsers)
+        throw new TransactionError('Error while creating users', { status: 500, errors: undefined })
+      } else {
+        return result.value
+      }
+    })
     return values
-  })
+  })) as { data: any[]; error: any }
   return { users: [...users, ...data], error }
 }
 
-export async function prismaCreateTransferRequest(requests, requesterId, approverRoleId) {
+export async function prismaCreateTransferRequest(requests: CompletedRequest[], requesterId: number, approverRoleId: number) {
   const { data, error } = await buildTransferRequestData(requests, requesterId, approverRoleId)
 
   if (error) {
@@ -121,21 +172,21 @@ export async function prismaCreateTransferRequest(requests, requesterId, approve
     })
 
     const createdTransferRequests = await Promise.allSettled(promiseList)
-    if (createdTransferRequests.filter(result => result.status === 'rejected').length) {
-      const requests = createdTransferRequests.map(result => (result.status === 'rejected' ? result : {}))
 
-      if (requests.find(req => req.status === 'rejected')) {
-        throw { status: 400, requests }
+    const requests = createdTransferRequests.map(result => {
+      if (result.status === 'rejected') {
+        logger.error('Error while creating transfer request', result)
+        throw new TransactionError('Error while creating transfer request', { status: 500, errors: undefined })
+      } else {
+        return result.value
       }
-      logger.error('Error while creating transfer requests', requests)
-      throw new TransactionError('Error while creating transfer requests', { status: 500 })
-    }
+    })
 
-    return createdTransferRequests.map(({ value }) => value)
+    return requests
   })
 }
 
-export async function buildTransferRequestData(requests, requesterId, approverRoleId) {
+export async function buildTransferRequestData(requests: CompletedRequest[], requesterId: number, approverRoleId: number) {
   const programs = await prisma.userRoleProgram.findMany({
     where: {
       userRoleId: approverRoleId,
@@ -174,11 +225,19 @@ export async function buildTransferRequestData(requests, requesterId, approverRo
         },
       })
 
-      const { data: file } = await moveFileS3({ userId: singleRequest.receiver.id, type: tempFile.type, source: tempFile.key })
+      if (!tempFile) {
+        throw { message: errorsMessages.something_went_wrong }
+      }
+
+      const { data: file, error } = await moveFileS3({ userId: singleRequest.receiver.id, type: tempFile.type, source: tempFile.key })
+
+      if (error) {
+        throw { message: errorsMessages.something_went_wrong }
+      }
 
       attachment = await prisma.userFile.create({
         data: {
-          userId: singleRequest.receiver.id,
+          userId: Number(singleRequest.receiver.id),
           uploaderId: tempFile.uploaderId,
           key: file.key,
           filename: tempFile.filename,
@@ -211,10 +270,10 @@ export async function buildTransferRequestData(requests, requesterId, approverRo
 
   const data = await Promise.allSettled(promiseList)
 
-  const errors = []
-  const finalData = []
+  const errors: any[] = []
+  const finalData: any[] = []
 
-  data.forEach(({ status, value, reason }) => {
+  data.forEach(({ status, value, reason }: any) => {
     if (status === 'rejected') {
       if (reason?.field) {
         errors.push({ [reason.field]: { message: reason?.message ?? 'Incorrect field' } })

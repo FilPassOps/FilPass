@@ -10,9 +10,10 @@ export const loginValidator = yup
   })
   .required()
 
+  // TODO: remove the pl email validation or change it?
 export const signupValidator = yup
   .object({
-    password: yup.string().min(errorsMessages.password_min_length.length).required(),
+    password: yup.string().min(errorsMessages.password_min_length.length as number).required(),
     confirmPassword: yup
       .string()
       .required()
@@ -35,7 +36,7 @@ export const verifyAccountValidator = yup.object({
 export const resetPasswordValidator = yup
   .object({
     token: yup.string().required(),
-    password: yup.string().min(errorsMessages.password_min_length.length).required(),
+    password: yup.string().min(errorsMessages.password_min_length.length as number).required(),
     passwordConfirm: yup
       .string()
       .required()

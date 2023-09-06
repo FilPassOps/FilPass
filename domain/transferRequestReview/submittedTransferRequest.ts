@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import { APPROVER_ROLE } from 'domain/auth/constants'
 import { createRequestChangeHistory } from 'domain/tranferRequestHistory/createRequestChangeHistory'
 import {
@@ -9,7 +9,7 @@ import {
   SUBMITTED_BY_APPROVER_STATUS,
   SUBMITTED_STATUS,
 } from 'domain/transferRequest/constants'
-import { getPrismaClient, newPrismaTransaction } from 'lib/prisma'
+import prisma, { newPrismaTransaction } from 'lib/prisma'
 import { validate } from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { submittedTransferRequestValidator } from './validation'
@@ -31,7 +31,6 @@ export async function submittedTransferRequest(params: SubmittedTransferRequestP
   }
 
   const { transferRequestId, approverId } = fields
-  const prisma: PrismaClient = await getPrismaClient()
 
   const [transferRequests, approverPrograms] = await Promise.all([
     prisma.transferRequest.findMany({
@@ -190,8 +189,6 @@ interface SubmittedTransferRequestsBySuperParams {
 }
 
 export async function submittedTransferRequestsBySuper({ transferRequestIds, fnPrisma, superId }: SubmittedTransferRequestsBySuperParams) {
-  const prisma: PrismaClient = await getPrismaClient()
-
   const requests = await prisma.transferRequest.findMany({
     where: {
       id: {

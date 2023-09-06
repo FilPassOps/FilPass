@@ -1,13 +1,19 @@
-const { decryptPII, decrypt } = require('lib/emissaryCrypto')
+import { TransferRequest } from '@prisma/client'
+import { decryptPII, decrypt } from 'lib/emissaryCrypto'
 
-const isFind = action => action === 'findOne' || action === 'findUnique' || action === 'findMany' || action === 'findFirst'
+interface DecryptUserParams {
+  email: string
+  [key: string]: any
+}
 
-const decryptUser = async ({ email, ...rest }) => ({
+const isFind = (action: string) => action === 'findOne' || action === 'findUnique' || action === 'findMany' || action === 'findFirst'
+
+const decryptUser = async ({ email, ...rest }: DecryptUserParams) => ({
   ...rest,
   ...(email && { email: await decryptPII(email) }),
 })
 
-const userMiddleware = async (params, next) => {
+export const userMiddleware = async (params: { action: any }, next: (params: any) => Promise<any>) => {
   if (isFind(params.action)) {
     const result = await next(params)
     if (Array.isArray(result)) {
@@ -23,13 +29,13 @@ const userMiddleware = async (params, next) => {
   return await next(params)
 }
 
-const decryptTransferRequest = async transferRequest => ({
+const decryptTransferRequest = async (transferRequest: TransferRequest) => ({
   ...transferRequest,
   ...(transferRequest.amount && { amount: await decrypt(transferRequest.amount) }),
   ...(transferRequest.team && { team: await decryptPII(transferRequest.team) }),
 })
 
-const transferRequestMiddleware = async (params, next) => {
+export const transferRequestMiddleware = async (params: { action: any }, next: (params: any) => Promise<any>) => {
   if (isFind(params.action)) {
     const result = await next(params)
 
@@ -47,7 +53,7 @@ const transferRequestMiddleware = async (params, next) => {
   return await next(params)
 }
 
-const transferMiddleware = async (params, next) => {
+export const transferMiddleware = async (params: { action: any }, next: (params: any) => Promise<any>) => {
   if (isFind(params.action)) {
     const result = await next(params)
 
@@ -68,10 +74,4 @@ const transferMiddleware = async (params, next) => {
   }
 
   return await next(params)
-}
-
-module.exports = {
-  userMiddleware,
-  transferRequestMiddleware,
-  transferMiddleware,
 }

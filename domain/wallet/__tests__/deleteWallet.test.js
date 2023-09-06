@@ -2,7 +2,7 @@ import { SUBMITTED_BY_APPROVER_STATUS, SUBMITTED_STATUS } from 'domain/transferR
 import { REQUIRES_CHANGES } from 'domain/transferRequestReview/constants'
 import * as deleteWalletModule from 'domain/wallet/deleteWallet'
 import * as prismaLib from 'lib/prisma'
-import errorsMessages from 'wordings-and-errors/errors-messages'
+import { parametrizedErrorsMessages } from 'wordings-and-errors/errors-messages'
 
 jest.mock('lib/prisma')
 jest.mock('lib/emissaryCrypto')
@@ -140,7 +140,7 @@ describe('deleteWallet', () => {
 
       const error = await deleteWalletModule.validateWalletTransferRequests({ prisma, userId: 1, userWalletId: 2 })
 
-      expect(error).toEqual(errorsMessages.wallet_has_active_transfer_request.message([1, 2]))
+      expect(error).toEqual(parametrizedErrorsMessages.wallet_has_active_transfer_request.message([1, 2]))
     })
 
     it('should return error message with single id when a single request is found', async () => {
@@ -152,7 +152,7 @@ describe('deleteWallet', () => {
 
       const error = await deleteWalletModule.validateWalletTransferRequests({ prisma, userId: 1, userWalletId: 2 })
 
-      expect(error).toEqual(errorsMessages.wallet_has_active_transfer_request.message([1]))
+      expect(error).toEqual(parametrizedErrorsMessages.wallet_has_active_transfer_request.message([1]))
     })
   })
 })

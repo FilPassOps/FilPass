@@ -8,10 +8,44 @@ import { validate } from 'lib/yup'
 import { DRAFT_STATUS } from './constants'
 import { getUserTransferRequestsValidator } from './validation'
 
-export async function getUserTransferRequests(params) {
+interface GetUserTransferRequestsParams {
+  userId?: number
+  programIds?: number[]
+  requestNumber?: string
+  status?: string
+  team?: string[]
+  from?: Date
+  to?: Date
+  wallets?: string[]
+  page?: number
+  size?: number
+  sort?: string
+  order?: string
+}
+
+interface Request {
+  id: string
+  status: string
+  team: string
+  create_date: Date
+  amount: string
+  vesting_start_epoch: number
+  vesting_months: number
+  program_name: string
+  receiver: string
+  applyer: string
+  notes: string
+  transfer_hash: string
+  request_unit: string
+  payment_unit: string
+  user_wallet_address: string
+  user_wallet_blockchain: string
+  user_wallet_is_verified: boolean
+}
+
+export async function getUserTransferRequests(params: GetUserTransferRequestsParams) {
   const { fields, errors } = await validate(getUserTransferRequestsValidator, params)
-  if (errors) {
-    console.error(errors)
+  if (errors || !fields) {
     return {
       error: {
         status: 400,
@@ -152,7 +186,7 @@ export async function getUserTransferRequests(params) {
     }
   }
 
-  const [requestsTotalItems] = await prisma.$queryRaw`
+  const [requestsTotalItems] = await prisma.$queryRaw<{ total: number }[]>`
       SELECT
       count(*)::integer AS total
       FROM (
@@ -167,7 +201,7 @@ export async function getUserTransferRequests(params) {
         ${walletFilter}
     `
 
-  const requests = await prisma.$queryRaw`
+  const requests = await prisma.$queryRaw<Request[]>`
     SELECT filter.id                         id,
       filter.status                          status,
       filter.team                            team,
@@ -228,14 +262,14 @@ export async function getUserTransferRequests(params) {
         amount,
         status: request.status || DRAFT_STATUS,
       }
-    })
+    }),
   )
 
   return { data: { requests: parsedRequests, totalItems: requestsTotalItems.total } }
 }
 
-const getSortParams = ({ sort, order }) => {
-  const sortTypes = {
+const getSortParams = ({ sort, order }: { sort?: string; order?: string }) => {
+  const sortTypes: Record<string, Prisma.Sql> = {
     number: Prisma.sql`ORDER BY filter.id`,
     status: Prisma.sql`ORDER BY filter.status`,
     program: Prisma.sql`ORDER BY program.name`,
@@ -243,12 +277,12 @@ const getSortParams = ({ sort, order }) => {
     create_date: Prisma.sql`ORDER BY filter.create_date`,
   }
 
-  const orderTypes = {
+  const orderTypes: Record<string, Prisma.Sql> = {
     desc: Prisma.sql`DESC`,
     asc: Prisma.sql`ASC`,
   }
 
-  const sortType = sortTypes[sort] || sortTypes.create_date
-  const orderBy = orderTypes[order] || orderTypes.desc
+  const sortType = (sort && sortTypes[sort]) || sortTypes.create_date
+  const orderBy = (order && orderTypes[order]) || orderTypes.desc
   return { sortType, orderBy }
 }

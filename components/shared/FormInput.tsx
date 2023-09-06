@@ -3,7 +3,8 @@ import { Listbox } from '@headlessui/react'
 import { ChevronDownIcon, ChevronUpIcon, EyeIcon, EyeSlashIcon, XMarkIcon } from '@heroicons/react/24/solid'
 import { classNames } from 'lib/classNames'
 import { forwardRef, useEffect, useRef, useState } from 'react'
-import { IMaskInput } from 'react-imask'
+import { IMaskInput } from 'react-imask/esm/index';
+
 import { NumericFormat } from 'react-number-format'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { Button } from './Button'
