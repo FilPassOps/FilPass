@@ -20,7 +20,7 @@ export const generateIdentifier = ({ address, amount, createdAt, email }: Genera
   return `${prefix}:${hash.digest('hex')}`
 }
 
-const generatePrefixByEnviroment = () => {
+export const generatePrefixByEnviroment = () => {
   switch (process.env.ENV_NAME) {
     case 'development':
       return 'PLREFD'
@@ -29,9 +29,4 @@ const generatePrefixByEnviroment = () => {
     default:
       return 'PLREF'
   }
-}
-
-module.exports = {
-  generateIdentifier,
-  generatePrefixByEnviroment,
 }
