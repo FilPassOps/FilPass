@@ -83,6 +83,7 @@
     "react-hook-form": "^7.45.4",
     "react-input-verification-code": "^1.0.2",
     "react-number-format": "^5.2.2",
+    "react-verification-input": "^3.3.1",
     "swr": "^2.2.0",
     "tailwind-merge": "^1.13.0",
     "winston": "^3.10.0",

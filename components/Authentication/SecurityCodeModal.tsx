@@ -1,11 +1,9 @@
 import { Modal } from 'components/shared/Modal'
 import { Button } from 'components/shared/Button'
-import ReactInputVerificationCode from 'react-input-verification-code'
-import { classNames } from 'lib/classNames'
 import { useState } from 'react'
 import { DateTime } from 'luxon'
-import styles from './securityCodeModal.module.css'
 import CountDownTimer from './CountDownTimer'
+import VerificationInput from 'react-verification-input'
 
 interface SecurityCodeModalProps {
   open?: boolean
@@ -67,8 +65,20 @@ export const SecurityCodeModal = ({
         Please enter a 4-digit security code that was sent to you email address <span className="text-indigo-600">{email}.</span> The code
         is valid for 10 minutes
       </p>
-      <div className={classNames('flex flex-row items-center justify-center', styles.customVerificationInput)}>
-        <ReactInputVerificationCode autoFocus={true} placeholder={''} type="text" onCompleted={handleComplete} />
+      <div className={'flex flex-row items-center justify-center'}>
+        <VerificationInput
+          autoFocus={true}
+          onComplete={handleComplete}
+          placeholder={''}
+          validChars="0-9"
+          length={4}
+          classNames={{
+            character: 'border border-g rounded-md outline-1 border-gray-400',
+            container: 'flex flex-row gap-5',
+            characterInactive: 'bg-white',
+            characterSelected: 'border-indigo-600',
+          }}
+        />
       </div>
       <p className="text-center text-sm text-red-500 mt-3">{submitErrors}</p>
       <div className="flex flex-row items-center justify-center mt-8 pb-4">
