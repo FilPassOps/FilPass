@@ -16,8 +16,6 @@ import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import { PLATFORM_NAME } from 'system.config'
-import { PageAlert } from '../../Layout/Alerts'
 import { AttachmentInput } from '../TransferRequestForm/AttachmentInput'
 import { ProgramInfo } from '../shared/ProgramInfo'
 import { RequestAmountInput } from '../shared/RequestAmountInput'
@@ -116,14 +114,8 @@ export const ApplyForSomeoneForm = () => {
       <div className="py-8 bg-white">
         <RequestorReceiver applyer={user?.email} />
         <Divider className="my-8" />
-        <PageAlert type="warning" withIcon={false} className="mb-8">
-          <p>
-            {PLATFORM_NAME} won&apos;t ask the receiver(s) to submit their tax form and personal information for sanction purposes. Please
-            ensure you have collected the appropriate information regarding tax and sanction checks if you proceed.
-          </p>
-        </PageAlert>
 
-        <CheckboxInput id="id-ask-review" className="items-center mb-2" value={receiverShouldReview} onChange={handleReceiverShouldReview}>
+        <CheckboxInput id="id-ask-review" name="askReview" className="items-center mb-2" value={receiverShouldReview} onChange={handleReceiverShouldReview}>
           <span className="text-gray-700 font-medium text-sm">{`Ask the receivers to review and submit the requests`}</span>
         </CheckboxInput>
 

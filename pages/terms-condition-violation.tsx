@@ -16,7 +16,7 @@ export default function BannedUserPage() {
   return (
     <>
       <Head>
-        <title>Terms and Condition violation - {PLATFORM_NAME}</title>
+        <title key='terms-conditions'>{`Terms and Condition violation - ${PLATFORM_NAME}`}</title>
       </Head>
       <div className="h-screen flex flex-col justify-center items-center">
         <LockClosedIcon className="w-14 h-14 text-gray-500 mb-3" />
@@ -38,13 +38,14 @@ export default function BannedUserPage() {
   )
 }
 
-export const getServerSideProps = withSessionSSR(async ({ req }: any) => {
+export const getServerSideProps = withSessionSSR(async function getServerSideProps({ req }) {
   const user = req.session.user
 
   if (!user) {
     return {
       redirect: {
         destination: '/',
+        permanent: false,
       },
     }
   }
@@ -54,6 +55,7 @@ export const getServerSideProps = withSessionSSR(async ({ req }: any) => {
     return {
       redirect: {
         destination: '/my-transfer-requests',
+        permanent: false,
       },
     }
   }

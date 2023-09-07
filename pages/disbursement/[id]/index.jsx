@@ -9,7 +9,9 @@ export default function ControllerView({ data }) {
   return (
     <>
       <Head>
-        <title>Disbursement #{data?.id} - {PLATFORM_NAME}</title>
+        <title>
+          {`Disbursement #${data?.id} - ${PLATFORM_NAME}`}
+        </title>
       </Head>
       <TransferRequestView data={data} />
     </>

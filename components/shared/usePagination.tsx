@@ -9,9 +9,9 @@ import { LoadingIndicator } from './LoadingIndicator'
 
 export interface PaginationWrapperProps {
   children: ReactNode
-  totalItems: number
-  pageSize: number
-  isLoading: boolean
+  totalItems?: number
+  pageSize?: number
+  isLoading?: boolean
   childrenContainerClass?: string
 }
 
@@ -84,6 +84,7 @@ export const PaginationWrapper = ({
             <SelectInput
               //@ts-ignore
               options={options}
+              name="itemsPerPage"
               label=""
               value={`${pageSize}`}
               onChange={(value: number) => changePage({ page: 1, itemsPerPage: value })}
@@ -148,4 +149,12 @@ export const checkItemsPerPage = (itemsPerPage: any) => {
   const PAGINATION_DEFAULT_VALUES = ['100', '200', '500', '1000']
 
   return PAGINATION_DEFAULT_VALUES.includes(itemsPerPage)
+}
+
+export const getItemsPerPage = (itemsPerPage: any) => {
+  const PAGINATION_DEFAULT_VALUES = ['100', '200', '500', '1000']
+
+  const pageSize = PAGINATION_DEFAULT_VALUES.find(item => item === itemsPerPage)
+
+  return parseInt(pageSize || PAGINATION_DEFAULT_VALUES[0])
 }

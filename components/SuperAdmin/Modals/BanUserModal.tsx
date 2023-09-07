@@ -28,11 +28,11 @@ interface BanUserModalProps {
 export const BanUserModal = ({ open, user, onModalClosed }: BanUserModalProps) => {
   const router = useRouter()
 
-  const [error, setError] = useState('')
+  const [error, setError] = useState<any>()
 
   const closeModal = () => {
     onModalClosed()
-    setError('')
+    setError(null)
     setTimeout(reset, 300)
   }
 

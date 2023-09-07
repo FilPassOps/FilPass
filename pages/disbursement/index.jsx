@@ -20,11 +20,11 @@ import { api } from 'lib/api'
 import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { withControllerSSR } from 'lib/ssr'
 import { DateTime } from 'luxon'
-import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { getChainByName, PLATFORM_NAME } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
+import Head from 'next/head'
 
 export default function Disbursement({ initialData = [], programs = [], pageSize, totalItems, page, status }) {
   const router = useRouter()
@@ -128,14 +128,12 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
       columns.paidFilAmount && headerFile.push('Paid Amount')
       columns.paidFilAmount && headerFile.push('Paid Amount Currency Unit')
       columns.status && headerFile.push('Status')
-      columns.residency && headerFile.push('Residency')
-      columns.taxForm && headerFile.push('Tax Form')
       columns.filfoxLink && headerFile.push('Filfox link')
 
       const csvTemplate = stringify(
         [
           headerFile,
-          ...data.requests.map(({ program, wallet, transfers, currency, receiver, form, ...request }) => {
+          ...data.requests.map(({ program, wallet, transfers, currency, receiver, ...request }) => {
             const row = []
             columns.number && row.push(request.publicId)
             columns.receiverEmail && row.push(receiver.email)
@@ -149,8 +147,6 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
             columns.paidFilAmount && row.push(transfers[0].amount)
             columns.paidFilAmount && row.push(transfers[0].amountCurrencyUnit?.name ?? 'FIL')
             columns.status && row.push(status)
-            columns.residency && row.push(request.isUSResident ? 'US' : 'Non-US')
-            columns.taxForm && !!form && row.push(`${window?.location.origin}/api/files/${form.publicId}/view`)
             columns.filfoxLink && row.push(`${config.chain.blockExplorerUrls[0]}/${transfers[0].txHash}`)
             return row
           }),
@@ -179,9 +175,8 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
   return (
     <>
       <Head>
-        <title>Disbursement - {PLATFORM_NAME}</title>
+        <title>{`Disbursement - ${PLATFORM_NAME}`}</title>
       </Head>
-
       {isPayment && paymentModalTransactions.length ? (
         <MetamaskPayment data={paymentModalTransactions} />
       ) : (

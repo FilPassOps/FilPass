@@ -4,7 +4,6 @@ import { getDraftTransferRequestById } from 'domain/transferRequestDraft/getDraf
 import { decrypt, decryptPII } from 'lib/emissaryCrypto'
 import prisma from 'lib/prisma'
 import { validate } from 'lib/yup'
-import { DateTime } from 'luxon'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { REQUIRES_CHANGES_STATUS } from './constants'
 import { isEditable, isVoidable } from './shared'
@@ -38,13 +37,6 @@ export async function getTransferRequestById(params: GetTransferRequestByIdParam
          filter.created_at                      created_at,
          filter.expected_transfer_date          expected_transfer_date,
          filter.amount                          amount,
-         filter.first_name                      first_name,
-         filter.last_name                       last_name,
-         filter.date_of_birth                   date_of_birth,
-         filter.country_residence               country_residence,
-         filter.sanction_reason                 sanction_reason,
-         filter.is_us_resident                  is_us_resident,
-         filter.is_legacy                       is_legacy,
          filter.terms                           terms,
          user_wallet.name                       wallet_name,
          user_wallet.address                    wallet_address,
@@ -55,12 +47,6 @@ export async function getTransferRequestById(params: GetTransferRequestByIdParam
          program.id                             program_id,
          program.delivery_method                program_delivery_method,
          program.visibility                     program_visibility,
-         user_file.type                         form_type,
-         user_file.public_id                    form_id,
-         user_file.key                          form_key,
-         user_file.filename                     form_filename,
-         user_file_user.email                   form_user_email,
-         user_file_uploader.email               form_uploader_email,
          filter.receiver_email                  receiver,
          filter.receiver_id                     receiver_id,
          filter.applyer_email                   applyer,
@@ -85,13 +71,6 @@ export async function getTransferRequestById(params: GetTransferRequestByIdParam
               transfer_request.created_at                   created_at,
               transfer_request.expected_transfer_date       expected_transfer_date,
               transfer_request.status                       status,
-              transfer_request.first_name                   first_name,
-              transfer_request.last_name                    last_name,
-              transfer_request.date_of_birth                date_of_birth,
-              transfer_request.country_residence            country_residence,
-              transfer_request.sanction_reason              sanction_reason,
-              transfer_request.is_us_resident               is_us_resident,
-              transfer_request.is_legacy                    is_legacy,
               transfer_request.team                         team,
               transfer_request.created_at                   create_date,
               transfer_request.amount                       amount,
@@ -282,28 +261,11 @@ export async function getTransferRequestById(params: GetTransferRequestByIdParam
     }
   }
 
-  const parseDateOfBirth = async (dateOfBirth: string) => {
-    const isoDateOfBirth = DateTime.fromISO(await decryptPII(dateOfBirth))
-    const month = isoDateOfBirth.month.toString()
-    const day = isoDateOfBirth.day.toString()
-    const year = isoDateOfBirth.year.toString()
-    return `${month.padStart(2, '0')}/${day.padStart(2, '0')}/${year}`
-  }
-
-  const { first_name, last_name, date_of_birth, country_residence, sanction_reason, is_legacy, ...transferRequestData } = transferRequest
-
   return {
     data: {
-      ...transferRequestData,
+      ...transferRequest,
       amount: await decrypt(transferRequest.amount),
       team: await decryptPII(transferRequest.team),
-      firstName: await decryptPII(first_name),
-      lastName: await decryptPII(last_name),
-      dateOfBirth: date_of_birth ? await parseDateOfBirth(date_of_birth) : null,
-      countryResidence: await decryptPII(country_residence),
-      sanctionReason: await decryptPII(sanction_reason),
-      form_user_email: await decryptPII(transferRequest.form_user_email),
-      form_uploader_email: await decryptPII(transferRequest.form_uploader_email),
       attachment_user_email: await decryptPII(transferRequest.attachment_user_email),
       attachment_uploader_email: await decryptPII(transferRequest.attachment_uploader_email),
       banActionedBy: await decryptPII(transferRequest.ban_actioner_email),
@@ -311,7 +273,6 @@ export async function getTransferRequestById(params: GetTransferRequestByIdParam
       applyer: await decryptPII(transferRequest.applyer),
       isEditable: isEditable(transferRequest),
       isVoidable: isVoidable(transferRequest),
-      isLegacy: is_legacy,
       history,
       changesRequested,
       programCurrency,

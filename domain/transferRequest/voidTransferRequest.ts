@@ -8,8 +8,8 @@ import { isVoidable } from './shared'
 import { voidTransferRequestValidator } from './validation'
 
 interface VoidTransferRequestParams {
-  transferRequestId: string
-  userId: number
+  transferRequestId?: string
+  userId?: number
 }
 
 interface UserPermission {

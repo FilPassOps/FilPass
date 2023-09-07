@@ -29,7 +29,7 @@ export const OnboardingModal = () => {
     setTimeout(() => setActiveStep(0), 500)
   }
 
-  const totalSteps = [!user?.piiUpdatedAt, !user?.terms, !user?.isTaxFormActive].filter(Boolean).length
+  const totalSteps = [!user?.terms].filter(Boolean).length
 
   return (
     <Modal open={openOnboardModal} onModalClosed={() => {}} isCloseable={false}>

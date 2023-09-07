@@ -67,9 +67,7 @@ npm run migrate
   - Users with specific roles (the email domain for specific users is defined on the config.js file)
     - test-approver / 123
     - test-controller / 123
-    - test-finance / 123
     - test-viewer / 123
-    - test-compliance / 123
     - test-super / 123
 
 ## Application Start Up

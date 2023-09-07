@@ -12,7 +12,7 @@ interface WalletAddressProps {
   enableVerifiedIcon?: boolean
   className?: string
   delegatedAddress?: string
-  label?: string
+  label?: string | null
   walletSize?: 'very-short' | 'short' | 'full'
 }
 

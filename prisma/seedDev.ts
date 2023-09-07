@@ -3,7 +3,6 @@ import { hash } from 'bcrypt'
 
 import { loadEnvConfig } from '@next/env'
 import { PrismaClient } from '@prisma/client'
-import { DateTime } from 'luxon'
 import { encrypt, encryptPII } from '../lib/emissaryCrypto'
 loadEnvConfig(process.cwd(), true)
 
@@ -26,15 +25,6 @@ const teamNames = [
   'First approver team',
 ]
 
-const usersInfoData = [
-  {
-    firstName: 'John',
-    lastName: 'Doe',
-    country: 'CUB',
-    dateOfBirth: DateTime.fromJSDate(new Date(754149600000)).toISO(),
-  },
-]
-
 interface Teams {
   [key: string]: {
     hash: string
@@ -42,17 +32,7 @@ interface Teams {
   }
 }
 
-interface UserInfo {
-  [key: string]: {
-    firstName: string
-    lastName: string
-    country: string
-    dateOfBirth: string
-  }
-}
-
 const teams: Teams = {}
-const usersInfo: UserInfo = {}
 
 const defaultTerms = {
   tax: true,
@@ -71,8 +51,8 @@ async function main() {
   await Promise.all([createSuperAdmin(), createCompliance(), createFinance()])
   const [[approver, approverRole], [controller, controllerRole], viewerRole, vestingPrograms, oneTimePrograms] = await Promise.all([
     createApprover(),
-    createController(),
-    createViewer(),
+  await createCompliance()
+  await createFinance()
     createLinearVestingPrograms(),
     createOneTimeProgramIds(),
   ])
@@ -358,10 +338,8 @@ interface CreateTransferRequestType {
     }[]
   }
   userWalletId: number
-  userFileId: number
   team: string
   amount: number
-  isUSResident: boolean
   review?: {
     approverId: number
     status: TransferRequestReviewStatus
@@ -374,9 +352,6 @@ interface CreateTransferRequestType {
     transferRef?: string
     txHash?: string
   }
-  firstName?: string
-  isSanctioned?: boolean
-  sanctionReason?: string
 }
 
 async function createTransferRequest({
@@ -385,15 +360,10 @@ async function createTransferRequest({
   requesterId,
   program,
   userWalletId,
-  userFileId,
   team,
   amount,
-  isUSResident,
   review,
   payment,
-  firstName,
-  isSanctioned,
-  sanctionReason,
 }: CreateTransferRequestType) {
   const request = await prisma.transferRequest.create({
     data: {
@@ -418,22 +388,9 @@ async function createTransferRequest({
           id: userWalletId,
         },
       },
-      form: {
-        connect: {
-          id: userFileId,
-        },
-      },
       team: teams[team].pii,
       teamHash: teams[team].hash,
       amount: await encrypt(amount.toString()),
-      dateOfBirth: firstName && usersInfo[firstName].dateOfBirth,
-      firstName: firstName && usersInfo[firstName].firstName,
-      lastName: firstName && usersInfo[firstName].lastName,
-      countryResidence: firstName && usersInfo[firstName].country,
-      sanctionReason: sanctionReason ? await encryptPII(sanctionReason) : null,
-      isUSResident,
-      isSanctioned,
-      isLegacy: true,
       expectedTransferDate: new Date(),
       terms: defaultTerms,
       currency: {
@@ -630,29 +587,6 @@ async function createUser(index: number) {
     },
   })
 
-  const [w8, w9] = await Promise.all([
-    prisma.userFile.create({
-      data: {
-        type: 'W8_FORM',
-        userId: user.id,
-        isApproved: false,
-        isActive: false,
-        filename: 'w8-form.pdf',
-        key: `w8.pdf`,
-      },
-    }),
-    prisma.userFile.create({
-      data: {
-        type: 'W9_FORM',
-        userId: user.id,
-        isApproved: false,
-        isActive: false,
-        filename: 'w9-form.pdf',
-        key: `w9.pdf`,
-      },
-    }),
-  ])
-
   const userRole = await prisma.userRole.create({
     data: {
       userId: user.id,
@@ -660,7 +594,7 @@ async function createUser(index: number) {
     },
   })
 
-  return { user, userRole, w8, w9, t1Wallet, t3Wallet }
+  return { user, userRole, t1Wallet, t3Wallet }
 }
 
 async function createController() {
@@ -717,62 +651,6 @@ async function createViewer() {
   })
 
   return viewerRole
-}
-
-async function createCompliance() {
-  const compliance = await prisma.user.create({
-    data: {
-      email: await encryptPII(`test-compliance${EMAIL_DOMAIN}`),
-      emailHash: await hash(`test-compliance${EMAIL_DOMAIN}`, salt),
-      isActive: true,
-      isVerified: true,
-      password: '$2b$10$JNEr1LRmoUgPWzbt8ve/a.ZcDIpMQK9II2OCj42kjNdWkG0.yluky',
-    },
-  })
-
-  await prisma.userRole.create({
-    data: {
-      userId: compliance.id,
-      role: 'USER',
-    },
-  })
-
-  const complianceRole = await prisma.userRole.create({
-    data: {
-      userId: compliance.id,
-      role: 'COMPLIANCE',
-    },
-  })
-
-  return [compliance, complianceRole]
-}
-
-async function createFinance() {
-  const finance = await prisma.user.create({
-    data: {
-      email: await encryptPII(`test-finance${EMAIL_DOMAIN}`),
-      emailHash: await hash(`test-finance${EMAIL_DOMAIN}`, salt),
-      isActive: true,
-      isVerified: true,
-      password: '$2b$10$JNEr1LRmoUgPWzbt8ve/a.ZcDIpMQK9II2OCj42kjNdWkG0.yluky',
-    },
-  })
-
-  await prisma.userRole.create({
-    data: {
-      userId: finance.id,
-      role: 'USER',
-    },
-  })
-
-  const financeRole = await prisma.userRole.create({
-    data: {
-      userId: finance.id,
-      role: 'FINANCE',
-    },
-  })
-
-  return [finance, financeRole]
 }
 
 async function getBlockchainValues() {

@@ -32,9 +32,10 @@ const config: Config = {
       accounts: [PRIVATE_KEY],
     },
   },
-  // paths: {
-  //   tests: './contracts/test',
-  // },
+  paths: {
+    sources: './contracts/src',
+    tests: './contracts/test',
+  },
 }
 
 export default config

@@ -1,7 +1,7 @@
 import { REQUIRES_CHANGES_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
 import prisma from 'lib/prisma'
 import { validate } from 'lib/yup'
-import errorsMessages from 'wordings-and-errors/errors-messages'
+import errorsMessages, { parametrizedErrorsMessages } from 'wordings-and-errors/errors-messages'
 import { removeFileValidator } from './validation'
 import { User } from '@prisma/client'
 
@@ -9,7 +9,7 @@ interface DeleteFileParams {
   id: string
 }
 
-export async function deleteFile(params:DeleteFileParams, user: User) {
+export async function deleteFile(params: DeleteFileParams, user: User) {
   const { id: userId } = user
   const { fields, errors } = await validate(removeFileValidator, params)
 
@@ -51,7 +51,7 @@ export async function deleteFile(params:DeleteFileParams, user: User) {
     return {
       error: {
         status: 400,
-        message: errorsMessages.file_has_active_transfer_request.message(publicIds),
+        message: parametrizedErrorsMessages.file_has_active_transfer_request.message(publicIds),
       },
     }
   }
@@ -63,7 +63,6 @@ export async function deleteFile(params:DeleteFileParams, user: User) {
       publicId: true,
       filename: true,
       type: true,
-      isApproved: true,
     },
   })
 

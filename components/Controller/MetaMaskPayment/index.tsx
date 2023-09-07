@@ -213,15 +213,15 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
 
   const handlePaymentErrors = (error: any) => {
     if (error.code === 4001 || error.code === 'ACTION_REJECTED') {
-      return errorsMessages.user_rejected_payment.component
+      return <p>{`${errorsMessages.user_rejected_payment.message}`}</p>
     } else if (error.code === -32603 && error?.data?.message.includes('failed to estimate gas')) {
       if (error.data.message.includes('insufficient funds')) {
-        return errorsMessages.not_enough_funds.component
+        return <p>{`${errorsMessages.not_enough_funds.message}`}</p>
       } else {
-        return errorsMessages.check_account_balance.component
+        return <p>{`${errorsMessages.check_account_balance.message}`}</p>
       }
     } else {
-      return errorsMessages.error_during_payment.component
+      return <p>{`${errorsMessages.error_during_payment.message}`}</p>
     }
   }
 

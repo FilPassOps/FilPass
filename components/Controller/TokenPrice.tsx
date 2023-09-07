@@ -77,6 +77,7 @@ export const TokenPrice = () => {
             className="pl-11 pointer-events-none font-medium text-gray-600"
             readOnly
             value={TOKEN.symbol}
+            name="price"
           />
         </div>
         <div className="mb-3 relative">

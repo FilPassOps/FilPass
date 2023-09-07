@@ -14,11 +14,10 @@ interface EmailReminderRecipient {
 const contractInterface = MultiForwarderFactory.createInterface()
 const blockExplorerUrl = config.chain.blockExplorerUrls[0]
 const provider = new ethers.providers.JsonRpcProvider(config.chain.rpcUrls[0])
+const forwardAnyEvent = contractInterface.getEvent('ForwardAny')
+const forwardEvent = contractInterface.getEvent('Forward')
 
 export default async function run() {
-  const receipt = await provider.getTransactionReceipt('0x1a17dea4597367fdfa439d13122ad31beaae438582adb2d2e9ac84653c4c2113')
-  console.log('🚀 ~ file: check-pending-transfer.ts:25 ~ run ~ receipt:', receipt)
-
   try {
     const pendingTransfers = await prisma.transfer.findMany({
       where: {
@@ -43,26 +42,21 @@ export default async function run() {
     const failedTransferRequestPublicIds = []
 
     for (const { txHash } of pendingTransfers) {
-      if (!txHash) {
-        continue
-      }
+      if (!txHash || !txHash.startsWith('0x')) continue
 
-      const receipt = await provider.getTransactionReceipt('0x1a17dea4597367fdfa439d13122ad31beaae438582adb2d2e9ac84653c4c2113')
+      const receipt = await provider.getTransactionReceipt(txHash)
 
-      if (!receipt) {
-        continue
-      }
+      if (!receipt) continue
 
-      // status 1 = Success
       if (receipt.status === 1) {
-        const logparsed = contractInterface.parseLog({
-          data: receipt.logs[0].data,
-          topics: receipt.logs[0].topics,
+        receipt.logs.forEach(log => {
+          if (log.address !== config.multiforwarder) return
+          const parsed = contractInterface.parseLog(log)
+          if (parsed.name !== forwardAnyEvent.name && parsed.name !== forwardEvent.name) return
+          const { id, from, to, value } = parsed.args
+          transferPaymentConfirm({ id, from, to, value, transactionHash: txHash })
         })
-        const { id, from, to, value } = logparsed.args
-        transferPaymentConfirm({ chainName: '', id, from, to, value, transactionHash: txHash }) // TODO OPEN-SOURCE: fix the chainname
       } else {
-        //ExitCode != 0 = Failed
         await prisma.transfer.updateMany({
           where: {
             txHash: txHash,
@@ -70,7 +64,7 @@ export default async function run() {
           },
           data: {
             status: 'FAILED',
-            // notes: data.error, // TODO OPEN-SOURCE: Add error message
+            notes: 'Payment failed',
             isActive: false,
           },
         })

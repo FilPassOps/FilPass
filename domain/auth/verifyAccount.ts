@@ -1,4 +1,4 @@
-import { getPrismaClient } from 'lib/prisma'
+import prisma from 'lib/prisma'
 import jwt from 'jsonwebtoken'
 import { validate } from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
@@ -7,7 +7,7 @@ import { generateEmailHash } from 'lib/password'
 import { logger } from 'lib/logger'
 
 interface VerifyAccountParams {
-  token: string
+  token?: string
 }
 
 export async function verifyAccount(params: VerifyAccountParams) {
@@ -47,8 +47,6 @@ export async function verifyAccount(params: VerifyAccountParams) {
       },
     }
   }
-
-  const prisma = await getPrismaClient()
 
   try {
     const user = await prisma.user.findFirst({

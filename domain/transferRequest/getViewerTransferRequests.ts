@@ -14,7 +14,7 @@ interface SortParams {
 interface GetViewerTransferRequetsParams extends SortParams {
   viewerId: number
   page?: number
-  size: number
+  size?: number
   programId?: number[]
   requestNumber?: string
   teamHashes?: string[]

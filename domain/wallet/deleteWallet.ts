@@ -3,12 +3,12 @@ import prisma from 'lib/prisma'
 import { validate } from 'lib/yup'
 import { deleteWalletValidator } from './validation'
 import * as deleteWalletModule from 'domain/wallet/deleteWallet'
-import errorsMessages from 'wordings-and-errors/errors-messages'
+import { parametrizedErrorsMessages } from 'wordings-and-errors/errors-messages'
 import { Prisma } from '@prisma/client'
 
 interface DeleteWalletParams {
-  id: number
-  userId: number
+  id?: number
+  userId?: number
 }
 
 interface ValidateWalletTransferRequestsParams {
@@ -76,5 +76,5 @@ export async function validateWalletTransferRequests({ prisma, userId, userWalle
 
   const transferRequestIds = walletTransferRequests.map(transferRequest => transferRequest.publicId)
 
-  return errorsMessages.wallet_has_active_transfer_request.message(transferRequestIds)
+  return parametrizedErrorsMessages.wallet_has_active_transfer_request.message(transferRequestIds)
 }

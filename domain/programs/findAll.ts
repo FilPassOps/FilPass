@@ -1,6 +1,6 @@
 import { Role, TransferRequestStatus } from '@prisma/client'
 import { decryptPII } from 'lib/emissaryCrypto'
-import prisma, { getPrismaClient } from 'lib/prisma'
+import prisma from 'lib/prisma'
 import { validate } from 'lib/yup'
 import _ from 'lodash'
 import errorsMessages from 'wordings-and-errors/errors-messages'
@@ -65,8 +65,6 @@ export async function findAllPrograms({ archived = false }: FindAllProgramsProps
 }
 
 export async function findAllExternalPrograms() {
-  const prisma = await getPrismaClient()
-
   const programs = await prisma.program.findMany({
     where: {
       isActive: true,
@@ -283,30 +281,6 @@ export async function findUserRolePrograms(userId: number) {
   return {
     data: programs,
   }
-}
-
-export async function findCompliancePrograms() {
-  return await prisma.program.findMany({
-    where: {
-      isActive: true,
-      transferRequests: {
-        some: {
-          status: 'BLOCKED',
-        },
-      },
-    },
-    include: {
-      programCurrency: {
-        select: {
-          currency: true,
-          type: true,
-        },
-      },
-    },
-    orderBy: {
-      name: 'asc',
-    },
-  })
 }
 
 interface UserRoleProgramQueryResult {

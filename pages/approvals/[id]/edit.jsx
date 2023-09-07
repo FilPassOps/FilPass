@@ -10,7 +10,9 @@ export default function ApproverViewAwaiting({ data }) {
   return (
     <>
       <Head>
-        <title>Approval #{data?.id} - {PLATFORM_NAME}</title>
+        <title>
+          {`Approval #${data?.id} - ${PLATFORM_NAME}`}
+        </title>
       </Head>
       <TransferRequestEdit data={data} />
     </>
