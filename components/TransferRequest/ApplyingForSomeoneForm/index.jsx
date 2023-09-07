@@ -12,11 +12,11 @@ import {
   createTransferRequestSubmittedFormValidator,
 } from 'domain/transferRequestDraft/validation'
 import { api } from 'lib/api'
-import { getDelegatedAddress } from 'lib/getDelegatedAddress'
+import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import { PLATFORM_NAME, TOKEN } from 'system.config'
+import { PLATFORM_NAME } from 'system.config'
 import { PageAlert } from '../../Layout/Alerts'
 import { AttachmentInput } from '../TransferRequestForm/AttachmentInput'
 import { ProgramInfo } from '../shared/ProgramInfo'
@@ -196,7 +196,7 @@ const FormComponent = ({
     programs: approverPrograms,
     programId: requests?.[index].programId,
   })
-  const delegatedAddress = TOKEN.name === 'Filecoin' && getDelegatedAddress(requests[index].wallet)
+  const delegatedAddress = getDelegatedAddress(requests[index].wallet, WalletSize.SHORT, selectedProgram?.blockchain.name)
 
   useEffect(() => {
     if (setValue) {

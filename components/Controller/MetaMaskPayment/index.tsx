@@ -14,7 +14,7 @@ import _ from 'lodash'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { TOKEN, getChainByName } from 'system.config'
+import { getChainByName } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { ErrorAlert, SuccessAlert } from './Alerts'
 import PaymentBatch from './PaymentBatch'
@@ -60,6 +60,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
   const [currentBatchIndex, setCurrentBatchIndex] = useState(0)
 
   const currentBatch = paymentBatchList[currentBatchIndex]
+  const chain = getChainByName(currentBatch?.blockchainName)
 
   useEffect(() => {
     let totalDollarAmount = 0
@@ -145,7 +146,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
         amounts.push(amount.toString())
       }
 
-      const { hash, from, to } = await forwardFunction(batch[0].program.blockchain.name, uuid, addresses, amounts)
+      const { hash, from, to } = await forwardFunction(blockchainName, uuid, addresses, amounts)
 
       await api.post('/transfers/payment-sent', {
         requests: requestIds,
@@ -256,11 +257,11 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
         )}
         <div className="py-6 md:p-6 border-b border-gray-200">
           <h1 className="text-base md:text-lg text-gray-900 font-medium mb-2">
-            Total payout amount: {formatCrypto(new Big(totalDollarAmount).div(rate).toFixed(2))} {TOKEN.symbol}
+            Total payout amount: {formatCrypto(new Big(totalDollarAmount).div(rate).toFixed(2))} {chain.symbol}
             <span className="text-sm text-gray-500"> ≈{formatCurrency(totalDollarAmount)}</span>
           </h1>
           <p className="text-xs md:text-sm text-gray-500">
-            1 {TOKEN.symbol} = {`${formatCurrency(rate)}`} ({updatedAt} updated)
+            1 {chain.symbol} = {`${formatCurrency(rate)}`} ({updatedAt} updated)
           </p>
         </div>
         {currentBatch && (

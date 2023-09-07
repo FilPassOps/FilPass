@@ -46,7 +46,7 @@ export default async function run() {
 
       for (const [, event] of uniqueEventMap) {
         const [id, from, to, value] = event.args
-        transferPaymentConfirm({ id, from, to, value, transactionHash: event.transactionHash })
+        transferPaymentConfirm({ chainName: 'Filecoin', id, from, to, value, transactionHash: event.transactionHash }) // TODO OPEN-SOURCE: fix the chainname
       }
 
       await prisma.blockTracker.updateMany({ data: { blockNumber: _endBlock + 1 } })

@@ -11,7 +11,7 @@ import { USD } from 'domain/currency/constants'
 import { formatCrypto, formatCurrency } from 'lib/currency'
 import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { useState } from 'react'
-import { SUPPORT_EMAIL, TOKEN, getChainByName } from 'system.config'
+import { SUPPORT_EMAIL, getChainByName } from 'system.config'
 import { Table, TableDiv, TableHeader } from './Table'
 import { TransactionParser } from './TransactionParser'
 
@@ -83,7 +83,7 @@ const PaymentBatch = ({
     }
   }
 
-  const validateParseData = (parsedData: ParsedData) => {
+  const validateParseData = (parsedData: ParsedData, blockchainName: string) => {
     const isValidFunctionCall = contractInterface.getFunction('forwardAny').name
 
     const parsedDataArray = parsedData.addresses.reduce((acc, address, index) => {
@@ -91,7 +91,7 @@ const PaymentBatch = ({
     }, Array<{ address: string; amount: string }>())
 
     const newData = data.map(tranferRequest => {
-      const is0xFilecoinAddress = tranferRequest.wallet.address.startsWith('0x') && TOKEN.name === 'Filecoin'
+      const is0xFilecoinAddress = tranferRequest.wallet.address.startsWith('0x') && blockchainName === 'Filecoin'
 
       const finalAddress = is0xFilecoinAddress
         ? getDelegatedAddress(tranferRequest.wallet.address)?.fullAddress
@@ -121,8 +121,8 @@ const PaymentBatch = ({
     }
     return true
   }
-  const handleParseData = async (parsedData: ParsedData) => {
-    const isValid = validateParseData(parsedData)
+  const handleParseData = async (parsedData: ParsedData, blockchainName: string) => {
+    const isValid = validateParseData(parsedData, blockchainName)
     setIsChunkHextMatch(isValid)
   }
 
@@ -171,13 +171,13 @@ const PaymentBatch = ({
       </div>
       <div className={`${isOpen ? 'block' : 'hidden'} py-6 md:p-6`}>
         {isHexMatch !== undefined && <ParseResultMessage isSucess={isHexMatch} />}
-        <TransactionParser onParseData={handleParseData} />
+        <TransactionParser onParseData={handleParseData} blockchainName={blockchainName} />
         <div className="overflow-x-scroll">
           <Table cols="grid-cols-5" className="bg-white">
             <TableHeader>No</TableHeader>
             <TableHeader>Destination</TableHeader>
             <TableHeader>Amount</TableHeader>
-            <TableHeader>{TOKEN.symbol} Amount</TableHeader>
+            <TableHeader>Token Amount</TableHeader>
             <TableHeader>Hex Match</TableHeader>
             {data.map(({ id, amount, wallet, program, publicId, transfers, isHexMatch }) => {
               const requestUnit = program.programCurrency.find(({ type }) => type === 'REQUEST') as ProgramCurrency

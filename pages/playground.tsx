@@ -19,7 +19,7 @@ const Playground: NextPageWithLayout = () => {
   const { wallet, connect } = useMetaMask()
   const [provider, setProvider] = useState<ethers.providers.Web3Provider>()
   const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner>()
-  const { forwardAll } = useContract()
+  const { forwardAll } = useContract('Filecoin')
 
   const [amounts, setAmounts] = useState<string[]>(['0.01'])
   const [destinations, setDestinations] = useState<string[]>(['0x8161d6022Db49f457242645D557dEf05359c9F1B'])

@@ -4,7 +4,6 @@ import { NumberInput, SelectInput, TextInput } from 'components/shared/FormInput
 import { StatusBadge } from 'components/shared/Status'
 import { WalletAddress } from 'components/shared/WalletAddress'
 import { DateTime } from 'luxon'
-import { TOKEN } from 'system.config'
 import { ProgramInfo } from '../shared/ProgramInfo'
 import { RequestorReceiver } from '../shared/RequestorReceiver'
 import { useDownloadFile } from '../shared/useDownloadFile'
@@ -48,14 +47,14 @@ export const EditTransferRequestAsApprover = ({ data, role }) => {
                             isVerified={data.wallet_is_verified}
                             label={data.wallet_name}
                             walletSize="short"
-                            blockchain={TOKEN.name}
+                            blockchain={data.wallet_blockchain_name}
                             className="sm:hidden"
                           />
                           <WalletAddress
                             address={data.wallet_address}
                             isVerified={data.wallet_is_verified}
                             label={data.wallet_name}
-                            blockchain={TOKEN.name}
+                            blockchain={data.wallet_blockchain_name}
                             className="hidden sm:flex"
                           />
                         </>

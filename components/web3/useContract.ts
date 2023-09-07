@@ -4,7 +4,7 @@ import { ExternalProvider } from '@ethersproject/providers'
 import filecoinAddress from '@glif/filecoin-address'
 import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
-import { TOKEN, getChainByName } from 'system.config'
+import { getChainByName } from 'system.config'
 import { MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
 import config from '../../chains.config'
 
@@ -58,7 +58,7 @@ export const useContract = (blockchainName: string) => {
       const weiTotal = weiValues.reduce((a, b) => a.add(b), ethers.BigNumber.from(0))
 
       const addresses = destinations.map(destination => {
-        if (TOKEN.name !== 'Filecoin') {
+        if (blockchainName !== 'Filecoin') {
           return ethers.utils.arrayify(destination)
         }
 
@@ -83,6 +83,7 @@ export const useContract = (blockchainName: string) => {
    * @returns
    */
   const forward = async (blockchainName: string, id: string, destinations: string[], amounts: string[]) => {
+    //TODO OPEN-SOURCE: use the blockchainName from the props
     if (!multiForwarder || !signer || !provider || !destinations || !amounts) {
       throw new Error('Missing dependencies')
     }

@@ -18,7 +18,7 @@ import { formatCrypto } from 'lib/currency'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import { TOKEN, getChainByName } from 'system.config'
+import { getChainByName } from 'system.config'
 
 const TransferList = ({
   requests = [],
@@ -234,7 +234,7 @@ const CryptoAmountInfo = ({ filecoin, request, requestUnit, paymentUnit, paidTra
   }
 
   if (request.status === PAID_STATUS) {
-    return `${paidTransfer.amount} ${paidTransfer.amountCurrencyUnit?.name ?? TOKEN.symbol}`
+    return `${paidTransfer.amount} ${paidTransfer.amountCurrencyUnit?.name}`
   }
 
   if (requestUnit.currency.name === USD) {

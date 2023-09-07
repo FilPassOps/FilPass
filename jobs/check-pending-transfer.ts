@@ -60,7 +60,7 @@ export default async function run() {
           topics: receipt.logs[0].topics,
         })
         const { id, from, to, value } = logparsed.args
-        transferPaymentConfirm({ id, from, to, value, transactionHash: txHash })
+        transferPaymentConfirm({ chainName: '', id, from, to, value, transactionHash: txHash }) // TODO OPEN-SOURCE: fix the chainname
       } else {
         //ExitCode != 0 = Failed
         await prisma.transfer.updateMany({
