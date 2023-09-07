@@ -2,7 +2,7 @@ import axios from 'axios'
 import config from 'chains.config'
 import { logger } from './logger'
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: config.chain.rpcUrls[0],
   timeout: 60000,
 })
@@ -101,13 +101,4 @@ export const getWalletBalance = (address: unknown) => {
     method: 'Filecoin.WalletBalance',
     params: [address],
   })
-}
-
-module.exports = {
-  api: api,
-  getGasEstimation: getGasEstimation,
-  getNonce: getNonce,
-  sendTransaction: sendTransaction,
-  chainGetMessageId: chainGetMessageId,
-  getWalletBalance: getWalletBalance,
 }

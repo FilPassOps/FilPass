@@ -4,12 +4,53 @@ import prisma, { newPrismaTransaction } from 'lib/prisma'
 import _ from 'lodash'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { getDelegatedAddress } from 'lib/getDelegatedAddress'
+import { Prisma } from '@prisma/client'
 
-export const batchCreateWallet = async (requests, users, isBatchCsv) => {
+interface Request {
+  wallet: {
+    created?: boolean
+    isDefault: boolean
+    address: string
+  }
+  receiver: {
+    id: number
+    email: string
+  }
+  receiverEmail: string
+  skipWalletCreation: boolean
+  row: number
+}
+
+interface BatchCreateWalletParams {
+  requests: {
+    receiverEmail: string
+    wallet?: string
+    skipWalletCreation?: boolean
+  }[]
+  users: {
+    id: number
+    email: string
+  }[]
+  isBatchCsv?: boolean
+}
+
+interface CheckWalletParams {
+  prisma: Prisma.TransactionClient
+  user: { id: number; email: string }
+  request: BatchCreateWalletParams['requests'][0]
+  isBatchCsv?: boolean
+  index: number
+}
+
+export const batchCreateWallet = async ({ requests, users, isBatchCsv }: BatchCreateWalletParams) => {
   const validatePromiseList = requests.map(async (singleRequest, index) => {
     const user = users.find(singleUser => singleUser.email === singleRequest.receiverEmail)
 
-    return await checkWallet(prisma, user, singleRequest, isBatchCsv, index)
+    if (!user) {
+      throw { message: `${errorsMessages.user_not_found.message} At line ${index + 1}` }
+    }
+
+    return await checkWallet({ prisma, user, request: singleRequest, isBatchCsv, index })
   })
 
   const validatedWallets = await Promise.allSettled(validatePromiseList)
@@ -18,8 +59,8 @@ export const batchCreateWallet = async (requests, users, isBatchCsv) => {
   const foundRejected = validatedWallets.find(req => req.status === 'rejected')
 
   if (foundRejected) {
-    const errors = validatedWallets.map(({ status, reason }) =>
-      status === 'rejected' ? { wallet: { message: reason?.message ?? errorsMessages.wallet_incorrect.message } } : null
+    const errors = validatedWallets.map(result =>
+      result.status === 'rejected' ? { wallet: { message: result.reason?.message ?? errorsMessages.wallet_incorrect.message } } : null,
     )
     return {
       error: {
@@ -35,10 +76,10 @@ export const batchCreateWallet = async (requests, users, isBatchCsv) => {
     return { error }
   }
 
-  return await setDefaultWallets(createdWallets)
+  return await setDefaultWallets(createdWallets as Request[])
 }
 
-const checkWallet = async (prisma, user, request, isBatchCsv, index) => {
+const checkWallet = async ({ prisma, user, request, isBatchCsv, index }: CheckWalletParams) => {
   const userWallets = await prisma.userWallet.findMany({
     where: {
       userId: user.id,
@@ -74,7 +115,7 @@ const checkWallet = async (prisma, user, request, isBatchCsv, index) => {
     throw { wallet: errorsMessages.wallet_cant_be_empty }
   }
 
-  if (request.wallet.startsWith('0x')) {
+  if (request.wallet?.startsWith('0x')) {
     const delegatedAddress = getDelegatedAddress(request.wallet).fullAddress
 
     if (!delegatedAddress) {
@@ -83,7 +124,7 @@ const checkWallet = async (prisma, user, request, isBatchCsv, index) => {
 
     request.wallet = request.wallet.toLowerCase()
   } else {
-    const isWalletValid = await matchWalletAddress(request.wallet)
+    const isWalletValid = await matchWalletAddress(request.wallet as string)
 
     if (!isWalletValid) {
       throw { wallet: errorsMessages.wallet_not_found }
@@ -97,7 +138,7 @@ const checkWallet = async (prisma, user, request, isBatchCsv, index) => {
   }
 }
 
-const createWallets = async requests => {
+const createWallets = async (requests: Request[]) => {
   return await newPrismaTransaction(async prisma => {
     const promiseList = requests.map(async singleRequest => {
       if (singleRequest.wallet?.created === false && !singleRequest?.skipWalletCreation) {
@@ -121,22 +162,23 @@ const createWallets = async requests => {
 
     const walletRequests = createdWallets.map(result => (result.status === 'rejected' ? result : result.value))
 
-    if (createdWallets.find(req => req.status === 'rejected')) {
-      const { reason } = createdWallets.find(req => req.status === 'rejected')
-      if (reason.code === 'P2002') {
+    const foundRejected = createdWallets.find(req => req.status === 'rejected')
+
+    if (foundRejected) {
+      if ((foundRejected as PromiseRejectedResult).reason.code === 'P2002') {
         throw new TransactionError(
           'Please update the file so you are only adding 1 wallet per user. If you are adding multiple requests for 1 user, add the wallet to the first request and keep wallet on other requests blank.',
-          { status: 400 }
+          { status: 400, errors: undefined },
         )
       }
-      throw new TransactionError('Error while creating wallets', { status: 500 })
+      throw new TransactionError('Error while creating wallets', { status: 500, errors: undefined })
     }
 
-    return cleanRequests(walletRequests)
+    return cleanRequests(walletRequests as Request[])
   })
 }
 
-const setDefaultWallets = async requests => {
+const setDefaultWallets = async (requests: Request[]) => {
   return await newPrismaTransaction(async prisma => {
     const promiseList = requests.map(async singleRequest => {
       if (singleRequest.wallet.isDefault) {
@@ -177,22 +219,21 @@ const setDefaultWallets = async requests => {
     const walletRequests = updatedWallets.map(result => (result.status === 'rejected' ? result : result.value))
 
     if (updatedWallets.find(req => req.status === 'rejected')) {
-      throw new TransactionError('Error while updating default wallet', { status: 500 })
+      throw new TransactionError('Error while updating default wallet', { status: 500, errors: undefined })
     }
 
     return walletRequests
   })
 }
 
-const cleanRequests = requests => {
+const cleanRequests = (requests: Request[]) => {
   const uniqueWalletsAndEmails = _.mapValues(_.groupBy(requests, 'wallet.address'), value => _.uniqBy(value, 'receiverEmail'))
   const uniqueRequests = _.flatMap(uniqueWalletsAndEmails, (value, key) => value.map(v => ({ ...v, wallet: key })))
 
   return requests.map(request => {
     if (!uniqueRequests.find(r => r.row === request.row)) {
-      const createdWallet = requests.find(
-        r => r.wallet.address === request.wallet.address && r.receiverEmail === request.receiverEmail
-      ).wallet
+      const createdWallet = requests.find(r => r.wallet.address === request.wallet.address && r.receiverEmail === request.receiverEmail)
+        ?.wallet
       return { ...request, wallet: createdWallet }
     } else {
       return request

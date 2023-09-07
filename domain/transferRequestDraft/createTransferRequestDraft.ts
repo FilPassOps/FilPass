@@ -4,14 +4,74 @@ import { createTransferRequestDraftValidator } from 'domain/transferRequestDraft
 import { encrypt, encryptPII } from 'lib/emissaryCrypto'
 import { TransactionError } from 'lib/errors'
 import { moveFileS3 } from 'lib/fileUpload'
+import { logger } from 'lib/logger'
 import { generateEmailHash, generateTeamHash } from 'lib/password'
 import prisma, { newPrismaTransaction } from 'lib/prisma'
 import { validate } from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
-export async function createTransferRequestDraft(params) {
+interface CreateTransferRequestDraftParams {
+  approverRoleId: number
+  requesterId: number
+  requests: {
+    receiverEmail: string
+    programId: number
+    team?: string
+    amount?: string
+    temporaryFileId?: string
+    currencyUnitId: number
+  }[]
+}
+
+interface BuildTransferRequestDraftDataParams {
+  users: {
+    id: number
+    email: string
+    isDraft: boolean
+  }[]
+  requests: {
+    receiverEmail: string
+    programId: number
+    team?: string
+    amount?: string
+    temporaryFileId?: string
+    currencyUnitId: number
+  }[]
+  approverRoleId: number
+  requesterId: number
+}
+
+interface PrismaCreateTransferRequestDraftParams {
+  draft: {
+    requesterId: number
+    receiverId: number
+    currencyUnitId: number
+    attachmentId?: number
+    programId: number
+    team: string
+    teamHash: string
+    amount: string
+  }
+  rawDraft: {
+    receiverEmail: string
+    programId: number
+    team?: string
+    amount?: string
+    temporaryFileId?: string
+    currencyUnitId: number
+  }
+  user: {
+    id: number
+    email: string
+    isDraft: boolean
+  }
+}
+
+type Requests = CreateTransferRequestDraftParams['requests']
+
+export async function createTransferRequestDraft(params: CreateTransferRequestDraftParams) {
   const { fields, errors } = await validate(createTransferRequestDraftValidator, params)
-  if (errors) {
+  if (errors || !fields) {
     return {
       error: {
         status: 400,
@@ -28,15 +88,15 @@ export async function createTransferRequestDraft(params) {
     return { error: userError }
   }
 
-  const drafts = await buildTransferRequestDraftData(users, requests, approverRoleId, requesterId)
+  const drafts = await buildTransferRequestDraftData({ users: users as any, requests, approverRoleId, requesterId })
 
-  return await prismaCreateTransferRequestDraft(drafts)
+  return await prismaCreateTransferRequestDraft(drafts as PrismaCreateTransferRequestDraftParams[])
 }
 
-async function validateAndCreateUsers(requests) {
+async function validateAndCreateUsers(requests: Requests) {
   const emailHashes = await Promise.all(requests.map(async request => generateEmailHash(request.receiverEmail)))
 
-  let users = await prisma.user.findMany({
+  const users = await prisma.user.findMany({
     where: {
       isActive: true,
       emailHash: { in: emailHashes },
@@ -54,7 +114,7 @@ async function validateAndCreateUsers(requests) {
     }
 
     return emailList
-  }, [])
+  }, [] as string[])
 
   const promiseList = newUsers.map(async user => ({
     encrypted: await encryptPII(user),
@@ -88,16 +148,21 @@ async function validateAndCreateUsers(requests) {
     })
 
     const createdUsers = await Promise.allSettled(createUserPromiseList)
-    const values = createdUsers.map(({ value }) => value)
-    if (values.filter(users => users.error).length) {
-      throw new TransactionError('Error while creating users', { status: 400 })
-    }
+
+    const values = createdUsers.map(result => {
+      if (result.status === 'rejected') {
+        logger.error('Error while creating user', result)
+        throw new TransactionError('Error while creating users', { status: 400, errors: undefined })
+      } else {
+        return result.value
+      }
+    })
 
     return [...users, ...values]
   })
 }
 
-async function buildTransferRequestDraftData(users, requests, approverRoleId, requesterId) {
+async function buildTransferRequestDraftData({ users, requests, approverRoleId, requesterId }: BuildTransferRequestDraftDataParams) {
   const programs = await prisma.userRoleProgram.findMany({
     where: {
       userRoleId: approverRoleId,
@@ -120,6 +185,10 @@ async function buildTransferRequestDraftData(users, requests, approverRoleId, re
 
     const user = users.find(({ email }) => email === singleRequest.receiverEmail)
 
+    if (!user) {
+      throw { receiverEmail: errorsMessages.not_found }
+    }
+
     let attachment
     if (singleRequest.temporaryFileId) {
       const tempFile = await prisma.temporaryFile.findUnique({
@@ -128,7 +197,15 @@ async function buildTransferRequestDraftData(users, requests, approverRoleId, re
         },
       })
 
-      const { data: file } = await moveFileS3({ userId: user.id, type: tempFile.type, source: tempFile.key })
+      if (!tempFile) {
+        throw { message: errorsMessages.something_went_wrong }
+      }
+
+      const { data: file, error } = await moveFileS3({ userId: String(user.id), type: tempFile.type, source: tempFile.key })
+
+      if (error) {
+        throw { message: errorsMessages.something_went_wrong }
+      }
 
       attachment = await prisma.userFile.create({
         data: {
@@ -168,14 +245,14 @@ async function buildTransferRequestDraftData(users, requests, approverRoleId, re
 
   const finalData = data.map(result => (result.status === 'rejected' ? result : result.value))
 
-  if (finalData.filter(req => req.reason).length) {
+  if (finalData.filter((req: any) => req.reason).length) {
     throw { status: 400, requests }
   }
 
   return finalData
 }
 
-async function prismaCreateTransferRequestDraft(draftList) {
+async function prismaCreateTransferRequestDraft(draftList: PrismaCreateTransferRequestDraftParams[]) {
   return await newPrismaTransaction(async prisma => {
     const promiseList = draftList.map(async ({ draft, user, rawDraft }) => {
       const data = await prisma.transferRequestDraft.create({
@@ -216,16 +293,15 @@ async function prismaCreateTransferRequestDraft(draftList) {
 
     const createdDrafts = await Promise.allSettled(promiseList)
 
-    if (createdDrafts.filter(result => result.status === 'rejected').length) {
-      const requests = createdDrafts.map(result => (result.status === 'rejected' ? result : {}))
-
-      if (requests.filter(req => req.reason).length) {
-        throw { status: 400, requests }
+    const requests = createdDrafts.map(result => {
+      if (result.status === 'rejected') {
+        logger.error('Error while creating draft transfer request', result)
+        throw new TransactionError('Error while creating transfer request', { status: 500, errors: undefined })
+      } else {
+        return result.value
       }
+    })
 
-      throw new TransactionError('Error while creating transfer requests', { status: 500 })
-    }
-
-    return createdDrafts.map(({ value }) => value)
+    return requests
   })
 }

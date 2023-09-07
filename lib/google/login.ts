@@ -4,7 +4,19 @@ const NEXT_PUBLIC_GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
 const APP_URL = process.env.APP_URL
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET
 
-async function getAccessTokenFromCode({ code }) {
+interface GetAccessTokenFromCodeParams {
+  code: string
+}
+
+interface GetGoogleUserInfoParams {
+  access_token: string
+}
+
+interface GetGoogleUserParams {
+  code: string
+}
+
+async function getAccessTokenFromCode({ code }: GetAccessTokenFromCodeParams) {
   try {
     const { data } = await axios({
       url: `https://oauth2.googleapis.com/token`,
@@ -18,7 +30,7 @@ async function getAccessTokenFromCode({ code }) {
       },
     })
     return { data: data.access_token, error: null }
-  } catch (e) {
+  } catch (e: any) {
     return {
       data: null,
       error: {
@@ -29,7 +41,7 @@ async function getAccessTokenFromCode({ code }) {
   }
 }
 
-async function getGoogleUserInfo({ access_token }) {
+async function getGoogleUserInfo({ access_token }: GetGoogleUserInfoParams) {
   try {
     const { data } = await axios({
       url: 'https://www.googleapis.com/oauth2/v2/userinfo',
@@ -39,7 +51,7 @@ async function getGoogleUserInfo({ access_token }) {
       },
     })
     return { data, error: null }
-  } catch (e) {
+  } catch (e: any) {
     return {
       data: null,
       error: {
@@ -50,7 +62,7 @@ async function getGoogleUserInfo({ access_token }) {
   }
 }
 
-export async function getGoogleUser({ code }) {
+export async function getGoogleUser({ code }: GetGoogleUserParams) {
   const { data: access_token, error: access_token_error } = await getAccessTokenFromCode({ code })
   if (access_token_error) {
     return { data: null, error: access_token_error }

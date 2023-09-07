@@ -84,15 +84,15 @@ export const getServerSideProps = withUserSSR(async ({ query, user }) => {
     userId: user.id,
     page,
     size: pageSize,
-    sort,
-    order,
+    sort: sort as string | undefined,
+    order: order as string | undefined,
     programIds,
-    requestNumber: number,
-    status,
+    requestNumber: number as string | undefined,
+    status: status as string | undefined,
     team: team?.toString().split(','),
     from: fromDate,
     to: toDate,
-    wallets,
+    wallets: wallets as string[] | undefined,
   })
 
   const programs = await findReceiverPrograms({ receiverId: user.id })

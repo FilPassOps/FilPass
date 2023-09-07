@@ -174,6 +174,18 @@ export const uploadBatchCsvValidator = yup
   })
   .required()
 
+export const csvSchemaV1 = yup.object().shape({
+  Email: yup.string().defined(),
+  Amount: yup.string().defined(),
+})
+
+export const csvSchemaV2 = yup.object().shape({
+  Email: yup.string().defined(),
+  Amount: yup.string().defined(),
+  ApprovalForTransfer: yup.string().defined(),
+  Custodian: yup.string().required(),
+})
+
 export const deleteTransferRequestValidator = yup.object({
   requests: yup.array(yup.string()).min(1).max(100, 'Must have less than or equal to 100 items').required(),
 })

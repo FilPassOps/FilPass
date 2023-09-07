@@ -1,8 +1,9 @@
 import { deleteDraftTransferRequestById } from 'domain/transferRequestDraft/deleteDraftTransferRequestById'
 import { submitDraftTransferRequestById } from 'domain/transferRequestDraft/submitDraftTransferRequestById'
-import { newHandler, withLimiter, withMethods, withUser } from 'lib/middleware'
+import { NextApiRequestWithSession, newHandler, withLimiter, withMethods, withUser } from 'lib/middleware'
+import { NextApiResponse } from 'next/types'
 
-async function handler(req, res) {
+async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
   if (req.method === 'PATCH') {
     return await handlePatchRequest(req, res)
   }
@@ -10,9 +11,9 @@ async function handler(req, res) {
   return await handlePostRequest(req, res)
 }
 
-async function handlePatchRequest(req, res) {
-  const publicId = req.query.id
-  const userId = req.user.id
+async function handlePatchRequest(req: NextApiRequestWithSession, res: NextApiResponse) {
+  const publicId = req.query.id as string
+  const userId = req.user?.id as number
 
   const { data, error } = await deleteDraftTransferRequestById({
     publicId,
@@ -25,7 +26,7 @@ async function handlePatchRequest(req, res) {
   return res.status(200).json(data)
 }
 
-async function handlePostRequest(req, res) {
+async function handlePostRequest(req: NextApiRequestWithSession, res: NextApiResponse) {
   const publicId = req.query.id
 
   const { data, error } = await submitDraftTransferRequestById({

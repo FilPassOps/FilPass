@@ -16,9 +16,55 @@ import {
 } from './constants'
 import { getApproverTransferRequestsValidator } from './validation'
 
-export async function getApproverTransferRequests(params) {
+interface GetApproverTransferRequestsParams {
+  approverId: number
+  status?: string
+  programId?: number[]
+  requestNumber?: string
+  teamHashes?: string[]
+  from?: Date
+  to?: Date
+  wallets?: string[]
+  page?: number
+  size?: number
+  sort?: string
+  order?: string
+}
+
+interface TransferRequestDraft {
+  id: string
+  team: string
+  create_date: Date
+  amount: string
+  program_name: string
+  request_unit: string
+  payment_unit: string
+}
+
+interface TransferRequest {
+  id: string
+  status: string
+  team: string
+  create_date: Date
+  amount: string
+  vesting_start_epoch: number
+  vesting_months: number
+  program_name: string
+  program_id: number
+  request_unit: string
+  payment_unit: string
+  transfer_hash: string
+  transfer_amount: string
+  transfer_amount_currency_unit_id: number
+  transfer_amount_currency_unit: string
+  wallet_address: string
+  wallet_blockchain: string
+  wallet_is_verified: boolean
+}
+
+export async function getApproverTransferRequests(params: GetApproverTransferRequestsParams) {
   const { fields, errors } = await validate(getApproverTransferRequestsValidator, params)
-  if (errors) {
+  if (errors || !fields) {
     return {
       error: {
         status: 400,
@@ -38,10 +84,10 @@ export async function getApproverTransferRequests(params) {
   const draftNumberFilter = requestNumber ? Prisma.sql`AND draft.public_id = '${requestNumber}'` : Prisma.empty
   const draftTeamFilter = teamHashes ? Prisma.sql`AND draft.team_hash IN (${Prisma.join(teamHashes)})` : Prisma.empty
   const draftWalletFilter = wallets?.length ? Prisma.sql`AND user_wallet.address IN (${Prisma.join(wallets)})` : Prisma.empty
-  const draftCreateDateFilter = from && to ? Prisma.sql`AND draft.created_atBETWEEN ${from} AND ${to}` : Prisma.empty
+  const draftCreateDateFilter = from && to ? Prisma.sql`AND draft.created_at BETWEEN ${from} AND ${to}` : Prisma.empty
 
   if (status === DRAFT_STATUS) {
-    const drafts = await prisma.$queryRaw`
+    const drafts = await prisma.$queryRaw<TransferRequestDraft[]>`
     SELECT
       draft.public_id                                      id,
       draft.team                                           team,
@@ -69,7 +115,7 @@ export async function getApproverTransferRequests(params) {
     ${pagination}
   `
 
-    const [transferRequestsTotalItems] = await prisma.$queryRaw`
+    const [transferRequestsTotalItems] = await prisma.$queryRaw<{ total: number }[]>`
       SELECT
 	      count(*)::integer AS total
       FROM user_role approver_role
@@ -98,7 +144,7 @@ export async function getApproverTransferRequests(params) {
           team,
           status: DRAFT_STATUS,
         }
-      })
+      }),
     )
     return {
       data: {
@@ -110,10 +156,7 @@ export async function getApproverTransferRequests(params) {
 
   let statusFilter = Prisma.sql`AND request.status::text IN (${Prisma.join([status])})`
   if (status === REJECTED_STATUS) {
-    statusFilter = Prisma.sql`AND request.status::text IN (${Prisma.join([
-      REJECTED_BY_CONTROLLER_STATUS,
-      REJECTED_BY_APPROVER_STATUS,
-    ])})`
+    statusFilter = Prisma.sql`AND request.status::text IN (${Prisma.join([REJECTED_BY_CONTROLLER_STATUS, REJECTED_BY_APPROVER_STATUS])})`
   }
   if (status === SUBMITTED_STATUS) {
     statusFilter = Prisma.sql`AND (
@@ -141,7 +184,7 @@ export async function getApproverTransferRequests(params) {
   const walletFilter = wallets?.length ? Prisma.sql`AND user_wallet.address IN (${Prisma.join(wallets)})` : Prisma.empty
   const createDateFilter = from && to ? Prisma.sql`AND request.created_at BETWEEN ${from} AND ${to}` : Prisma.empty
 
-  const transferRequests = await prisma.$queryRaw`
+  const transferRequests = await prisma.$queryRaw<TransferRequest[]>`
     SELECT
         request.public_id                                    id,
         request.status                                       status,
@@ -188,7 +231,7 @@ export async function getApproverTransferRequests(params) {
     ${pagination}
   `
 
-  const [transferRequestsTotalItems] = await prisma.$queryRaw`
+  const [transferRequestsTotalItems] = await prisma.$queryRaw<{ total: number }[]>`
       SELECT
 	      count(*)::integer AS total
       FROM user_role approver_role
@@ -228,7 +271,7 @@ export async function getApproverTransferRequests(params) {
         delegated_address: getDelegatedAddress(request.wallet_address, WalletSize.VERY_SHORT)?.shortAddress,
         wallet_address: shortenAddress(request.wallet_address),
       }
-    })
+    }),
   )
 
   return {
@@ -239,8 +282,8 @@ export async function getApproverTransferRequests(params) {
   }
 }
 
-const getSortParams = ({ sort, order, status }) => {
-  let sortTypes = {
+const getSortParams = ({ sort, order, status }: { sort?: string; order?: string; status: string }) => {
+  let sortTypes: Record<string, Prisma.Sql> = {
     number: Prisma.sql`ORDER BY request.public_id`,
     program: Prisma.sql`ORDER BY program.name`,
     create_date: Prisma.sql`ORDER BY request.created_at`,
@@ -251,16 +294,16 @@ const getSortParams = ({ sort, order, status }) => {
       number: Prisma.sql`ORDER BY draft.public_id`,
       program: Prisma.sql`ORDER BY program.name`,
       create_date: Prisma.sql`ORDER BY draft.created_at`,
-    }
+    } as { number: Prisma.Sql; program: Prisma.Sql; create_date: Prisma.Sql }
   }
 
-  const orderTypes = {
+  const orderTypes: Record<string, Prisma.Sql> = {
     desc: Prisma.sql`DESC`,
     asc: Prisma.sql`ASC`,
   }
 
-  const sortType = sortTypes[sort] || sortTypes.create_date
-  const orderBy = orderTypes[order] || orderTypes.desc
+  const sortType = (sort && sortTypes[sort]) || sortTypes.create_date
+  const orderBy = (order && orderTypes[order]) || orderTypes.desc
 
   return { sortType, orderBy }
 }

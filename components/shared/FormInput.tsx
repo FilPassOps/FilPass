@@ -3,7 +3,7 @@ import { Listbox } from '@headlessui/react'
 import { ChevronDownIcon, ChevronUpIcon, EyeIcon, EyeSlashIcon, XMarkIcon } from '@heroicons/react/24/solid'
 import { classNames } from 'lib/classNames'
 import { forwardRef, useEffect, useRef, useState } from 'react'
-import { IMaskInput } from 'react-imask'
+
 import { NumericFormat } from 'react-number-format'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { Button } from './Button'
@@ -632,36 +632,6 @@ const InputController = ({ id, label, error, children, name: inputName }: InputC
     </div>
   )
 }
-
-interface DateInputProps {
-  error?: any
-  id: string
-  label: string
-  className?: string
-  disabled?: boolean
-  value?: string
-  name: string
-  onChange: (value: string) => void
-  [key: string]: any
-}
-
-export const DateInput = forwardRef<HTMLInputElement, DateInputProps>(
-  ({ error, id, label, className, disabled, value, onChange, ...props }, ref) => {
-    const classes = getInputClasses({ error, disabled })
-    return (
-      <InputController id={id} label={label} error={error} name={props.name}>
-        <IMaskInput
-          className={classNames(classes, className)}
-          mask={Date}
-          inputRef={ref}
-          onAccept={value => onChange(value)}
-          defaultValue={value}
-          {...props}
-        />
-      </InputController>
-    )
-  },
-)
 
 interface GetErrorMessageParams {
   error: any

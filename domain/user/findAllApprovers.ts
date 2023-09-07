@@ -1,10 +1,7 @@
-import { PrismaClient } from '@prisma/client'
 import { decryptPII } from 'lib/emissaryCrypto'
-import { getPrismaClient } from 'lib/prisma'
+import prisma from 'lib/prisma'
 
 export async function findAllApprovers() {
-  const prisma: PrismaClient = await getPrismaClient()
-
   const approvers = await prisma.userRole.findMany({
     where: {
       role: 'APPROVER',

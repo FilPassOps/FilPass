@@ -1,24 +1,27 @@
+import { Role } from '@prisma/client'
 import { getApprovalsByRole } from 'domain/approvals/service'
 import { APPROVER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
 import { SUBMITTED_STATUS } from 'domain/transferRequest/constants'
 import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { getEthereumAddress } from 'lib/getEthereumAddress'
-import { newHandler, withMethods, withRoles } from 'lib/middleware'
+import { NextApiRequestWithSession, newHandler, withMethods, withRoles } from 'lib/middleware'
+import { NextApiResponse } from 'next/types'
 
-const handler = async (req, res) => {
-  const userId = req.user.id
-  const roles = req.user.roles
+const handler = async (req: NextApiRequestWithSession, res: NextApiResponse) => {
+  const userId = req.user?.id as number
+  const roles = req.user?.roles as { id: number; role: Role }[]
   const query = req.query
-  const status =  query.status || SUBMITTED_STATUS
-  const requestNumber = query.number
+  const status = (query.status || SUBMITTED_STATUS) as string
+  const requestNumber = query.number as string
   const team = query.team?.toString().split(',')
+  const programId = query.programId as string
 
-  const wallet = query.wallet
+  const wallet = query.wallet as string
 
   const ethereumWallet = getEthereumAddress(wallet)?.fullAddress.toLowerCase()
   const delegatedAddress = getDelegatedAddress(wallet)?.fullAddress
 
-  const wallets = [wallet, ethereumWallet, delegatedAddress].filter(Boolean)
+  const wallets = [wallet, ethereumWallet, delegatedAddress].filter(Boolean) as string[]
 
   let fromDate, toDate
 
@@ -29,11 +32,11 @@ const handler = async (req, res) => {
     toDate.setHours(23, 59, 59, 999)
   }
 
-  const { transfers, totalItems, error, tabs, shouldShowHeaderCheckbox } = await getApprovalsByRole({
+  const { transfers, totalItems, error, shouldShowHeaderCheckbox } = await getApprovalsByRole({
     roles,
     userId,
     ...query,
-    programId: query.programId?.length ? query.programId.split(',') : undefined,
+    programId,
     status,
     requestNumber,
     team,
@@ -45,7 +48,6 @@ const handler = async (req, res) => {
   const data = {
     transfers,
     totalItems,
-    tabs,
     shouldShowHeaderCheckbox,
   }
 

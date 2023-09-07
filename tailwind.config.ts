@@ -1,8 +1,8 @@
-const colors = require('tailwindcss/colors')
+import type { Config } from 'tailwindcss'
+import colors from 'tailwindcss/colors'
 
-module.exports = {
+export default {
   content: ['./pages/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
-  plugins: [require('@tailwindcss/forms'), require('@headlessui/tailwindcss')],
   theme: {
     fontFamily: {
       sans: ['Inter', 'sans-serif'],
@@ -50,12 +50,12 @@ module.exports = {
       },
       keyframes: {
         fadeInUp: {
-          '0%': { opacity: 0, transform: 'translate3d(0,100%,0)' },
-          '100%': { opacity: 1, transform: 'translate3d(0,0,0)' },
+          '0%': { opacity: '0', transform: 'translate3d(0,100%,0)' },
+          '100%': { opacity: '1', transform: 'translate3d(0,0,0)' },
         },
         fadeInRight: {
-          '0%': { opacity: 0, transform: 'translate3d(100%,0,0)' },
-          '100%': { opacity: 1, transform: 'translate3d(0,0,0)' },
+          '0%': { opacity: '0', transform: 'translate3d(100%,0,0)' },
+          '100%': { opacity: '1', transform: 'translate3d(0,0,0)' },
         },
       },
       animation: {
@@ -64,4 +64,5 @@ module.exports = {
       },
     },
   },
-}
+  plugins: [require('@tailwindcss/forms'), require('@headlessui/tailwindcss')],
+} satisfies Config

@@ -1,7 +1,9 @@
 import { uploadBatchCsv } from 'domain/transferRequest/uploadBatchCsv'
 import { newHandler, withApprover, withFile, withMethods } from 'lib/middleware'
+import { NextApiResponse } from 'next/types'
+import { NextApiRequestWithSessionAndFile } from 'pages/api/files'
 
-async function handler(req, res) {
+async function handler(req: NextApiRequestWithSessionAndFile, res: NextApiResponse) {
   const body = JSON.parse(req.body.data)
   const file = req.file
   const { approverId } = req
