@@ -3,15 +3,14 @@ import { Layout } from 'components/Layout'
 import { getApprovalDetailsByRole } from 'domain/approvals/service'
 import { APPROVER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
 import { withRolesSSR } from 'lib/ssr'
+import Head from 'next/head'
 import { PLATFORM_NAME } from 'system.config'
 
 export default function ApproverViewAwaiting({ data }) {
   return (
     <>
       <Head>
-        <title>
-          {`Approval #${data?.id} - ${PLATFORM_NAME}`}
-        </title>
+        <title>{`Approval #${data?.id} - ${PLATFORM_NAME}`}</title>
       </Head>
       <TransferRequestView data={data} />
     </>

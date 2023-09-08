@@ -1,5 +1,4 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Blockchain } from '@prisma/client'
 import { useAuth } from 'components/Authentication/Provider'
 import { Button } from 'components/shared/Button'
 import { TextInput } from 'components/shared/FormInput'
@@ -14,10 +13,11 @@ interface ConnectStepProps {
   onNextStepClick: (data: any) => void
   connectionMethod: string
   wallet: string
+  blockchainName: string
 }
 
 interface FormValues {
-  blockchain: Blockchain
+  blockchain: string
   address: string
   name?: string
 }
@@ -39,7 +39,7 @@ export function ConnectStep({ onBackClick, onNextStepClick, connectionMethod, wa
   })
 
   const handleFormSubmit = async (formData: FormValues) => {
-    const addressIndex = user.wallets?.findIndex(
+    const addressIndex = user?.wallets?.findIndex(
       wallet => wallet.address.toLowerCase() === formData.address.toLowerCase() && wallet.blockchain.name === formData.blockchain,
     )
 

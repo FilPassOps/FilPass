@@ -60,7 +60,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
   const [currentBatchIndex, setCurrentBatchIndex] = useState(0)
 
   const currentBatch = paymentBatchList[currentBatchIndex]
-  const chain = getChainByName(currentBatch?.blockchainName)
+  const chain = getChainByName(data[0].program.blockchain.name)
 
   useEffect(() => {
     let totalDollarAmount = 0

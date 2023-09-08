@@ -48,11 +48,11 @@ let blockchainList: Blockchain[] = []
 
 async function main() {
   blockchainList = await getBlockchainValues()
-  await Promise.all([createSuperAdmin(), createCompliance(), createFinance()])
+  await Promise.all([createSuperAdmin()])
   const [[approver, approverRole], [controller, controllerRole], viewerRole, vestingPrograms, oneTimePrograms] = await Promise.all([
     createApprover(),
-  await createCompliance()
-  await createFinance()
+    createController(),
+    createViewer(),
     createLinearVestingPrograms(),
     createOneTimeProgramIds(),
   ])
@@ -97,25 +97,14 @@ async function main() {
     }
   }
 
-  for await (const userInfo of usersInfoData) {
-    usersInfo[userInfo.firstName] = {
-      firstName: await encryptPII(userInfo.firstName),
-      lastName: await encryptPII(userInfo.lastName),
-      country: await encryptPII(userInfo.country),
-      dateOfBirth: userInfo.dateOfBirth ? await encryptPII(userInfo.dateOfBirth) : '',
-    }
-  }
-
   for (let i = 0; i < 150; i++) {
-    const { user, w9, w8, t1Wallet, t3Wallet, userRole } = await createUser(i)
+    const { user, t1Wallet, t3Wallet, userRole } = await createUser(i)
     for (let index = 0; index < vestingPrograms.length; index++) {
       await Promise.all([
         createTransferRequest({
           receiverId: user.id,
           requesterId: userRole.userId,
           amount: 0.1,
-          isUSResident: true,
-          userFileId: w9.id,
           program: oneTimePrograms[index],
           team: 'First team',
           userWalletId: t1Wallet.id,
@@ -124,8 +113,6 @@ async function main() {
           receiverId: user.id,
           requesterId: user.id,
           amount: 0.2,
-          isUSResident: true,
-          userFileId: w9.id,
           program: oneTimePrograms[index],
           team: 'Second team',
           userWalletId: t1Wallet.id,
@@ -135,8 +122,6 @@ async function main() {
           receiverId: user.id,
           requesterId: user.id,
           amount: 0.3,
-          isUSResident: true,
-          userFileId: w9.id,
           program: oneTimePrograms[index],
           team: 'Third team',
           userWalletId: t1Wallet.id,
@@ -150,8 +135,6 @@ async function main() {
           receiverId: user.id,
           requesterId: user.id,
           amount: 0.3,
-          isUSResident: true,
-          userFileId: w9.id,
           program: oneTimePrograms[index],
           team: 'Third team',
           userWalletId: t1Wallet.id,
@@ -165,8 +148,6 @@ async function main() {
           receiverId: user.id,
           requesterId: user.id,
           amount: 0.32,
-          isUSResident: true,
-          userFileId: w9.id,
           program: oneTimePrograms[index],
           team: 'Third team',
           userWalletId: t3Wallet.id,
@@ -180,8 +161,6 @@ async function main() {
           receiverId: user.id,
           requesterId: user.id,
           amount: 0.4,
-          isUSResident: true,
-          userFileId: w9.id,
           program: oneTimePrograms[index],
           team: 'Fourth team',
           userWalletId: t1Wallet.id,
@@ -196,8 +175,6 @@ async function main() {
           receiverId: user.id,
           requesterId: user.id,
           amount: 0.5,
-          isUSResident: true,
-          userFileId: w9.id,
           program: oneTimePrograms[index],
           team: 'Fifth team',
           userWalletId: t1Wallet.id,
@@ -212,8 +189,6 @@ async function main() {
           receiverId: user.id,
           requesterId: user.id,
           amount: 0.6,
-          isUSResident: true,
-          userFileId: w9.id,
           program: oneTimePrograms[index],
           team: 'Sixth team',
           userWalletId: t1Wallet.id,
@@ -232,8 +207,6 @@ async function main() {
           receiverId: user.id,
           requesterId: user.id,
           amount: 0.6,
-          isUSResident: true,
-          userFileId: w9.id,
           program: oneTimePrograms[index],
           team: 'Seventh team',
           userWalletId: t1Wallet.id,
@@ -253,8 +226,6 @@ async function main() {
           receiverId: user.id,
           requesterId: approver.id,
           amount: 0.1,
-          isUSResident: true,
-          userFileId: w9.id,
           program: oneTimePrograms[index],
           team: 'First approver team',
           userWalletId: t1Wallet.id,
@@ -263,8 +234,6 @@ async function main() {
           receiverId: user.id,
           requesterId: controller.id,
           amount: 0.1,
-          isUSResident: true,
-          userFileId: w9.id,
           program: vestingPrograms[index],
           team: 'First controller team',
           userWalletId: t1Wallet.id,
@@ -275,51 +244,6 @@ async function main() {
           amount: 0.1,
           team: 'Draft team',
           program: oneTimePrograms[index],
-        }),
-        createTransferRequest({
-          receiverId: user.id,
-          requesterId: user.id,
-          amount: 0.1,
-          isUSResident: false,
-          userFileId: w8.id,
-          program: oneTimePrograms[index],
-          team: 'First team',
-          userWalletId: t1Wallet.id,
-          status: 'BLOCKED',
-          firstName: 'John',
-          sanctionReason: 'Country of residence is sanctioned',
-          isSanctioned: true,
-        }),
-        createTransferRequest({
-          receiverId: user.id,
-          requesterId: user.id,
-          amount: 0.1,
-          isUSResident: false,
-          userFileId: w8.id,
-          program: oneTimePrograms[index],
-          team: 'Second team',
-          userWalletId: t1Wallet.id,
-          status: 'BLOCKED',
-          firstName: 'John',
-          sanctionReason: 'Country of residence is sanctioned',
-          isSanctioned: true,
-        }),
-        createTransferRequest({
-          receiverId: user.id,
-          requesterId: user.id,
-          amount: 0.1,
-          isUSResident: false,
-          userFileId: w8.id,
-          program: oneTimePrograms[index],
-          team: 'Third team',
-          userWalletId: t1Wallet.id,
-          status: 'BLOCKED',
-          firstName: 'John',
-          sanctionReason: `
-        SDNT(Specially Designated Narcotics Traffickers).<br/>
-        Entity Number: 1234; Sanctioned Since: 11-9-2005; DOB 24-11-1993; POB Armenia, Quindio, Colombia; POB Roldanillo, Valle, Colombia;
-        Cedula No. 123456789 (Colombia); Cedula No. 123456789 (Colombia); Citizenship Colombia; Passport AB12345 (Colombia)`,
-          isSanctioned: true,
         }),
       ])
     }

@@ -1,10 +1,12 @@
 import { ArrowTopRightOnSquareIcon } from '@heroicons/react/24/solid'
 
 interface FilfoxProps {
+  blockExplorerUrl: string
+  blockExplorerName: string
   transactionHash: string
 }
 
-export const Filfox = ({ transactionHash }: FilfoxProps) => (
+export const Filfox = ({ blockExplorerName, blockExplorerUrl, transactionHash }: FilfoxProps) => (
   <div onClick={e => e.stopPropagation()}>
     <a
       className="flex text-violets-are-blue text-base leading-6 hover:underline z-10"

@@ -1,3 +1,4 @@
+import { Blockchain } from '@prisma/client'
 import Big from 'big.js'
 import { useCurrency } from 'components/Currency/Provider'
 import { BellCheckbox } from 'components/shared/BellCheckbox'
@@ -19,7 +20,6 @@ import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { getChainByName } from 'system.config'
-import { Blockchain } from '@prisma/client'
 
 interface Request {
   id: number
@@ -32,6 +32,9 @@ interface Request {
         name: string
       }
     }[]
+    blockchain: {
+      name: string
+    }
   }
   team: string
   amount: number
@@ -267,7 +270,7 @@ const TransferList = ({
                         </Button>
                       </div>
                     )}
-                    {request.status === PAID_STATUS && (
+                    {request.status === PAID_STATUS && paidTransfer?.txHash && (
                       <Filfox
                         blockExplorerName={blockExplorer.name}
                         blockExplorerUrl={blockExplorer.url}
@@ -301,7 +304,7 @@ const CryptoAmountInfo = ({ filecoin, request, requestUnit, paymentUnit, paidTra
   }
 
   if (request.status === PAID_STATUS) {
-    return `${paidTransfer.amount} ${paidTransfer.amountCurrencyUnit?.name}`
+    return `${paidTransfer?.amount} ${paidTransfer?.amountCurrencyUnit?.name}`
   }
 
   if (requestUnit.currency.name === USD) {

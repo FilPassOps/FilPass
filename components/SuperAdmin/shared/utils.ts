@@ -148,10 +148,7 @@ export const formatProgramApproversRole = (program: Program) => {
   ]
 }
 
-export const groupProgramApproversRole = (
-  approversRole: { roleId: number }[][],
-  programId: number,
-) => {
+export const groupProgramApproversRole = (approversRole: { roleId: number }[][], programId: number) => {
   const groupedApproversRole = new Map()
 
   for (const role of approversRole.flat()) {

@@ -16,6 +16,9 @@ interface Wallet {
   verification: {
     isVerified: boolean
   }
+  blockchain: {
+    name: string
+  }
 }
 
 interface WalletListProps {

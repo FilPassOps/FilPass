@@ -13,6 +13,7 @@ import { formatCrypto } from 'lib/currency'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
+import { getChainByName } from 'system.config'
 
 interface TransferListProps {
   data?: any[]
@@ -95,6 +96,9 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
         </TableHead>
         <TableBody>
           {data.map((request, requestIndex) => {
+            console.log(request)
+            const { blockExplorer } = getChainByName(request.program_blockchain)
+
             const href = `/approvals/${request.id}`
 
             return (
@@ -157,7 +161,15 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
                 <LinkedCell href={href}>
                   <StatusPill status={request.status} />
                 </LinkedCell>
-                <Cell>{request.status === PAID_STATUS && request.transfer_hash && <Filfox transfer_hash={request.transfer_hash} />}</Cell>
+                <Cell>
+                  {request.status === PAID_STATUS && request.transfer_hash && (
+                    <Filfox
+                      blockExplorerName={blockExplorer.name}
+                      blockExplorerUrl={blockExplorer.url}
+                      transactionHash={request.transfer_hash}
+                    />
+                  )}
+                </Cell>
               </tr>
             )
           })}

@@ -7,10 +7,10 @@ import { findUserByIdAndEmail } from 'domain/user'
 import { fetcher } from 'lib/fetcher'
 import { getMasterWallet } from 'lib/filecoin'
 import { withUserSSR } from 'lib/ssr'
+import Head from 'next/head'
 import { ReactElement, useState } from 'react'
 import useSWR from 'swr'
 import { PLATFORM_NAME } from 'system.config'
-import Head from 'next/head'
 
 interface UserSettingsProps {
   data: any
@@ -77,6 +77,7 @@ export default function UserSettings({ data }: UserSettingsProps) {
           refresh()
           setOpenWalletModal(false)
         }}
+        blockchain={undefined} //TODO OPEN-SOURCE
       />
     </>
   )

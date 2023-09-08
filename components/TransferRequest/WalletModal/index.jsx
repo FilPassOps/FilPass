@@ -9,7 +9,6 @@ import { ChainSelection } from './ChainSelectionStep'
 import { ConnectStep } from './ConnectStep'
 import { NotificationStep } from './NotificationStep'
 import { VerifyEthereumStep } from './VerifyEthereumStep'
-import { VerifyStep } from './VerifyStep'
 
 export function WalletModal({ open, onModalClosed, setUserWalletId, blockchain }) {
   const { wallet, connect, chainId } = useMetaMask()
@@ -80,24 +79,15 @@ export function WalletModal({ open, onModalClosed, setUserWalletId, blockchain }
         />
       )}
 
-      {step === 3 &&
-        (connectionMethod === 'Metamask' ? (
-          <VerifyEthereumStep
-            onNextStepClick={handleNextStepClick}
-            onBackClick={handlePreviousStepClick}
-            formData={form}
-            setUserWalletId={setUserWalletId}
-            networkName={chain?.networkName}
-          />
-        ) : (
-          <VerifyStep
-            onNextStepClick={handleNextStepClick}
-            onCancelClick={handleModalClosed}
-            formData={form}
-            setUserWalletId={setUserWalletId}
-            createWallet={createWallet}
-          />
-        ))}
+      {step === 3 && (
+        <VerifyEthereumStep
+          onNextStepClick={handleNextStepClick}
+          onBackClick={handlePreviousStepClick}
+          formData={form}
+          setUserWalletId={setUserWalletId}
+          networkName={chain?.networkName}
+        />
+      )}
 
       {step === 4 && form?.skipAlert && (
         <AlertSkipStep

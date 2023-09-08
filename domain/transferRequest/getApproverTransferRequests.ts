@@ -59,6 +59,7 @@ interface TransferRequest {
   wallet_address: string
   wallet_blockchain: string
   wallet_is_verified: boolean
+  program_blockchain: string
 }
 
 export async function getApproverTransferRequests(params: GetApproverTransferRequestsParams) {
@@ -201,8 +202,9 @@ export async function getApproverTransferRequests(params: GetApproverTransferReq
         transfer.amount_currency_unit_id                     transfer_amount_currency_unit_id,
         transfer_currency_unit.name                          transfer_amount_currency_unit,
         user_wallet.address                                  wallet_address,
-        blockchain.name                                      wallet_blockchain,
-        wallet_verification.is_verified                      wallet_is_verified
+        user_wallet_blockchain.name                          wallet_blockchain,
+        wallet_verification.is_verified                        wallet_is_verified,
+        program_blockchain.name                              program_blockchain
     FROM user_role approver_role
             INNER JOIN user_role_program approver_program ON approver_program.user_role_id = approver_role.id AND approver_program.is_active = TRUE
             INNER JOIN transfer_request request ON request.program_id = approver_program.program_id AND request.is_active = TRUE
@@ -216,7 +218,8 @@ export async function getApproverTransferRequests(params: GetApproverTransferReq
                             AND program.is_active = TRUE
             LEFT JOIN user_wallet ON request.user_wallet_id = user_wallet.id
             LEFT JOIN wallet_verification ON user_wallet.verification_id = wallet_verification.id
-            LEFT JOIN blockchain ON blockchain.id = user_wallet.blockchain_id
+            LEFT JOIN blockchain AS user_wallet_blockchain ON user_wallet_blockchain.id = user_wallet.blockchain_id
+            INNER JOIN blockchain AS program_blockchain ON program_blockchain.id = program.blockchain_id
     WHERE approver_role.is_active = TRUE
     AND approver_role.role::text = 'APPROVER'
     AND approver_role.user_id = ${approverId}
