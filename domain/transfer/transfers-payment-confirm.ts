@@ -4,18 +4,19 @@ import { validateWalletAddress } from 'lib/filecoinShipyard'
 import { WalletSize, amountConverter, getDelegatedAddress, hexAddressDecoder } from 'lib/getDelegatedAddress'
 import { logger } from 'lib/logger'
 import prisma from 'lib/prisma'
+import { CONFIG } from 'system.config'
 import { TransferResult, select, updateTransfer } from './paymentDbTransferVerificationJob'
 
 interface TransferPaymentConfirmParams {
-  chainName: string
   id: string
   to: string[]
   from: string
   value: ethers.BigNumber[]
   transactionHash: string
+  contractAddress: string
 }
 
-export const transferPaymentConfirm = async ({ chainName, id, to, from, value, transactionHash }: TransferPaymentConfirmParams) => {
+export const transferPaymentConfirm = async ({ id, to, from, value, transactionHash, contractAddress }: TransferPaymentConfirmParams) => {
   const pendingTransfers = await prisma.transfer.findMany({
     select: select,
     where: {
@@ -26,6 +27,13 @@ export const transferPaymentConfirm = async ({ chainName, id, to, from, value, t
       from: from.toLowerCase(),
     },
   })
+
+  const chainName = CONFIG.chains.find(chain => chain.contractAddress === contractAddress)?.name
+
+  if (!chainName) {
+    logger.error('Chain name not found')
+    throw new Error('Chain name not found')
+  }
 
   processPayment(chainName, pendingTransfers, to, value, transactionHash)
 

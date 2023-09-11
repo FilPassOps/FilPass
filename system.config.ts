@@ -28,7 +28,7 @@ export const TOKEN = {
   paymentUnit: 'USD',
 }
 
-type Chain = {
+export type Chain = {
   name: string
   networkName: string
   symbol: string

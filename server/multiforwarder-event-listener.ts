@@ -13,11 +13,11 @@ CONFIG.chains.forEach(chain => {
 })
 
 for (const [chainName, contract] of map.entries()) {
+  logger.info(`> Listening for events on ${chainName}...`)
+
   const filter = contract.filters.Forward()
   contract.on(filter, (id, from, to, value, _total, event) => {
     logger.info('Forward', event.transactionHash)
-    transferPaymentConfirm({ chainName, id, from, to, value, transactionHash: event.transactionHash })
+    transferPaymentConfirm({ id, from, to, value, transactionHash: event.transactionHash, contractAddress: event.address })
   })
 }
-
-logger.info('> Listening for events...')
