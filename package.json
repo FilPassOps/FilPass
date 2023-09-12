@@ -19,7 +19,7 @@
     "docker:down": "docker-compose -f docker-compose.test.yml down ",
     "test": "npm run docker:up && dotenv -e .env.test -- npm run migrate:test && dotenv -e .env.test -- jest -i --watch --forceExit",
     "test:coverage": "npm run docker:up && dotenv -e .env.test -- npm run migrate:test && dotenv -e .env.test -- jest -i --coverage --forceExit && npm run docker:down",
-    "deploy": "npx hardhat run --network mumbai scripts/deploy.ts",
+    "deploy": "npx hardhat run --network filecoin scripts/deploy.ts",
     "test-contract": "npx hardhat --network calibration test",
     "pre-dev": "docker compose up -d && npm run migrate && npm run seed && npm run seed:dev"
   },
@@ -81,8 +81,8 @@
     "react-datepicker": "^4.16.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.45.4",
-    "react-input-verification-code": "^1.0.2",
     "react-number-format": "^5.2.2",
+    "react-otp-input": "^3.0.4",
     "swr": "^2.2.0",
     "tailwind-merge": "^1.13.0",
     "winston": "^3.10.0",

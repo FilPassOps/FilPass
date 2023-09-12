@@ -1,11 +1,9 @@
 import { Modal } from 'components/shared/Modal'
 import { Button } from 'components/shared/Button'
-import ReactInputVerificationCode from 'react-input-verification-code'
-import { classNames } from 'lib/classNames'
 import { useState } from 'react'
 import { DateTime } from 'luxon'
-import styles from './securityCodeModal.module.css'
 import CountDownTimer from './CountDownTimer'
+import OtpInput from 'react-otp-input'
 
 interface SecurityCodeModalProps {
   open?: boolean
@@ -27,12 +25,14 @@ export const SecurityCodeModal = ({
   const [submitErrors, setSubmitErrors] = useState<any>()
   const [loading, setLoading] = useState(false)
   const [blocked, setBlocked] = useState(false)
+  const [code, setCode] = useState('')
 
   const handleClose = () => {
     setSubmitErrors(null)
     setLoading(false)
     onClose(false)
     setBlocked(false)
+    setCode('')
   }
 
   const handleComplete = async (value: string) => {
@@ -41,6 +41,14 @@ export const SecurityCodeModal = ({
     if (error) {
       return setSubmitErrors(error.message)
     }
+  }
+
+  const handleOnChangeCode = (value: string) => {
+    setSubmitErrors(null)
+    if (value.length === 4) {
+      handleComplete(value)
+    }
+    setCode(value)
   }
 
   const handleResend = async () => {
@@ -67,9 +75,16 @@ export const SecurityCodeModal = ({
         Please enter a 4-digit security code that was sent to you email address <span className="text-indigo-600">{email}.</span> The code
         is valid for 10 minutes
       </p>
-      <div className={classNames('flex flex-row items-center justify-center', styles.customVerificationInput)}>
-        <ReactInputVerificationCode autoFocus={true} placeholder={''} type="text" onCompleted={handleComplete} />
-      </div>
+      <OtpInput
+        shouldAutoFocus={true}
+        inputType="number"
+        containerStyle={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}
+        inputStyle={{ width: '3rem', height: '3rem', borderRadius: '0.375rem', border: '1px solid #D1D5DB', fontSize: '2rem' }}
+        value={code}
+        onChange={handleOnChangeCode}
+        numInputs={4}
+        renderInput={props => <input {...props} />}
+      />
       <p className="text-center text-sm text-red-500 mt-3">{submitErrors}</p>
       <div className="flex flex-row items-center justify-center mt-8 pb-4">
         <p className="mr-3 text-sm text-gray-500">Didn&apos;t get an email?</p>
