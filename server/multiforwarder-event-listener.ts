@@ -2,7 +2,8 @@ import { transferPaymentConfirm } from 'domain/transfer/transfers-payment-confir
 import { ethers } from 'ethers'
 import { logger } from 'lib/logger'
 import { CONFIG } from 'system.config'
-import { MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
+import { MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
+import { MultiForwarder } from 'typechain-types/contracts/src'
 
 const map = new Map<string, MultiForwarder>()
 
@@ -17,7 +18,7 @@ for (const [chainName, contract] of map.entries()) {
 
   const filter = contract.filters.Forward()
   contract.on(filter, (id, from, to, value, _total, event) => {
-    logger.info('Forward', event.transactionHash)
+    logger.info(`${chainName} - Forward: ${event.transactionHash}`)
     transferPaymentConfirm({ id, from, to, value, transactionHash: event.transactionHash, contractAddress: event.address })
   })
 }

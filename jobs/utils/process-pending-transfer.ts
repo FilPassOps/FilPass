@@ -4,7 +4,8 @@ import { decryptPII } from 'lib/emissaryCrypto'
 import prisma from 'lib/prisma'
 import { sendBatchEmail } from 'lib/sendEmail'
 import { Chain } from 'system.config'
-import { MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
+import { MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
+import { MultiForwarder } from 'typechain-types/contracts/src'
 
 interface EmailReminderRecipient {
   email: string

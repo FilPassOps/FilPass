@@ -1,4 +1,4 @@
-import * as FormData from 'form-data'
+import FormData from 'form-data'
 import { chunk } from 'lodash'
 import Mailgun from 'mailgun.js'
 
@@ -42,7 +42,7 @@ export const sendBatchEmail = async ({ recipients, subject, text = '', html = ''
   const sendEmailPromisses = recipientChunks.map(recipient => {
     const emails = recipient.map(item => (item.email ? item.email : item))
     const variables = JSON.stringify(
-      recipient.reduce((a, v, idx) => ({ ...a, [v.email || v]: { recipientId: idx + 1, ...v.variables } }), {})
+      recipient.reduce((a, v, idx) => ({ ...a, [v.email || v]: { recipientId: idx + 1, ...v.variables } }), {}),
     )
 
     return client.messages.create(domain, {

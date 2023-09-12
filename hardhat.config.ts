@@ -5,12 +5,13 @@ import { HttpNetworkUserConfig } from 'hardhat/types'
 
 dotenv.config()
 
-const PRIVATE_KEY = process.env.PRIVATE_KEY || '7c19c76458a0d6faf4fa0735e172568083ef2b86698f0c739dae2c34a1f14ad8'
+const PRIVATE_KEY = process.env.PRIVATE_KEY || 'af0b7b857ff6fe0d45a8613ee96e30771e5e7dbdddb778c324b81c980f4f71c7'
 
 interface Config extends HardhatUserConfig {
   defaultNetwork: keyof Config['networks']
   networks: {
-    mumbai: HttpNetworkUserConfig
+    calibration: HttpNetworkUserConfig
+    filecoin: HttpNetworkUserConfig
   }
 }
 
@@ -24,11 +25,16 @@ const config: Config = {
       },
     },
   },
-  defaultNetwork: 'mumbai',
+  defaultNetwork: 'calibration',
   networks: {
-    mumbai: {
-      chainId: 80001,
-      url: 'https://rpc-mumbai.maticvigil.com',
+    calibration: {
+      chainId: 314159,
+      url: 'https://api.calibration.node.glif.io/rpc/v1',
+      accounts: [PRIVATE_KEY],
+    },
+    filecoin: {
+      chainId: 314,
+      url: 'https://api.node.glif.io',
       accounts: [PRIVATE_KEY],
     },
   },

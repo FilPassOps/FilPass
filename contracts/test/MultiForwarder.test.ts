@@ -1,3 +1,4 @@
+import { JsonRpcProvider } from '@ethersproject/providers'
 import filecoinAddress from '@glif/filecoin-address'
 import { expect } from 'chai'
 import { ethers } from 'hardhat'
@@ -16,7 +17,6 @@ import {
   getPaddedAddress,
   getProvider,
 } from './utils'
-import { JsonRpcProvider } from '@ethersproject/providers'
 
 describe('MultiForwarder', function () {
   let multiForwarder: MultiForwarder
@@ -69,7 +69,7 @@ describe('MultiForwarder', function () {
         await expect(
           multiForwarder.forward(UNIQUE_ID, [...t1Addresses, ...t2Addresses, ...t4Addresses], values, {
             value: total,
-          })
+          }),
         ).to.emit(multiForwarder, 'Forward')
 
         const newBalance1 = await getBalance(receiver1, provider)
@@ -87,7 +87,7 @@ describe('MultiForwarder', function () {
         const amounts: string[] = []
 
         await expect(multiForwarder.forward(UNIQUE_ID, addresses, amounts, { value: total })).to.be.rejectedWith(
-          'addresses and amounts must not be empty'
+          'addresses and amounts must not be empty',
         )
       })
 
@@ -102,7 +102,7 @@ describe('MultiForwarder', function () {
         const amounts = [value, value]
 
         await expect(multiForwarder.forward(UNIQUE_ID, addresses, amounts, { value: total })).to.be.rejectedWith(
-          'addresses and amounts must be the same length'
+          'addresses and amounts must be the same length',
         )
       })
 
@@ -117,7 +117,7 @@ describe('MultiForwarder', function () {
         const amounts = Array.from({ length: 101 }, () => value)
 
         await expect(multiForwarder.forward(UNIQUE_ID, addresses, amounts, { value: total })).to.be.rejectedWith(
-          'addresses must not be more than 100'
+          'addresses must not be more than 100',
         )
       })
 
@@ -132,7 +132,7 @@ describe('MultiForwarder', function () {
         const amounts = [value, value]
 
         await expect(multiForwarder.forward(UNIQUE_ID, addresses, amounts, { value: total })).to.be.rejectedWith(
-          'msg.value must be equal to the sum of all amounts'
+          'msg.value must be equal to the sum of all amounts',
         )
       })
 
@@ -146,7 +146,7 @@ describe('MultiForwarder', function () {
         const amounts = [value]
 
         await expect(multiForwarder.forward(UNIQUE_ID, addresses, amounts, { value: total })).to.be.rejectedWith(
-          'address must be Secp256k1, Actor or Delegated'
+          'address must be Secp256k1, Actor or Delegated',
         )
       })
     })
@@ -166,7 +166,7 @@ describe('MultiForwarder', function () {
         await expect(
           multiForwarder.forwardAny(UNIQUE_ID, addresses, amounts, {
             value: total,
-          })
+          }),
         ).to.emit(multiForwarder, 'ForwardAny')
 
         const newBalance = await getBalance(receiver, provider)
@@ -222,7 +222,7 @@ describe('MultiForwarder', function () {
         const amounts: string[] = []
 
         await expect(multiForwarder.forwardAny(UNIQUE_ID, addresses, amounts, { value: total })).to.be.rejectedWith(
-          'addresses and amounts must not be empty'
+          'addresses and amounts must not be empty',
         )
       })
 
@@ -237,7 +237,7 @@ describe('MultiForwarder', function () {
         const amounts = [value, value]
 
         await expect(multiForwarder.forwardAny(UNIQUE_ID, addresses, amounts, { value: total })).to.be.rejectedWith(
-          'addresses and amounts must be the same length'
+          'addresses and amounts must be the same length',
         )
       })
 
@@ -252,7 +252,7 @@ describe('MultiForwarder', function () {
         const amounts = Array.from({ length: 46 }, () => value)
 
         await expect(multiForwarder.forwardAny(UNIQUE_ID, addresses, amounts, { value: total })).to.be.rejectedWith(
-          'addresses must not be more than 45'
+          'addresses must not be more than 45',
         )
       })
 
@@ -267,7 +267,7 @@ describe('MultiForwarder', function () {
         const amounts = [value, value]
 
         await expect(multiForwarder.forwardAny(UNIQUE_ID, addresses, amounts, { value: total })).to.be.rejectedWith(
-          'msg.value must be equal to the sum of all amounts'
+          'msg.value must be equal to the sum of all amounts',
         )
       })
     })
