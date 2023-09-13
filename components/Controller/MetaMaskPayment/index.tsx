@@ -52,7 +52,6 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
   const router = useRouter()
   const { filecoin } = useCurrency()
   const { dispatch, close } = useAlertDispatcher()
-  // const { forwardAll, forwardNonBLS } = useContract()
   const { wallet } = useMetaMask()
 
   const [totalDollarAmount, setTotalDollarAmount] = useState(0)
@@ -202,14 +201,6 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
     newPaymentBatchList[currentBatchIndex].data = transferRequest
     setPaymentBatchList(newPaymentBatchList)
   }
-
-  // const handleForwardAll = async (batch: TransferRequest[]) => {
-  //   return doForward(batch, forwardAll)
-  // }
-
-  // const handleForwardNonBLS = async (batch: TransferRequest[]) => {
-  //   return doForward(batch, forwardNonBLS)
-  // }
 
   const handlePaymentErrors = (error: any) => {
     if (error.code === 4001 || error.code === 'ACTION_REJECTED') {

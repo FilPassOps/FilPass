@@ -96,7 +96,6 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
         </TableHead>
         <TableBody>
           {data.map((request, requestIndex) => {
-            console.log(request)
             const { blockExplorer } = getChainByName(request.program_blockchain)
 
             const href = `/approvals/${request.id}`
