@@ -22,11 +22,41 @@ import { RequestAmountInput } from '../shared/RequestAmountInput'
 import { RequestorReceiver } from '../shared/RequestorReceiver'
 import { SelectProgramInput } from '../shared/SelectProgramInput'
 import { useProgramCurrency } from '../shared/useProgramCurrency'
+import { UserResult } from 'domain/user/findByIdAndEmail'
+
+interface FormComponentProps {
+  approverPrograms: {
+    id: number
+    name: string
+    blockchain: {
+      id: number
+      name: string
+    }
+  }[]
+  control: any
+  errors: any
+  submitErrors: any
+  clearErrors: () => void
+  requests: {
+    programId: number
+    receiverEmail: string
+    team?: string
+    amount?: string
+    currencyUnitId: number
+    wallet?: string
+    temporaryFileId?: string
+  }[]
+  register: any
+  setValue: any
+  index: number
+  remove: any
+  receiverShouldReview: boolean
+}
 
 export const ApplyForSomeoneForm = () => {
   const { user } = useAuth()
   const router = useRouter()
-  const [submitErrors, setSubmitErrors] = useState()
+  const [submitErrors, setSubmitErrors] = useState<any>()
   const [openConfirmation, setOpenConfirmation] = useState(false)
   const [receiverShouldReview, setReceiverShouldReview] = useState(false)
   const [genericError, setGenericError] = useState('')
@@ -49,13 +79,10 @@ export const ApplyForSomeoneForm = () => {
     defaultValues: {
       requests: [
         {
-          programId: '',
+          programId: undefined as any,
           receiverEmail: '',
           team: '',
-          amount: '',
-          currencyUnitId: '',
-          wallet: '',
-          temporaryFileId: undefined,
+          amount: undefined as any,
         },
       ],
     },
@@ -68,7 +95,7 @@ export const ApplyForSomeoneForm = () => {
 
   const { requests } = watch()
 
-  const handleFormSubmit = async values => {
+  const handleFormSubmit = async (values: any) => {
     const { data, error } = await api.post('/transfer-requests/applying-for-others', {
       receiverShouldReview,
       ...values,
@@ -82,7 +109,7 @@ export const ApplyForSomeoneForm = () => {
       return setSubmitErrors({ requests: error.errors })
     }
 
-    const hasError = data?.filter(({ error }) => error).length > 0
+    const hasError = data?.filter(({ error }: { error: any }) => error).length > 0
     if (hasError) {
       return setSubmitErrors(data)
     } else {
@@ -96,11 +123,11 @@ export const ApplyForSomeoneForm = () => {
   const handleAddForm = () => {
     if (requests.length < 10) {
       insert(requests.length, {
-        programId: '',
+        programId: undefined as any,
         receiverEmail: '',
         team: '',
         amount: '',
-        currencyUnitId: '',
+        currencyUnitId: undefined as any,
       })
     }
   }
@@ -112,10 +139,16 @@ export const ApplyForSomeoneForm = () => {
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
       <div className="py-8 bg-white">
-        <RequestorReceiver applyer={user?.email} />
+        <RequestorReceiver applyer={user?.email as string} />
         <Divider className="my-8" />
 
-        <CheckboxInput id="id-ask-review" name="askReview" className="items-center mb-2" value={receiverShouldReview} onChange={handleReceiverShouldReview}>
+        <CheckboxInput
+          id="id-ask-review"
+          name="askReview"
+          className="items-center mb-2"
+          value={receiverShouldReview}
+          onChange={handleReceiverShouldReview}
+        >
           <span className="text-gray-700 font-medium text-sm">{`Ask the receivers to review and submit the requests`}</span>
         </CheckboxInput>
 
@@ -128,7 +161,7 @@ export const ApplyForSomeoneForm = () => {
             submitErrors={submitErrors}
             clearErrors={clearErrors}
             control={control}
-            approverPrograms={user?.approverPrograms}
+            approverPrograms={user?.approverPrograms as UserResult['approverPrograms']}
             setValue={setValue}
             requests={requests}
             remove={remove}
@@ -183,12 +216,12 @@ const FormComponent = ({
   index,
   remove,
   receiverShouldReview,
-}) => {
+}: FormComponentProps) => {
   const { selectedProgram, paymentCurrency, requestCurrency } = useProgramCurrency({
     programs: approverPrograms,
     programId: requests?.[index].programId,
   })
-  const delegatedAddress = getDelegatedAddress(requests[index].wallet, WalletSize.SHORT, selectedProgram?.blockchain.name)
+  const delegatedAddress = getDelegatedAddress(requests[index].wallet, WalletSize.SHORT, selectedProgram?.blockchain?.name)
 
   useEffect(() => {
     if (setValue) {
@@ -231,7 +264,7 @@ const FormComponent = ({
       <SelectProgramInput
         required
         control={control}
-        programs={approverPrograms}
+        programs={approverPrograms as UserResult['approverPrograms']}
         name={`requests[${index}].programId`}
         error={errors.requests?.[index]?.programId || submitErrors?.requests?.[index]?.programId}
       />
@@ -253,8 +286,8 @@ const FormComponent = ({
         value={requests[index].amount}
         required={!receiverShouldReview ? <Asterisk /> : ''}
         {...register(`requests[${index}].amount`, {
-          setValueAs: val => {
-            const parsedValue = String(val).replaceAll(/[, \s]+/g, '')
+          setValueAs: (val: string) => {
+            const parsedValue = Number(String(val).replaceAll(/[, \s]+/g, ''))
             return isNaN(parsedValue) ? 0 : parsedValue
           },
         })}
@@ -283,7 +316,6 @@ const FormComponent = ({
           uploadingForOthers={true}
           setUserAttachmentId={val => {
             setValue(`requests[${index}].temporaryFileId`, val)
-            clearErrors(`requests[${index}].temporaryFileId`)
           }}
         />
 

@@ -5,14 +5,14 @@ import { useMemo } from 'react'
 interface SelectProgramInputProps {
   required?: boolean
   control: any
-  errors: any
+  errors?: any
   submitErrors?: any
   programs?: {
-    id: string
+    id: number
     name: string
   }[]
   defaultProgram?: {
-    id: string
+    id: number
     name: string
   }
   name?: string
