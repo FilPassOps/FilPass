@@ -1,4 +1,4 @@
-export function FilecoinIcon({ className }) {
+export function FilecoinIcon({ className }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 127 127"

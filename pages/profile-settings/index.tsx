@@ -77,7 +77,7 @@ export default function UserSettings({ data }: UserSettingsProps) {
           refresh()
           setOpenWalletModal(false)
         }}
-        blockchain={undefined} //TODO OPEN-SOURCE
+        blockchain={undefined as any} //TODO OPEN-SOURCE
       />
     </>
   )

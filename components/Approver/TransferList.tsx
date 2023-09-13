@@ -18,7 +18,7 @@ import { getChainByName } from 'system.config'
 interface TransferListProps {
   data?: any[]
   shouldShowHeaderCheckbox?: boolean
-  onHeaderToggle?: () => void
+  onHeaderToggle?: (e: any) => void
   onRequestChecked: (index: number) => void
 }
 

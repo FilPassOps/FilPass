@@ -3,10 +3,16 @@ import { Layout } from 'components/Layout'
 import { getApprovalDetailsByRole } from 'domain/approvals/service'
 import { APPROVER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
 import { withRolesSSR } from 'lib/ssr'
-import Head from 'next/head'
 import { PLATFORM_NAME } from 'system.config'
+import Head from 'next/head'
+import { ReactElement } from 'react'
+import { ViewTransferRequestProps } from 'components/TransferRequest/ViewTransferRequest'
 
-export default function ApproverViewAwaiting({ data }) {
+export type TransferRequestViewProps = Omit<ViewTransferRequestProps, 'role'> & {
+  role?: string
+}
+
+export default function ApproverViewAwaiting({ data }: TransferRequestViewProps) {
   return (
     <>
       <Head>
@@ -17,7 +23,7 @@ export default function ApproverViewAwaiting({ data }) {
   )
 }
 
-ApproverViewAwaiting.getLayout = function getLayout(page) {
+ApproverViewAwaiting.getLayout = function getLayout(page: ReactElement) {
   const data = page.props.data
   const hasApprovalBar = data?.approversGroup?.length > 1
   return (
@@ -30,7 +36,7 @@ ApproverViewAwaiting.getLayout = function getLayout(page) {
 export const getServerSideProps = withRolesSSR([APPROVER_ROLE, VIEWER_ROLE], async ({ user, query }) => {
   const { id, roles } = user
 
-  const { data, error } = await getApprovalDetailsByRole({ transferRequestId: query.id, roles, userId: id })
+  const { data, error } = await getApprovalDetailsByRole({ transferRequestId: query.id as string, roles, userId: id })
 
   if (error) {
     return {

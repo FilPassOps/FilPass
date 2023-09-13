@@ -9,9 +9,9 @@ interface GenericApiResponse extends AxiosResponse {
 }
 
 interface VerifyEthereumStepProps {
-  onNextStepClick: () => void
+  onNextStepClick: (stepData: any) => void
+  setUserWalletId: (id: number) => void
   onBackClick: () => void
-  signMessage: (message: string) => Promise<string | undefined>
   formData: {
     address: string
     name: string
@@ -20,7 +20,7 @@ interface VerifyEthereumStepProps {
   networkName: string
 }
 
-export const VerifyEthereumStep = ({ onNextStepClick, onBackClick, formData, networkName }: VerifyEthereumStepProps) => {
+export const VerifyEthereumStep = ({ onNextStepClick, onBackClick, formData, networkName, setUserWalletId }: VerifyEthereumStepProps) => {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -28,7 +28,7 @@ export const VerifyEthereumStep = ({ onNextStepClick, onBackClick, formData, net
     setLoading(true)
 
     try {
-      const { error }: GenericApiResponse = await api.post('/wallets/ethereum', {
+      const { error, data }: GenericApiResponse = await api.post('/wallets/ethereum', {
         walletAddress: formData.address,
         label: formData.name,
         blockchain: formData.blockchain,
@@ -38,7 +38,13 @@ export const VerifyEthereumStep = ({ onNextStepClick, onBackClick, formData, net
         setError(error.message)
         return
       }
-      onNextStepClick()
+      onNextStepClick({
+        ...formData,
+        verification: false,
+        success: !error,
+      })
+
+      setUserWalletId(data.id)
     } catch (error: any) {
       setError('Unexpected error occurred. Please try again.')
       console.error(error)

@@ -32,7 +32,7 @@ interface TransferRequest {
   publicId: string
   amount: string
   wallet: { address: string; blockchain: Blockchain }
-  program: { programCurrency: ProgramCurrency[]; blockchain: { name: string } }
+  program: { programCurrency: ProgramCurrency[]; blockchain: Blockchain }
   transfers: { txHash: string; status: TransferStatus; amount: string; isActive: boolean; amountCurrencyUnit: { name: string } }[]
   isHexMatch?: boolean
 }

@@ -20,7 +20,57 @@ import { BannedUserReason } from './BannedUserReason'
 import { StatusNotes } from './StatusNotes'
 import { TransferRequestHistory } from './TransferRequestHistory'
 
-export const ViewTransferRequest = ({ data, role }) => {
+export interface ViewTransferRequestProps {
+  data: {
+    approversGroup: {
+      groupId: string
+      approved: number
+      members: {
+        email: string
+        userRoleId: number
+      }[]
+    }[]
+    status: string
+    changesRequested: any[]
+    notes: string
+    banActionedBy: string
+    id: string
+    program_name: string
+    team: string
+    wallet_id: string
+    wallet_address: string
+    wallet_is_verified: boolean
+    wallet_name: string
+    request_unit: string
+    payment_unit: string
+    program_delivery_method: string
+    expected_transfer_date: string
+    amount: number
+    vesting_start_epoch: number
+    vesting_months: number
+    created_at: string
+    receiver: string
+    receiver_is_banned: boolean
+    attachment_id: string
+    attachment_filename: string
+    attachment_uploader_email: string
+    attachment_user_email: string
+    delegated_address: string
+    history: any
+    applyer: string
+    isVoidable?: boolean
+    isEditable?: boolean
+    applyer_id?: number
+    wallet_blockchain_name: string
+  }
+  role: string
+}
+
+interface ShowAttachmentProps {
+  data: any
+}
+
+export const ViewTransferRequest = ({ data, role }: ViewTransferRequestProps) => {
   const { approversGroup, status } = data
 
   const hasGroupApproval = approversGroup?.some(group => group.approved)
@@ -70,7 +120,7 @@ export const ViewTransferRequest = ({ data, role }) => {
           applyer={data?.applyer}
           issuedOn={data?.created_at}
           receiver={data?.receiver}
-          expectedTransferDate={data?.expected_transfer_date || DateTime.now().plus({ days: 30 }).toISO()}
+          expectedTransferDate={data?.expected_transfer_date || (DateTime.now().plus({ days: 30 }).toISO() as string)}
         />
 
         <Divider className="my-8" />
@@ -130,7 +180,7 @@ export const ViewTransferRequest = ({ data, role }) => {
             paymentCurrency={{ name: data?.payment_unit }}
             requestCurrency={{ name: data?.request_unit }}
             selectedProgram={{ deliveryMethod: data?.program_delivery_method }}
-            expectedTransferDate={data?.expected_transfer_date || DateTime.now().plus({ days: 30 }).toISO()}
+            expectedTransferDate={data?.expected_transfer_date || (DateTime.now().plus({ days: 30 }).toISO() as string)}
           />
           {isApprover && (
             <div className="p-4 text-sm rounded-lg text-gamboge-orange bg-papaya-whip">
@@ -146,7 +196,7 @@ export const ViewTransferRequest = ({ data, role }) => {
   )
 }
 
-const ShowAttachment = ({ data }) => {
+const ShowAttachment = ({ data }: ShowAttachmentProps) => {
   const { handleDownloadFile } = useDownloadFile({ fileId: data?.attachment_id, fileName: data?.attachment_filename })
 
   return (

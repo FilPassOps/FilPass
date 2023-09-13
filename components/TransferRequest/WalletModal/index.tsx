@@ -10,17 +10,26 @@ import { ConnectStep } from './ConnectStep'
 import { NotificationStep } from './NotificationStep'
 import { VerifyEthereumStep } from './VerifyEthereumStep'
 
-export function WalletModal({ open, onModalClosed, setUserWalletId, blockchain }) {
+interface WalletModalProps {
+  open: boolean
+  onModalClosed: () => void
+  setUserWalletId: (id: number) => void
+  blockchain: string
+}
+
+export function WalletModal({ open, onModalClosed, setUserWalletId, blockchain }: WalletModalProps) {
   const { wallet, connect, chainId } = useMetaMask()
 
   const { refresh, user } = useAuth()
   const [step, setStep] = useState(1)
-  const [form, setForm] = useState({})
-  const [connectionMethod, setConnectionMethod] = useState()
+  const [form, setForm] = useState<any>({})
+  const [connectionMethod, setConnectionMethod] = useState<string>()
 
-  const chain = getChain(chainId)
+  // TODO: the chainId, wallet, or the user can return null/undefined?
 
-  const handleChainSelectionClick = method => {
+  const chain = getChain(chainId as string)
+
+  const handleChainSelectionClick = (method: string) => {
     setConnectionMethod(method)
     if (method === 'Metamask') {
       connect()
@@ -28,7 +37,7 @@ export function WalletModal({ open, onModalClosed, setUserWalletId, blockchain }
     setStep(curr => curr + 1)
   }
 
-  const handleNextStepClick = stepData => {
+  const handleNextStepClick = (stepData: any) => {
     setForm(stepData)
     setStep(curr => curr + 1)
   }
@@ -55,7 +64,7 @@ export function WalletModal({ open, onModalClosed, setUserWalletId, blockchain }
   const showConfirmationStep = (step === 4 && !form?.skipAlert) || (step === 5 && form?.skipAlert)
 
   const createWallet = useCallback(
-    async values => {
+    async (values: any) => {
       const hasDefaultWallet = user?.wallets?.find(wallet => wallet.isDefault)
       return await api.post('/wallets', { ...values, isDefault: !hasDefaultWallet })
     },
@@ -64,9 +73,7 @@ export function WalletModal({ open, onModalClosed, setUserWalletId, blockchain }
 
   return (
     <Modal open={open} onModalClosed={handleModalClosed}>
-      {step === 1 && (
-        <ChainSelection onCancelClick={handleModalClosed} onConnectionMethodClick={handleChainSelectionClick} blockchain={blockchain} />
-      )}
+      {step === 1 && <ChainSelection onConnectionMethodClick={handleChainSelectionClick} blockchain={blockchain} />}
 
       {step === 2 && (
         <ConnectStep
@@ -74,7 +81,7 @@ export function WalletModal({ open, onModalClosed, setUserWalletId, blockchain }
           onNextStepClick={handleNextStepClick}
           connectionMethod={connectionMethod}
           blockchainName={chain?.name}
-          wallet={wallet}
+          wallet={wallet as string}
           key={wallet}
         />
       )}
@@ -99,7 +106,7 @@ export function WalletModal({ open, onModalClosed, setUserWalletId, blockchain }
         />
       )}
 
-      {showConfirmationStep && <NotificationStep onCloseClick={handleModalClosed} address={user.email} />}
+      {showConfirmationStep && user && <NotificationStep onCloseClick={handleModalClosed} address={user.email} />}
     </Modal>
   )
 }
