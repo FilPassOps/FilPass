@@ -49,7 +49,7 @@ export const TransactionParser = ({ onParseData, blockchainName }: TransactionPa
         {
           functionName,
           id,
-          addresses: addresses.map(hexAddressDecoder),
+          addresses: addresses.map((address: string) => hexAddressDecoder(blockchainName, address)),
           amount: amount.map(amountConverter),
         },
         blockchainName,
