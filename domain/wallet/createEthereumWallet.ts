@@ -13,9 +13,9 @@ interface CreateEthereumWalletRequestParams {
 export async function createEthereumWallet(params: CreateEthereumWalletRequestParams) {
   const { userId, address, label, email, blockchain } = params
 
-  const blokchainEntity = await prisma.blockchain.findUnique({ where: { name: blockchain } })
+  const blockchainEntity = await prisma.blockchain.findUnique({ where: { name: blockchain } })
 
-  if (!blokchainEntity) {
+  if (!blockchainEntity) {
     return {
       error: {
         status: 400,
@@ -31,7 +31,7 @@ export async function createEthereumWallet(params: CreateEthereumWalletRequestPa
       data: {
         userId,
         address,
-        blockchainId: blokchainEntity.id,
+        blockchainId: blockchainEntity.id,
         transactionContent: Math.floor(Math.random() * 1000000),
         transactionId: '0x',
         isVerified: true,
@@ -40,7 +40,7 @@ export async function createEthereumWallet(params: CreateEthereumWalletRequestPa
 
     const userWallet = await tx.userWallet.upsert({
       where: {
-        userId_address_blockchainId: { address, userId, blockchainId: blokchainEntity.id },
+        userId_address_blockchainId: { address, userId, blockchainId: blockchainEntity.id },
       },
       update: {
         isActive: false,
@@ -50,7 +50,7 @@ export async function createEthereumWallet(params: CreateEthereumWalletRequestPa
       create: {
         userId,
         address,
-        blockchainId: blokchainEntity.id,
+        blockchainId: blockchainEntity.id,
         name: label,
         isActive: false,
         verificationId: walletVerification.id,
