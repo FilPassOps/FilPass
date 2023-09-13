@@ -38,9 +38,6 @@ CREATE TYPE "FileType" AS ENUM ('ATTACHMENT');
 CREATE TYPE "ProgramCurrencyType" AS ENUM ('REQUEST', 'PAYMENT');
 
 -- CreateEnum
-CREATE TYPE "Blockchain" AS ENUM ('FILECOIN');
-
--- CreateEnum
 CREATE TYPE "ProgramVisibility" AS ENUM ('EXTERNAL', 'INTERNAL');
 
 -- CreateEnum
@@ -149,7 +146,7 @@ CREATE TABLE "user_wallet" (
     "verification_id" INTEGER,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
     "address" TEXT NOT NULL,
-    "blockchain" "Blockchain" NOT NULL,
+    "blockchain_id" INTEGER NOT NULL,
     "name" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -164,7 +161,7 @@ CREATE TABLE "wallet_verification" (
     "user_id" INTEGER NOT NULL,
     "is_verified" BOOLEAN NOT NULL DEFAULT false,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
-    "blockchain" "Blockchain" NOT NULL,
+    "blockchain_id" INTEGER NOT NULL,
     "address" TEXT NOT NULL,
     "transaction_content" JSONB NOT NULL,
     "transaction_id" TEXT NOT NULL,
@@ -187,6 +184,7 @@ CREATE TABLE "program" (
     "updated_at" TIMESTAMP(3) NOT NULL,
     "signers_wallet_addresses" TEXT[],
     "visibility" "ProgramVisibility" DEFAULT 'EXTERNAL',
+    "blockchain_id" INTEGER NOT NULL,
 
     CONSTRAINT "program_pkey" PRIMARY KEY ("id")
 );
@@ -303,7 +301,7 @@ CREATE TABLE "transfer" (
 
 -- CreateTable
 CREATE TABLE "currency" (
-    "id" INTEGER NOT NULL,
+    "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "rate" DECIMAL(65,2) NOT NULL,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
@@ -315,7 +313,7 @@ CREATE TABLE "currency" (
 
 -- CreateTable
 CREATE TABLE "currency_unit" (
-    "id" INTEGER NOT NULL,
+    "id" SERIAL NOT NULL,
     "currency_id" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
     "scale" INTEGER NOT NULL,
@@ -407,6 +405,16 @@ CREATE TABLE "newsletter_subscriber" (
     CONSTRAINT "newsletter_subscriber_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "blockchain" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "blockchain_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
@@ -438,7 +446,7 @@ CREATE INDEX "temporary_file_public_id_idx" ON "temporary_file"("public_id");
 CREATE INDEX "user_wallet_address_idx" ON "user_wallet"("address");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "user_wallet_user_id_address_key" ON "user_wallet"("user_id", "address");
+CREATE UNIQUE INDEX "user_wallet_user_id_address_blockchain_id_key" ON "user_wallet"("user_id", "address", "blockchain_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "program_name_key" ON "program"("name");
@@ -492,16 +500,10 @@ CREATE INDEX "transfer_request_draft_team_hash_idx" ON "transfer_request_draft"(
 CREATE INDEX "transfer_transfer_ref_idx" ON "transfer"("transfer_ref");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "currency_id_key" ON "currency"("id");
-
--- CreateIndex
 CREATE UNIQUE INDEX "currency_name_key" ON "currency"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "currency_unit_id_key" ON "currency_unit"("id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "currency_unit_name_key" ON "currency_unit"("name");
+CREATE UNIQUE INDEX "currency_unit_currency_id_name_key" ON "currency_unit"("currency_id", "name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "script_transaction_transaction_key" ON "script_transaction"("transaction");
@@ -526,6 +528,9 @@ CREATE UNIQUE INDEX "newsletter_subscriber_email_key" ON "newsletter_subscriber"
 
 -- CreateIndex
 CREATE UNIQUE INDEX "newsletter_subscriber_email_hash_key" ON "newsletter_subscriber"("email_hash");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "blockchain_name_key" ON "blockchain"("name");
 
 -- AddForeignKey
 ALTER TABLE "user" ADD CONSTRAINT "user_ban_actioned_by_id_fkey" FOREIGN KEY ("ban_actioned_by_id") REFERENCES "user_role"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -564,10 +569,19 @@ ALTER TABLE "user_wallet" ADD CONSTRAINT "user_wallet_user_id_fkey" FOREIGN KEY 
 ALTER TABLE "user_wallet" ADD CONSTRAINT "user_wallet_verification_id_fkey" FOREIGN KEY ("verification_id") REFERENCES "wallet_verification"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "user_wallet" ADD CONSTRAINT "user_wallet_blockchain_id_fkey" FOREIGN KEY ("blockchain_id") REFERENCES "blockchain"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "wallet_verification" ADD CONSTRAINT "wallet_verification_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "wallet_verification" ADD CONSTRAINT "wallet_verification_blockchain_id_fkey" FOREIGN KEY ("blockchain_id") REFERENCES "blockchain"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "wallet_verification" ADD CONSTRAINT "wallet_verification_transaction_currency_unit_id_fkey" FOREIGN KEY ("transaction_currency_unit_id") REFERENCES "currency_unit"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "program" ADD CONSTRAINT "program_blockchain_id_fkey" FOREIGN KEY ("blockchain_id") REFERENCES "blockchain"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "transfer_request" ADD CONSTRAINT "transfer_request_requester_id_fkey" FOREIGN KEY ("requester_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -646,13 +660,3 @@ ALTER TABLE "auth_verification" ADD CONSTRAINT "auth_verification_user_id_fkey" 
 
 -- AddForeignKey
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- CURRENCIES
-INSERT INTO currency (id, name, rate, updated_at) VALUES (1, 'FIL', 1, now());
-INSERT INTO currency(id, name, rate, updated_at)  VALUES (2, 'USD', 0, now());
-
--- CURRENCY UNITS
-INSERT INTO currency_unit(id, currency_id, name, scale, updated_at) VALUES (1, 1, 'FIL', 0, now());
-INSERT INTO currency_unit(id, currency_id, name, scale, updated_at) VALUES (2, 1, 'NANOFIL', -9, now());
-INSERT INTO currency_unit(id, currency_id, name, scale, updated_at) VALUES (3, 1, 'ATTOFIL', -18, now());
-INSERT INTO currency_unit(id, currency_id, name, scale, updated_at) VALUES (4, 2, 'USD', 0, now());

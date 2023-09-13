@@ -1,3 +1,4 @@
+import { Blockchain } from '@prisma/client'
 import Big from 'big.js'
 import { useCurrency } from 'components/Currency/Provider'
 import { BellCheckbox } from 'components/shared/BellCheckbox'
@@ -9,18 +10,16 @@ import { StatusPill } from 'components/shared/Status'
 import { Cell, Header, LinkedCell, Table, TableBody, TableHead } from 'components/shared/Table'
 import Currency, { CryptoAmount } from 'components/shared/Table/Currency'
 import { WalletAddress } from 'components/shared/WalletAddress'
-import useDelegatedAddress, { WalletSize } from 'components/web3/useDelegatedAddress'
+import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
 import { USD } from 'domain/currency/constants'
 import { SUCCESS_STATUS } from 'domain/transfer/constants'
 import { APPROVED_STATUS, PAID_STATUS } from 'domain/transferRequest/constants'
 import { classNames } from 'lib/classNames'
 import { formatCrypto } from 'lib/currency'
-import { shortenAddress } from 'lib/shortenAddress'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
-import { Blockchain } from '@prisma/client'
+import { getChainByName } from 'system.config'
 
 interface Request {
   id: number
@@ -33,6 +32,9 @@ interface Request {
         name: string
       }
     }[]
+    blockchain: {
+      name: string
+    }
   }
   team: string
   amount: number
@@ -101,7 +103,6 @@ const TransferList = ({
   const { filecoin } = useCurrency()
   const selectAllRef = useRef<HTMLInputElement>(null)
   const [selectAll, setSelectAll] = useState(false)
-  const getDelegatedAddress = useDelegatedAddress()
 
   // Select checkbox
   useEffect(() => {
@@ -167,7 +168,7 @@ const TransferList = ({
             </Header>
             <Header style={{ minWidth: 200 }}>Address</Header>
             <Header>Request Amount</Header>
-            <Header>{query.status === PAID_STATUS ? 'Paid FIL Amount' : 'Estimated FIL Amount'}</Header>
+            <Header>{query.status === PAID_STATUS ? `Paid Amount` : `Estimated Amount`}</Header>
             <Header style={{ minWidth: 180 }}>Vesting Start Epoch</Header>
             <Header style={{ minWidth: 180 }}>Vesting Months</Header>
             <Header style={{ minWidth: 190 }}>Status</Header>
@@ -180,7 +181,7 @@ const TransferList = ({
               const paymentUnit = request.program.programCurrency.find(({ type }) => type === 'PAYMENT') as Unit
               const requestUnit = request.program.programCurrency.find(({ type }) => type === 'REQUEST') as Unit
               const href = `/disbursement/${request.publicId}`
-              const delegatedAddress = getDelegatedAddress(request.wallet.address, WalletSize.VERY_SHORT)
+              const { blockExplorer } = getChainByName(request.program.blockchain.name)
 
               const paidTransfer = request?.transfers?.find(({ status }) => status === SUCCESS_STATUS)
               return (
@@ -222,16 +223,21 @@ const TransferList = ({
                   <LinkedCell href={href}>
                     {request?.wallet?.address && (
                       <WalletAddress
-                        address={shortenAddress(request.wallet.address)}
-                        delegatedAddress={delegatedAddress?.shortAddress}
-                        blockchain={request.wallet.blockchain}
+                        address={request.wallet.address}
+                        blockchain={request.wallet.blockchain.name}
                         isVerified={!!request.wallet.verificationId}
                       />
                     )}
                     {!request.wallet && '-'}
                   </LinkedCell>
                   <LinkedCell href={href}>
-                    {filecoin && <Currency amount={request.amount} requestCurrency={requestUnit?.currency.name} />}
+                    {filecoin && (
+                      <Currency
+                        amount={request.amount}
+                        requestCurrency={requestUnit.currency.name}
+                        paymentUnit={paymentUnit.currency.name}
+                      />
+                    )}
                   </LinkedCell>
                   <LinkedCell href={href}>
                     <CryptoAmount>
@@ -264,7 +270,13 @@ const TransferList = ({
                         </Button>
                       </div>
                     )}
-                    {request.status === PAID_STATUS && <Filfox transfer_hash={paidTransfer?.txHash as string} />}
+                    {request.status === PAID_STATUS && paidTransfer?.txHash && (
+                      <Filfox
+                        blockExplorerName={blockExplorer.name}
+                        blockExplorerUrl={blockExplorer.url}
+                        transactionHash={paidTransfer?.txHash}
+                      />
+                    )}
                   </Cell>
                 </tr>
               )
@@ -292,7 +304,7 @@ const CryptoAmountInfo = ({ filecoin, request, requestUnit, paymentUnit, paidTra
   }
 
   if (request.status === PAID_STATUS) {
-    return `${paidTransfer?.amount} ${paidTransfer?.amountCurrencyUnit?.name ?? 'FIL'}`
+    return `${paidTransfer?.amount} ${paidTransfer?.amountCurrencyUnit?.name}`
   }
 
   if (requestUnit.currency.name === USD) {

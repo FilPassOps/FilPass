@@ -10,12 +10,12 @@ import { Divider } from 'components/shared/Divider'
 import { TextInput } from 'components/shared/FormInput'
 
 import { ProgramVisibility } from '@prisma/client'
+import { WalletModal } from '../WalletModal'
 import { ProgramInfo } from '../shared/ProgramInfo'
 import { RequestAmountInput } from '../shared/RequestAmountInput'
 import { RequestorReceiver } from '../shared/RequestorReceiver'
 import { SelectProgramInput } from '../shared/SelectProgramInput'
 import { useProgramCurrency } from '../shared/useProgramCurrency'
-import { WalletModal } from '../WalletModal'
 import { AttachmentInput } from './AttachmentInput'
 import { FooterButtons } from './FooterButtons'
 import { SelectWalletInput } from './SelectWalletInput'
@@ -144,6 +144,8 @@ export const TransferRequestForm = ({ isEditable = false, data = null, programs 
               data={data}
               control={control}
               onCreateWalletClick={() => setOpenWalletModal(true)}
+              blockchainIdFilter={selectedProgram?.blockchainId}
+              disabled={!programId}
             />
 
             <RequestAmountInput
@@ -188,6 +190,7 @@ export const TransferRequestForm = ({ isEditable = false, data = null, programs 
         }}
         open={openWalletModal}
         onModalClosed={() => setOpenWalletModal(false)}
+        blockchain={selectedProgram?.blockchain.name}
       />
 
       <SubmittedModal openModal={openSubmittedModal && (!submitErrors || hasUnhandledError)} hasError={hasUnhandledError} />

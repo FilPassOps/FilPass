@@ -78,6 +78,11 @@ export async function findAllExternalPrograms() {
           type: true,
         },
       },
+      blockchain: {
+        select: {
+          name: true,
+        },
+      },
     },
     orderBy: {
       name: 'asc',

@@ -1,43 +1,45 @@
 import { CoinType } from '@glif/filecoin-address'
 
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID
-const FILECOIN_MAINNET_ID = '0x13a' // 314
-const FILECOIN_CALIBRATION_ID = '0x4cb2f' // 314159
+const MAINNET_ID = '0x89' // 137
+const TESTNET_ID = '0x13881' // 80001
 
-export const calibration = {
+export const testnet = {
   chain: {
-    chainId: FILECOIN_CALIBRATION_ID,
-    chainName: 'Filecoin - Calibration testnet',
+    chainId: TESTNET_ID,
+    chainName: 'Mumbai testnet',
     nativeCurrency: {
-      name: 'tFIL',
-      symbol: 'tFIL',
+      name: 'MATIC',
+      symbol: 'MATIC',
       decimals: 18,
     },
-    rpcUrls: ['https://api.calibration.node.glif.io'],
-    blockExplorerUrls: ['https://calibration.filfox.info/en'],
+    rpcUrls: ['https://rpc-mumbai.maticvigil.com'],
+    blockExplorerUrls: ['https://mumbai.polygonscan.com/tx'],
+    blockExplorerName: 'Polygonscan',
   },
-  blockExplorerApi: 'https://calibration.filfox.info/api/v1',
-  coinType: CoinType.TEST,
-  multiforwarder: '0xbEF649DB6b4e1b2Ac044492433Bccca4287BE90F',
-  networkPrefix: 't',
+  blockExplorerApi: 'https://mumbai.polygonscan.com/',
+  coinType: CoinType.TEST, // TODO OPEN-SOURCE: should be null
+  multiforwarder: '0xb63704b534583Eca727d78dde6cCe438171846dc',
+  networkPrefix: 't', // TODO OPEN-SOURCE: should be null
 }
 
 export const mainnet = {
   chain: {
-    chainId: FILECOIN_MAINNET_ID,
-    chainName: 'Filecoin - Mainnet',
+    chainId: MAINNET_ID,
+    chainName: 'Polygon Mainnet',
     nativeCurrency: {
-      name: 'FIL',
-      symbol: 'FIL',
+      name: 'MATIC',
+      symbol: 'MATIC',
       decimals: 18,
     },
-    rpcUrls: ['https://api.node.glif.io'],
-    blockExplorerUrls: ['https://filfox.info/en'],
+    rpcUrls: ['https://polygon.llamarpc.com'],
+    blockExplorerUrls: ['https://polygonscan.com'],
+    blockExplorerName: 'Polygonscan',
   },
-  blockExplorerApi: 'https://filfox.info/api/v1',
-  coinType: CoinType.MAIN,
+  blockExplorerApi: 'https://polygonscan.com',
+  coinType: CoinType.MAIN, // TODO OPEN-SOURCE: should be null
   multiforwarder: '0x593eD7Fc71F6bE340A993b809086159Fd9407c6a',
-  networkPrefix: 'f',
+  networkPrefix: 'f', // TODO OPEN-SOURCE: should be null
 }
 
-export default CHAIN_ID === FILECOIN_CALIBRATION_ID ? calibration : mainnet
+export default CHAIN_ID === TESTNET_ID ? testnet : mainnet

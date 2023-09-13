@@ -1,10 +1,11 @@
 import { APPROVED_STATUS, PAID_STATUS, REJECTED_BY_CONTROLLER_STATUS } from 'domain/transferRequest/constants'
+import { REJECTED } from 'domain/transferRequestReview/constants'
 import yup from 'lib/yup'
 import { MAX_INTEGER_VALUE } from '../constants'
-import { REJECTED } from 'domain/transferRequestReview/constants'
 
 export const getControllerTransferRequestsValidator = yup.object({
   status: yup.string().oneOf([REJECTED_BY_CONTROLLER_STATUS, APPROVED_STATUS, PAID_STATUS, REJECTED]).required(),
+  networks: yup.array(yup.string().required()).optional(),
   programId: yup.array(yup.number().integer().positive().max(MAX_INTEGER_VALUE).required()).optional(),
   requestNumber: yup.string().optional(),
   wallet: yup.string().optional(),

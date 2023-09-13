@@ -1,6 +1,6 @@
 import { coinmarketcapApi } from 'lib/coinmarketcapApi'
 import { validate } from 'lib/yup'
-import { TOKEN_COIN_MARKET_API_CODE, TOKEN_SYMBOL } from 'system.config'
+import { TOKEN } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { getCurrencyRateFromCoinMarketCapValidator } from './validation'
 
@@ -59,6 +59,6 @@ export async function getCurrencyMarketRate(params: GetCurrencyMarketRateParams)
   }
 }
 
-const coinMarketCapCurrencyMap: Record<string, string> = {
-  [TOKEN_SYMBOL]: TOKEN_COIN_MARKET_API_CODE,
+const coinMarketCapCurrencyMap: Record<string, number> = {
+  [TOKEN.symbol]: TOKEN.coinMarketApiCode,
 }

@@ -17,9 +17,10 @@ interface VerifyEthereumStepProps {
     name: string
     blockchain: string
   }
+  networkName: string
 }
 
-export const VerifyEthereumStep = ({ onNextStepClick, onBackClick, formData }: VerifyEthereumStepProps) => {
+export const VerifyEthereumStep = ({ onNextStepClick, onBackClick, formData, networkName }: VerifyEthereumStepProps) => {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -53,7 +54,7 @@ export const VerifyEthereumStep = ({ onNextStepClick, onBackClick, formData }: V
       <div className="flex flex-col p-4 space-y-2 text-indigo-900 font-medium text-sm bg-indigo-50 border border-indigo-200 rounded-md w-full my-6">
         <div className="flex items-center gap-2 ">
           <FilecoinIcon className="h-5 w-5" />
-          <span>Filecoin MetaMask Address</span>
+          <span>{`${formData.blockchain} ${networkName}`} MetaMask Address</span>
         </div>
         <span className="text-indigo-700 break-all">{formData?.address}</span>
       </div>

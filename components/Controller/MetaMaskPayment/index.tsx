@@ -6,13 +6,15 @@ import { useCurrency } from 'components/Currency/Provider'
 import { useAlertDispatcher } from 'components/Layout/Alerts'
 import { Button } from 'components/shared/Button'
 import { useMetaMask } from 'components/web3/MetaMaskProvider'
-import { useContract } from 'components/web3/useContract'
+import { ForwardNonBLS } from 'components/web3/useContract'
 import { USD } from 'domain/currency/constants'
 import { api } from 'lib/api'
 import { formatCrypto, formatCurrency } from 'lib/currency'
+import _ from 'lodash'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { getChainByName } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { ErrorAlert, SuccessAlert } from './Alerts'
 import PaymentBatch from './PaymentBatch'
@@ -30,7 +32,7 @@ interface TransferRequest {
   publicId: string
   amount: string
   wallet: { address: string; blockchain: Blockchain }
-  program: { programCurrency: ProgramCurrency[] }
+  program: { programCurrency: ProgramCurrency[]; blockchain: { name: string } }
   transfers: { txHash: string; status: TransferStatus; amount: string; isActive: boolean; amountCurrencyUnit: { name: string } }[]
   isHexMatch?: boolean
 }
@@ -40,7 +42,7 @@ interface MetamaskPaymentModalProps {
 }
 
 interface PaymentBatchData {
-  isNonBls: boolean
+  blockchainName: string
   isPaymentSent: boolean
   isHexMatch?: boolean
   data: TransferRequest[]
@@ -50,7 +52,6 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
   const router = useRouter()
   const { filecoin } = useCurrency()
   const { dispatch, close } = useAlertDispatcher()
-  const { forwardAll, forwardNonBLS } = useContract()
   const { wallet } = useMetaMask()
 
   const [totalDollarAmount, setTotalDollarAmount] = useState(0)
@@ -58,16 +59,12 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
   const [currentBatchIndex, setCurrentBatchIndex] = useState(0)
 
   const currentBatch = paymentBatchList[currentBatchIndex]
+  const chain = getChainByName(data[0].program.blockchain.name)
 
   useEffect(() => {
-    const bls: typeof data = []
-    const nonBls: typeof data = []
-    const blsChunks: (typeof data)[] = []
-    const nonBlsChunks: (typeof data)[] = []
     let totalDollarAmount = 0
 
     for (const item of data) {
-      const protocol = item.wallet.address.charAt(1)
       const programCurrency = item.program.programCurrency.find(({ type }) => type === 'REQUEST')
 
       if (programCurrency?.currency.name === USD) {
@@ -75,23 +72,17 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
       } else {
         totalDollarAmount += Number(item.amount) * filecoin.rate
       }
-      if (protocol === '3') {
-        bls.push(item)
-      } else {
-        nonBls.push(item)
-      }
-    }
-    for (let i = 0; i < nonBls.length; i += 100) {
-      nonBlsChunks.push(nonBls.slice(i, i + 100))
-    }
-    for (let i = 0; i < bls.length; i += 45) {
-      blsChunks.push(bls.slice(i, i + 45))
     }
 
     setTotalDollarAmount(totalDollarAmount)
-    setPaymentBatchList(
-      [...blsChunks, ...nonBlsChunks].map(data => ({ isNonBls: data[0].wallet.address.charAt(1) !== '3', data, isPaymentSent: false })),
-    )
+
+    const finalList = _.chunk(data, 10).map(chunk => ({
+      blockchainName: chunk[0].program.blockchain.name,
+      isPaymentSent: false,
+      data: chunk,
+    }))
+
+    setPaymentBatchList(finalList)
   }, [data, filecoin])
 
   useEffect(() => {
@@ -105,7 +96,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
   const rate = filecoin?.rate || 1
   const updatedAt = DateTime.fromISO(filecoin?.updatedAt).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS)
 
-  const doForward = async (batch: TransferRequest[], forwardFunction: typeof forwardAll | typeof forwardNonBLS) => {
+  const doForward = async (batch: TransferRequest[], forwardFunction: ForwardNonBLS, blockchainName: string) => {
     if (!wallet) {
       dispatch({
         type: 'warning',
@@ -154,7 +145,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
         amounts.push(amount.toString())
       }
 
-      const { hash, from, to } = await forwardFunction(uuid, addresses, amounts)
+      const { hash, from, to } = await forwardFunction(blockchainName, uuid, addresses, amounts)
 
       await api.post('/transfers/payment-sent', {
         requests: requestIds,
@@ -169,7 +160,9 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
         config: {
           closeable: true,
         },
-        body: () => <SuccessAlert hash={hash} handleClose={() => close()} />,
+        body: () => (
+          <SuccessAlert hash={hash} blockExplorerUrl={getChainByName(blockchainName).blockExplorer.url} handleClose={() => close()} />
+        ),
       })
       return true
     } catch (error: any) {
@@ -207,14 +200,6 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
     const newPaymentBatchList = [...paymentBatchList]
     newPaymentBatchList[currentBatchIndex].data = transferRequest
     setPaymentBatchList(newPaymentBatchList)
-  }
-
-  const handleForwardAll = async (batch: TransferRequest[]) => {
-    return doForward(batch, forwardAll)
-  }
-
-  const handleForwardNonBLS = async (batch: TransferRequest[]) => {
-    return doForward(batch, forwardNonBLS)
   }
 
   const handlePaymentErrors = (error: any) => {
@@ -263,11 +248,11 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
         )}
         <div className="py-6 md:p-6 border-b border-gray-200">
           <h1 className="text-base md:text-lg text-gray-900 font-medium mb-2">
-            Total payout amount: {formatCrypto(new Big(totalDollarAmount).div(rate).toFixed(2))} FIL
+            Total payout amount: {formatCrypto(new Big(totalDollarAmount).div(rate).toFixed(2))} {chain.symbol}
             <span className="text-sm text-gray-500"> ≈{formatCurrency(totalDollarAmount)}</span>
           </h1>
           <p className="text-xs md:text-sm text-gray-500">
-            1 FIL = {`${formatCurrency(rate)}`} ({updatedAt} updated)
+            1 {chain.symbol} = {`${formatCurrency(rate)}`} ({updatedAt} updated)
           </p>
         </div>
         {currentBatch && (
@@ -276,7 +261,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
             batchData={currentBatch}
             filecoin={filecoin}
             rate={rate}
-            forwardHandler={currentBatch.isNonBls ? handleForwardNonBLS : handleForwardAll}
+            forwardHandler={doForward}
             setIsBatchSent={setIsBatchSent}
             setHextMatch={setHextMatch}
             setIsChunkHextMatch={setIsChunkHextMatch}

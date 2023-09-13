@@ -1,4 +1,4 @@
-export const formatPaymentMethod = (request_unit_name: string, payment_unit_name: string) => {
+export const formatPaymentMethod = (request_unit_name?: string, payment_unit_name?: string) => {
   if (!request_unit_name && !payment_unit_name) {
     return '-'
   }

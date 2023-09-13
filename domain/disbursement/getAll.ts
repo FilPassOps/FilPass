@@ -1,15 +1,16 @@
 import { PAID_STATUS, REJECTED_BY_CONTROLLER_STATUS, REJECTED_STATUS } from 'domain/transferRequest/constants'
+import { getDelegatedAddress } from 'lib/getDelegatedAddress'
+import { getEthereumAddress } from 'lib/getEthereumAddress'
 import { generateTeamHash } from 'lib/password'
 import { validate } from 'lib/yup'
 import { getApproved } from './getApproved'
 import { getPaid } from './getPaid'
 import { getRejected } from './getRejected'
 import { getControllerTransferRequestsValidator } from './validation'
-import { getEthereumAddress } from 'lib/getEthereumAddress'
-import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 
 interface GetAllParams {
   status?: string
+  networks?: string[]
   programId?: number[]
   requestNumber?: string
   wallet?: string

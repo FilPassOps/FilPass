@@ -86,6 +86,11 @@ export const getPaid = async (params: GetPaidParams) => {
               },
             },
           },
+          blockchain: {
+            select: {
+              name: true,
+            },
+          },
         },
       },
       currency: {

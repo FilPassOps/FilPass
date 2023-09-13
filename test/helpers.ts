@@ -11,9 +11,9 @@ import {
   UserWallet,
 } from '@prisma/client'
 import { hash } from 'bcrypt'
-import { EMAIL_DOMAIN } from 'system.config'
 import { encrypt, encryptPII } from 'lib/emissaryCrypto'
 import prisma from 'lib/prisma'
+import { EMAIL_DOMAIN } from 'system.config'
 
 const salt = '$2b$10$.J0sdgSE.in0MgyMhnS/q.'
 const teamSalt = '$2b$10$Qhy1ImEvtwATUFGdoA7g9u'
@@ -268,7 +268,7 @@ export type CreateProgramResult = Program & {
 }
 
 export async function createLinearVestingProgram(
-  name: string | undefined = 'LINEAR VESTING USD TO FIL PROGRAM'
+  name: string | undefined = 'LINEAR VESTING USD TO FIL PROGRAM',
 ): Promise<CreateProgramResult> {
   const result = await prisma.program.create({
     data: {
@@ -278,23 +278,16 @@ export async function createLinearVestingProgram(
       programCurrency: {
         create: [
           {
-            currency: {
-              connect: {
-                name: 'USD',
-              },
-            },
+            currencyUnitId: 1,
             type: 'REQUEST',
           },
           {
-            currency: {
-              connect: {
-                name: 'FIL',
-              },
-            },
+            currencyUnitId: 1,
             type: 'PAYMENT',
           },
         ],
       },
+      blockchainId: 1,
     },
     include: {
       programCurrency: {
@@ -318,23 +311,16 @@ export async function createOneTimeProgram(name: string | undefined = 'FIL ONE T
       programCurrency: {
         create: [
           {
-            currency: {
-              connect: {
-                name: 'FIL',
-              },
-            },
+            currencyUnitId: 1,
             type: 'REQUEST',
           },
           {
-            currency: {
-              connect: {
-                name: 'FIL',
-              },
-            },
+            currencyUnitId: 1,
             type: 'PAYMENT',
           },
         ],
       },
+      blockchainId: 1,
     },
     include: {
       programCurrency: {
@@ -375,7 +361,7 @@ export async function createUser(email: string): Promise<CreateUserResult> {
     prisma.userWallet.create({
       data: {
         address: 'f1ifoar2uwirdrmr5hylvhpphdph6z6ppgebummli',
-        blockchain: 'FILECOIN',
+        blockchainId: 1,
         userId: user.id,
         isDefault: true,
       },
@@ -512,7 +498,7 @@ export const createWallet = async (userId: number, address: string, isDefault = 
       address,
       isDefault,
       isActive: true,
-      blockchain: 'FILECOIN',
+      blockchainId: 1,
     },
   })
   await prisma.$disconnect()

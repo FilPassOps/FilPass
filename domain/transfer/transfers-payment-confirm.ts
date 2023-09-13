@@ -1,10 +1,11 @@
 import { ethers } from 'ethers'
 import { decrypt } from 'lib/emissaryCrypto'
 import { validateWalletAddress } from 'lib/filecoinShipyard'
-import { amountConverter, getDelegatedAddress, hexAddressDecoder } from 'lib/getDelegatedAddress'
-import prisma from 'lib/prisma'
-import { TransferResult, select, updateTransfer } from './paymentDbTransferVerificationJob'
+import { WalletSize, amountConverter, getDelegatedAddress, hexAddressDecoder } from 'lib/getDelegatedAddress'
 import { logger } from 'lib/logger'
+import prisma from 'lib/prisma'
+import { CONFIG } from 'system.config'
+import { TransferResult, select, updateTransfer } from './paymentDbTransferVerificationJob'
 
 interface TransferPaymentConfirmParams {
   id: string
@@ -12,9 +13,10 @@ interface TransferPaymentConfirmParams {
   from: string
   value: ethers.BigNumber[]
   transactionHash: string
+  contractAddress: string
 }
 
-export const transferPaymentConfirm = async ({ id, to, from, value, transactionHash }: TransferPaymentConfirmParams) => {
+export const transferPaymentConfirm = async ({ id, to, from, value, transactionHash, contractAddress }: TransferPaymentConfirmParams) => {
   const pendingTransfers = await prisma.transfer.findMany({
     select: select,
     where: {
@@ -26,7 +28,14 @@ export const transferPaymentConfirm = async ({ id, to, from, value, transactionH
     },
   })
 
-  processPayment(pendingTransfers, to, value, transactionHash)
+  const chainName = CONFIG.chains.find(chain => chain.contractAddress === contractAddress)?.name
+
+  if (!chainName) {
+    logger.error('Chain name not found')
+    throw new Error('Chain name not found')
+  }
+
+  processPayment(chainName, pendingTransfers, to, value, transactionHash)
 
   if (pendingTransfers.length > 0) {
     return
@@ -59,7 +68,7 @@ export const transferPaymentConfirm = async ({ id, to, from, value, transactionH
     },
   })
 
-  processPayment(pendingTransfersWithNoTxHash, to, value, transactionHash)
+  processPayment(chainName, pendingTransfersWithNoTxHash, to, value, transactionHash)
 
   if (pendingTransfersWithNoTxHash.length > 0) {
     logger.warning('Transfer request with no transaction hash set as Paid', {
@@ -70,9 +79,15 @@ export const transferPaymentConfirm = async ({ id, to, from, value, transactionH
   }
 }
 
-const processPayment = async (pendingTransfers: TransferResult[], to: string[], value: ethers.BigNumber[], transactionHash: string) => {
+const processPayment = async (
+  chainName: string,
+  pendingTransfers: TransferResult[],
+  to: string[],
+  value: ethers.BigNumber[],
+  transactionHash: string,
+) => {
   for (let i = 0; i < to.length; i++) {
-    const receiver = hexAddressDecoder(to[i])
+    const receiver = hexAddressDecoder(chainName, to[i])
     const paidAmount = amountConverter(value[i])
 
     const transfers = []
@@ -80,8 +95,8 @@ const processPayment = async (pendingTransfers: TransferResult[], to: string[], 
       try {
         const { actorAddress, robustAddress, wallet, amount } = transfer.transferRequest
         const decryptedAmount = await decrypt(amount)
-        const finalAddress = getDelegatedAddress(wallet.address)?.fullAddress || wallet.address
-        const alias = await validateWalletAddress(finalAddress)
+        const finalAddress = getDelegatedAddress(wallet.address, WalletSize.SHORT, chainName)?.fullAddress || wallet.address
+        const alias = await validateWalletAddress(chainName, finalAddress)
 
         const isAddressValid = actorAddress === receiver || robustAddress === receiver || wallet.address === receiver || alias === receiver
         if (isAddressValid && Number(decryptedAmount) === Number(paidAmount)) {

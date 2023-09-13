@@ -21,9 +21,9 @@ export const createProgramValidator = yup
               .object({
                 roleId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
               })
-              .required()
+              .required(),
           )
-          .required()
+          .required(),
       )
       .required(),
     viewersRole: yup.array().of(yup.object({ roleId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required() }).required()),
@@ -35,8 +35,9 @@ export const createProgramValidator = yup
           .object({
             name: yup.string().required(),
             type: yup.mixed<ProgramCurrencyType>().oneOf(['REQUEST', 'PAYMENT']).required(),
+            blockchain: yup.string().required(),
           })
-          .required()
+          .required(),
       )
       .required(),
     signersWalletAddresses: yup
@@ -44,7 +45,7 @@ export const createProgramValidator = yup
       .of(
         yup.object({
           address: yup.string().optional(),
-        })
+        }),
       )
       .optional(),
     visibility: yup.mixed<ProgramVisibility>().oneOf([PROGRAM_TYPE_EXTERNAL, PROGRAM_TYPE_INTERNAL]).required(),
@@ -69,9 +70,9 @@ export const createProgramFormValidator = yup
               .object({
                 roleId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
               })
-              .required()
+              .required(),
           )
-          .required()
+          .required(),
       )
       .required(),
     viewersRole: yup.array().of(yup.object({ roleId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required() }).required()),
@@ -84,7 +85,7 @@ export const createProgramFormValidator = yup
             name: yup.string().required(),
             type: yup.mixed<ProgramCurrencyType>().oneOf(['REQUEST', 'PAYMENT']).required(),
           })
-          .required()
+          .required(),
       )
       .required(),
     signersWalletAddresses: yup
@@ -92,7 +93,7 @@ export const createProgramFormValidator = yup
       .of(
         yup.object({
           address: yup.string().optional(),
-        })
+        }),
       )
       .optional(),
   })
@@ -119,9 +120,9 @@ export const updateProgramValidator = yup
               .object({
                 roleId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
               })
-              .required()
+              .required(),
           )
-          .required()
+          .required(),
       )
       .required(),
     viewersRole: yup.array().of(yup.object({ roleId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required() }).required()),
@@ -135,7 +136,7 @@ export const updateProgramValidator = yup
             name: yup.string().required(),
             type: yup.mixed<ProgramCurrencyType>().oneOf(['REQUEST', 'PAYMENT']).required(),
           })
-          .required()
+          .required(),
       )
       .required(),
     name: yup.string().required(),
@@ -145,7 +146,7 @@ export const updateProgramValidator = yup
       .of(
         yup.object({
           address: yup.string().optional(),
-        })
+        }),
       )
       .optional(),
     visibility: yup.mixed<ProgramVisibility>().oneOf([PROGRAM_TYPE_EXTERNAL, PROGRAM_TYPE_INTERNAL]).required(),

@@ -6,15 +6,14 @@ import { Button } from 'components/shared/Button'
 import Currency, { CryptoAmount } from 'components/shared/Table/Currency'
 import { WalletAddress } from 'components/shared/WalletAddress'
 import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
-import { contractInterface } from 'components/web3/useContract'
-import useDelegatedAddress, { WalletSize } from 'components/web3/useDelegatedAddress'
+import { ForwardNonBLS, contractInterface, useContract } from 'components/web3/useContract'
 import { USD } from 'domain/currency/constants'
 import { formatCrypto, formatCurrency } from 'lib/currency'
-import { shortenAddress } from 'lib/shortenAddress'
+import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { useState } from 'react'
+import { SUPPORT_EMAIL, getChainByName } from 'system.config'
 import { Table, TableDiv, TableHeader } from './Table'
 import { TransactionParser } from './TransactionParser'
-import { SUPPORT_EMAIL } from 'system.config'
 
 interface ProgramCurrency {
   currency: {
@@ -28,13 +27,13 @@ interface TransferRequest {
   publicId: string
   amount: string
   wallet: { address: string; blockchain: Blockchain; verificationId?: string }
-  program: { programCurrency: ProgramCurrency[] }
+  program: { programCurrency: ProgramCurrency[]; blockchain: { name: string } }
   transfers: { txHash: string; status: TransferStatus; amount: string; isActive: boolean; amountCurrencyUnit: { name: string } }[]
   isHexMatch?: boolean
 }
 
 interface PaymentBatchData {
-  isNonBls: boolean
+  blockchainName: string
   isPaymentSent: boolean
   isHexMatch?: boolean
   data: TransferRequest[]
@@ -52,7 +51,7 @@ interface BatchProps {
   batchData: PaymentBatchData
   filecoin: any
   rate: number
-  forwardHandler: (batch: TransferRequest[]) => Promise<boolean>
+  forwardHandler: (batch: TransferRequest[], forwardFunction: ForwardNonBLS, blockchainName: string) => Promise<boolean>
   setIsBatchSent: (isBatchSent: boolean) => void
   setIsChunkHextMatch: (isChunkHextMatch: boolean) => void
   setHextMatch: (transferRequests: TransferRequest[]) => void
@@ -68,9 +67,9 @@ const PaymentBatch = ({
   setIsChunkHextMatch,
   setHextMatch,
 }: BatchProps) => {
-  const { data, isNonBls, isPaymentSent, isHexMatch } = batchData
+  const { data, isPaymentSent, isHexMatch, blockchainName } = batchData
   const [isOpen, setIsOpen] = useState(false)
-  const getDelegatedAddress = useDelegatedAddress()
+  const { forwardNonBLS } = useContract(blockchainName)
 
   let totalDollarAmount = 0
 
@@ -84,19 +83,17 @@ const PaymentBatch = ({
     }
   }
 
-  const validateParseData = (parsedData: ParsedData) => {
-    const isValidFunctionCall = isNonBls
-      ? parsedData.functionName === contractInterface.getFunction('forward').name
-      : contractInterface.getFunction('forwardAny').name
+  const validateParseData = (parsedData: ParsedData, blockchainName: string) => {
+    const isValidFunctionCall = contractInterface.getFunction('forwardAny').name
 
     const parsedDataArray = parsedData.addresses.reduce((acc, address, index) => {
       return [...acc, { address, amount: parsedData.amount[index] }]
     }, Array<{ address: string; amount: string }>())
 
     const newData = data.map(tranferRequest => {
-      const isEthereumWallet = tranferRequest.wallet.address.startsWith('0x')
+      const is0xFilecoinAddress = tranferRequest.wallet.address.startsWith('0x') && blockchainName === 'Filecoin'
 
-      const finalAddress = isEthereumWallet
+      const finalAddress = is0xFilecoinAddress
         ? getDelegatedAddress(tranferRequest.wallet.address)?.fullAddress
         : tranferRequest.wallet.address
 
@@ -124,9 +121,8 @@ const PaymentBatch = ({
     }
     return true
   }
-
-  const handleParseData = (parsedData: ParsedData) => {
-    const isValid = validateParseData(parsedData)
+  const handleParseData = async (parsedData: ParsedData, blockchainName: string) => {
+    const isValid = validateParseData(parsedData, blockchainName)
     setIsChunkHextMatch(isValid)
   }
 
@@ -134,14 +130,14 @@ const PaymentBatch = ({
     <div key={index} className="text-gray-900">
       <div className="md:p-6 flex flex-wrap items-center justify-between border-b border-gray-200 gap-4 py-5">
         <div>
-          <h2 className="text-base md:text-xl text-gray-900 font-medium mb-2">{`Batch ${index + 1}${isNonBls ? '' : ' - BLS'}`}</h2>
+          <h2 className="text-base md:text-xl text-gray-900 font-medium mb-2">{`Batch ${index + 1}`}</h2>
           <div className="flex items-center gap-2 md:gap-6 text-gray-500 text-xs md:text-base">
             <div className="flex items-center gap-2">
               <Bars4Icon className="w-6 text-gray-400" /> {data.length} Requests
             </div>
             <div className="flex items-center gap-2">
               <CurrencyDollarIcon className="w-6 text-gray-400" />
-              {formatCrypto(new Big(totalDollarAmount).div(rate).toFixed(2))} FIL
+              {formatCrypto(new Big(totalDollarAmount).div(rate).toFixed(2))} {getChainByName(blockchainName).symbol}
               <span className="text-sm "> ≈{formatCurrency(totalDollarAmount)}</span>
             </div>
           </div>
@@ -150,8 +146,9 @@ const PaymentBatch = ({
           {!isPaymentSent && (
             <WithMetaMaskButton
               className="w-full md:w-auto"
+              targetChainId={getChainByName(blockchainName).chainId}
               onClick={async () => {
-                const sent = await forwardHandler(data)
+                const sent = await forwardHandler(data, forwardNonBLS, blockchainName)
                 setIsBatchSent(sent)
               }}
             >
@@ -174,13 +171,13 @@ const PaymentBatch = ({
       </div>
       <div className={`${isOpen ? 'block' : 'hidden'} py-6 md:p-6`}>
         {isHexMatch !== undefined && <ParseResultMessage isSucess={isHexMatch} />}
-        <TransactionParser onParseData={handleParseData} />
+        <TransactionParser onParseData={handleParseData} blockchainName={blockchainName} />
         <div className="overflow-x-scroll">
           <Table cols="grid-cols-5" className="bg-white">
             <TableHeader>No</TableHeader>
             <TableHeader>Destination</TableHeader>
             <TableHeader>Amount</TableHeader>
-            <TableHeader>FIL Amount</TableHeader>
+            <TableHeader>Token Amount</TableHeader>
             <TableHeader>Hex Match</TableHeader>
             {data.map(({ id, amount, wallet, program, publicId, transfers, isHexMatch }) => {
               const requestUnit = program.programCurrency.find(({ type }) => type === 'REQUEST') as ProgramCurrency
@@ -198,12 +195,7 @@ const PaymentBatch = ({
                     </div>
                   </TableDiv>
                   <TableDiv>
-                    <WalletAddress
-                      address={shortenAddress(wallet.address)}
-                      blockchain={wallet.blockchain}
-                      delegatedAddress={getDelegatedAddress(wallet.address, WalletSize.VERY_SHORT)?.shortAddress}
-                      isVerified={!!wallet.verificationId}
-                    />
+                    <WalletAddress address={wallet.address} blockchain={wallet.blockchain.name} isVerified={!!wallet.verificationId} />
                   </TableDiv>
                   <TableDiv>
                     <Currency amount={Number(amount)} requestCurrency={requestUnit.currency.name} paymentUnit={paymentUnit.currency.name} />

@@ -1,5 +1,5 @@
-import { formatCurrency, formatCrypto } from 'lib/currency'
 import { USD } from 'domain/currency/constants'
+import { formatCrypto, formatCurrency } from 'lib/currency'
 
 interface CurrencyProps {
   amount?: number

@@ -49,7 +49,12 @@ const select = {
       id: true,
       name: true,
       address: true,
-      blockchain: true,
+      blockchain: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
       isDefault: true,
       verification: {
         select: {
@@ -94,7 +99,7 @@ export async function findUserByIdAndEmail(params: GetUserByIdAndEmailParams) {
     return orderBy(
       approverPrograms.map(p => p.program).filter(p => p.isArchived === false),
       ['name'],
-      ['asc']
+      ['asc'],
     )
   }
 

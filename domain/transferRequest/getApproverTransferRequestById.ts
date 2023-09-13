@@ -1,11 +1,10 @@
+import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import prisma from 'lib/prisma'
 import { shortenAddress } from 'lib/shortenAddress'
 import { validate } from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { getTransferRequestById } from './getTransferRequestById'
 import { getUserTransferRequestByIdValidator } from './validation'
-import { getDelegatedAddress } from 'lib/getDelegatedAddress'
-import { WalletSize } from 'components/web3/useDelegatedAddress'
 
 interface GetUserTransferRequestByIdParams {
   transferRequestId: string

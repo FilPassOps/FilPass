@@ -24,6 +24,7 @@ const errorsMessages: ErrorsMessages = {
   not_found: { message: 'Not found.' },
   email_in_use: { message: 'Email already being used.' },
   wallet_address_in_use: { message: 'Address already being used.' },
+  wallet_blockchain_not_found: { message: 'Blockchain not found.' },
   wrong_credentials: { message: 'Wrong credentials.' },
   invalid_token: { message: 'Invalid token.' },
   something_went_wrong: { message: 'Something went wrong, please try again later.' },

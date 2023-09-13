@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  // previewFeatures = ["extendedWhereUnique"]
 }
 
 datasource db {
@@ -56,10 +55,6 @@ enum FileType {
 enum ProgramCurrencyType {
   REQUEST
   PAYMENT
-}
-
-enum Blockchain {
-  FILECOIN
 }
 
 enum ProgramVisibility {
@@ -212,14 +207,15 @@ model UserWallet {
   verificationId   Int?                @map("verification_id")
   isActive         Boolean             @default(true) @map("is_active")
   address          String
-  blockchain       Blockchain
+  blockchain       Blockchain          @relation(fields: [blockchainId], references: [id])
+  blockchainId     Int                 @map("blockchain_id")
   name             String?
   createdAt        DateTime            @default(now()) @map("created_at")
   updatedAt        DateTime            @updatedAt @map("updated_at")
   transferRequests TransferRequest[]
   isDefault        Boolean             @default(false) @map("is_default")
 
-  @@unique([userId, address])
+  @@unique([userId, address, blockchainId])
   @@index([address])
   @@map("user_wallet")
 }
@@ -230,7 +226,8 @@ model WalletVerification {
   userId                    Int           @map("user_id")
   isVerified                Boolean       @default(false) @map("is_verified")
   isActive                  Boolean       @default(true) @map("is_active")
-  blockchain                Blockchain
+  blockchain                Blockchain    @relation(fields: [blockchainId], references: [id])
+  blockchainId              Int           @map("blockchain_id")
   address                   String
   transactionContent        Json          @map("transaction_content")
   transactionId             String        @map("transaction_id")
@@ -254,6 +251,8 @@ model Program {
   updatedAt              DateTime               @updatedAt @map("updated_at")
   signersWalletAddresses String[]               @map("signers_wallet_addresses")
   visibility             ProgramVisibility?     @default(EXTERNAL) @map("visibility")
+  blockchain             Blockchain             @relation(fields: [blockchainId], references: [id])
+  blockchainId           Int                    @map("blockchain_id")
   userRolePrograms       UserRoleProgram[]
   transferRequests       TransferRequest[]
   programCurrency        ProgramCurrency[]
@@ -406,7 +405,7 @@ model Transfer {
 }
 
 model Currency {
-  id        Int            @id @unique
+  id        Int            @id @default(autoincrement())
   name      String         @unique
   rate      Decimal        @db.Decimal(65, 2)
   isActive  Boolean        @default(true) @map("is_active")
@@ -418,10 +417,10 @@ model Currency {
 }
 
 model CurrencyUnit {
-  id                   Int                    @id @unique
+  id                   Int                    @id @default(autoincrement())
   currency             Currency               @relation(fields: [currencyId], references: [id])
   currencyId           Int                    @map("currency_id")
-  name                 String                 @unique
+  name                 String
   scale                Int
   isActive             Boolean                @default(true) @map("is_active")
   createdAt            DateTime               @default(now()) @map("created_at")
@@ -433,6 +432,7 @@ model CurrencyUnit {
 
   Transfer Transfer[]
 
+  @@unique([currencyId, name])
   @@map("currency_unit")
 }
 
@@ -516,4 +516,16 @@ model NewsletterSubscriber {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("newsletter_subscriber")
+}
+
+model Blockchain {
+  id                 Int                  @id @default(autoincrement())
+  name               String               @unique
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @updatedAt @map("updated_at")
+  UserWallet         UserWallet[]
+  WalletVerification WalletVerification[]
+  Program            Program[]
+
+  @@map("blockchain")
 }

@@ -20,11 +20,6 @@ import { BannedUserReason } from './BannedUserReason'
 import { StatusNotes } from './StatusNotes'
 import { TransferRequestHistory } from './TransferRequestHistory'
 
-import useDelegatedAddress, { WalletSize } from 'components/web3/useDelegatedAddress'
-import { shortenAddress } from 'lib/shortenAddress'
-
-const SHORT_WITH_DOTS = WalletSize.SHORT + 3
-
 export const ViewTransferRequest = ({ data, role }) => {
   const { approversGroup, status } = data
 
@@ -32,8 +27,6 @@ export const ViewTransferRequest = ({ data, role }) => {
   const rejected = [REJECTED, REJECTED_BY_APPROVER_STATUS, REJECTED_BY_CONTROLLER_STATUS].includes(status)
   const submitted = [SUBMITTED_STATUS, SUBMITTED_BY_APPROVER_STATUS].includes(status)
   const isApprover = role === APPROVER_ROLE
-
-  const getDelegatedAddress = useDelegatedAddress()
 
   return (
     <>
@@ -96,21 +89,18 @@ export const ViewTransferRequest = ({ data, role }) => {
                   label: (
                     <>
                       <WalletAddress
-                        address={
-                          data.wallet_address.length > SHORT_WITH_DOTS
-                            ? shortenAddress(data.wallet_address, WalletSize.SHORT)
-                            : data.wallet_address
-                        }
+                        address={data.wallet_address}
                         isVerified={data.wallet_is_verified}
-                        delegatedAddress={data.delegated_address || getDelegatedAddress(data.wallet_address)?.shortAddress}
                         label={data.wallet_name}
+                        blockchain={data.wallet_blockchain_name}
                         className="sm:hidden"
                       />
                       <WalletAddress
                         address={data.wallet_address}
                         isVerified={data.wallet_is_verified}
-                        delegatedAddress={data.delegated_address || getDelegatedAddress(data.wallet_address)?.fullAddress}
                         label={data.wallet_name}
+                        blockchain={data.wallet_blockchain_name}
+                        walletSize="full"
                         className="hidden sm:flex"
                       />
                     </>

@@ -1,10 +1,10 @@
+import { createWallet } from 'domain/wallet/createWallet'
+import * as verifyWalletModule from 'domain/walletVerification/verifyWallet'
+import { TransactionError } from 'lib/errors'
 import prisma, { newPrismaTransaction } from 'lib/prisma'
 import { validate } from 'lib/yup'
-import { verifyWalletValidator } from './validation'
-import { createWallet } from 'domain/wallet/createWallet'
-import { TransactionError } from 'lib/errors'
-import * as verifyWalletModule from 'domain/walletVerification/verifyWallet'
 import errorsMessages from 'wordings-and-errors/errors-messages'
+import { verifyWalletValidator } from './validation'
 
 interface VerifyWalletParams {
   amount: number
@@ -20,7 +20,7 @@ interface HandleWalletVerifiedParams {
   userId: number
   verificationId: number
   address: string
-  blockchain: string
+  blockchain: string // TODO OPEN-SOURCE: should be the id of the blockchain table
   email: string
 }
 
@@ -48,7 +48,7 @@ export async function verifyWallet(params: VerifyWalletParams) {
     }
   }
 
-  const { transactionAmount, address, blockchain } = verification
+  const { transactionAmount, address, blockchainId } = verification
 
   if (`${transactionAmount}` === `${amount}`) {
     return verifyWalletModule.handleWalletVerified({
@@ -56,7 +56,7 @@ export async function verifyWallet(params: VerifyWalletParams) {
       userId,
       verificationId,
       address,
-      blockchain: blockchain,
+      blockchain: '', // TODO OPEN-SOURCE: should get the value from params
       email,
     })
   }

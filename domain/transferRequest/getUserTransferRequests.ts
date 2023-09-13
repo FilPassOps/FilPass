@@ -99,7 +99,7 @@ export async function getUserTransferRequests(params: GetUserTransferRequestsPar
       transfer_request.program_id               request_program_id,
       transfer_request.currency_unit_id request_currency_unit_id,
       user_wallet.address               request_user_wallet_address,
-      user_wallet.blockchain            request_user_wallet_blockchain,
+      blockchain.name                           request_user_wallet_blockchain,
       wallet_verification.is_verified   request_user_wallet_is_verified,
       MAX(CASE WHEN request_user.id = transfer_request.receiver_id THEN request_user.email END) receiver_email,
       MAX(CASE WHEN request_user.id = transfer_request.requester_id THEN request_user.email END) applyer_email,
@@ -112,9 +112,10 @@ export async function getUserTransferRequests(params: GetUserTransferRequestsPar
                     ON review.transfer_request_id = transfer_request.id AND review.is_active = TRUE
           LEFT JOIN user_wallet ON transfer_request.user_wallet_id = user_wallet.id
           LEFT JOIN wallet_verification ON user_wallet.verification_id = wallet_verification.id
+          LEFT JOIN blockchain ON user_wallet.blockchain_id = blockchain.id
     WHERE transfer_request.is_active = TRUE
     AND transfer_request.receiver_id = ${userId}
-    GROUP BY transfer_request.id, user_wallet.id, wallet_verification.id
+    GROUP BY transfer_request.id, user_wallet.id, wallet_verification.id, blockchain.id
   `
 
   const draftCount = Prisma.sql`

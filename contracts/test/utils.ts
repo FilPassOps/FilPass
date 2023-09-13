@@ -1,9 +1,9 @@
-import { ethers } from 'hardhat'
-import config from '../../hardhat.config'
-import { calibration } from '../../chains.config'
-import { MultiForwarder } from 'typechain-types'
 import { JsonRpcProvider } from '@ethersproject/providers'
 import filecoinAddress from '@glif/filecoin-address'
+import { ethers } from 'hardhat'
+import { MultiForwarder } from 'typechain-types'
+import { testnet } from '../../chains.config'
+import config from '../../hardhat.config'
 
 export const TEST_ADDRESS_T0 = 't024550'
 export const TEST_ADDRESS_T1 = 't1d6udrjruc3iqhyhrd2rjnjkhzsa6gd6tb63oi6i'
@@ -17,7 +17,7 @@ export const UNIQUE_ID = 'unique-generate-id'
 
 export const getProvider = () => new ethers.providers.JsonRpcProvider(config.networks.calibration.url)
 export const getContract = async () => {
-  return (await ethers.getContractAt('contracts/MultiForwarder.sol:MultiForwarder', calibration.multiforwarder)) as MultiForwarder
+  return (await ethers.getContractAt('contracts/MultiForwarder.sol:MultiForwarder', testnet.multiforwarder)) as MultiForwarder
 }
 export const getBalance = async (address: string, provider: JsonRpcProvider) => {
   return ethers.utils.parseUnits(await provider.send('Filecoin.WalletBalance', [address]), 'wei')

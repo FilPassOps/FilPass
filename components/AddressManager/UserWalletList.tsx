@@ -3,12 +3,12 @@ import { Button } from 'components/shared/Button'
 import { IsVerified } from 'components/shared/IsVerified'
 import { Cell, Header, Table, TableBody, TableHead } from 'components/shared/Table'
 import { WalletAddress } from 'components/shared/WalletAddress'
-import { PLATFORM_NAME } from 'system.config'
 import { stringify } from 'csv-stringify/sync'
 import JsFileDownload from 'js-file-download'
 import { api } from 'lib/api'
 import { DateTime } from 'luxon'
 import { useState } from 'react'
+import { PLATFORM_NAME } from 'system.config'
 
 interface UserWalletListProps {
   data?: any[]
@@ -60,9 +60,9 @@ export const UserWalletList = ({ data = [], totalItems }: UserWalletListProps) =
       <Table style={{ display: 'table' }}>
         <TableHead>
           <tr>
-            <Header style={{ minWidth: 200 }}>User Email</Header>
-            <Header style={{ minWidth: 350 }}>Wallet Address</Header>
-            <Header style={{ minWidth: 200 }}>Is Verified</Header>
+            <Header style={{ width: '50%' }}>User Email</Header>
+            <Header>Wallet Address</Header>
+            <Header>Is Verified</Header>
             <Header style={{ minWidth: 200 }}>
               <Button onClick={handleDownloadCsv} loading={isLoading} disabled={isLoading}>
                 <div className="flex items-center">
@@ -78,7 +78,7 @@ export const UserWalletList = ({ data = [], totalItems }: UserWalletListProps) =
             <tr key={wallet.id}>
               <Cell className="break-all">{wallet.user.email}</Cell>
               <Cell>
-                <WalletAddress {...wallet} />
+                <WalletAddress address={wallet.address} enableVerifiedIcon={false} blockchain={wallet.blockchain.name} walletSize="full" />
               </Cell>
               <Cell className="break-all">
                 <IsVerified isVerified={wallet.verification?.isVerified} />

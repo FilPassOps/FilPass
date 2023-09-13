@@ -1,4 +1,6 @@
 import { deliveryMethod as deliveryMethodConst, ONE_TIME } from 'domain/programs/constants'
+import { CONFIG } from 'system.config'
+import { formatPaymentMethod } from './formatPaymentMethod'
 
 interface ApproverRole {
   roleId: number
@@ -53,38 +55,49 @@ export const formatProgramCurrency = (program: Program) => {
 }
 
 export const findProgramPaymentMethod = (program: Program) =>
-  paymentMethodOptions.find(option => option.label === `Request in ${program?.request_unit_name} and Pay in ${program?.payment_unit_name}`)
+  paymentMethodOptions.find(option => option.label === formatPaymentMethod(program?.request_unit_name, program?.payment_unit_name))
 
-export const paymentMethodOptions = [
-  {
-    value: 1,
-    label: 'Request in FIL and Pay in FIL',
-    programCurrency: [
-      {
-        name: 'FIL',
-        type: 'REQUEST',
-      },
-      {
-        name: 'FIL',
-        type: 'PAYMENT',
-      },
-    ],
-  },
-  {
-    value: 2,
-    label: 'Request in USD and Pay in FIL',
-    programCurrency: [
-      {
-        name: 'USD',
-        type: 'REQUEST',
-      },
-      {
-        name: 'FIL',
-        type: 'PAYMENT',
-      },
-    ],
-  },
-]
+const createPaymentMethodOptions = () => {
+  let index = 1
+  const options = []
+  for (const chain of CONFIG.chains) {
+    options.push({
+      value: index++,
+      label: formatPaymentMethod(chain.symbol, chain.symbol),
+      programCurrency: [
+        {
+          name: chain.symbol,
+          type: 'REQUEST',
+          blockchain: chain.name,
+        },
+        {
+          name: chain.symbol,
+          type: 'PAYMENT',
+          blockchain: chain.name,
+        },
+      ],
+    })
+    options.push({
+      value: index++,
+      label: formatPaymentMethod(CONFIG.fiatPaymentUnit, chain.symbol),
+      programCurrency: [
+        {
+          name: CONFIG.fiatPaymentUnit,
+          type: 'REQUEST',
+          blockchain: chain.name,
+        },
+        {
+          name: chain.symbol,
+          type: 'PAYMENT',
+          blockchain: chain.name,
+        },
+      ],
+    })
+  }
+  return options
+}
+
+export const paymentMethodOptions = createPaymentMethodOptions()
 
 export const formatProgramViewersRole = (program: Program) =>
   program?.viewersRole?.map(r => ({
@@ -135,10 +148,7 @@ export const formatProgramApproversRole = (program: Program) => {
   ]
 }
 
-export const groupProgramApproversRole = (
-  approversRole: { roleId: number }[][],
-  programId: number,
-) => {
+export const groupProgramApproversRole = (approversRole: { roleId: number }[][], programId: number) => {
   const groupedApproversRole = new Map()
 
   for (const role of approversRole.flat()) {

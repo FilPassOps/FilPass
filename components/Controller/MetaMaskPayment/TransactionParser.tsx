@@ -13,10 +13,11 @@ interface ParsedData {
 }
 
 interface TransactionParserProps {
-  onParseData: (data: ParsedData) => void
+  onParseData: (data: ParsedData, blockchainName: string) => void
+  blockchainName: string
 }
 
-export const TransactionParser = ({ onParseData }: TransactionParserProps) => {
+export const TransactionParser = ({ onParseData, blockchainName }: TransactionParserProps) => {
   const [hexDataInput, setHexDataInput] = useState('')
   const [error, setError] = useState('')
   const { dispatch } = useAlertDispatcher()
@@ -44,12 +45,15 @@ export const TransactionParser = ({ onParseData }: TransactionParserProps) => {
       const functionName = transactionDescription.name
       const [id, addresses, amount] = transactionDescription.args
 
-      onParseData({
-        functionName,
-        id,
-        addresses: addresses.map(hexAddressDecoder),
-        amount: amount.map(amountConverter),
-      })
+      onParseData(
+        {
+          functionName,
+          id,
+          addresses: addresses.map(hexAddressDecoder),
+          amount: amount.map(amountConverter),
+        },
+        blockchainName,
+      )
     } catch (error) {
       setError('Invalid hex data')
     }

@@ -10,7 +10,7 @@ import { Button } from 'components/shared/Button'
 import { PaginationCounter } from 'components/shared/PaginationCounter'
 import { checkItemsPerPage, PaginationWrapper } from 'components/shared/usePagination'
 import { CreateReportModal } from 'components/TransferRequest/shared/CreateReportModal'
-import { PLATFORM_NAME } from 'system.config'
+import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
 import { stringify } from 'csv-stringify/sync'
 import { getAll } from 'domain/disbursement/getAll'
 import { findAllPrograms } from 'domain/programs/findAll'
@@ -22,8 +22,8 @@ import { withControllerSSR } from 'lib/ssr'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { getChainByName, PLATFORM_NAME } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
-import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
 import Head from 'next/head'
 
 export default function Disbursement({ initialData = [], programs = [], pageSize, totalItems, page, status }) {
@@ -43,13 +43,19 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
   const handleRequestChecked = requestIndex => {
     requestList[requestIndex].selected = !requestList[requestIndex].selected
     setRequestList([...requestList])
+    localStorage.setItem(
+      'disbursement-selected',
+      JSON.stringify(requestList.filter(request => request.selected).map(({ publicId }) => publicId)),
+    )
   }
 
   useEffect(() => {
     if (!data) {
       return
     }
-    const initialRequestList = data.map(request => ({ ...request, selected: false }))
+    const selectedRequests = JSON.parse(localStorage.getItem('disbursement-selected'))
+
+    const initialRequestList = data.map(request => ({ ...request, selected: selectedRequests.includes(request.publicId) }))
     setRequestList(initialRequestList)
   }, [data])
 
@@ -67,13 +73,11 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
   }
 
   const onSinglePayClick = data => {
-    setPaymentModalTransactions([data])
-    router.push('#payment')
+    handlePayment([data])
   }
 
   const onMetamaskBatchPayClick = () => {
-    setPaymentModalTransactions(requestList.filter(request => request.selected))
-    router.push('#payment')
+    handlePayment(requestList.filter(request => request.selected))
   }
 
   const onSingleRejectClick = data => {
@@ -89,6 +93,12 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
   const handleNotifyClick = () => {
     setPaymentModalTransactions(requestList.filter(request => request.selected))
     setOpenNotifyModal(true)
+  }
+
+  const handlePayment = requestListData => {
+    localStorage.setItem('disbursement', JSON.stringify(requestListData))
+    setPaymentModalTransactions(requestListData)
+    router.push('#payment')
   }
 
   const handleDownloadCSV = async values => {
@@ -137,7 +147,7 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
             columns.paidFilAmount && row.push(transfers[0].amount)
             columns.paidFilAmount && row.push(transfers[0].amountCurrencyUnit?.name ?? 'FIL')
             columns.status && row.push(status)
-            columns.filfoxLink && row.push(`${config.chain.blockExplorerUrls[0]}/message/${transfers[0].txHash}`)
+            columns.filfoxLink && row.push(`${config.chain.blockExplorerUrls[0]}/${transfers[0].txHash}`)
             return row
           }),
         ],
@@ -207,7 +217,12 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
             {selectedRequests.length > 0 && isNotPaidStatus && (
               <div className="flex items-center gap-4">
                 <div>
-                  <WithMetaMaskButton variant="green" onClick={onMetamaskBatchPayClick} defaultLabel="Pay">
+                  <WithMetaMaskButton
+                    variant="green"
+                    onClick={onMetamaskBatchPayClick}
+                    defaultLabel="Pay"
+                    targetChainId={getChainByName(selectedRequests[0].program.blockchain.name).chainId}
+                  >
                     Pay
                   </WithMetaMaskButton>
                 </div>
@@ -258,6 +273,7 @@ export const getServerSideProps = withControllerSSR(async ({ query }) => {
   const pageSize = checkItemsPerPage(query.itemsPerPage) ? parseInt(query.itemsPerPage) : 100
   const page = parseInt(query.page) || 1
   const status = query.status || APPROVED_STATUS
+  const networks = query.network?.length ? query.network.split(',') : []
   const programId = query.programId?.length ? query.programId.split(',') : []
   const requestNumber = query.number
   const wallet = query.wallet
@@ -277,6 +293,7 @@ export const getServerSideProps = withControllerSSR(async ({ query }) => {
     error,
   } = await getAll({
     status,
+    networks,
     programId,
     requestNumber,
     team,

@@ -1,9 +1,9 @@
 import { TransactionError } from 'lib/errors'
 import { matchWalletAddress } from 'lib/filecoinShipyard'
+import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 import prisma, { newPrismaTransaction } from 'lib/prisma'
 import _ from 'lodash'
 import errorsMessages from 'wordings-and-errors/errors-messages'
-import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { Prisma } from '@prisma/client'
 
 interface Request {
@@ -147,7 +147,7 @@ const createWallets = async (requests: Request[]) => {
             userId: singleRequest.receiver.id,
             name: 'created by approver',
             address: singleRequest.wallet.address,
-            blockchain: 'FILECOIN',
+            blockchainId: 1, // TODO OPEN-SOURCE: should the id of the blockchain table
             isDefault: false,
           },
         })

@@ -1,7 +1,8 @@
 import MetaMaskOnboarding from '@metamask/onboarding'
 import { Button, ButtonProps } from 'components/shared/Button'
+import { useRouter } from 'next/router'
 import { Dispatch, MouseEventHandler, ReactNode, SetStateAction, createContext, useContext, useEffect, useRef, useState } from 'react'
-import config from '../../chains.config'
+import { CONFIG, getMetamaskParam } from 'system.config'
 
 interface ProviderMessage {
   type: string
@@ -54,7 +55,7 @@ interface WalletContext {
   chainId?: string
   busy: boolean
   connect: () => void
-  switchChain: () => void
+  switchChain: (chainId: string) => void
   setBusy: Dispatch<SetStateAction<boolean>>
 }
 
@@ -78,6 +79,7 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode | undefined
   const [wallet, setWallet] = useState<string>()
   const [chainId, setChainId] = useState<string>()
   const [busy, setBusy] = useState(false)
+  const { asPath } = useRouter()
 
   const handleNewAccounts = async ([wallet]: Array<string>) => {
     setWallet(wallet)
@@ -108,8 +110,11 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode | undefined
 
   useEffect(() => {
     if (MetaMaskOnboarding.isMetaMaskInstalled()) {
-      const onChainChanged = () => {
-        window.location.reload()
+      const onChainChanged = (chainId: string) => {
+        setChainId(chainId)
+        if (asPath.includes('/disbursement')) {
+          window.location.reload()
+        }
       }
       window.ethereum.on('chainChanged', onChainChanged)
 
@@ -117,7 +122,7 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode | undefined
         window.ethereum.removeListener('chainChanged', onChainChanged)
       }
     }
-  }, [])
+  }, [asPath])
 
   useEffect(() => {
     if (MetaMaskOnboarding.isMetaMaskInstalled()) {
@@ -146,12 +151,12 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode | undefined
     }
   }
 
-  const switchChain = async () => {
+  const switchChain = async (chainId: string) => {
     try {
       setBusy(true)
       await window.ethereum.request({
         method: 'wallet_switchEthereumChain',
-        params: [{ chainId: config.chain.chainId }], // Hyperspace testnet
+        params: [{ chainId }],
       })
     } catch (switchError: any) {
       console.log(switchError)
@@ -160,7 +165,7 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode | undefined
         try {
           await window.ethereum.request({
             method: 'wallet_addEthereumChain',
-            params: [config.chain],
+            params: [getMetamaskParam(chainId)],
           })
         } catch (addError) {
           console.error(addError)
@@ -184,15 +189,24 @@ interface WithMetaMaskButtonProps extends Omit<ButtonProps, 'loading' | 'disable
   connectWalletLabel?: ReactNode
   switchChainLabel?: string
   defaultLabel?: string
+  targetChainId?: string
 }
 
 export const WithMetaMaskButton: React.FC<React.PropsWithChildren<WithMetaMaskButtonProps>> = props => {
-  const { onClick, connectWalletLabel = 'Connect MetaMask', switchChainLabel = 'Switch network', defaultLabel, children, ...rest } = props
-  const { wallet, connect, switchChain, busy, chainId } = useMetaMask()
+  const {
+    onClick,
+    connectWalletLabel = 'Connect MetaMask',
+    switchChainLabel = 'Switch network',
+    defaultLabel,
+    targetChainId = CONFIG.chains[0].chainId, // TODO: OPEN-SOURCE
+    children,
+    ...rest
+  } = props
+  const { wallet, connect, switchChain, busy, chainId: connectedChainId } = useMetaMask()
   const [loading, setLoading] = useState(false)
   const ref = useRef<HTMLButtonElement>(null)
 
-  const connectedToTargetChain = wallet && chainId === config.chain.chainId
+  const connectedToTargetChain = wallet && connectedChainId === targetChainId
 
   useEffect(() => {
     if (!busy) {
@@ -206,7 +220,7 @@ export const WithMetaMaskButton: React.FC<React.PropsWithChildren<WithMetaMaskBu
     if (wallet && connectedToTargetChain) {
       onClick?.(event)
     } else if (wallet && !connectedToTargetChain) {
-      switchChain()
+      switchChain(targetChainId)
     } else {
       connect()
     }
@@ -214,7 +228,13 @@ export const WithMetaMaskButton: React.FC<React.PropsWithChildren<WithMetaMaskBu
 
   return (
     <Button ref={ref} className="flex items-center" {...rest} loading={busy && loading} disabled={busy} onClick={handleClick}>
-      {wallet && connectedToTargetChain ? children : defaultLabel ? defaultLabel : wallet && !connectedToTargetChain ? switchChainLabel : connectWalletLabel}
+      {wallet && connectedToTargetChain
+        ? children
+        : defaultLabel
+        ? defaultLabel
+        : wallet && !connectedToTargetChain
+        ? switchChainLabel
+        : connectWalletLabel}
     </Button>
   )
 }

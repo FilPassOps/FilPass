@@ -1,7 +1,6 @@
 import { Prisma } from '@prisma/client'
-import { WalletSize } from 'components/web3/useDelegatedAddress'
 import { decrypt, decryptPII } from 'lib/emissaryCrypto'
-import { getDelegatedAddress } from 'lib/getDelegatedAddress'
+import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import prisma from 'lib/prisma'
 import { shortenAddress } from 'lib/shortenAddress'
 import { validate } from 'lib/yup'
@@ -88,7 +87,7 @@ export async function getViewerTransferRequests(params: GetViewerTransferRequets
         transfer.amount_currency_unit_id                     transfer_amount_currency_unit_id,
         transfer_currency_unit.name                          transfer_amount_currency_unit,
         user_wallet.address                                  wallet_address,
-        user_wallet.blockchain                               wallet_blockchain,
+        blockchain.name                                      wallet_blockchain,
         wallet_verification.is_verified                      wallet_is_verified
     FROM user_role
             INNER JOIN user_role_program ON user_role_program.user_role_id = user_role.id AND user_role_program.is_active = TRUE
@@ -104,6 +103,7 @@ export async function getViewerTransferRequests(params: GetViewerTransferRequets
                             AND program.is_active = TRUE
             LEFT JOIN user_wallet ON request.user_wallet_id = user_wallet.id
             LEFT JOIN wallet_verification ON user_wallet.verification_id = wallet_verification.id
+            LEFT JOIN blockchain ON user_wallet.blockchain_id = blockchain.id
     WHERE user_role.is_active = TRUE
     AND user_role.role::text = 'VIEWER'
     AND user_role.user_id = ${viewerId}
@@ -158,7 +158,7 @@ export async function getViewerTransferRequests(params: GetViewerTransferRequets
         delegated_address: getDelegatedAddress(request.wallet_address, WalletSize.VERY_SHORT)?.shortAddress,
         wallet_address: shortenAddress(request.wallet_address),
       }
-    })
+    }),
   )
 
   return {

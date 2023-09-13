@@ -4,18 +4,15 @@ import { useAuth } from 'components/Authentication/Provider'
 import { Button } from 'components/shared/Button'
 import { SelectInput } from 'components/shared/FormInput'
 import { WalletAddress } from 'components/shared/WalletAddress'
-import useDelegatedAddress, { WalletSize } from 'components/web3/useDelegatedAddress'
-import { shortenAddress } from 'lib/shortenAddress'
 import _get from 'lodash/get'
 import { useMemo, useState } from 'react'
 import { Controller } from 'react-hook-form'
 import { DeleteWalletAddressModal } from './DeleteWalletAddressModal'
 
-export const SelectWalletInput = ({ control, errors, submitErrors, data, onCreateWalletClick }) => {
+export const SelectWalletInput = ({ control, errors, submitErrors, data, onCreateWalletClick, blockchainIdFilter, disabled }) => {
   const { user } = useAuth()
   const [walletData, setWalletData] = useState()
   const [openDeleteWalletAddressModal, setOpenDeleteWalletAddressModal] = useState(false)
-  const getDelegatedAddress = useDelegatedAddress()
 
   const defaultTransferWallet = useMemo(() => {
     if (!data || !data?.wallet_id) {
@@ -34,46 +31,48 @@ export const SelectWalletInput = ({ control, errors, submitErrors, data, onCreat
       return []
     }
 
-    const userWalletOptions = _get(user, 'wallets', []).map(wallet => {
-      const delegatedAddress = getDelegatedAddress(wallet.address, WalletSize.SHORT)
-
-      return {
-        label: (
-          <div className="flex items-start gap-1">
-            <div className="flex flex-col lg:flex-row lg:gap-1 truncate">
-              <div className="flex gap-1 items-center">
-                <WalletAddress
-                  address={shortenAddress(wallet.address, WalletSize.SHORT)}
-                  isVerified={wallet.verification}
-                  delegatedAddress={delegatedAddress?.shortAddress}
-                  label={wallet?.name}
-                  className="sm:hidden"
-                />
-                <WalletAddress
-                  address={wallet.address}
-                  isVerified={wallet.verification}
-                  delegatedAddress={delegatedAddress?.fullAddress}
-                  label={wallet?.name}
-                  className="hidden sm:flex"
-                />
+    const userWalletOptions = _get(user, 'wallets', [])
+      .filter(wallet => wallet.blockchain.id === blockchainIdFilter)
+      .map(wallet => {
+        return {
+          label: (
+            <div className="flex items-start gap-1">
+              <div className="flex flex-col lg:flex-row lg:gap-1 truncate">
+                <div className="flex gap-1 items-center">
+                  <WalletAddress
+                    address={wallet.address}
+                    isVerified={wallet.verification}
+                    label={wallet?.name}
+                    blockchain={wallet.blockchain.name}
+                    walletSize="short"
+                    className="sm:hidden"
+                  />
+                  <WalletAddress
+                    address={wallet.address}
+                    isVerified={wallet.verification}
+                    label={wallet?.name}
+                    blockchain={wallet.blockchain.name}
+                    walletSize="full"
+                    className="hidden sm:flex"
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        ),
-        value: wallet.id,
-        rightElement: (
-          <span
-            className="ml-auto cursor-pointer h-6 w-6 bg-gray-200 rounded-full flex items-center justify-center shrink-0"
-            onClick={() => {
-              setOpenDeleteWalletAddressModal(true)
-              setWalletData(wallet)
-            }}
-          >
-            <XMarkIcon className="h-5 w-5 text-indigo-500" />
-          </span>
-        ),
-      }
-    })
+          ),
+          value: wallet.id,
+          rightElement: (
+            <span
+              className="ml-auto cursor-pointer h-6 w-6 bg-gray-200 rounded-full flex items-center justify-center shrink-0"
+              onClick={() => {
+                setOpenDeleteWalletAddressModal(true)
+                setWalletData(wallet)
+              }}
+            >
+              <XMarkIcon className="h-5 w-5 text-indigo-500" />
+            </span>
+          ),
+        }
+      })
 
     if (defaultTransferWallet && !user.wallets.some(wallet => wallet.address === defaultTransferWallet.address)) {
       userWalletOptions.unshift({
@@ -83,7 +82,7 @@ export const SelectWalletInput = ({ control, errors, submitErrors, data, onCreat
     }
 
     return userWalletOptions
-  }, [user, defaultTransferWallet, getDelegatedAddress])
+  }, [user, defaultTransferWallet, blockchainIdFilter])
 
   return (
     <>
@@ -104,12 +103,14 @@ export const SelectWalletInput = ({ control, errors, submitErrors, data, onCreat
               onChange={field.onChange}
               ref={field.ref}
               value={field.value}
+              disabled={disabled}
             />
           )}
         />
         <Button
           onClick={onCreateWalletClick}
           className={`self-start sm:self-end w-fit sm:full shrink-0 ${errors.userWalletId || submitErrors?.userWalletId ? 'mb-6' : ''}`}
+          disabled={disabled}
         >
           Connect Wallet
         </Button>

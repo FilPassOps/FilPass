@@ -3,10 +3,8 @@ import { DeleteWalletAddressModal } from 'components/TransferRequest/TransferReq
 import { LoadingIndicator } from 'components/shared/LoadingIndicator'
 import { WalletAddress } from 'components/shared/WalletAddress'
 import { WarningPopup } from 'components/shared/WarningPopup'
-import useDelegatedAddress, { WalletSize } from 'components/web3/useDelegatedAddress'
 import { api } from 'lib/api'
 import { classNames } from 'lib/classNames'
-import { shortenAddress } from 'lib/shortenAddress'
 import { useState } from 'react'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
@@ -17,6 +15,9 @@ interface Wallet {
   isDefault: boolean
   verification: {
     isVerified: boolean
+  }
+  blockchain: {
+    name: string
   }
 }
 
@@ -49,7 +50,6 @@ const ListItems = ({ items, isLoading, setLoading, refresh }: ListItemsProps) =>
   const [currentWallet, setcurrentWallet] = useState<Wallet>()
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const [openWarningPopup, setOpenWarningPopup] = useState(false)
-  const getDelegatedAddress = useDelegatedAddress()
 
   const handleRemove = (wallet: Wallet) => {
     if (wallet.isDefault) {
@@ -75,7 +75,6 @@ const ListItems = ({ items, isLoading, setLoading, refresh }: ListItemsProps) =>
   return (
     <>
       {items.map((wallet, index) => {
-        const delegatedAddress = getDelegatedAddress(wallet.address)
         const disableEthereum = wallet.address.startsWith('0x') || wallet.address.startsWith('f4') || wallet.address.startsWith('t4')
         const hoverMessage = disableEthereum
           ? errorsMessages.invalid_default_wallet_ethereum.message
@@ -88,17 +87,19 @@ const ListItems = ({ items, isLoading, setLoading, refresh }: ListItemsProps) =>
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm flex-1">
               <>
                 <WalletAddress
-                  address={shortenAddress(wallet.address, WalletSize.SHORT)}
+                  address={wallet.address}
                   isVerified={wallet.verification?.isVerified}
-                  delegatedAddress={delegatedAddress?.shortAddress}
                   label={wallet.name}
+                  blockchain={wallet.blockchain.name}
+                  walletSize="short"
                   className="sm:hidden"
                 />
                 <WalletAddress
                   address={wallet.address}
                   isVerified={wallet.verification?.isVerified}
-                  delegatedAddress={delegatedAddress?.fullAddress}
                   label={wallet.name}
+                  blockchain={wallet.blockchain.name}
+                  walletSize="full"
                   className="hidden sm:flex"
                 />
               </>

@@ -13,7 +13,7 @@ import { formatCrypto } from 'lib/currency'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import useDelegatedAddress from 'components/web3/useDelegatedAddress'
+import { getChainByName } from 'system.config'
 
 interface TransferListProps {
   data?: any[]
@@ -46,7 +46,6 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
   const { filecoin } = useCurrency()
   const [selectAll, setSelectAll] = useState(false)
   const selectAllRef = useRef<HTMLInputElement>(null)
-  const getDelegatedAddress = useDelegatedAddress()
 
   useEffect(() => {
     if (data && shouldShowHeaderCheckbox) {
@@ -88,7 +87,7 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
             </Header>
             <Header style={{ minWidth: 200 }}>Address</Header>
             <Header>Request Amount</Header>
-            <Header>{query.status === PAID_STATUS ? 'Paid FIL Amount' : 'Estimated FIL Amount'}</Header>
+            <Header>{query.status === PAID_STATUS ? `Paid Amount` : `Estimated Amount`}</Header>
             <Header style={{ minWidth: 180 }}>Vesting Start Epoch</Header>
             <Header style={{ minWidth: 180 }}>Vesting Months</Header>
             <Header>Status</Header>
@@ -97,8 +96,9 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
         </TableHead>
         <TableBody>
           {data.map((request, requestIndex) => {
+            const { blockExplorer } = getChainByName(request.program_blockchain)
+
             const href = `/approvals/${request.id}`
-            const delegatedAddress = request.delegated_address || getDelegatedAddress(request.wallet_address)?.fullAddress
 
             return (
               <tr
@@ -130,7 +130,6 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
                       address={request.wallet_address}
                       blockchain={request.wallet_blockchain}
                       isVerified={!!request.wallet_is_verified}
-                      delegatedAddress={delegatedAddress}
                     />
                   )}
                   {!request.wallet_address && '-'}
@@ -161,7 +160,15 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
                 <LinkedCell href={href}>
                   <StatusPill status={request.status} />
                 </LinkedCell>
-                <Cell>{request.status === PAID_STATUS && request.transfer_hash && <Filfox transfer_hash={request.transfer_hash} />}</Cell>
+                <Cell>
+                  {request.status === PAID_STATUS && request.transfer_hash && (
+                    <Filfox
+                      blockExplorerName={blockExplorer.name}
+                      blockExplorerUrl={blockExplorer.url}
+                      transactionHash={request.transfer_hash}
+                    />
+                  )}
+                </Cell>
               </tr>
             )
           })}

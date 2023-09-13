@@ -10,7 +10,6 @@ import { DeleteModal } from 'components/TransferRequest/shared/DeleteModal'
 import { Button, LinkButton } from 'components/shared/Button'
 import { PaginationCounter } from 'components/shared/PaginationCounter'
 import { PaginationWrapper, checkItemsPerPage } from 'components/shared/usePagination'
-import { PLATFORM_NAME } from 'system.config'
 import { stringify } from 'csv-stringify/sync'
 import { getApprovalsByRole } from 'domain/approvals/service'
 import { APPROVER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
@@ -23,6 +22,7 @@ import { withRolesSSR } from 'lib/ssr'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { PLATFORM_NAME } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import Head from 'next/head'
 
@@ -132,7 +132,7 @@ export default function Approvals({
               columns.paidFilAmount && row.push(transfer_amount_currency_unit)
               columns.status && row.push(status)
               columns.residency && row.push(is_us_resident ? 'US' : 'Non-US')
-              columns.filfoxLink && row.push(`${config.chain.blockExplorerUrls[0]}/message/${transfer_hash}`)
+              columns.filfoxLink && row.push(`${config.chain.blockExplorerUrls[0]}/${transfer_hash}`)
               return row
             },
           ),

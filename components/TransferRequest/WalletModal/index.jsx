@@ -3,20 +3,22 @@ import { Modal } from 'components/shared/Modal'
 import { useMetaMask } from 'components/web3/MetaMaskProvider'
 import { api } from 'lib/api'
 import { useCallback, useEffect, useState } from 'react'
+import { getChain } from 'system.config'
 import { AlertSkipStep } from './AlertSkipStep'
 import { ChainSelection } from './ChainSelectionStep'
 import { ConnectStep } from './ConnectStep'
 import { NotificationStep } from './NotificationStep'
 import { VerifyEthereumStep } from './VerifyEthereumStep'
-import { VerifyStep } from './VerifyStep'
 
-export function WalletModal({ open, onModalClosed, setUserWalletId }) {
-  const { wallet, connect } = useMetaMask()
+export function WalletModal({ open, onModalClosed, setUserWalletId, blockchain }) {
+  const { wallet, connect, chainId } = useMetaMask()
 
   const { refresh, user } = useAuth()
   const [step, setStep] = useState(1)
   const [form, setForm] = useState({})
   const [connectionMethod, setConnectionMethod] = useState()
+
+  const chain = getChain(chainId)
 
   const handleChainSelectionClick = method => {
     setConnectionMethod(method)
@@ -57,40 +59,35 @@ export function WalletModal({ open, onModalClosed, setUserWalletId }) {
       const hasDefaultWallet = user?.wallets?.find(wallet => wallet.isDefault)
       return await api.post('/wallets', { ...values, isDefault: !hasDefaultWallet })
     },
-    [user?.wallets]
+    [user?.wallets],
   )
 
   return (
     <Modal open={open} onModalClosed={handleModalClosed}>
-      {step === 1 && <ChainSelection onCancelClick={handleModalClosed} onConnectionMethodClick={handleChainSelectionClick} />}
+      {step === 1 && (
+        <ChainSelection onCancelClick={handleModalClosed} onConnectionMethodClick={handleChainSelectionClick} blockchain={blockchain} />
+      )}
 
       {step === 2 && (
         <ConnectStep
           onBackClick={handlePreviousStepClick}
           onNextStepClick={handleNextStepClick}
           connectionMethod={connectionMethod}
+          blockchainName={chain?.name}
           wallet={wallet}
           key={wallet}
         />
       )}
 
-      {step === 3 &&
-        (connectionMethod === 'Metamask' ? (
-          <VerifyEthereumStep
-            onNextStepClick={handleNextStepClick}
-            onBackClick={handlePreviousStepClick}
-            formData={form}
-            setUserWalletId={setUserWalletId}
-          />
-        ) : (
-          <VerifyStep
-            onNextStepClick={handleNextStepClick}
-            onCancelClick={handleModalClosed}
-            formData={form}
-            setUserWalletId={setUserWalletId}
-            createWallet={createWallet}
-          />
-        ))}
+      {step === 3 && (
+        <VerifyEthereumStep
+          onNextStepClick={handleNextStepClick}
+          onBackClick={handlePreviousStepClick}
+          formData={form}
+          setUserWalletId={setUserWalletId}
+          networkName={chain?.networkName}
+        />
+      )}
 
       {step === 4 && form?.skipAlert && (
         <AlertSkipStep

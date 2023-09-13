@@ -41,6 +41,7 @@ export async function getTransferRequestById(params: GetTransferRequestByIdParam
          user_wallet.name                       wallet_name,
          user_wallet.address                    wallet_address,
          user_wallet.id                         wallet_id,
+         blockchain.name                        wallet_blockchain_name,
          wallet_verification.is_verified        wallet_is_verified,
          program.name                           program_name,
          program.id                             program_id,
@@ -97,6 +98,7 @@ export async function getTransferRequestById(params: GetTransferRequestByIdParam
     ) AS filter
         INNER JOIN program ON program.id = filter.request_program_id
         INNER JOIN user_wallet ON user_wallet.id = filter.user_wallet_id
+        INNER JOIN blockchain ON user_wallet.blockchain_id = blockchain.id
         LEFT JOIN wallet_verification
                   ON user_wallet.verification_id = wallet_verification.id AND wallet_verification.is_active = TRUE
         LEFT JOIN user_file ON user_file.id = filter.user_file_id

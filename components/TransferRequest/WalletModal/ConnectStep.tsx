@@ -1,9 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Blockchain } from '@prisma/client'
 import { useAuth } from 'components/Authentication/Provider'
 import { Button } from 'components/shared/Button'
 import { TextInput } from 'components/shared/FormInput'
-import { FILECOIN_BLOCKCHAIN } from 'domain/wallet/constants'
 import { connectWalletStepValidator } from 'domain/walletVerification/validation'
 import { api } from 'lib/api'
 import { useState } from 'react'
@@ -15,15 +13,16 @@ interface ConnectStepProps {
   onNextStepClick: (data: any) => void
   connectionMethod: string
   wallet: string
+  blockchainName: string
 }
 
 interface FormValues {
-  blockchain: Blockchain
+  blockchain: string
   address: string
   name?: string
 }
 
-export function ConnectStep({ onBackClick, onNextStepClick, connectionMethod, wallet }: ConnectStepProps) {
+export function ConnectStep({ onBackClick, onNextStepClick, connectionMethod, wallet, blockchainName }: ConnectStepProps) {
   const { user } = useAuth()
   const [submitErrors, setSubmitErrors] = useState<any>()
 
@@ -33,14 +32,16 @@ export function ConnectStep({ onBackClick, onNextStepClick, connectionMethod, wa
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      blockchain: FILECOIN_BLOCKCHAIN,
+      blockchain: connectionMethod === 'Filecoin' ? 'Filecoin' : blockchainName, // TODO OPEN-SOURCE: should the id of the blockchain table
       address: connectionMethod === 'Metamask' ? wallet : '',
     },
     resolver: yupResolver(connectWalletStepValidator),
   })
 
   const handleFormSubmit = async (formData: FormValues) => {
-    const addressIndex = user?.wallets?.findIndex(wallet => wallet.address.toLowerCase() === formData.address.toLowerCase())
+    const addressIndex = user?.wallets?.findIndex(
+      wallet => wallet.address.toLowerCase() === formData.address.toLowerCase() && wallet.blockchain.name === formData.blockchain,
+    )
 
     if (addressIndex && addressIndex >= 0) {
       setSubmitErrors({
@@ -77,6 +78,7 @@ export function ConnectStep({ onBackClick, onNextStepClick, connectionMethod, wa
           error={errors.blockchain || submitErrors?.blockchain}
           {...register('blockchain')}
         />
+
         <TextInput
           label="Wallet Address"
           id="address"

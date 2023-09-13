@@ -1,15 +1,15 @@
+import { Prisma } from '@prisma/client'
 import { sendWalletVerificationNotification } from 'domain/notifications/sendWalletVerificationNotification'
 import { validate } from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { createWalletValidator } from './validation'
-import { Prisma } from '@prisma/client'
 
 interface CreateWalletParams {
   name?: string
   verificationId: number
   userId: number
   address: string
-  blockchain: string
+  blockchain: string // TODO OPEN-SOURCE: should be the id of the blockchain table
   isDefault: boolean
   email: string
 }
@@ -34,6 +34,21 @@ export async function createWallet(prisma: Prisma.TransactionClient, params: Cre
 
   const { name, address, blockchain, verificationId, userId, isDefault, email } = fields
 
+  const blokchainEntity = await prisma.blockchain.findUnique({ where: { name: blockchain } })
+
+  if (!blokchainEntity) {
+    return {
+      error: {
+        status: 400,
+        errors: {
+          address: errorsMessages.wallet_blockchain_not_found,
+        },
+      },
+    }
+  }
+
+  console.log({ address, verificationId, userId })
+
   const [walletSearchResult] = await prisma.$queryRaw<WalletSearchResult[]>`
   SELECT *
   FROM
@@ -54,10 +69,12 @@ export async function createWallet(prisma: Prisma.TransactionClient, params: Cre
         verification.id = ${verificationId}
         AND verification.address = ${address}
         AND verification.user_id = ${userId}
-        AND verification.blockchain::text = ${blockchain}
+        AND verification.blockchain_id = blokchainEntity.id
         AND verification.is_active = TRUE
     ) verification;
   `
+
+  // TODO OPEN-SOURCE: should the id of the blockchain table
 
   const { wallet_exists = 0, verification_used = 0, verification_match = 0 } = walletSearchResult
   if (wallet_exists > 0) {
@@ -94,7 +111,7 @@ export async function createWallet(prisma: Prisma.TransactionClient, params: Cre
 
   const wallet = await prisma.userWallet.upsert({
     where: {
-      userId_address: { userId, address },
+      userId_address_blockchainId: { address, userId, blockchainId: blokchainEntity.id },
     },
     update: {
       verificationId,
@@ -106,7 +123,7 @@ export async function createWallet(prisma: Prisma.TransactionClient, params: Cre
       verificationId,
       name,
       address,
-      blockchain,
+      blockchainId: blokchainEntity.id, // TODO OPEN-SOURCE: should get the value from params
       isDefault,
       isActive: false,
     },
