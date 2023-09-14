@@ -1,8 +1,8 @@
 import { DocumentPlusIcon } from '@heroicons/react/24/outline'
 import { Blockchain } from '@prisma/client'
 import { useCurrency } from 'components/Currency/Provider'
+import { BlockExplorerLink } from 'components/shared/BlockExplorerLink'
 import { LinkButton } from 'components/shared/Button'
-import { Filfox } from 'components/shared/Filfox'
 import { LoadingIndicator } from 'components/shared/LoadingIndicator'
 import Sortable from 'components/shared/Sortable'
 import { StatusPill } from 'components/shared/Status'
@@ -158,7 +158,9 @@ const Memo = ({ notes, transfer_hash, program_blockchain }: MemoProps) => {
   return (
     <>
       {notes && <p className="break-all whitespace-normal 2xl:truncate w-0 min-w-full">{notes}</p>}
-      {transfer_hash && <Filfox blockExplorerName={blockExplorer.name} blockExplorerUrl={blockExplorer.url} transactionHash={transfer_hash} />}
+      {transfer_hash && (
+        <BlockExplorerLink blockExplorerName={blockExplorer.name} blockExplorerUrl={blockExplorer.url} transactionHash={transfer_hash} />
+      )}
     </>
   )
 }
