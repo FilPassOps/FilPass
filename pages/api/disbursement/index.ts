@@ -8,7 +8,7 @@ const handler = async (req: NextApiRequestWithSession, res: NextApiResponse) => 
   const status = (req.query.status || APPROVED_STATUS) as string
   const requestNumber = query.number as string
   const team = query.team?.toString().split(',') as string[]
-  const programId = query.programId?.toString().split(',') as any[]
+  const programId = (query.programId as string)?.split(',').map(Number)
 
   const wallet = query.wallet as string
   let fromDate, toDate

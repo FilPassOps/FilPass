@@ -7,8 +7,7 @@ import {
   SUPERADMIN_ROLE,
   VIEWER_ROLE,
 } from 'domain/auth/constants'
-import { FilecoinApiResult } from 'domain/utils/sendFILWithMaster'
-import { api } from 'lib/api'
+import { BaseApiResult, api } from 'lib/api'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 
@@ -58,7 +57,7 @@ export const SelectRoles = ({ user, scrolled }: SelectRolesProps) => {
 
   const handleFormSubmit = async (values: Role) => {
     setLoading(true)
-    const { error } = (await api.post(`/roles/${user.id}`, { roles: values })) as FilecoinApiResult
+    const { error } = (await api.post(`/roles/${user.id}`, { roles: values })) as BaseApiResult
 
     if (error) {
       setSubmitErrors(error.errors)

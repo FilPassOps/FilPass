@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 interface UseProgramCurrencyProps {
   defaultRequestProgram?: any
   programs?: any[]
-  programId?: string
+  programId?: number
 }
 
 export const useProgramCurrency = ({ defaultRequestProgram, programs = [], programId }: UseProgramCurrencyProps) => {

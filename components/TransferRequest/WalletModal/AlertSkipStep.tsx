@@ -6,15 +6,16 @@ interface AlertSkipStepProps {
   formData: {
     walletAddress: string
     walletName: string
-    walletId: string
+    walletId: number
     verification: boolean
     success: boolean
   }
-  setUserWalletId: (id: string) => void
+  setUserWalletId: (id: number) => void
   onBackClick: () => void
   createWallet: (data: any) => Promise<any>
 }
 
+// TODO: still maintain this file?
 export const AlertSkipStep = ({ onNextStepClick, formData, setUserWalletId, onBackClick, createWallet }: AlertSkipStepProps) => {
   const [loading, setLoading] = useState(false)
 

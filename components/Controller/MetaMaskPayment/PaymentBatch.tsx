@@ -27,7 +27,7 @@ interface TransferRequest {
   publicId: string
   amount: string
   wallet: { address: string; blockchain: Blockchain; verificationId?: string }
-  program: { programCurrency: ProgramCurrency[]; blockchain: { name: string } }
+  program: { programCurrency: ProgramCurrency[]; blockchain: Blockchain }
   transfers: { txHash: string; status: TransferStatus; amount: string; isActive: boolean; amountCurrencyUnit: { name: string } }[]
   isHexMatch?: boolean
 }
@@ -198,7 +198,7 @@ const PaymentBatch = ({
                     <WalletAddress address={wallet.address} blockchain={wallet.blockchain.name} isVerified={!!wallet.verificationId} />
                   </TableDiv>
                   <TableDiv>
-                    <Currency amount={Number(amount)} requestCurrency={requestUnit.currency.name} paymentUnit={paymentUnit.currency.name} />
+                    <Currency amount={amount} requestCurrency={requestUnit.currency.name} paymentUnit={paymentUnit.currency.name} />
                   </TableDiv>
                   <TableDiv>
                     <div className="w-40">

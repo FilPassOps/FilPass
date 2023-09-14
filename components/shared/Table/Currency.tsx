@@ -2,12 +2,12 @@ import { USD } from 'domain/currency/constants'
 import { formatCrypto, formatCurrency } from 'lib/currency'
 
 interface CurrencyProps {
-  amount?: number
+  amount?: string
   requestCurrency?: string
   paymentUnit?: string
 }
 
-const Currency = ({ amount = 0, requestCurrency = '', paymentUnit = 'FIL' }: CurrencyProps) => {
+const Currency = ({ amount = '0', requestCurrency = '', paymentUnit = 'FIL' }: CurrencyProps) => {
   if (requestCurrency === USD) {
     return (
       <div className="text-deep-koamaru font-normal text-sm leading-tight w-0 min-w-full break-all whitespace-normal 2xl:truncate">

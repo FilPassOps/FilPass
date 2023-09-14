@@ -8,7 +8,7 @@ import { Filters } from 'components/Filters/Filters'
 import { Layout } from 'components/Layout'
 import { Button } from 'components/shared/Button'
 import { PaginationCounter } from 'components/shared/PaginationCounter'
-import { checkItemsPerPage, PaginationWrapper } from 'components/shared/usePagination'
+import { getItemsPerPage, PaginationWrapper } from 'components/shared/usePagination'
 import { CreateReportModal } from 'components/TransferRequest/shared/CreateReportModal'
 import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
 import { stringify } from 'csv-stringify/sync'
@@ -21,26 +21,92 @@ import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { withControllerSSR } from 'lib/ssr'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { ReactElement, useEffect, useState } from 'react'
 import { getChainByName, PLATFORM_NAME } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import Head from 'next/head'
+import { Blockchain, TransferStatus } from '@prisma/client'
 
-export default function Disbursement({ initialData = [], programs = [], pageSize, totalItems, page, status }) {
+interface DisbursementProps {
+  initialData: any[]
+  pageSize: number
+  totalItems: number
+  page: number
+  status: string
+  programs: any[]
+}
+
+interface ProgramCurrency {
+  currency: {
+    name: string
+  }
+  type: string
+}
+
+interface DisbursementRequest {
+  id: number
+  status: string
+  vestingStartEpoch: number
+  vestingMonths: number
+  publicId: string
+  team: string
+  createdAt: string
+  updatedAt: string
+  delegated_address: string
+  amount: string
+  isHexMatch?: boolean
+  selected: boolean
+  wallet: {
+    address: string
+    blockchain: Blockchain
+    verificationId: string
+  }
+  program: {
+    programCurrency: ProgramCurrency[]
+    blockchain: Blockchain
+    name: string
+  }
+  transfers: {
+    isActive: boolean
+    amount: string
+    status: TransferStatus
+    amountCurrencyUnit: {
+      name: string
+    }
+    txHash: string
+  }[]
+  currency: {
+    name: string
+  }
+  receiver: {
+    email: string
+  }
+  amountCurrencyUnit: {
+    name: string
+  }
+}
+
+interface DisbursementResult {
+  data: {
+    requests: DisbursementRequest[]
+  }
+}
+
+export default function Disbursement({ initialData = [], programs = [], pageSize, totalItems, page, status }: DisbursementProps) {
   const router = useRouter()
   const sort = router?.query?.sort || 'createdAt'
   const order = router?.query?.order || 'asc'
   const isPayment = router.asPath.split('#')[1] === 'payment'
 
-  const [requestList, setRequestList] = useState([])
-  const [paymentModalTransactions, setPaymentModalTransactions] = useState([])
-  const [rejectModalTransactions, setRejectModalTransactions] = useState([])
+  const [requestList, setRequestList] = useState<DisbursementRequest[]>([])
+  const [paymentModalTransactions, setPaymentModalTransactions] = useState<DisbursementRequest[]>([])
+  const [rejectModalTransactions, setRejectModalTransactions] = useState<string[]>([])
   const [openRejectModal, setOpenRejectModal] = useState(false)
   const [openNotifyModal, setOpenNotifyModal] = useState(false)
   const [createReportModal, setCreateReportModal] = useState(false)
   const [data, setData] = useState(initialData)
 
-  const handleRequestChecked = requestIndex => {
+  const handleRequestChecked = (requestIndex: number) => {
     requestList[requestIndex].selected = !requestList[requestIndex].selected
     setRequestList([...requestList])
     localStorage.setItem(
@@ -53,7 +119,8 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
     if (!data) {
       return
     }
-    const selectedRequests = JSON.parse(localStorage.getItem('disbursement-selected'))
+    const selected = localStorage.getItem('disbursement-selected')
+    const selectedRequests = selected ? JSON.parse(selected) : []
 
     const initialRequestList = data.map(request => ({ ...request, selected: selectedRequests.includes(request.publicId) }))
     setRequestList(initialRequestList)
@@ -63,7 +130,7 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
     setData(initialData)
   }, [initialData])
 
-  const handleHeaderCheckboxToggle = e => {
+  const handleHeaderCheckboxToggle = (e: any) => {
     const nextSelectAll = e.target.checked
     setRequestList(requestList.map(request => ({ ...request, selected: !!nextSelectAll })))
   }
@@ -72,15 +139,16 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
     setRequestList(requestList.map(request => ({ ...request, selected: false })))
   }
 
-  const onSinglePayClick = data => {
-    handlePayment([data])
+  const onSinglePayClick = (data: DisbursementRequest) => {
+    setPaymentModalTransactions([data])
+    router.push('#payment')
   }
 
   const onMetamaskBatchPayClick = () => {
     handlePayment(requestList.filter(request => request.selected))
   }
 
-  const onSingleRejectClick = data => {
+  const onSingleRejectClick = (data: DisbursementRequest) => {
     setRejectModalTransactions([data.publicId])
     setOpenRejectModal(true)
   }
@@ -95,16 +163,16 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
     setOpenNotifyModal(true)
   }
 
-  const handlePayment = requestListData => {
+  const handlePayment = (requestListData: DisbursementRequest[]) => {
     localStorage.setItem('disbursement', JSON.stringify(requestListData))
     setPaymentModalTransactions(requestListData)
     router.push('#payment')
   }
 
-  const handleDownloadCSV = async values => {
+  const handleDownloadCSV = async (values: { pageSelected: string; columns: any }) => {
     const { pageSelected, columns } = values
     try {
-      const { data } = await api.get(`/disbursement`, {
+      const { data } = (await api.get(`/disbursement`, {
         params: {
           ...router.query,
           status,
@@ -113,7 +181,7 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
           sort,
           order,
         },
-      })
+      })) as DisbursementResult
 
       const headerFile = []
       columns.number && headerFile.push('No')
@@ -265,16 +333,18 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
   )
 }
 
-Disbursement.getLayout = function getLayout(page) {
+Disbursement.getLayout = function getLayout(page: ReactElement) {
   return <Layout title="Disbursement">{page}</Layout>
 }
 
 export const getServerSideProps = withControllerSSR(async ({ query }) => {
-  const pageSize = checkItemsPerPage(query.itemsPerPage) ? parseInt(query.itemsPerPage) : 100
-  const page = parseInt(query.page) || 1
+  const pageSize = getItemsPerPage(query.itemsPerPage)
+  const page = query.page && typeof query.page === 'string' ? parseInt(query.page) : 1
+
   const status = query.status || APPROVED_STATUS
-  const networks = query.network?.length ? query.network.split(',') : []
-  const programId = query.programId?.length ? query.programId.split(',') : []
+  const networks = query.network?.length ? (query.network as string).split(',') : []
+
+  const programId = query.programId?.length ? (query.programId as string).split(',').map(Number) : []
   const requestNumber = query.number
   const wallet = query.wallet
   const team = query.team?.toString().split(',')
@@ -291,28 +361,28 @@ export const getServerSideProps = withControllerSSR(async ({ query }) => {
   const {
     data: { requests, total },
     error,
-  } = await getAll({
-    status,
+  } = (await getAll({
+    status: status as string | undefined,
     networks,
     programId,
-    requestNumber,
+    requestNumber: requestNumber as string,
     team,
     from: fromDate,
     to: toDate,
-    wallet,
+    wallet: wallet as string,
     size: pageSize,
-    sort: query?.sort,
-    order: query?.order,
+    sort: query?.sort as 'number' | 'program' | 'create_date',
+    order: query?.order as 'asc' | 'desc',
     page,
-  })
-
-  const { data: programs } = await findAllPrograms({ archived: false })
+  })) as any
 
   if (error && error.status !== 400) {
     return {
       notFound: true,
     }
   }
+
+  const { data: programs } = await findAllPrograms({ archived: false })
 
   return {
     props: {

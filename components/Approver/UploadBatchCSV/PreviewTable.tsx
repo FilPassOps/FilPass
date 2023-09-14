@@ -4,7 +4,32 @@ import { LoadingIndicator } from 'components/shared/LoadingIndicator'
 import { Cell, Header, Table, TableBody, TableHead } from 'components/shared/Table'
 import Currency from 'components/shared/Table/Currency'
 
-export const PreviewTable = ({ data, program }) => {
+interface PreviewTableProps {
+  data: {
+    Email: string
+    Custodian: string
+    Name: string
+    Amount: string
+    'Vesting Start Epoch'?: string
+    'Vesting Months'?: string
+    'Wallet Address'?: string
+    'Should Receiver Review'?: string
+    Addresses?: string
+    VestingStartEpoch?: string
+    VestingMonths?: string
+  }[]
+  program?: {
+    name: string
+    programCurrency: {
+      type: string
+      currency: {
+        name: string
+      }
+    }[]
+  }
+}
+
+export const PreviewTable = ({ data, program }: PreviewTableProps) => {
   const { filecoin } = useCurrency()
   const request_unit = program?.programCurrency.find(p => p.type === 'REQUEST')?.currency?.name
   const payment_unit = program?.programCurrency.find(p => p.type === 'PAYMENT')?.currency?.name
@@ -71,7 +96,8 @@ export const PreviewTable = ({ data, program }) => {
   )
 }
 
-function middleEllipsis(str) {
+function middleEllipsis(str: string | undefined) {
+  if (!str) return str
   if (str?.length > 13) {
     return str.substr(0, 6) + '...' + str.substr(str.length - 6, str.length)
   }

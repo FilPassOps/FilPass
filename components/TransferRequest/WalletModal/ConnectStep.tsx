@@ -11,7 +11,7 @@ import errorsMessages from 'wordings-and-errors/errors-messages'
 interface ConnectStepProps {
   onBackClick: () => void
   onNextStepClick: (data: any) => void
-  connectionMethod: string
+  connectionMethod?: string
   wallet: string
   blockchainName: string
 }
