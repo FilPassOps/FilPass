@@ -37,7 +37,7 @@ interface Request {
     }
   }
   team: string
-  amount: number
+  amount: string
   status: string
   createdAt: string
   updatedAt: string
@@ -51,7 +51,7 @@ interface Request {
   selected: boolean
   transfers: {
     status: string
-    amount: number
+    amount: string
     txHash: string
     amountCurrencyUnit: {
       name: string
@@ -62,7 +62,7 @@ interface Request {
 interface TransferListProps {
   requests?: Request[]
   onSinglePayClick: (request: any) => void
-  onHeaderToggle: () => void
+  onHeaderToggle: (e: any) => void
   onRequestChecked: (requestIndex: number) => void
   onSingleRejectClick: (request: any) => void
   shouldShowHeaderCheckbox?: boolean
@@ -81,7 +81,7 @@ interface CryptoAmountInfoProps {
   }
   request: Request
   paidTransfer?: {
-    amount: number
+    amount: string
     amountCurrencyUnit: {
       name: string
     }
@@ -308,7 +308,7 @@ const CryptoAmountInfo = ({ filecoin, request, requestUnit, paymentUnit, paidTra
   }
 
   if (requestUnit.currency.name === USD) {
-    return `${formatCrypto(new Big(request.amount / filecoin?.rate).toFixed(2))} ${paymentUnit.currency.name}`
+    return `${formatCrypto(new Big(Number(request.amount) / filecoin?.rate).toFixed(2))} ${paymentUnit.currency.name}`
   }
 
   if (requestUnit.currency.name !== USD) {

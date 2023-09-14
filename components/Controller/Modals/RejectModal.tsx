@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form'
 
 interface RejectModalProps {
-  data: string
+  data: string[]
   open: boolean
   onModalClosed: () => void
 }

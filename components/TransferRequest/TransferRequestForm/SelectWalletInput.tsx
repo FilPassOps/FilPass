@@ -9,9 +9,41 @@ import { useMemo, useState } from 'react'
 import { Controller } from 'react-hook-form'
 import { DeleteWalletAddressModal } from './DeleteWalletAddressModal'
 
-export const SelectWalletInput = ({ control, errors, submitErrors, data, onCreateWalletClick, blockchainIdFilter, disabled }) => {
+interface SelectWalletInputProps {
+  control: any
+  errors: any
+  submitErrors: any
+  data: {
+    wallet_id: string
+    wallet_name: string
+    wallet_address: string
+  }
+  onCreateWalletClick: () => void
+  blockchainIdFilter: number
+  disabled?: boolean
+}
+
+interface Wallet {
+  id: number
+  name?: string | null
+  address: string
+  blockchain: {
+    id: number
+    name: string
+  }
+}
+
+export const SelectWalletInput = ({
+  control,
+  errors,
+  submitErrors,
+  data,
+  onCreateWalletClick,
+  blockchainIdFilter,
+  disabled,
+}: SelectWalletInputProps) => {
   const { user } = useAuth()
-  const [walletData, setWalletData] = useState()
+  const [walletData, setWalletData] = useState<Wallet>()
   const [openDeleteWalletAddressModal, setOpenDeleteWalletAddressModal] = useState(false)
 
   const defaultTransferWallet = useMemo(() => {
@@ -41,7 +73,7 @@ export const SelectWalletInput = ({ control, errors, submitErrors, data, onCreat
                 <div className="flex gap-1 items-center">
                   <WalletAddress
                     address={wallet.address}
-                    isVerified={wallet.verification}
+                    isVerified={wallet.verification?.isVerified}
                     label={wallet?.name}
                     blockchain={wallet.blockchain.name}
                     walletSize="short"
@@ -49,7 +81,7 @@ export const SelectWalletInput = ({ control, errors, submitErrors, data, onCreat
                   />
                   <WalletAddress
                     address={wallet.address}
-                    isVerified={wallet.verification}
+                    isVerified={wallet.verification?.isVerified}
                     label={wallet?.name}
                     blockchain={wallet.blockchain.name}
                     walletSize="full"
@@ -72,12 +104,13 @@ export const SelectWalletInput = ({ control, errors, submitErrors, data, onCreat
             </span>
           ),
         }
-      })
+      }) as any
 
+      // TODO: the label should be just an string as above is a JSX Element?
     if (defaultTransferWallet && !user.wallets.some(wallet => wallet.address === defaultTransferWallet.address)) {
       userWalletOptions.unshift({
         label: defaultTransferWallet.name || defaultTransferWallet.address,
-        value: defaultTransferWallet.id,
+        value: Number(defaultTransferWallet.id),
       })
     }
 

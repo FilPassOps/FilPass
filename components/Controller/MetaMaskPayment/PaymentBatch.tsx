@@ -9,7 +9,7 @@ import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
 import { ForwardNonBLS, contractInterface, useContract } from 'components/web3/useContract'
 import { USD } from 'domain/currency/constants'
 import { formatCrypto, formatCurrency } from 'lib/currency'
-import { getDelegatedAddress } from 'lib/getDelegatedAddress'
+import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { useState } from 'react'
 import { SUPPORT_EMAIL, getChainByName } from 'system.config'
 import { Table, TableDiv, TableHeader } from './Table'
@@ -27,7 +27,7 @@ interface TransferRequest {
   publicId: string
   amount: string
   wallet: { address: string; blockchain: Blockchain; verificationId?: string }
-  program: { programCurrency: ProgramCurrency[]; blockchain: { name: string } }
+  program: { programCurrency: ProgramCurrency[]; blockchain: Blockchain }
   transfers: { txHash: string; status: TransferStatus; amount: string; isActive: boolean; amountCurrencyUnit: { name: string } }[]
   isHexMatch?: boolean
 }
@@ -84,7 +84,7 @@ const PaymentBatch = ({
   }
 
   const validateParseData = (parsedData: ParsedData, blockchainName: string) => {
-    const isValidFunctionCall = contractInterface.getFunction('forwardAny').name
+    const isValidFunctionCall = contractInterface.getFunction('forward').name
 
     const parsedDataArray = parsedData.addresses.reduce((acc, address, index) => {
       return [...acc, { address, amount: parsedData.amount[index] }]
@@ -94,7 +94,7 @@ const PaymentBatch = ({
       const is0xFilecoinAddress = tranferRequest.wallet.address.startsWith('0x') && blockchainName === 'Filecoin'
 
       const finalAddress = is0xFilecoinAddress
-        ? getDelegatedAddress(tranferRequest.wallet.address)?.fullAddress
+        ? getDelegatedAddress(tranferRequest.wallet.address, WalletSize.FULL, blockchainName)?.fullAddress
         : tranferRequest.wallet.address
 
       const foundIndex = parsedDataArray.findIndex(item => {
@@ -198,7 +198,7 @@ const PaymentBatch = ({
                     <WalletAddress address={wallet.address} blockchain={wallet.blockchain.name} isVerified={!!wallet.verificationId} />
                   </TableDiv>
                   <TableDiv>
-                    <Currency amount={Number(amount)} requestCurrency={requestUnit.currency.name} paymentUnit={paymentUnit.currency.name} />
+                    <Currency amount={amount} requestCurrency={requestUnit.currency.name} paymentUnit={paymentUnit.currency.name} />
                   </TableDiv>
                   <TableDiv>
                     <div className="w-40">

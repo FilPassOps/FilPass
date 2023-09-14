@@ -1,8 +1,7 @@
 import { useAuth } from 'components/Authentication/Provider'
 import { Button } from 'components/shared/Button'
 import { Modal } from 'components/shared/Modal'
-import { FilecoinApiResult } from 'domain/utils/sendFILWithMaster'
-import { api } from 'lib/api'
+import { BaseApiResult, api } from 'lib/api'
 import { useState } from 'react'
 
 interface DeleteWalletAddressModalProps {
@@ -27,7 +26,7 @@ export const DeleteWalletAddressModal = ({ openModal, onModalClosed, wallet }: D
       setLoading(false)
       return
     }
-    const { error } = await api.delete(`/wallets/${wallet.id}`) as FilecoinApiResult
+    const { error } = await api.delete(`/wallets/${wallet.id}`) as BaseApiResult
     setLoading(false)
 
     if (error) {

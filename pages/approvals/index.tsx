@@ -9,7 +9,8 @@ import { CreateReportModal } from 'components/TransferRequest/shared/CreateRepor
 import { DeleteModal } from 'components/TransferRequest/shared/DeleteModal'
 import { Button, LinkButton } from 'components/shared/Button'
 import { PaginationCounter } from 'components/shared/PaginationCounter'
-import { PaginationWrapper, checkItemsPerPage } from 'components/shared/usePagination'
+import { PaginationWrapper, getItemsPerPage } from 'components/shared/usePagination'
+import { PLATFORM_NAME } from 'system.config'
 import { stringify } from 'csv-stringify/sync'
 import { getApprovalsByRole } from 'domain/approvals/service'
 import { APPROVER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
@@ -21,10 +22,51 @@ import { getEthereumAddress } from 'lib/getEthereumAddress'
 import { withRolesSSR } from 'lib/ssr'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { PLATFORM_NAME } from 'system.config'
+import { ReactElement, useEffect, useState } from 'react'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import Head from 'next/head'
+
+interface ApprovalsProps {
+  initialData: any[]
+  totalItems: number
+  programs: any[]
+  pageSize: number
+  page: number
+  shouldShowHeaderCheckbox: boolean
+  currentStatus: string
+  isViewer: boolean
+  isApprover: boolean
+}
+
+interface Transfer {
+  id: number
+  program_name: string
+  team: string
+  wallet_address: string
+  delegated_address: string
+  amount: number
+  request_unit: string
+  transfer_amount: number
+  transfer_amount_currency_unit: string
+  create_date: string
+  status: string
+  is_us_resident: boolean
+  transfer_hash: string
+}
+
+interface Request {
+  id: string
+  amount: number
+  request_unit: string
+  payment_unit: string
+  status: string
+  transfer_amount: number
+  transfer_amount_currency_unit: string
+  transfer_hash: string
+  delegated_address: string
+  wallet_address: string
+  selected: boolean
+}
 
 export default function Approvals({
   initialData = [],
@@ -36,22 +78,22 @@ export default function Approvals({
   currentStatus,
   isViewer,
   isApprover,
-}) {
+}: ApprovalsProps) {
   const router = useRouter()
 
-  const [requestList, setRequestList] = useState([])
+  const [requestList, setRequestList] = useState<Request[]>([])
   const [approveModalOpen, setApproveModalOpen] = useState(false)
   const [rejectModalOpen, setRejectModalOpen] = useState(false)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [createReportModal, setCreateReportModal] = useState(false)
   const [data, setData] = useState(initialData)
 
-  const handleHeaderCheckboxToggle = e => {
+  const handleHeaderCheckboxToggle = (e: any) => {
     const nextSelectAll = e.target.checked
     setRequestList(requestList.map(request => ({ ...request, selected: !!nextSelectAll })))
   }
 
-  const handleRequestChecked = requestIndex => {
+  const handleRequestChecked = (requestIndex: number) => {
     requestList[requestIndex].selected = !requestList[requestIndex].selected
     setRequestList([...requestList])
   }
@@ -70,19 +112,19 @@ export default function Approvals({
   const hasOnlySubmittedByApprover =
     selectedRequests.length > 0 && selectedRequests.every(request => request.status === SUBMITTED_BY_APPROVER_STATUS)
 
-  const handleDownloadCSV = async values => {
+  const handleDownloadCSV = async (values: { pageSelected: string; columns: any }) => {
     const { pageSelected, columns } = values
     try {
       const {
         data: { transfers },
-      } = await api.get(`/approvals`, {
+      } = (await api.get(`/approvals`, {
         params: {
           ...router.query,
           status: currentStatus,
           size: pageSelected === 'SINGLE_PAGE' ? pageSize : totalItems,
           page: pageSelected === 'SINGLE_PAGE' ? page : 1,
         },
-      })
+      })) as { data: { transfers: Transfer[] } }
 
       const headerFile = []
       columns.number && headerFile.push('No')
@@ -241,7 +283,6 @@ export default function Approvals({
 
       {deleteModalOpen && (
         <DeleteModal
-          status={currentStatus}
           onModalClosed={() => setDeleteModalOpen(false)}
           open={deleteModalOpen}
           data={selectedRequests}
@@ -289,13 +330,13 @@ export const BatchActionsButton = () => {
   )
 }
 
-Approvals.getLayout = function getLayout(page) {
+Approvals.getLayout = function getLayout(page: ReactElement) {
   return <Layout title="My Approvals">{page}</Layout>
 }
 
 export const getServerSideProps = withRolesSSR([APPROVER_ROLE, VIEWER_ROLE], async ({ user: { id, roles }, query }) => {
-  const pageSize = checkItemsPerPage(query.itemsPerPage) ? parseInt(query.itemsPerPage) : 100
-  const page = parseInt(query.page) || 1
+  const pageSize = getItemsPerPage(query.itemsPerPage)
+  const page = query.page && typeof query.page === 'string' ? parseInt(query.page) : 1
   const programId = query.programId || null
   const requestNumber = query.number
   const team = query.team?.toString().split(',')
@@ -315,24 +356,24 @@ export const getServerSideProps = withRolesSSR([APPROVER_ROLE, VIEWER_ROLE], asy
     toDate.setHours(23, 59, 59, 999)
   }
 
-  const ethereumWallet = getEthereumAddress(wallet)?.fullAddress.toLowerCase()
-  const delegatedAddress = getDelegatedAddress(wallet)?.fullAddress
+  const ethereumWallet = getEthereumAddress(wallet as string)?.fullAddress.toLowerCase()
+  const delegatedAddress = getDelegatedAddress(wallet as string)?.fullAddress
 
   const wallets = [wallet, ethereumWallet, delegatedAddress].filter(Boolean)
 
   const { transfers, totalItems, error, shouldShowHeaderCheckbox, currentStatus, programs } = await getApprovalsByRole({
     roles,
     userId: id,
-    status,
-    programId,
-    requestNumber,
+    status: status as string | undefined,
+    programId: programId as string | undefined,
+    requestNumber: requestNumber as string | undefined,
     team,
     from: fromDate,
     to: toDate,
-    wallets,
+    wallets: wallets as string[],
     size: pageSize,
-    sort: query?.sort,
-    order: query?.order,
+    sort: query?.sort as 'number' | 'program' | 'create_date',
+    order: query?.order as 'asc' | 'desc',
     page,
   })
 

@@ -1,7 +1,8 @@
 import { DocumentPlusIcon } from '@heroicons/react/24/outline'
+import { Blockchain } from '@prisma/client'
 import { useCurrency } from 'components/Currency/Provider'
-import { BlockExplorerLink } from 'components/shared/BlockExplorerLink'
 import { LinkButton } from 'components/shared/Button'
+import { Filfox } from 'components/shared/Filfox'
 import { LoadingIndicator } from 'components/shared/LoadingIndicator'
 import Sortable from 'components/shared/Sortable'
 import { StatusPill } from 'components/shared/Status'
@@ -12,8 +13,44 @@ import { WalletAddress } from 'components/shared/WalletAddress'
 import { DRAFT_STATUS } from 'domain/transferRequest/constants'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
+import { getChainByName } from 'system.config'
 
-const TransferList = ({ data = [] }) => {
+interface Request {
+  id: string
+  amount: string
+  request_unit: string
+  payment_unit: string
+  status: string
+  transfer_amount: number
+  transfer_amount_currency_unit: string
+  transfer_hash: string
+  delegated_address: string
+  wallet_address: string
+  user_wallet_address: string
+  user_wallet_blockchain: Blockchain
+  user_wallet_is_verified: boolean
+  applyer: string
+  receiver: string
+  program_name: string
+  team: string
+  create_date: string
+  vesting_start_epoch: number
+  vesting_months: number
+  notes: string
+  program_blockchain: string
+}
+
+interface TransferListProps {
+  data?: Request[]
+}
+
+interface MemoProps {
+  notes: string
+  transfer_hash: string
+  program_blockchain: string
+}
+
+const TransferList = ({ data = [] }: TransferListProps) => {
   const router = useRouter()
   const { filecoin } = useCurrency()
 
@@ -67,7 +104,7 @@ const TransferList = ({ data = [] }) => {
                   {request.user_wallet_address && (
                     <WalletAddress
                       address={request.user_wallet_address}
-                      blockchain={request.user_wallet_blockchain}
+                      blockchain={request.user_wallet_blockchain.name}
                       isVerified={!!request.user_wallet_is_verified}
                     />
                   )}
@@ -89,7 +126,7 @@ const TransferList = ({ data = [] }) => {
                 <LinkedCell href={href}>{request.vesting_start_epoch || '-'}</LinkedCell>
                 <LinkedCell href={href}>{request.vesting_months || '-'}</LinkedCell>
                 <Cell>
-                  <Memo notes={request.notes} transfer_hash={request.transfer_hash} />
+                  <Memo notes={request.notes} transfer_hash={request.transfer_hash} program_blockchain={request.program_blockchain} />
                 </Cell>
               </tr>
             )
@@ -115,11 +152,13 @@ const TransferList = ({ data = [] }) => {
 
 export default TransferList
 
-const Memo = ({ notes, transfer_hash }) => {
+const Memo = ({ notes, transfer_hash, program_blockchain }: MemoProps) => {
+  const { blockExplorer } = getChainByName(program_blockchain)
+
   return (
     <>
       {notes && <p className="break-all whitespace-normal 2xl:truncate w-0 min-w-full">{notes}</p>}
-      {transfer_hash && <BlockExplorerLink transfer_hash={transfer_hash} />}
+      {transfer_hash && <Filfox blockExplorerName={blockExplorer.name} blockExplorerUrl={blockExplorer.url} transactionHash={transfer_hash} />}
     </>
   )
 }

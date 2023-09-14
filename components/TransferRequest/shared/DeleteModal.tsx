@@ -1,13 +1,12 @@
 import { Button } from 'components/shared/Button'
 import { Modal } from 'components/shared/Modal'
 import { DRAFT_STATUS, SUBMITTED_BY_APPROVER_STATUS } from 'domain/transferRequest/constants'
-import { api } from 'lib/api'
+import { BaseApiResult, api } from 'lib/api'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import Link from 'next/link'
 import qs from 'qs'
 import { ParamsSerializerOptions } from 'axios'
-import { FilecoinApiResult } from 'domain/utils/sendFILWithMaster'
 
 interface DeleteModalProps {
   onModalClosed: () => void
@@ -48,7 +47,7 @@ export const DeleteModal = ({ onModalClosed, open, data, redirectTo }: DeleteMod
           requests: requests.join(','),
         },
         paramsSerializer: qs.stringify as ParamsSerializerOptions,
-      })) as FilecoinApiResult
+      })) as BaseApiResult
       setIsLoading(false)
 
       if (error) {

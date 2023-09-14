@@ -1,4 +1,4 @@
-import { Role, UserRole } from '@prisma/client'
+import { Role } from '@prisma/client'
 import { APPROVER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
 import { findUserRolePrograms } from 'domain/programs/findAll'
 import { PAID_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
@@ -9,11 +9,11 @@ import { getViewerTransferRequests } from 'domain/transferRequest/getViewerTrans
 import { generateTeamHash } from 'lib/password'
 import prisma from 'lib/prisma'
 
+export type GetApproverSort = 'number' | 'program' | 'create_date' | 'status'
+export type GetApproverOrder = 'asc' | 'desc'
+
 interface GetApprovalsByRoleParams {
-  roles: {
-    role: Role
-    id: number
-  }[]
+  roles: { id: number; role: Role }[]
   userId: number
   status?: string
   programId?: string
@@ -31,7 +31,7 @@ interface GetApprovalsByRoleParams {
 interface GetApprovalDetailsByRoleParams {
   transferRequestId: string
   userId: number
-  roles: UserRole[]
+  roles: { id: number; role: Role }[]
 }
 
 export const getApprovalDetailsByRole = async ({ transferRequestId, userId, roles }: GetApprovalDetailsByRoleParams) => {

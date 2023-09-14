@@ -2,11 +2,10 @@ import { DocumentMagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outl
 import { DocumentTextIcon } from '@heroicons/react/24/solid'
 import { Button } from 'components/shared/Button'
 import { UploadFileButton } from 'components/shared/FormInput'
-import { api } from 'lib/api'
+import { BaseApiResult, api } from 'lib/api'
 import { useEffect, useState } from 'react'
 import { useDownloadFile } from '../shared/useDownloadFile'
 import { DeleteFileModal } from './DeleteFileModal'
-import { FilecoinApiResult } from 'domain/utils/sendFILWithMaster'
 
 interface AttachmentInputProps {
   userAttachmentId?: string
@@ -47,10 +46,10 @@ export const AttachmentInput = ({
 
   const apiCall = async (form: FormData) => {
     if (uploadingForOthers) {
-      return (await api.postForm('/files/temporary', form)) as FilecoinApiResult
+      return (await api.postForm('/files/temporary', form)) as BaseApiResult
     }
 
-    return (await api.postForm('/files', form)) as FilecoinApiResult
+    return (await api.postForm('/files', form)) as BaseApiResult
   }
 
   const handleFileUpload = async (file: any) => {

@@ -1,11 +1,12 @@
-import { TransferRequestView } from 'components/Controller/TransferRequestView'
+import { TransferRequestView, TransferRequestViewProps } from 'components/Controller/TransferRequestView'
 import { Layout } from 'components/Layout'
 import { PLATFORM_NAME } from 'system.config'
 import { getTransferRequestById } from 'domain/transferRequest/getTransferRequestById'
 import { withControllerSSR } from 'lib/ssr'
 import Head from 'next/head'
+import { ReactElement } from 'react'
 
-export default function ControllerView({ data }) {
+export default function ControllerView({ data }: TransferRequestViewProps) {
   return (
     <>
       <Head>
@@ -18,7 +19,7 @@ export default function ControllerView({ data }) {
   )
 }
 
-ControllerView.getLayout = function getLayout(page) {
+ControllerView.getLayout = function getLayout(page: ReactElement) {
   const data = page.props.data
   const hasApprovalBar = data?.approversGroup?.length > 1
   return (
@@ -30,8 +31,7 @@ ControllerView.getLayout = function getLayout(page) {
 
 export const getServerSideProps = withControllerSSR(async ({ user, query }) => {
   const { data, error } = await getTransferRequestById({
-    transferRequestId: query.id,
-    userId: user.id,
+    transferRequestId: query.id as string,
   })
 
   if (error) {

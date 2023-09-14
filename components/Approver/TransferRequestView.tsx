@@ -17,24 +17,7 @@ import { ApproveModal } from './Modals/ApproveModal'
 import { RejectModal } from './Modals/RejectModal'
 import { RequireChangeModal } from './Modals/RequireChangeModal'
 import { WithdrawModal } from './Modals/WithdrawModal'
-
-interface TransferRequestViewProps {
-  data: {
-    id: string
-    status: string
-    history: {
-      field: string
-      old_value: string
-    }[]
-    approversGroup: {
-      approved: boolean
-      members: {
-        userRoleId: number
-      }[]
-    }[]
-    applyer_id: number
-  }
-}
+import { TransferRequestViewProps } from 'components/Controller/TransferRequestView'
 
 export const TransferRequestView = ({ data }: TransferRequestViewProps) => {
   const { user } = useAuth()

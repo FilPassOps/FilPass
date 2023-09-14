@@ -1,20 +1,10 @@
 import { Layout } from 'components/Layout'
-import { TransferDetails } from 'components/User/TransferDetails'
+import { TransferDetails, TransferRequestDetailsProps } from 'components/User/TransferDetails'
 import { PLATFORM_NAME } from 'system.config'
 import { getUserTransferRequestById } from 'domain/transferRequest/getUserTransferRequestById'
 import { withUserSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { ReactElement } from 'react'
-
-interface TransferRequestDetailsProps {
-  data: {
-    id: number
-    isVoidable: boolean
-    isEditable: boolean
-    applyer_id: number
-    status: string
-  }
-}
 
 export default function TransferRequestDetails({ data }: TransferRequestDetailsProps) {
   return (

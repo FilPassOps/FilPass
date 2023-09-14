@@ -11,6 +11,15 @@ export interface AxiosResponseWithError<T = any, D = any> extends AxiosResponse<
   error?: Error
 }
 
+export interface BaseApiResult {
+  data?: any
+  error?: {
+    message?: string
+    status?: number
+    errors?: any
+  }
+}
+
 export interface Api extends AxiosInstance {
   post<T = any, R = AxiosResponseWithError<T>, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<R>
   patch<T = any, R = AxiosResponseWithError<T>, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<R>
@@ -51,5 +60,5 @@ api.interceptors.response.use(
       }
     }
     return Promise.resolve({ error: err })
-  }
+  },
 )

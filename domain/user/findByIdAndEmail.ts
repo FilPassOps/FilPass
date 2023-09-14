@@ -69,7 +69,22 @@ const select = {
   },
 }
 
-export type UserResult = Prisma.UserGetPayload<{ select: typeof select }>
+export type UserResult = Prisma.UserGetPayload<{ select: typeof select }> & {
+  approverPrograms: {
+    id: number
+    name: string
+    blockchain: {
+      id: number
+      name: string
+    }
+    programCurrency: {
+      type: string
+      currency: {
+        name: string
+      }
+    }[]
+  }[]
+}
 
 export async function findUserByIdAndEmail(params: GetUserByIdAndEmailParams) {
   const { fields, errors } = await validate(getUserByIdAndEmailValidator, params)
