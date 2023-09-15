@@ -1,4 +1,5 @@
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline'
+import { Blockchain, TransferStatus } from '@prisma/client'
 import config from 'chains.config'
 import MetamaskPayment from 'components/Controller/MetaMaskPayment'
 import NotifyCorfimationModal from 'components/Controller/Modals/NotifyConfirmationModal'
@@ -6,6 +7,7 @@ import RejectModal from 'components/Controller/Modals/RejectModal'
 import TransferList from 'components/Controller/TransferList'
 import { Filters } from 'components/Filters/Filters'
 import { Layout } from 'components/Layout'
+import { useAlertDispatcher } from 'components/Layout/Alerts'
 import { Button } from 'components/shared/Button'
 import { PaginationCounter } from 'components/shared/PaginationCounter'
 import { getItemsPerPage, PaginationWrapper } from 'components/shared/usePagination'
@@ -20,12 +22,11 @@ import { api } from 'lib/api'
 import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { withControllerSSR } from 'lib/ssr'
 import { DateTime } from 'luxon'
+import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
 import { getChainByName, PLATFORM_NAME } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
-import Head from 'next/head'
-import { Blockchain, TransferStatus } from '@prisma/client'
 
 interface DisbursementProps {
   initialData: any[]
@@ -106,6 +107,11 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
   const [createReportModal, setCreateReportModal] = useState(false)
   const [data, setData] = useState(initialData)
 
+  const { dispatch } = useAlertDispatcher()
+
+  const selectedRequests = requestList.filter(request => request.selected)
+  const isNotPaidStatus = status !== PAID_STATUS
+
   const handleRequestChecked = (requestIndex: number) => {
     requestList[requestIndex].selected = !requestList[requestIndex].selected
     setRequestList([...requestList])
@@ -145,6 +151,23 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
   }
 
   const onMetamaskBatchPayClick = () => {
+    const hasDifferentChains = selectedRequests.some(
+      request => request.program.blockchain.name !== selectedRequests[0].program.blockchain.name,
+    )
+    if (hasDifferentChains) {
+      dispatch({
+        type: 'warning',
+        title: 'Transfer requests on multiple chains selected',
+        body: () => (
+          <p>{`You cannot pay requests on different blockchains at the same time. Select 'Filters' to display only requests of one blockchain.`}</p>
+        ),
+        config: {
+          closeable: true,
+        },
+      })
+      return
+    }
+
     handlePayment(requestList.filter(request => request.selected))
   }
 
@@ -235,10 +258,6 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
       setCreateReportModal(false)
     }
   }
-
-  const selectedRequests = requestList.filter(request => request.selected)
-
-  const isNotPaidStatus = status !== PAID_STATUS
 
   return (
     <>
