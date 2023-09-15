@@ -2,8 +2,8 @@ import { Blockchain } from '@prisma/client'
 import Big from 'big.js'
 import { useCurrency } from 'components/Currency/Provider'
 import { BellCheckbox } from 'components/shared/BellCheckbox'
+import { BlockExplorerLink } from 'components/shared/BlockExplorerLink'
 import { Button } from 'components/shared/Button'
-import { Filfox } from 'components/shared/Filfox'
 import { LoadingIndicator } from 'components/shared/LoadingIndicator'
 import Sortable from 'components/shared/Sortable'
 import { StatusPill } from 'components/shared/Status'
@@ -271,7 +271,7 @@ const TransferList = ({
                       </div>
                     )}
                     {request.status === PAID_STATUS && paidTransfer?.txHash && (
-                      <Filfox
+                      <BlockExplorerLink
                         blockExplorerName={blockExplorer.name}
                         blockExplorerUrl={blockExplorer.url}
                         transactionHash={paidTransfer?.txHash}

@@ -1,6 +1,6 @@
 import Big from 'big.js'
 import { useCurrency } from 'components/Currency/Provider'
-import { Filfox } from 'components/shared/Filfox'
+import { BlockExplorerLink } from 'components/shared/BlockExplorerLink'
 import { LoadingIndicator } from 'components/shared/LoadingIndicator'
 import Sortable from 'components/shared/Sortable'
 import { StatusPill } from 'components/shared/Status'
@@ -162,7 +162,7 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
                 </LinkedCell>
                 <Cell>
                   {request.status === PAID_STATUS && request.transfer_hash && (
-                    <Filfox
+                    <BlockExplorerLink
                       blockExplorerName={blockExplorer.name}
                       blockExplorerUrl={blockExplorer.url}
                       transactionHash={request.transfer_hash}
