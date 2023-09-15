@@ -48,15 +48,6 @@ Create hash for all teams:
 
 ## Version 2.3.0
 
-### New ENV vars:
-
-
-```
-METAMASK_CONNECTION_REWARD_AMOUNT="0.2"
-METAMASK_CONNECTION_REWARD_DOMAIN="@protocol.ai"
-
-```
-
 ### Breaking changes
 
 - For Web3 development, the minimum Node version is 16.17.0

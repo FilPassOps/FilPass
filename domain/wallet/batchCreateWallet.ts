@@ -197,10 +197,7 @@ const setDefaultWallets = async (requests: Request[]) => {
 
       const defaultWallet = userWallets.find(wallet => wallet.isDefault)
 
-      const isEthereumWallet =
-        userWallets[0].address.startsWith('0x') || userWallets[0].address.startsWith('f4') || userWallets[0].address.startsWith('t4')
-
-      if (!defaultWallet && !isEthereumWallet) {
+      if (!defaultWallet) {
         await prisma.userWallet.update({
           where: {
             id: userWallets[0].id,

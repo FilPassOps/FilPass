@@ -75,12 +75,7 @@ const ListItems = ({ items, isLoading, setLoading, refresh }: ListItemsProps) =>
   return (
     <>
       {items.map((wallet, index) => {
-        const disableEthereum = wallet.address.startsWith('0x') || wallet.address.startsWith('f4') || wallet.address.startsWith('t4')
-        const hoverMessage = disableEthereum
-          ? errorsMessages.invalid_default_wallet_ethereum.message
-          : wallet.isDefault
-          ? 'The wallet is already set as default'
-          : undefined
+        const hoverMessage = wallet.isDefault ? 'The wallet is already set as default' : undefined
 
         return (
           <div key={wallet.id} className={`flex flex-col gap-1 px-3 py-4 ${index > 0 ? 'border-t border-gray-200' : ''}`}>
@@ -108,11 +103,9 @@ const ListItems = ({ items, isLoading, setLoading, refresh }: ListItemsProps) =>
                 <div className="text-sm pr-4 border-r border-gray-200">
                   <Tooltip content={hoverMessage}>
                     <button
-                      className={classNames(
-                        wallet.isDefault || disableEthereum ? 'text-gray-400 pointer-events-auto' : 'text-indigo-600 hover:underline',
-                      )}
+                      className={classNames(wallet.isDefault ? 'text-gray-400 pointer-events-auto' : 'text-indigo-600 hover:underline')}
                       onClick={() => handeSetDefault(wallet)}
-                      disabled={wallet.isDefault || isLoading || disableEthereum}
+                      disabled={wallet.isDefault || isLoading}
                     >
                       Set as default
                     </button>

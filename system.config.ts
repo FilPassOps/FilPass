@@ -5,7 +5,6 @@ export const EMAIL_DOMAIN = '@protocol.ai'
 export const EMAIL_FROM_NAME = 'Emissary Support'
 export const SUPPORT_EMAIL = 'emissary@protocol.ai'
 
-
 export const TOKEN = {
   name: 'Polygon',
   symbol: 'MATIC',
@@ -45,6 +44,7 @@ export type Chain = {
     url: string
   }
   contractAddress: string
+  iconFileName: string
 }
 
 type Config = {
@@ -75,6 +75,7 @@ const ethereum = {
   rpcUrls: ['https://ethereum-sepolia.blockpi.network/v1/rpc/public'],
   blockExplorer: { name: 'Etherscan', url: 'https://sepolia.etherscan.io/tx' },
   contractAddress: '0xA6B0F90E96Ff8E6b79D859E2067afFA190AE8dB5',
+  iconFileName: 'ethereum-icon.svg',
 } //as const
 
 const polygon = {
@@ -100,6 +101,7 @@ const polygon = {
   rpcUrls: ['https://rpc-mumbai.maticvigil.com'],
   blockExplorer: { name: 'Polygonscan', url: 'https://mumbai.polygonscan.com/tx' },
   contractAddress: '0xb63704b534583Eca727d78dde6cCe438171846dc',
+  iconFileName: 'polygon-icon.svg',
 } //as const
 
 const filecoin = {
@@ -125,6 +127,7 @@ const filecoin = {
   rpcUrls: ['https://api.calibration.node.glif.io'],
   blockExplorer: { name: 'Filfox', url: 'https://calibration.filfox.info/en/message' },
   contractAddress: '0xbEF649DB6b4e1b2Ac044492433Bccca4287BE90F',
+  iconFileName: 'filecoin-icon.svg',
 } //as const
 
 export const CONFIG: Config = { fiatPaymentUnit: 'USD', chains: [ethereum, polygon, filecoin] }

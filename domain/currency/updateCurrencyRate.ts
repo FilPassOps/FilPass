@@ -18,10 +18,14 @@ export async function updateCurrencyRate(params: UpdateCurrencyRateParams) {
     }
   }
 
-  const { rate, name } = fields
+  const { rate, chainId } = fields
+
+  const blockchain = await prisma.blockchain.findUnique({
+    where: { chainId },
+  })
 
   const updatedRate = await prisma.currency.updateMany({
-    where: { name, isActive: true },
+    where: { id: blockchain?.currencyId, isActive: true },
     data: {
       rate: rate.toString().match(/^-?\d+(?:\.\d{0,2})?/)?.[0] || '0',
     },

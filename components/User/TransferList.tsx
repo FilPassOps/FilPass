@@ -1,5 +1,4 @@
 import { DocumentPlusIcon } from '@heroicons/react/24/outline'
-import { Blockchain } from '@prisma/client'
 import { useCurrency } from 'components/Currency/Provider'
 import { BlockExplorerLink } from 'components/shared/BlockExplorerLink'
 import { LinkButton } from 'components/shared/Button'
@@ -27,7 +26,7 @@ interface Request {
   delegated_address: string
   wallet_address: string
   user_wallet_address: string
-  user_wallet_blockchain: Blockchain
+  user_wallet_blockchain: string
   user_wallet_is_verified: boolean
   applyer: string
   receiver: string
@@ -37,7 +36,6 @@ interface Request {
   vesting_start_epoch: number
   vesting_months: number
   notes: string
-  program_blockchain: string
 }
 
 interface TransferListProps {
@@ -47,7 +45,7 @@ interface TransferListProps {
 interface MemoProps {
   notes: string
   transfer_hash: string
-  program_blockchain: string
+  blockchain: string
 }
 
 const TransferList = ({ data = [] }: TransferListProps) => {
@@ -104,7 +102,7 @@ const TransferList = ({ data = [] }: TransferListProps) => {
                   {request.user_wallet_address && (
                     <WalletAddress
                       address={request.user_wallet_address}
-                      blockchain={request.user_wallet_blockchain.name}
+                      blockchain={request.user_wallet_blockchain}
                       isVerified={!!request.user_wallet_is_verified}
                     />
                   )}
@@ -126,7 +124,7 @@ const TransferList = ({ data = [] }: TransferListProps) => {
                 <LinkedCell href={href}>{request.vesting_start_epoch || '-'}</LinkedCell>
                 <LinkedCell href={href}>{request.vesting_months || '-'}</LinkedCell>
                 <Cell>
-                  <Memo notes={request.notes} transfer_hash={request.transfer_hash} program_blockchain={request.program_blockchain} />
+                  <Memo notes={request.notes} transfer_hash={request.transfer_hash} blockchain={request.user_wallet_blockchain} />
                 </Cell>
               </tr>
             )
@@ -152,8 +150,8 @@ const TransferList = ({ data = [] }: TransferListProps) => {
 
 export default TransferList
 
-const Memo = ({ notes, transfer_hash, program_blockchain }: MemoProps) => {
-  const { blockExplorer } = getChainByName(program_blockchain)
+const Memo = ({ notes, transfer_hash, blockchain }: MemoProps) => {
+  const { blockExplorer } = getChainByName(blockchain) || {}
 
   return (
     <>

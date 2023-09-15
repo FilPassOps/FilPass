@@ -2,7 +2,7 @@ import { classNames } from 'lib/classNames'
 import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { shortenAddress } from 'lib/shortenAddress'
 import { IsVerified } from './IsVerified'
-import { FilecoinIcon } from './icons/chains/FilecoinIcon'
+import { BlockchainIcon } from './icons/BlockchainIcon'
 
 interface WalletAddressProps {
   blockchain: string
@@ -48,7 +48,7 @@ export const WalletAddress = ({
 
   return (
     <div title={address} className={classNames('flex items-center text-sm text-gray-900', className)}>
-      {enableBlockchainIcon && <FilecoinIcon className="w-4 h-4 mr-2 shrink-0" />}
+      {enableBlockchainIcon && <BlockchainIcon blockchainName={blockchain} className="mr-2" />}
       <span className="flex flex-col justify-center items-start">
         {blockchain && <p className="text-gray-500 ui-active:text-white truncate">{blockchain}</p>}
         <p className="text-gray-500 ui-active:text-white truncate">{label}</p>

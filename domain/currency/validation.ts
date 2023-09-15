@@ -11,13 +11,13 @@ export const getCurrencyRateFromCoinMarketCapValidator = yup
 
 export const updateCurrencyRateValidator = yup
   .object({
-    name: yup.string().oneOf([TOKEN.symbol]).required(),
+    chainId: yup.string().required(),
     rate: yup.number().typeError(errorsMessages.required_field.message).positive().max(MAX_INTEGER_VALUE).required(),
   })
   .required()
 
 export const getCurrencyRateValidator = yup
   .object({
-    name: yup.string().oneOf([TOKEN.symbol]).required(),
+    chainId: yup.string().required(),
   })
   .required()
