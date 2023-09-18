@@ -4,6 +4,7 @@ import { Button, ButtonProps } from 'components/shared/Button'
 import { useRouter } from 'next/router'
 import { Dispatch, MouseEventHandler, ReactNode, SetStateAction, createContext, useContext, useEffect, useRef, useState } from 'react'
 import { getMetamaskParam } from 'system.config'
+import { twMerge } from 'tailwind-merge'
 
 interface ProviderMessage {
   type: string
@@ -199,6 +200,7 @@ export const WithMetaMaskButton: React.FC<React.PropsWithChildren<WithMetaMaskBu
     connectWalletLabel = 'Connect MetaMask',
     switchChainLabel = 'Switch network',
     targetChainId = props.targetChainId,
+    className,
     ...rest
   } = props
   const { wallet, connect, switchChain, busy, chainId: connectedChainId } = useMetaMask()
@@ -240,7 +242,7 @@ export const WithMetaMaskButton: React.FC<React.PropsWithChildren<WithMetaMaskBu
       <Button
         {...rest}
         ref={ref}
-        className="flex items-center"
+        className={twMerge('flex items-center', className)}
         loading={busy && loading}
         disabled={busy || !props.targetChainId}
         onClick={handleClick}

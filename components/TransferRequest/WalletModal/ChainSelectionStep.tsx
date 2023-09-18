@@ -32,21 +32,17 @@ export function ChainSelection({ onConnectionMethodClick }: ChainSelectionProps)
   }
 
   return (
-    <form onSubmit={handleSubmit(handleSubmitForm)}>
-      <div className="w-full h-full flex flex-col justify-center items-center sm:py-2 sm:px-11">
-        <p className="font-medium text-lg text-gray-900 text-center mb-2">Connect Wallet</p>
+    <div className="w-full h-full flex flex-col gap-4 justify-center items-center space-y-6 sm:px-11 my-6">
+      <span className='flex flex-col gap-2'>
+        <p className="font-medium text-lg text-gray-900 text-center">Connect Wallet</p>
         <p className="font-normal text-sm text-gray-500 text-center">Connect a default wallet address.</p>
-        <div className="flex flex-col w-full gap-6 mt-6">
-          <SelectNetworkInput control={control} errors={errors.chainId} label="Select Network" placeholder="Choose wallet network" />
-
-          <WithMetaMaskButton
-            type="submit"
-            className="w-full"
-            buttonStyle="flex gap-2 justify-center items-center"
-            targetChainId={chainId}
-          />
+      </span>
+      <form onSubmit={handleSubmit(handleSubmitForm)} className="flex flex-col gap-4 w-full h-full space-y-6 ">
+        <SelectNetworkInput control={control} errors={errors.chainId} label="Select Network" placeholder="Choose wallet network" />
+        <div className="flex w-full">
+          <WithMetaMaskButton type="submit" className="w-full" targetChainId={chainId} />
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   )
 }

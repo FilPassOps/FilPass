@@ -9,13 +9,13 @@ import { updateCurrencyRateValidator } from 'domain/currency/validation'
 import { api } from 'lib/api'
 import yup from 'lib/yup'
 import { DateTime } from 'luxon'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 type FormValue = yup.InferType<typeof updateCurrencyRateValidator>
 
 export const TokenPrice = () => {
-  // TODO: how to get the rate of the other chains
+  // TODO: useCurrency should have all the chains
   const { filecoin, refresh } = useCurrency()
   const [submitErrors, setSubmitErrors] = useState<string | { message: string }>()
   const [loadingRefresh, setLoadingRefresh] = useState(false)
@@ -35,11 +35,12 @@ export const TokenPrice = () => {
       chainId: undefined,
     },
   })
-  const { rate } = watch()
 
-  useEffect(() => {
-    setValue('rate', filecoin?.rate)
-  }, [filecoin?.rate, setValue])
+  const { rate, chainId } = watch()
+
+  // useEffect(() => {
+  //   setValue('rate', filecoin?.rate)
+  // }, [filecoin?.rate, setValue])
 
   const handleFormSubmit = async (values: FormValue) => {
     if (Object.keys(errors).length > 0) {
@@ -57,9 +58,10 @@ export const TokenPrice = () => {
 
   const handleRefreshClick = async () => {
     setLoadingRefresh(true)
-    const { data, error } = await api.get(`/currency/${name}/market-rate`)
+    const { data, error } = await api.get(`/currency/${chainId}/market-rate`)
     if (error) {
       setSubmitErrors(error)
+      setLoadingRefresh(false)
       return
     }
     setLoadingRefresh(false)
@@ -67,12 +69,19 @@ export const TokenPrice = () => {
   }
 
   const handleChangeNetwork = async (chainId: string) => {
+    if (!chainId) {
+      return
+    }
+    setLoadingRefresh(true)
     const { data, error } = await api.get(`/currency/${chainId}`)
     if (error) {
       setSubmitErrors(error)
+      setLoadingRefresh(false)
       return
     }
     setValue('rate', data.rate.toString())
+    setLoadingRefresh(false)
+    setSubmitErrors(undefined)
   }
 
   return (
@@ -81,7 +90,7 @@ export const TokenPrice = () => {
       <p className="mb-5 text-xs text-gray-500 whitespace-nowrap">Updated: {updatedAt}</p>
       <form onSubmit={handleSubmit(handleFormSubmit)}>
         <div className="mb-3 relative">
-          <SelectNetworkInput control={control} errors={errors?.chainId} submitErrors={null} onChange={handleChangeNetwork} />
+          <SelectNetworkInput control={control} errors={errors?.chainId} submitErrors={submitErrors} onChange={handleChangeNetwork} />
         </div>
         <div className="mb-3 relative">
           <NumberInput
