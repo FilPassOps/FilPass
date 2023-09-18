@@ -1,25 +1,21 @@
 import { ArrowPathIcon } from '@heroicons/react/24/solid'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useCurrency } from 'components/Currency/Provider'
 import { Button } from 'components/shared/Button'
 import { NumberInput } from 'components/shared/FormInput'
 import { LoadingIndicator } from 'components/shared/LoadingIndicator'
 import { SelectNetworkInput } from 'components/shared/SelectNetworkInput'
+import useCurrency from 'components/web3/useCurrency'
 import { updateCurrencyRateValidator } from 'domain/currency/validation'
 import { api } from 'lib/api'
 import yup from 'lib/yup'
-import { DateTime } from 'luxon'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 type FormValue = yup.InferType<typeof updateCurrencyRateValidator>
 
 export const TokenPrice = () => {
-  // TODO: useCurrency should have all the chains
-  const { filecoin, refresh } = useCurrency()
   const [submitErrors, setSubmitErrors] = useState<string | { message: string }>()
   const [loadingRefresh, setLoadingRefresh] = useState(false)
-  const updatedAt = DateTime.fromISO(filecoin?.updatedAt).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS)
 
   const {
     handleSubmit,
@@ -38,22 +34,20 @@ export const TokenPrice = () => {
 
   const { rate, chainId } = watch()
 
-  // useEffect(() => {
-  //   setValue('rate', filecoin?.rate)
-  // }, [filecoin?.rate, setValue])
+  const { mutate } = useCurrency(chainId)
 
   const handleFormSubmit = async (values: FormValue) => {
     if (Object.keys(errors).length > 0) {
       return
     }
 
-    const { error } = await api.patch(`/currency/${values.chainId}`, values)
+    const { error, data } = await api.patch(`/currency/${values.chainId}`, values)
     if (error) {
       setSubmitErrors(error.errors)
       return
     }
 
-    refresh()
+    mutate(data.rate)
   }
 
   const handleRefreshClick = async () => {
@@ -87,7 +81,6 @@ export const TokenPrice = () => {
   return (
     <div className="flex flex-col bg-gray-100 p-4">
       <h1 className="font-medium mb-2 text-lg">Token Price</h1>
-      <p className="mb-5 text-xs text-gray-500 whitespace-nowrap">Updated: {updatedAt}</p>
       <form onSubmit={handleSubmit(handleFormSubmit)}>
         <div className="mb-3 relative">
           <SelectNetworkInput control={control} errors={errors?.chainId} submitErrors={submitErrors} onChange={handleChangeNetwork} />

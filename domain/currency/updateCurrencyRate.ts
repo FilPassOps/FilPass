@@ -24,11 +24,14 @@ export async function updateCurrencyRate(params: UpdateCurrencyRateParams) {
     where: { chainId },
   })
 
-  const updatedRate = await prisma.currency.updateMany({
+  const updatedRate = await prisma.currency.update({
     where: { id: blockchain?.currencyId, isActive: true },
     data: {
       rate: rate.toString().match(/^-?\d+(?:\.\d{0,2})?/)?.[0] || '0',
     },
+    select: {
+      rate: true,
+    }
   })
 
   return {

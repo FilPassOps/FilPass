@@ -1,8 +1,6 @@
 import { DocumentPlusIcon } from '@heroicons/react/24/outline'
-import { useCurrency } from 'components/Currency/Provider'
 import { BlockExplorerLink } from 'components/shared/BlockExplorerLink'
 import { LinkButton } from 'components/shared/Button'
-import { LoadingIndicator } from 'components/shared/LoadingIndicator'
 import Sortable from 'components/shared/Sortable'
 import { StatusPill } from 'components/shared/Status'
 import { Cell, Header, LinkedCell, Table, TableBody, TableHead } from 'components/shared/Table'
@@ -50,7 +48,6 @@ interface MemoProps {
 
 const TransferList = ({ data = [] }: TransferListProps) => {
   const router = useRouter()
-  const { filecoin } = useCurrency()
 
   return (
     <div className="flex flex-col">
@@ -109,14 +106,7 @@ const TransferList = ({ data = [] }: TransferListProps) => {
                   {!request.user_wallet_address && '-'}
                 </LinkedCell>
                 <LinkedCell href={href}>
-                  {!filecoin && (
-                    <div className="flex items-center">
-                      <LoadingIndicator className="text-azureish-white" />
-                    </div>
-                  )}
-                  {filecoin && (
-                    <Currency amount={request.amount} requestCurrency={request.request_unit} paymentUnit={request.payment_unit} />
-                  )}
+                  <Currency amount={request.amount} requestCurrency={request.request_unit} paymentUnit={request.payment_unit} />
                 </LinkedCell>
                 <Cell>
                   <PaymentControl applyer={request.applyer} receiver={request.receiver} />

@@ -1,6 +1,4 @@
 import { CheckCircleIcon } from '@heroicons/react/24/solid'
-import { useCurrency } from 'components/Currency/Provider'
-import { LoadingIndicator } from 'components/shared/LoadingIndicator'
 import { Cell, Header, Table, TableBody, TableHead } from 'components/shared/Table'
 import Currency from 'components/shared/Table/Currency'
 
@@ -30,7 +28,6 @@ interface PreviewTableProps {
 }
 
 export const PreviewTable = ({ data, program }: PreviewTableProps) => {
-  const { filecoin } = useCurrency()
   const request_unit = program?.programCurrency.find(p => p.type === 'REQUEST')?.currency?.name
   const payment_unit = program?.programCurrency.find(p => p.type === 'PAYMENT')?.currency?.name
   const vestingStartEpochSet = new Set()
@@ -71,12 +68,7 @@ export const PreviewTable = ({ data, program }: PreviewTableProps) => {
                   <Cell>{item?.Custodian ?? program?.name}</Cell>
                   <Cell>{item?.Name || item.Email || '-'}</Cell>
                   <Cell>
-                    {!filecoin && (
-                      <div className="flex items-center">
-                        <LoadingIndicator className="text-azureish-white" />
-                      </div>
-                    )}
-                    {filecoin && <Currency amount={item?.Amount} requestCurrency={request_unit} paymentUnit={payment_unit} />}
+                    <Currency amount={item?.Amount} requestCurrency={request_unit} paymentUnit={payment_unit} />
                   </Cell>
                   <Cell>{item?.['Vesting Start Epoch'] || item?.['VestingStartEpoch']}</Cell>
                   <Cell>{item?.['Vesting Months'] || item?.['VestingMonths']}</Cell>
