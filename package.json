@@ -6,7 +6,7 @@
     "postinstall": "npx hardhat compile",
     "build": "next build && tsc --project tsconfig.server.json && tsc-alias -p tsconfig.server.json",
     "dev": "next dev",
-    "dev:server": "nodemon",
+    "dev:server": "npx nodemon server/index.ts",
     "start": "npx prisma generate && node dist/server/index.js",
     "start:dev": "cross-env NODE_ENV=production IS_DEV=false node dist/server/index.js",
     "create-migration": "npx prisma migrate dev --create-only",
