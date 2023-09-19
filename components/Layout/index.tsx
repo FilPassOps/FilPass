@@ -1,4 +1,3 @@
-import { ChainBanner } from 'components/web3/ChainBanner'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Header } from './Header'
@@ -35,7 +34,6 @@ export const Layout = ({ children, title, containerClass = '', defaultPadding = 
           sidebarToggle ? 'hidden md:block md:pl-64' : 'block pl-0 md:pl-14'
         } flex flex-col flex-1 overflow-x-hidden ${containerClass}`}
       >
-        <ChainBanner />
         <Header title={title} setSidebarToggle={setSidebarToggle} />
         <main id="main">
           <div className={defaultPadding ? 'py-6' : 'pb-6'}>
