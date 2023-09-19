@@ -34,7 +34,6 @@
     "npm": ">=8.0.0 <=9.6.7"
   },
   "dependencies": {
-    "@aws-sdk/client-cloudtrail": "^3.370.0",
     "@filecoin-shipyard/lotus-client-provider-nodejs": "1.1.1",
     "@filecoin-shipyard/lotus-client-rpc": "1.2.0",
     "@filecoin-shipyard/lotus-client-schema": "4.2.0",
@@ -71,7 +70,7 @@
     "magic-bytes.js": "^1.0.15",
     "mailgun.js": "^9.2.0",
     "multer": "^1.4.5-lts.1",
-    "next": "^13.4.13",
+    "next": "^13.4.12",
     "node-cron": "^3.0.2",
     "node-schedule": "^2.1.0",
     "nprogress": "^0.2.0",
@@ -86,8 +85,6 @@
     "swr": "^2.2.0",
     "tailwind-merge": "^1.13.0",
     "winston": "^3.10.0",
-    "xml2js": "^0.6.2",
-    "xmlbuilder2": "^3.1.1",
     "xss": "^1.0.14",
     "yup": "^1.2.0"
   },
@@ -123,7 +120,6 @@
     "@types/pg": "^8.6.6",
     "@types/react": "18.2.19",
     "@types/react-datepicker": "^4.15.0",
-    "@types/xml2js": "^0.4.11",
     "@typescript-eslint/eslint-plugin": "^6.3.0",
     "@typescript-eslint/parser": "^6.3.0",
     "autoprefixer": "^10.4.12",
@@ -131,7 +127,7 @@
     "chai": "^4.3.7",
     "dotenv-cli": "^7.2.1",
     "eslint": "8.46.0",
-    "eslint-config-next": "^13.4.13",
+    "eslint-config-next": "^13.4.12",
     "ethers": "^5.7.2",
     "hardhat": "^2.17.0",
     "hardhat-gas-reporter": "^1.0.9",
