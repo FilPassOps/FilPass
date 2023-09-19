@@ -151,6 +151,10 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
   }
 
   const onMetamaskBatchPayClick = () => {
+    handlePayment(requestList.filter(request => request.selected))
+  }
+
+  const onBeforeMetamaskBatchPayClick = () => {
     const hasDifferentChains = selectedRequests.some(
       request => request.program.blockchain.name !== selectedRequests[0].program.blockchain.name,
     )
@@ -165,10 +169,8 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
           closeable: true,
         },
       })
-      return
+      throw new Error('Transfer requests on multiple chains selected')
     }
-
-    handlePayment(requestList.filter(request => request.selected))
   }
 
   const onSingleRejectClick = (data: DisbursementRequest) => {
@@ -306,9 +308,11 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
                 <div>
                   <WithMetaMaskButton
                     variant="green"
+                    onBeforeClick={onBeforeMetamaskBatchPayClick}
                     onClick={onMetamaskBatchPayClick}
                     defaultLabel="Pay"
                     targetChainId={getChainByName(selectedRequests[0].program.blockchain.name).chainId}
+                    switchChainLabel="Switch network to pay"
                   >
                     Pay
                   </WithMetaMaskButton>
