@@ -46,11 +46,6 @@ const defaultTerms = {
 
 let blockchainList: Blockchain[] = []
 
-// Get the information from the database with the ID
-const filecoinId = CONFIG.chains.findIndex(chain => chain.name === 'Filecoin') + 1
-const ethereumId = CONFIG.chains.findIndex(chain => chain.name === 'Ethereum') + 1
-const polygonId = CONFIG.chains.findIndex(chain => chain.name === 'Polygon') + 1
-
 async function main() {
   blockchainList = await getBlockchainValues()
   await Promise.all([createSuperAdmin()])
@@ -103,21 +98,13 @@ async function main() {
   }
 
   for (let i = 0; i < 150; i++) {
-    const { user, t1Wallet, ethWallet, polygonWallet, userRole } = await createUser(i)
-    const chainWallet = {
-      [filecoinId]: {
-        wallet: t1Wallet,
-      },
-      [ethereumId]: {
-        wallet: ethWallet,
-      },
-      [polygonId]: {
-        wallet: polygonWallet,
-      },
-    }
+    const { user, userRole, userWallets } = await createUser(i)
 
     for (let index = 0; index < vestingPrograms.length; index++) {
-      const walletId = chainWallet[vestingPrograms[index].blockchainId].wallet.id
+      const walletId = userWallets.find(wallet => wallet.blockchainId === vestingPrograms[index].blockchainId)?.id
+
+      if (!walletId) throw new Error(`Wallet not found for user ${user.id}`)
+
       await Promise.all([
         createTransferRequest({
           receiverId: user.id,
@@ -139,7 +126,7 @@ async function main() {
         createTransferRequest({
           receiverId: user.id,
           requesterId: user.id,
-          amount: 0.3,
+          amount: 0.01,
           program: oneTimePrograms[index],
           team: 'Third team',
           userWalletId: walletId,
@@ -152,7 +139,7 @@ async function main() {
         createTransferRequest({
           receiverId: user.id,
           requesterId: user.id,
-          amount: 0.3,
+          amount: 0.01,
           program: oneTimePrograms[index],
           team: 'Third team',
           userWalletId: walletId,
@@ -165,7 +152,7 @@ async function main() {
         createTransferRequest({
           receiverId: user.id,
           requesterId: user.id,
-          amount: 0.32,
+          amount: 0.01,
           program: oneTimePrograms[index],
           team: 'Third team',
           userWalletId: walletId,
@@ -511,32 +498,22 @@ async function createUser(index: number) {
     },
   })
 
-  const t1Wallet = await prisma.userWallet.create({
-    data: {
-      address: 't1d6udrjruc3iqhyhrd2rjnjkhzsa6gd6tb63oi6i',
-      userId: user.id,
-      blockchainId: filecoinId,
-      isDefault: true,
-    },
+  const promises = CONFIG.chains.map((chain, index) => {
+    const blockchainId = blockchainList.find(blockchain => blockchain.name === chain.name)?.id
+
+    if (!blockchainId) throw new Error(`Blockchain ${chain.name} not found`)
+
+    return prisma.userWallet.create({
+      data: {
+        address: '0xe1d4a6d35d980ef93cc3be03c543edec2948c3d1',
+        userId: user.id,
+        blockchainId,
+        isDefault: index === 0,
+      },
+    })
   })
 
-  const ethWallet = await prisma.userWallet.create({
-    data: {
-      address: '0x16D2aC099Ec23CAD893041652Deca454cd2b96B9',
-      userId: user.id,
-      blockchainId: ethereumId,
-      isDefault: false,
-    },
-  })
-
-  const polygonWallet = await prisma.userWallet.create({
-    data: {
-      address: '0x16D2aC099Ec23CAD893041652Deca454cd2b96B9',
-      userId: user.id,
-      blockchainId: polygonId,
-      isDefault: false,
-    },
-  })
+  const userWallets = await Promise.all(promises)
 
   const userRole = await prisma.userRole.create({
     data: {
@@ -545,7 +522,7 @@ async function createUser(index: number) {
     },
   })
 
-  return { user, userRole, t1Wallet, ethWallet, polygonWallet }
+  return { user, userRole, userWallets }
 }
 
 async function createController() {

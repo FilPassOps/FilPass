@@ -7,6 +7,7 @@ import Currency, { CryptoAmount } from 'components/shared/Table/Currency'
 import { WalletAddress } from 'components/shared/WalletAddress'
 import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
 import { ForwardNonBLS, contractInterface, useContract } from 'components/web3/useContract'
+import useCurrency from 'components/web3/useCurrency'
 import { USD } from 'domain/currency/constants'
 import { formatCrypto, formatCurrency } from 'lib/currency'
 import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
@@ -14,7 +15,6 @@ import { useState } from 'react'
 import { SUPPORT_EMAIL, getChainByName } from 'system.config'
 import { Table, TableDiv, TableHeader } from './Table'
 import { TransactionParser } from './TransactionParser'
-import useCurrency from 'components/web3/useCurrency'
 
 interface ProgramCurrency {
   currency: {
@@ -91,7 +91,7 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
         : tranferRequest.wallet.address
 
       const foundIndex = parsedDataArray.findIndex(item => {
-        return item.address === finalAddress && Number(item.amount) === Number(tranferRequest.amount)
+        return item.address.toLowerCase() === finalAddress.toLowerCase() && Number(item.amount) === Number(tranferRequest.amount)
       })
 
       if (foundIndex !== -1 && isValidFunctionCall) {
