@@ -46,8 +46,6 @@ interface Request {
     blockchain: Blockchain
     verificationId: string
   }
-  vestingStartEpoch: number
-  vestingMonths: number
   selected: boolean
   transfers: {
     status: string
@@ -169,8 +167,6 @@ const TransferList = ({
             <Header style={{ minWidth: 200 }}>Address</Header>
             <Header>Request Amount</Header>
             <Header>{query.status === PAID_STATUS ? `Paid Amount` : `Estimated Amount`}</Header>
-            <Header style={{ minWidth: 180 }}>Vesting Start Epoch</Header>
-            <Header style={{ minWidth: 180 }}>Vesting Months</Header>
             <Header style={{ minWidth: 190 }}>Status</Header>
             <Header />
           </tr>
@@ -250,8 +246,6 @@ const TransferList = ({
                       />
                     </CryptoAmount>
                   </LinkedCell>
-                  <LinkedCell href={href}>{request.vestingStartEpoch || '-'}</LinkedCell>
-                  <LinkedCell href={href}>{request.vestingMonths || '-'}</LinkedCell>
                   <LinkedCell href={href}>
                     <StatusPill status={request.status} />
                   </LinkedCell>

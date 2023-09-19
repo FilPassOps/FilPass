@@ -49,30 +49,13 @@ let blockchainList: Blockchain[] = []
 async function main() {
   blockchainList = await getBlockchainValues()
   await Promise.all([createSuperAdmin()])
-  const [[approver, approverRole], [controller, controllerRole], viewerRole, vestingPrograms, oneTimePrograms] = await Promise.all([
+  const [[approver, approverRole], controllerRole, viewerRole, oneTimePrograms] = await Promise.all([
     createApprover(),
     createController(),
     createViewer(),
-    createLinearVestingPrograms(),
     createOneTimeProgramIds(),
   ])
 
-  for (const program of vestingPrograms) {
-    await Promise.all([
-      prisma.userRoleProgram.create({
-        data: {
-          programId: program.id,
-          userRoleId: approverRole.id,
-        },
-      }),
-      prisma.userRoleProgram.create({
-        data: {
-          programId: program.id,
-          userRoleId: viewerRole.id,
-        },
-      }),
-    ])
-  }
   for (const program of oneTimePrograms) {
     await Promise.all([
       prisma.userRoleProgram.create({
@@ -99,7 +82,7 @@ async function main() {
 
   for (let i = 0; i < 150; i++) {
     const { user, t1Wallet, t3Wallet, userRole } = await createUser(i)
-    for (let index = 0; index < vestingPrograms.length; index++) {
+    for (let index = 0; index < oneTimePrograms.length; index++) {
       await Promise.all([
         createTransferRequest({
           receiverId: user.id,
@@ -228,14 +211,6 @@ async function main() {
           amount: 0.1,
           program: oneTimePrograms[index],
           team: 'First approver team',
-          userWalletId: t1Wallet.id,
-        }),
-        createTransferRequest({
-          receiverId: user.id,
-          requesterId: controller.id,
-          amount: 0.1,
-          program: vestingPrograms[index],
-          team: 'First controller team',
           userWalletId: t1Wallet.id,
         }),
         createTransferRequestDraft({
@@ -399,50 +374,6 @@ async function createTransferRequestDraft({ requesterId, receiverId, program, te
   })
 }
 
-async function createLinearVestingPrograms() {
-  const programs = []
-  for (const chain of CONFIG.chains) {
-    const { id: requestCurrencyUnitId } = await prisma.currencyUnit.findFirstOrThrow({
-      where: {
-        name: CONFIG.fiatPaymentUnit,
-      },
-    })
-
-    const { id: paymentCurrencyUnitId } = await prisma.currencyUnit.findFirstOrThrow({
-      where: { name: chain.symbol },
-    })
-    const blockchainId = blockchainList.find(blockchain => blockchain.name === chain.name)?.id
-
-    if (!blockchainId) throw new Error(`Blockchain ${chain.name} not found`)
-
-    const program = await prisma.program.create({
-      data: {
-        deliveryMethod: 'LINEAR_VESTING',
-        name: `LINEAR VESTING USD TO ${chain.symbol} PROGRAM`,
-        visibility: 'EXTERNAL',
-        programCurrency: {
-          create: [
-            {
-              currencyUnitId: requestCurrencyUnitId,
-              type: 'REQUEST',
-            },
-            {
-              currencyUnitId: paymentCurrencyUnitId,
-              type: 'PAYMENT',
-            },
-          ],
-        },
-        blockchainId,
-      },
-      include: {
-        programCurrency: true,
-      },
-    })
-    programs.push(program)
-  }
-  return programs
-}
-
 async function createOneTimeProgramIds() {
   const programs = []
   for (const chain of CONFIG.chains) {
@@ -546,7 +477,7 @@ async function createController() {
     },
   })
 
-  return [controller, controllerRole]
+  return controllerRole
 }
 
 async function createViewer() {

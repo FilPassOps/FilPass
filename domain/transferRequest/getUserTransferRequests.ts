@@ -29,8 +29,6 @@ interface Request {
   team: string
   create_date: Date
   amount: string
-  vesting_start_epoch: number
-  vesting_months: number
   program_name: string
   receiver: string
   applyer: string
@@ -94,8 +92,6 @@ export async function getUserTransferRequests(params: GetUserTransferRequestsPar
       transfer_request.team_hash                team_hash,
       transfer_request.created_at               create_date,
       transfer_request.amount                   amount,
-      transfer_request.vesting_start_epoch      vesting_start_epoch,
-      transfer_request.vesting_months           vesting_months,
       transfer_request.program_id               request_program_id,
       transfer_request.currency_unit_id request_currency_unit_id,
       user_wallet.address               request_user_wallet_address,
@@ -143,8 +139,6 @@ export async function getUserTransferRequests(params: GetUserTransferRequestsPar
       transfer_request_draft.team_hash        team_hash,
       transfer_request_draft.created_at       create_date,
       transfer_request_draft.amount           amount,
-      null vesting_start_epoch,
-      null vesting_months,
       transfer_request_draft.program_id       request_program_id,
       transfer_request_draft.currency_unit_id request_currency_unit_id,
       null request_user_wallet_address,
@@ -208,8 +202,6 @@ export async function getUserTransferRequests(params: GetUserTransferRequestsPar
       filter.team                            team,
       filter.create_date                     create_date,
       filter.amount                          amount,
-      filter.vesting_start_epoch             vesting_start_epoch,
-      filter.vesting_months                  vesting_months,
       program.name                           program_name,
       filter.receiver_email                  receiver,
       filter.applyer_email                   applyer,

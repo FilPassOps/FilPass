@@ -47,8 +47,6 @@ interface ProgramCurrency {
 interface DisbursementRequest {
   id: number
   status: string
-  vestingStartEpoch: number
-  vestingMonths: number
   publicId: string
   team: string
   createdAt: string

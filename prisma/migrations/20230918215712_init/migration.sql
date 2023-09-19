@@ -26,7 +26,7 @@ CREATE TYPE "TransferStatus" AS ENUM ('PENDING', 'SUCCESS', 'FAILED', 'REJECTED'
 CREATE TYPE "TransferRequestReviewStatus" AS ENUM ('APPROVED', 'REJECTED', 'REQUIRES_CHANGES', 'BLOCKED');
 
 -- CreateEnum
-CREATE TYPE "DeliveryMethod" AS ENUM ('ONE_TIME', 'LINEAR_VESTING');
+CREATE TYPE "DeliveryMethod" AS ENUM ('ONE_TIME');
 
 -- CreateEnum
 CREATE TYPE "TransferRequestStatus" AS ENUM ('SUBMITTED', 'VOIDED', 'APPROVED', 'PROCESSING', 'REJECTED_BY_APPROVER', 'REQUIRES_CHANGES', 'PAID', 'REJECTED_BY_CONTROLLER', 'SUBMITTED_BY_APPROVER', 'BLOCKED');
@@ -212,8 +212,6 @@ CREATE TABLE "transfer_request" (
     "actor_address" TEXT NOT NULL DEFAULT '',
     "robust_address" TEXT NOT NULL DEFAULT '',
     "attachment_id" INTEGER,
-    "vesting_start_epoch" INTEGER,
-    "vesting_months" INTEGER,
 
     CONSTRAINT "transfer_request_pkey" PRIMARY KEY ("id")
 );

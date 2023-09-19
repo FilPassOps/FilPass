@@ -60,8 +60,6 @@ export async function getTransferRequestById(params: GetTransferRequestByIdParam
          attachment.filename                    attachment_filename,
          attachment_user.email                  attachment_user_email,
          attachment_uploader.email              attachment_uploader_email,
-         filter.vesting_start_epoch             vesting_start_epoch,
-         filter.vesting_months                  vesting_months,
          receiver_user.is_banned                receiver_is_banned,
          ban_actioner_user.email                ban_actioner_email
   FROM (
@@ -85,8 +83,6 @@ export async function getTransferRequestById(params: GetTransferRequestByIdParam
               MAX(CASE WHEN request_user.id = transfer_request.requester_id THEN request_user.email END) applyer_email,
               MAX(transfer.id)                              transfer_id,
               MAX(review.id)                                review_id,
-              transfer_request.vesting_months               vesting_months,
-              transfer_request.vesting_start_epoch          vesting_start_epoch
         FROM transfer_request
                 INNER JOIN "user" AS request_user ON request_user.id = transfer_request.receiver_id OR request_user.id = transfer_request.requester_id
                 LEFT JOIN transfer ON transfer.transfer_request_id = transfer_request.id AND transfer.is_active = TRUE

@@ -1,4 +1,4 @@
-import { SUPPORT_EMAIL, PLATFORM_NAME } from 'system.config'
+import { PLATFORM_NAME, SUPPORT_EMAIL } from 'system.config'
 
 interface ErrorsMessages {
   [key: string]: {
@@ -43,8 +43,6 @@ const errorsMessages: ErrorsMessages = {
   program_not_found: { message: 'Program not found' },
   user_already_invited: { message: 'This user has already been invited.' },
   default_wallet_not_found: { message: 'Default Wallet not found, please specify a wallet.' },
-  program_vesting_not_supported: { message: "Program doesn't support vesting." },
-  invalid_vesting_months_range: { message: 'Vesting month range has to be between 0 and 200.' },
   expired_token_link: { message: 'The link has expired, please try again.' },
   auth_code_not_found: { message: 'Verification code not found.' },
   auth_code_expired: { message: 'Verification code expired, please request a new one.' },

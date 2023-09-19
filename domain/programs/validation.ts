@@ -3,12 +3,12 @@ import yup from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
 import { MAX_INTEGER_VALUE } from '../constants'
-import { LINEAR_VESTING, ONE_TIME, PROGRAM_TYPE_EXTERNAL, PROGRAM_TYPE_INTERNAL } from './constants'
+import { ONE_TIME, PROGRAM_TYPE_EXTERNAL, PROGRAM_TYPE_INTERNAL } from './constants'
 
 export const createProgramValidator = yup
   .object({
     name: yup.string().required(),
-    deliveryMethod: yup.mixed<DeliveryMethod>().oneOf([ONE_TIME, LINEAR_VESTING]).required(),
+    deliveryMethod: yup.mixed<DeliveryMethod>().oneOf([ONE_TIME]).required(),
     approversRole: yup
       .array()
       .min(1, errorsMessages.required_field.message)
@@ -56,7 +56,7 @@ export const createProgramFormValidator = yup
   .object({
     paymentMethod: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
     name: yup.string().required(),
-    deliveryMethod: yup.mixed<DeliveryMethod>().oneOf([ONE_TIME, LINEAR_VESTING]).required(),
+    deliveryMethod: yup.mixed<DeliveryMethod>().oneOf([ONE_TIME]).required(),
     visibility: yup.mixed<ProgramVisibility>().oneOf([PROGRAM_TYPE_EXTERNAL, PROGRAM_TYPE_INTERNAL]).required(),
     approversRole: yup
       .array()
@@ -140,7 +140,7 @@ export const updateProgramValidator = yup
       )
       .required(),
     name: yup.string().required(),
-    deliveryMethod: yup.mixed<DeliveryMethod>().oneOf([ONE_TIME, LINEAR_VESTING]).required(),
+    deliveryMethod: yup.mixed<DeliveryMethod>().oneOf([ONE_TIME]).required(),
     signersWalletAddresses: yup
       .array()
       .of(

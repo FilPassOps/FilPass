@@ -87,8 +87,6 @@ describe('getPaid', () => {
       team: await decryptPII(tr.team),
       createdAt: tr.createdAt,
       updatedAt: tr.updatedAt,
-      vestingMonths: null,
-      vestingStartEpoch: null,
       amount: await decrypt(tr.amount),
       status: tr.status,
       wallet: {

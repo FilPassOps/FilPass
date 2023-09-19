@@ -58,8 +58,6 @@ export const createTransferRequestSubmittedFormValidator = yup
             temporaryFileId: yup.string().max(40),
             currencyUnitId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
             wallet: yup.string(),
-            vestingStartEpoch: yup.number(),
-            vestingMonths: yup.number(),
             skipWalletCreation: yup.boolean(),
           })
           .required(),

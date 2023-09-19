@@ -29,8 +29,6 @@ interface ViewerTransferRequest {
   team: string
   create_date: string
   amount: string
-  vesting_start_epoch: number
-  vesting_months: number
   program_name: string
   program_id: string
   request_unit: string
@@ -74,8 +72,6 @@ export async function getViewerTransferRequests(params: GetViewerTransferRequets
         request.team                                         team,
         request.created_at                                   create_date,
         request.amount                                       amount,
-        request.vesting_start_epoch                          vesting_start_epoch,
-        request.vesting_months                               vesting_months,
         request.is_us_resident                               is_us_resident,
         user_file.public_id                                  file_id,
         program.name                                         program_name,

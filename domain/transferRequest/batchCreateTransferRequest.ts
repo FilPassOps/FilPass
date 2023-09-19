@@ -4,16 +4,16 @@ import { batchCreateWallet } from 'domain/wallet/batchCreateWallet'
 import { encrypt, encryptPII } from 'lib/emissaryCrypto'
 import { TransactionError } from 'lib/errors'
 import { moveFileS3 } from 'lib/fileUpload'
+import { logger } from 'lib/logger'
 import { generateEmailHash, generateTeamHash } from 'lib/password'
 import prisma, { newPrismaTransaction } from 'lib/prisma'
 import { validate } from 'lib/yup'
 import { DateTime } from 'luxon'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { SUBMITTED_BY_APPROVER_STATUS } from './constants'
-import { logger } from 'lib/logger'
 
 interface BatchCreateTransferRequestParams {
-  approverRoleId?: number,
+  approverRoleId?: number
   requesterId?: number
   isBatchCsv: boolean
   requests: {
@@ -24,8 +24,6 @@ interface BatchCreateTransferRequestParams {
     temporaryFileId?: string
     currencyUnitId: number
     wallet?: string
-    vestingStartEpoch?: number
-    vestingMonths?: number
     skipWalletCreation?: boolean
   }[]
 }
@@ -37,8 +35,6 @@ interface CompletedRequest extends BatchCreateTransferRequestParams {
   amount: string
   temporaryFileId?: string
   currencyUnitId: number
-  vestingStartEpoch?: number
-  vestingMonths?: number
   skipWalletCreation?: boolean
   receiver: {
     id: string
@@ -208,15 +204,6 @@ export async function buildTransferRequestData(requests: CompletedRequest[], req
       throw { message: errorsMessages.program_not_found, field: 'programId' }
     }
 
-    //TODO MSIG 1 of 2
-    // if (singleRequest.vestingMonths && singleRequest.vestingStartEpoch && userRoleProgram.program.deliveryMethod !== MULTISIG_1_OF_2) {
-    //   throw { message: errorsMessages.program_vesting_not_supported, field: 'programId' }
-    // }
-
-    if (singleRequest.vestingMonths && (singleRequest.vestingMonths < 0 || singleRequest.vestingMonths > 200)) {
-      throw { message: `${errorsMessages.invalid_vesting_months_range.message} At line ${index + 1}` }
-    }
-
     let attachment
     if (singleRequest.temporaryFileId) {
       const tempFile = await prisma.temporaryFile.findUnique({
@@ -263,8 +250,6 @@ export async function buildTransferRequestData(requests: CompletedRequest[], req
       currencyUnitId: singleRequest.currencyUnitId,
       terms: receiver?.terms ?? undefined,
       expectedTransferDate: DateTime.now().plus({ days: 30 }).toISO(),
-      vestingStartEpoch: singleRequest.vestingStartEpoch,
-      vestingMonths: singleRequest.vestingMonths,
     }
   })
 

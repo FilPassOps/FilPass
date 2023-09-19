@@ -10,6 +10,7 @@ import { UploadFileButton } from 'components/shared/FormInput'
 import { Modal } from 'components/shared/Modal'
 import { CheckCircleThinIcon } from 'components/shared/icons/CheckCircleThinIcon'
 import { MAX_INTEGER_VALUE } from 'domain/constants'
+import JsFileDownload from 'js-file-download'
 import { BaseApiResult, api } from 'lib/api'
 import { classNames } from 'lib/classNames'
 import yup from 'lib/yup'
@@ -17,7 +18,6 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { PreviewTable } from './PreviewTable'
 import { handleDownloadCSVTemplate } from './csvTemplate'
-import JsFileDownload from 'js-file-download'
 
 interface FileData {
   file: {
@@ -29,14 +29,10 @@ interface FileData {
     Custodian: string
     Name: string
     Amount: string
-    'Vesting Start Epoch'?: string
-    'Vesting Months'?: string
     'Wallet Address'?: string
     'Should Receiver Review'?: string
     Hash?: string
     Addresses?: string
-    VestingStartEpoch?: string
-    VestingMonths?: string
     programId?: number
   }[]
   hasCustodian: boolean
@@ -128,8 +124,6 @@ export const BatchCSV = () => {
         wallet: request['Wallet Address'] || request['Addresses'],
         programId: request.programId || values.programId,
         currencyUnitId: values.currencyUnitId,
-        vestingStartEpoch: request['Vesting Start Epoch'] || request['VestingStartEpoch'] || undefined,
-        vestingMonths: request['Vesting Months'] || request['VestingMonths'] || undefined,
         shouldReceiverReview: shouldReceiverReviewStr === 'true' || shouldReceiverReviewStr === 'yes' || shouldReceiverReviewStr === '1',
         row: index + 2,
       }
