@@ -61,7 +61,7 @@ export function Modal({
           >
             <div
               className={twMerge(
-                `inline-block align-bottom bg-white text-left shadow-xl transform transition-all sm:my-8 sm:align-middle max-h-full overflow-y-auto`,
+                `inline-block align-bottom bg-white text-left shadow-xl transform transition-all sm:my-8 sm:align-middle max-h-full `,
                 className,
               )}
             >
