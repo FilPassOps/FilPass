@@ -96,7 +96,7 @@ const processPayment = async (
         const { actorAddress, robustAddress, wallet, amount } = transfer.transferRequest
         const decryptedAmount = await decrypt(amount)
         const finalAddress = getDelegatedAddress(wallet.address, WalletSize.SHORT, chainName)?.fullAddress || wallet.address
-        const alias = await validateWalletAddress(chainName, finalAddress)
+        const alias = await validateWalletAddress(finalAddress)
 
         const isAddressValid = actorAddress === receiver || robustAddress === receiver || wallet.address === receiver || alias === receiver
         if (isAddressValid && Number(decryptedAmount) === Number(paidAmount)) {

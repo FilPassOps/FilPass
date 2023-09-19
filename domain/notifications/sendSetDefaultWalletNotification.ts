@@ -45,15 +45,6 @@ export async function sendSetDefaultWalletConfirmation(params: SendSetDefaultWal
     where: { id, userId },
   })
 
-  if (newDefaultWallet.address.startsWith('0x') || newDefaultWallet.address.startsWith('f4') || newDefaultWallet.address.startsWith('t4')) {
-    return {
-      error: {
-        status: 400,
-        message: errorsMessages.invalid_default_wallet_ethereum.message,
-      },
-    }
-  }
-
   const secret = process.env.APP_SECRET
 
   if (!secret) {

@@ -1,11 +1,11 @@
 import { coinmarketcapApi } from 'lib/coinmarketcapApi'
 import { validate } from 'lib/yup'
-import { TOKEN } from 'system.config'
+import { getChain } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { getCurrencyRateFromCoinMarketCapValidator } from './validation'
 
 interface GetCurrencyMarketRateParams {
-  name: string
+  chainId: string
 }
 
 export async function getCurrencyMarketRate(params: GetCurrencyMarketRateParams) {
@@ -20,11 +20,11 @@ export async function getCurrencyMarketRate(params: GetCurrencyMarketRateParams)
     }
   }
 
-  const { name } = fields
+  const { chainId } = fields
 
-  const code = coinMarketCapCurrencyMap[name]
+  const chain = getChain(chainId)
 
-  if (!code) {
+  if (!chain.coinMarketApiCode) {
     return {
       error: {
         status: 404,
@@ -33,7 +33,7 @@ export async function getCurrencyMarketRate(params: GetCurrencyMarketRateParams)
     }
   }
 
-  const { data, error: coinmarketcapError } = await coinmarketcapApi.get(`/v2/cryptocurrency/quotes/latest?id=${code}`)
+  const { data, error: coinmarketcapError } = await coinmarketcapApi.get(`/v2/cryptocurrency/quotes/latest?id=${chain.coinMarketApiCode}`)
 
   if (coinmarketcapError) {
     return {
@@ -44,7 +44,8 @@ export async function getCurrencyMarketRate(params: GetCurrencyMarketRateParams)
     }
   }
 
-  const rate = data.data[code]?.quote?.USD?.price
+  const rate = data.data[chain.coinMarketApiCode]?.quote?.USD?.price
+
   if (!rate) {
     return {
       error: {
@@ -57,8 +58,4 @@ export async function getCurrencyMarketRate(params: GetCurrencyMarketRateParams)
   return {
     data: { rate },
   }
-}
-
-const coinMarketCapCurrencyMap: Record<string, number> = {
-  [TOKEN.symbol]: TOKEN.coinMarketApiCode,
 }

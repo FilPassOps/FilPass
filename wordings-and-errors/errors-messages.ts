@@ -46,7 +46,6 @@ const errorsMessages: ErrorsMessages = {
   expired_token_link: { message: 'The link has expired, please try again.' },
   auth_code_not_found: { message: 'Verification code not found.' },
   auth_code_expired: { message: 'Verification code expired, please request a new one.' },
-  invalid_default_wallet_ethereum: { message: `f4 / 0x addresses can't be set as a default address` },
   wallet_verification_not_found: { message: 'Verification not found.' },
   wallet_verification_value_not_match: { message: 'Amount provided did not match amount sent.' },
   wallet_cant_be_empty: { message: 'Please, provide a wallet address.' },

@@ -1,6 +1,5 @@
 import { Blockchain } from '@prisma/client'
 import Big from 'big.js'
-import { useCurrency } from 'components/Currency/Provider'
 import { BellCheckbox } from 'components/shared/BellCheckbox'
 import { BlockExplorerLink } from 'components/shared/BlockExplorerLink'
 import { Button } from 'components/shared/Button'
@@ -20,6 +19,7 @@ import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { getChainByName } from 'system.config'
+import useCurrency from 'components/web3/useCurrency'
 
 interface Request {
   id: number
@@ -74,9 +74,7 @@ interface Unit {
 }
 
 interface CryptoAmountInfoProps {
-  filecoin: {
-    rate: number
-  }
+  chainId: string
   request: Request
   paidTransfer?: {
     amount: string
@@ -98,7 +96,6 @@ const TransferList = ({
   notifyCheckbox = false,
 }: TransferListProps) => {
   const { push, query } = useRouter()
-  const { filecoin } = useCurrency()
   const selectAllRef = useRef<HTMLInputElement>(null)
   const [selectAll, setSelectAll] = useState(false)
 
@@ -177,7 +174,7 @@ const TransferList = ({
               const paymentUnit = request.program.programCurrency.find(({ type }) => type === 'PAYMENT') as Unit
               const requestUnit = request.program.programCurrency.find(({ type }) => type === 'REQUEST') as Unit
               const href = `/disbursement/${request.publicId}`
-              const { blockExplorer } = getChainByName(request.program.blockchain.name)
+              const { blockExplorer, chainId } = getChainByName(request.program.blockchain.name)
 
               const paidTransfer = request?.transfers?.find(({ status }) => status === SUCCESS_STATUS)
               return (
@@ -227,7 +224,7 @@ const TransferList = ({
                     {!request.wallet && '-'}
                   </LinkedCell>
                   <LinkedCell href={href}>
-                    {filecoin && (
+                    {request.amount && (
                       <Currency
                         amount={request.amount}
                         requestCurrency={requestUnit.currency.name}
@@ -238,7 +235,7 @@ const TransferList = ({
                   <LinkedCell href={href}>
                     <CryptoAmount>
                       <CryptoAmountInfo
-                        filecoin={filecoin}
+                        chainId={chainId}
                         request={request}
                         requestUnit={requestUnit}
                         paymentUnit={paymentUnit}
@@ -288,8 +285,10 @@ const TransferList = ({
 
 export default TransferList
 
-const CryptoAmountInfo = ({ filecoin, request, requestUnit, paymentUnit, paidTransfer }: CryptoAmountInfoProps) => {
-  if (!filecoin) {
+const CryptoAmountInfo = ({ chainId, request, requestUnit, paymentUnit, paidTransfer }: CryptoAmountInfoProps) => {
+  const { currency } = useCurrency(chainId)
+
+  if (!currency) {
     return (
       <div className="flex items-center justify-center">
         <LoadingIndicator />
@@ -302,7 +301,7 @@ const CryptoAmountInfo = ({ filecoin, request, requestUnit, paymentUnit, paidTra
   }
 
   if (requestUnit.currency.name === USD) {
-    return `${formatCrypto(new Big(Number(request.amount) / filecoin?.rate).toFixed(2))} ${paymentUnit.currency.name}`
+    return `${formatCrypto(new Big(Number(request.amount) / Number(currency)).toFixed(2))} ${paymentUnit.currency.name}`
   }
 
   if (requestUnit.currency.name !== USD) {

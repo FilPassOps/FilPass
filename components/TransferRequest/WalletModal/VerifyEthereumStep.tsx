@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios'
 import { Button } from 'components/shared/Button'
-import { FilecoinIcon } from 'components/shared/icons/chains/FilecoinIcon'
+import { BlockchainIcon } from 'components/shared/icons/BlockchainIcon'
 import { api } from 'lib/api'
 import { useState } from 'react'
 
@@ -59,7 +59,7 @@ export const VerifyEthereumStep = ({ onNextStepClick, onBackClick, formData, net
       <p className="font-normal text-sm text-gray-500 text-center mt-2">Confirm your MetaMask wallet address to continue</p>
       <div className="flex flex-col p-4 space-y-2 text-indigo-900 font-medium text-sm bg-indigo-50 border border-indigo-200 rounded-md w-full my-6">
         <div className="flex items-center gap-2 ">
-          <FilecoinIcon className="h-5 w-5" />
+          <BlockchainIcon blockchainName={formData.blockchain} className="h-5 w-5" />
           <span>{`${formData.blockchain} ${networkName}`} MetaMask Address</span>
         </div>
         <span className="text-indigo-700 break-all">{formData?.address}</span>

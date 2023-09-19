@@ -7,6 +7,7 @@ import Currency, { CryptoAmount } from 'components/shared/Table/Currency'
 import { WalletAddress } from 'components/shared/WalletAddress'
 import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
 import { ForwardNonBLS, contractInterface, useContract } from 'components/web3/useContract'
+import useCurrency from 'components/web3/useCurrency'
 import { USD } from 'domain/currency/constants'
 import { formatCrypto, formatCurrency } from 'lib/currency'
 import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
@@ -49,27 +50,19 @@ interface ParsedData {
 interface BatchProps {
   index: number
   batchData: PaymentBatchData
-  filecoin: any
-  rate: number
   forwardHandler: (batch: TransferRequest[], forwardFunction: ForwardNonBLS, blockchainName: string) => Promise<boolean>
   setIsBatchSent: (isBatchSent: boolean) => void
   setIsChunkHextMatch: (isChunkHextMatch: boolean) => void
   setHextMatch: (transferRequests: TransferRequest[]) => void
 }
 
-const PaymentBatch = ({
-  index,
-  batchData,
-  filecoin,
-  rate,
-  forwardHandler,
-  setIsBatchSent,
-  setIsChunkHextMatch,
-  setHextMatch,
-}: BatchProps) => {
+const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsChunkHextMatch, setHextMatch }: BatchProps) => {
   const { data, isPaymentSent, isHexMatch, blockchainName } = batchData
   const [isOpen, setIsOpen] = useState(false)
   const { forwardNonBLS } = useContract(blockchainName)
+  const { chainId } = getChainByName(blockchainName)
+
+  const { currency } = useCurrency(chainId)
 
   let totalDollarAmount = 0
 
@@ -79,7 +72,7 @@ const PaymentBatch = ({
     if (programCurrency?.currency.name === USD) {
       totalDollarAmount += Number(item.amount)
     } else {
-      totalDollarAmount += Number(item.amount) * filecoin.rate
+      totalDollarAmount += Number(item.amount) * Number(currency)
     }
   }
 
@@ -98,7 +91,7 @@ const PaymentBatch = ({
         : tranferRequest.wallet.address
 
       const foundIndex = parsedDataArray.findIndex(item => {
-        return item.address === finalAddress && Number(item.amount) === Number(tranferRequest.amount)
+        return item.address.toLowerCase() === finalAddress.toLowerCase() && Number(item.amount) === Number(tranferRequest.amount)
       })
 
       if (foundIndex !== -1 && isValidFunctionCall) {
@@ -137,7 +130,7 @@ const PaymentBatch = ({
             </div>
             <div className="flex items-center gap-2">
               <CurrencyDollarIcon className="w-6 text-gray-400" />
-              {formatCrypto(new Big(totalDollarAmount).div(rate).toFixed(2))} {getChainByName(blockchainName).symbol}
+              {formatCrypto(new Big(totalDollarAmount).div(currency as number).toFixed(2))} {getChainByName(blockchainName).symbol}
               <span className="text-sm "> ≈{formatCurrency(totalDollarAmount)}</span>
             </div>
           </div>
@@ -203,7 +196,7 @@ const PaymentBatch = ({
                   <TableDiv>
                     <div className="w-40">
                       <CryptoAmount>
-                        {requestUnit.currency.name === USD ? formatCrypto(new Big(Number(amount) / filecoin?.rate).toFixed(2)) : amount}{' '}
+                        {requestUnit.currency.name === USD ? formatCrypto(new Big(Number(amount) / Number(currency)).toFixed(2)) : amount}{' '}
                         {paymentUnit.currency.name}
                       </CryptoAmount>
                     </div>

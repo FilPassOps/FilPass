@@ -17,23 +17,18 @@ interface WalletModalProps {
   blockchain: string
 }
 
-export function WalletModal({ open, onModalClosed, setUserWalletId, blockchain }: WalletModalProps) {
-  const { wallet, connect, chainId } = useMetaMask()
+export function WalletModal({ open, onModalClosed, setUserWalletId }: WalletModalProps) {
+  const { wallet, chainId } = useMetaMask()
 
   const { refresh, user } = useAuth()
   const [step, setStep] = useState(1)
   const [form, setForm] = useState<any>({})
-  const [connectionMethod, setConnectionMethod] = useState<string>()
 
   // TODO: the chainId, wallet, or the user can return null/undefined?
 
   const chain = getChain(chainId as string)
 
-  const handleChainSelectionClick = (method: string) => {
-    setConnectionMethod(method)
-    if (method === 'Metamask') {
-      connect()
-    }
+  const handleChainSelectionClick = () => {
     setStep(curr => curr + 1)
   }
 
@@ -73,13 +68,12 @@ export function WalletModal({ open, onModalClosed, setUserWalletId, blockchain }
 
   return (
     <Modal open={open} onModalClosed={handleModalClosed}>
-      {step === 1 && <ChainSelection onConnectionMethodClick={handleChainSelectionClick} blockchain={blockchain} />}
+      {step === 1 && <ChainSelection onConnectionMethodClick={handleChainSelectionClick} />}
 
       {step === 2 && (
         <ConnectStep
           onBackClick={handlePreviousStepClick}
           onNextStepClick={handleNextStepClick}
-          connectionMethod={connectionMethod}
           blockchainName={chain?.name}
           wallet={wallet as string}
           key={wallet}

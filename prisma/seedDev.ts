@@ -81,8 +81,13 @@ async function main() {
   }
 
   for (let i = 0; i < 150; i++) {
-    const { user, t1Wallet, t3Wallet, userRole } = await createUser(i)
+    const { user, userRole, userWallets } = await createUser(i)
+
     for (let index = 0; index < oneTimePrograms.length; index++) {
+      const walletId = userWallets.find(wallet => wallet.blockchainId === oneTimePrograms[index].blockchainId)?.id
+
+      if (!walletId) throw new Error(`Wallet not found for user ${user.id}`)
+
       await Promise.all([
         createTransferRequest({
           receiverId: user.id,
@@ -90,7 +95,7 @@ async function main() {
           amount: 0.1,
           program: oneTimePrograms[index],
           team: 'First team',
-          userWalletId: t1Wallet.id,
+          userWalletId: walletId,
         }),
         createTransferRequest({
           receiverId: user.id,
@@ -98,16 +103,16 @@ async function main() {
           amount: 0.2,
           program: oneTimePrograms[index],
           team: 'Second team',
-          userWalletId: t1Wallet.id,
+          userWalletId: walletId,
           status: 'VOIDED',
         }),
         createTransferRequest({
           receiverId: user.id,
           requesterId: user.id,
-          amount: 0.3,
+          amount: 0.01,
           program: oneTimePrograms[index],
           team: 'Third team',
-          userWalletId: t1Wallet.id,
+          userWalletId: walletId,
           status: 'APPROVED',
           review: {
             approverId: approverRole.id,
@@ -117,10 +122,10 @@ async function main() {
         createTransferRequest({
           receiverId: user.id,
           requesterId: user.id,
-          amount: 0.3,
+          amount: 0.01,
           program: oneTimePrograms[index],
           team: 'Third team',
-          userWalletId: t1Wallet.id,
+          userWalletId: walletId,
           status: 'APPROVED',
           review: {
             approverId: approverRole.id,
@@ -130,10 +135,10 @@ async function main() {
         createTransferRequest({
           receiverId: user.id,
           requesterId: user.id,
-          amount: 0.32,
+          amount: 0.01,
           program: oneTimePrograms[index],
           team: 'Third team',
-          userWalletId: t3Wallet.id,
+          userWalletId: walletId,
           status: 'APPROVED',
           review: {
             approverId: approverRole.id,
@@ -146,7 +151,7 @@ async function main() {
           amount: 0.4,
           program: oneTimePrograms[index],
           team: 'Fourth team',
-          userWalletId: t1Wallet.id,
+          userWalletId: walletId,
           status: 'REQUIRES_CHANGES',
           review: {
             approverId: approverRole.id,
@@ -160,7 +165,7 @@ async function main() {
           amount: 0.5,
           program: oneTimePrograms[index],
           team: 'Fifth team',
-          userWalletId: t1Wallet.id,
+          userWalletId: walletId,
           status: 'REJECTED_BY_APPROVER',
           review: {
             approverId: approverRole.id,
@@ -174,7 +179,7 @@ async function main() {
           amount: 0.6,
           program: oneTimePrograms[index],
           team: 'Sixth team',
-          userWalletId: t1Wallet.id,
+          userWalletId: walletId,
           status: 'REJECTED_BY_CONTROLLER',
           review: {
             approverId: approverRole.id,
@@ -192,7 +197,7 @@ async function main() {
           amount: 0.6,
           program: oneTimePrograms[index],
           team: 'Seventh team',
-          userWalletId: t1Wallet.id,
+          userWalletId: walletId,
           status: 'PAID',
           review: {
             approverId: approverRole.id,
@@ -211,7 +216,7 @@ async function main() {
           amount: 0.1,
           program: oneTimePrograms[index],
           team: 'First approver team',
-          userWalletId: t1Wallet.id,
+          userWalletId: walletId,
         }),
         createTransferRequestDraft({
           receiverId: user.id,
@@ -424,23 +429,22 @@ async function createUser(index: number) {
     },
   })
 
-  const t1Wallet = await prisma.userWallet.create({
-    data: {
-      address: 't1d6udrjruc3iqhyhrd2rjnjkhzsa6gd6tb63oi6i',
-      userId: user.id,
-      blockchainId: 1,
-      isDefault: true,
-    },
+  const promises = CONFIG.chains.map((chain, index) => {
+    const blockchainId = blockchainList.find(blockchain => blockchain.name === chain.name)?.id
+
+    if (!blockchainId) throw new Error(`Blockchain ${chain.name} not found`)
+
+    return prisma.userWallet.create({
+      data: {
+        address: '0xe1d4a6d35d980ef93cc3be03c543edec2948c3d1',
+        userId: user.id,
+        blockchainId,
+        isDefault: index === 0,
+      },
+    })
   })
 
-  const t3Wallet = await prisma.userWallet.create({
-    data: {
-      address: 't3vw7ph2pbdvwfmkhjy52pfnjkglspzq45batjybrpgrw7etpii3nc7l2sz6x6uumpc32hnhkf5qc3kj5zimeq',
-      blockchainId: 1,
-      userId: user.id,
-      isDefault: false,
-    },
-  })
+  const userWallets = await Promise.all(promises)
 
   const userRole = await prisma.userRole.create({
     data: {
@@ -449,7 +453,7 @@ async function createUser(index: number) {
     },
   })
 
-  return { user, userRole, t1Wallet, t3Wallet }
+  return { user, userRole, userWallets }
 }
 
 async function createController() {

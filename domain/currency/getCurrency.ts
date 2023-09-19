@@ -3,7 +3,7 @@ import { validate } from 'lib/yup'
 import { getCurrencyRateValidator } from './validation'
 
 interface GetCurrencyParams {
-  name: string
+  chainId: string
 }
 
 export async function getCurrency(params: GetCurrencyParams) {
@@ -17,10 +17,15 @@ export async function getCurrency(params: GetCurrencyParams) {
     }
   }
 
-  const { name } = fields
+  const { chainId } = fields
+
+  const blockchain = await prisma.blockchain.findUnique({
+    where: { chainId },
+  })
+
 
   const [currencyRate] = await prisma.currency.findMany({
-    where: { name, isActive: true },
+    where: { id: blockchain?.currencyId, isActive: true },
     select: {
       id: true,
       name: true,

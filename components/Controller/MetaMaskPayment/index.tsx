@@ -2,7 +2,6 @@ import { ArrowLeftIcon } from '@heroicons/react/24/outline'
 import { Blockchain, TransferStatus } from '@prisma/client'
 import Big from 'big.js'
 import config from 'chains.config'
-import { useCurrency } from 'components/Currency/Provider'
 import { useAlertDispatcher } from 'components/Layout/Alerts'
 import { Button } from 'components/shared/Button'
 import { useMetaMask } from 'components/web3/MetaMaskProvider'
@@ -11,7 +10,6 @@ import { USD } from 'domain/currency/constants'
 import { api } from 'lib/api'
 import { formatCrypto, formatCurrency } from 'lib/currency'
 import _ from 'lodash'
-import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { getChainByName } from 'system.config'
@@ -19,6 +17,7 @@ import errorsMessages from 'wordings-and-errors/errors-messages'
 import { ErrorAlert, SuccessAlert } from './Alerts'
 import PaymentBatch from './PaymentBatch'
 import { PaymentBatchStep } from './PaymentBatchStep'
+import useCurrency from 'components/web3/useCurrency'
 
 interface ProgramCurrency {
   currency: {
@@ -50,7 +49,6 @@ interface PaymentBatchData {
 
 const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
   const router = useRouter()
-  const { filecoin } = useCurrency()
   const { dispatch, close } = useAlertDispatcher()
   const { wallet } = useMetaMask()
 
@@ -60,6 +58,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
 
   const currentBatch = paymentBatchList[currentBatchIndex]
   const chain = getChainByName(data[0].program.blockchain.name)
+  const {currency} = useCurrency(chain.chainId)
 
   useEffect(() => {
     let totalDollarAmount = 0
@@ -70,7 +69,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
       if (programCurrency?.currency.name === USD) {
         totalDollarAmount += Number(item.amount)
       } else {
-        totalDollarAmount += Number(item.amount) * filecoin.rate
+        totalDollarAmount += Number(item.amount) * Number(currency)
       }
     }
 
@@ -83,7 +82,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
     }))
 
     setPaymentBatchList(finalList)
-  }, [data, filecoin])
+  }, [currency, data])
 
   useEffect(() => {
     document.getElementById('main')?.classList.add('md:bg-gray-100')
@@ -92,9 +91,6 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
       document.getElementById('main')?.classList.remove('md:bg-gray-100')
     }
   }, [])
-
-  const rate = filecoin?.rate || 1
-  const updatedAt = DateTime.fromISO(filecoin?.updatedAt).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS)
 
   const doForward = async (batch: TransferRequest[], forwardFunction: ForwardNonBLS, blockchainName: string) => {
     if (!wallet) {
@@ -248,19 +244,14 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
         )}
         <div className="py-6 md:p-6 border-b border-gray-200">
           <h1 className="text-base md:text-lg text-gray-900 font-medium mb-2">
-            Total payout amount: {formatCrypto(new Big(totalDollarAmount).div(rate).toFixed(2))} {chain.symbol}
+            Total payout amount: {formatCrypto(new Big(totalDollarAmount).div(Number(currency)).toFixed(2))} {chain.symbol}
             <span className="text-sm text-gray-500"> ≈{formatCurrency(totalDollarAmount)}</span>
           </h1>
-          <p className="text-xs md:text-sm text-gray-500">
-            1 {chain.symbol} = {`${formatCurrency(rate)}`} ({updatedAt} updated)
-          </p>
         </div>
         {currentBatch && (
           <PaymentBatch
             index={currentBatchIndex}
             batchData={currentBatch}
-            filecoin={filecoin}
-            rate={rate}
             forwardHandler={doForward}
             setIsBatchSent={setIsBatchSent}
             setHextMatch={setHextMatch}

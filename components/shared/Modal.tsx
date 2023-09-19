@@ -1,7 +1,7 @@
 import { Dialog, Transition } from '@headlessui/react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
-import { classNames } from 'lib/classNames'
 import { Fragment, useRef } from 'react'
+import { twMerge } from 'tailwind-merge'
 
 interface ModalProps {
   open: boolean
@@ -60,8 +60,8 @@ export function Modal({
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <div
-              className={classNames(
-                `inline-block align-bottom bg-white text-left shadow-xl transform transition-all sm:my-8 sm:align-middle max-h-full overflow-y-auto`,
+              className={twMerge(
+                `inline-block align-bottom bg-white text-left shadow-xl transform transition-all sm:my-8 sm:align-middle max-h-full `,
                 className,
               )}
             >

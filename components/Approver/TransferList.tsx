@@ -1,5 +1,4 @@
 import Big from 'big.js'
-import { useCurrency } from 'components/Currency/Provider'
 import { BlockExplorerLink } from 'components/shared/BlockExplorerLink'
 import { LoadingIndicator } from 'components/shared/LoadingIndicator'
 import Sortable from 'components/shared/Sortable'
@@ -7,6 +6,7 @@ import { StatusPill } from 'components/shared/Status'
 import { Cell, Header, LinkedCell, Table, TableBody, TableHead } from 'components/shared/Table'
 import Currency, { CryptoAmount } from 'components/shared/Table/Currency'
 import { WalletAddress } from 'components/shared/WalletAddress'
+import useCurrency from 'components/web3/useCurrency'
 import { USD } from 'domain/currency/constants'
 import { PAID_STATUS } from 'domain/transferRequest/constants'
 import { formatCrypto } from 'lib/currency'
@@ -35,15 +35,12 @@ interface Request {
 }
 
 interface CryptoAmountInfoProps {
-  filecoin: {
-    rate: number
-  }
+  chainId: string
   request: Request
 }
 
 const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderToggle, onRequestChecked }: TransferListProps) => {
   const { push, query } = useRouter()
-  const { filecoin } = useCurrency()
   const [selectAll, setSelectAll] = useState(false)
   const selectAllRef = useRef<HTMLInputElement>(null)
 
@@ -94,8 +91,7 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
         </TableHead>
         <TableBody>
           {data.map((request, requestIndex) => {
-            const { blockExplorer } = getChainByName(request.program_blockchain)
-
+            const { blockExplorer, chainId } = getChainByName(request.program_blockchain)
             const href = `/approvals/${request.id}`
 
             return (
@@ -133,12 +129,7 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
                   {!request.wallet_address && '-'}
                 </LinkedCell>
                 <LinkedCell href={href}>
-                  {!filecoin && (
-                    <div className="flex items-center">
-                      <LoadingIndicator className="text-azureish-white" />
-                    </div>
-                  )}
-                  {filecoin && request.amount ? (
+                  {request.amount ? (
                     <Currency amount={request.amount} requestCurrency={request.request_unit} paymentUnit={request.payment_unit} />
                   ) : (
                     '-'
@@ -147,7 +138,7 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
                 <LinkedCell href={href}>
                   {request.amount ? (
                     <CryptoAmount>
-                      <CryptoAmountInfo filecoin={filecoin} request={request} />
+                      <CryptoAmountInfo chainId={chainId} request={request} />
                     </CryptoAmount>
                   ) : (
                     '-'
@@ -181,8 +172,10 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
 
 export default TransferList
 
-const CryptoAmountInfo = ({ filecoin, request }: CryptoAmountInfoProps) => {
-  if (!filecoin || !filecoin?.rate) {
+const CryptoAmountInfo = ({ chainId, request }: CryptoAmountInfoProps) => {
+  const {currency, isLoading} = useCurrency(chainId)
+
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center">
         <LoadingIndicator />
@@ -195,7 +188,7 @@ const CryptoAmountInfo = ({ filecoin, request }: CryptoAmountInfoProps) => {
   }
 
   if (request.request_unit === USD) {
-    return `${formatCrypto(new Big(request.amount / filecoin?.rate).toFixed(2))} ${request.payment_unit}`
+    return `${formatCrypto(new Big(request.amount / Number(currency)).toFixed(2))} ${request.payment_unit}`
   }
 
   if (request.request_unit !== USD) {

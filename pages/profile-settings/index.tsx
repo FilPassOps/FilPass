@@ -3,6 +3,7 @@ import { Layout } from 'components/Layout'
 import { WalletModal } from 'components/TransferRequest/WalletModal'
 import { WalletList } from 'components/User/WalletList'
 import { Button } from 'components/shared/Button'
+import { WalletAddress } from 'components/shared/WalletAddress'
 import { findUserByIdAndEmail } from 'domain/user'
 import { fetcher } from 'lib/fetcher'
 import { getMasterWallet } from 'lib/filecoin'
@@ -44,10 +45,12 @@ export default function UserSettings({ data }: UserSettingsProps) {
         <div className="flex flex-col lg:flex-row gap-4 px-6 py-5 bg-gray-50 border-t border-gray-200">
           <p className="text-gray-500 text-sm font-medium w-full lg:w-1/3 py-2 md:py-0">Default FIL Wallet Address</p>
           {defaultWallet ? (
-            <div>
-              <p className="text-sm text-gray-500 break-words">{defaultWallet?.name}</p>
-              <p className="text-sm text-gray-900 break-words">{defaultWallet?.address}</p>
-            </div>
+            <WalletAddress
+              address={defaultWallet?.address}
+              blockchain={defaultWallet?.blockchain.name}
+              walletSize="full"
+              enableVerifiedIcon={false}
+            />
           ) : (
             <p className="text-gray-400 text-sm w-full md:w-2/3">Set a default wallet address below.</p>
           )}

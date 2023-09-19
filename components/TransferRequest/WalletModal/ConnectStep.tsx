@@ -11,7 +11,6 @@ import errorsMessages from 'wordings-and-errors/errors-messages'
 interface ConnectStepProps {
   onBackClick: () => void
   onNextStepClick: (data: any) => void
-  connectionMethod?: string
   wallet: string
   blockchainName: string
 }
@@ -22,7 +21,7 @@ interface FormValues {
   name?: string
 }
 
-export function ConnectStep({ onBackClick, onNextStepClick, connectionMethod, wallet, blockchainName }: ConnectStepProps) {
+export function ConnectStep({ onBackClick, onNextStepClick, wallet, blockchainName }: ConnectStepProps) {
   const { user } = useAuth()
   const [submitErrors, setSubmitErrors] = useState<any>()
 
@@ -32,8 +31,8 @@ export function ConnectStep({ onBackClick, onNextStepClick, connectionMethod, wa
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      blockchain: connectionMethod === 'Filecoin' ? 'Filecoin' : blockchainName, // TODO OPEN-SOURCE: should the id of the blockchain table
-      address: connectionMethod === 'Metamask' ? wallet : '',
+      blockchain: blockchainName,
+      address: wallet,
     },
     resolver: yupResolver(connectWalletStepValidator),
   })
@@ -47,11 +46,6 @@ export function ConnectStep({ onBackClick, onNextStepClick, connectionMethod, wa
       setSubmitErrors({
         address: errorsMessages.wallet_address_in_use.message,
       })
-      return
-    }
-
-    if (connectionMethod === 'Metamask') {
-      onNextStepClick(formData)
       return
     }
 
@@ -83,7 +77,7 @@ export function ConnectStep({ onBackClick, onNextStepClick, connectionMethod, wa
           label="Wallet Address"
           id="address"
           maxLength={100}
-          disabled={connectionMethod === 'Metamask'}
+          disabled={true}
           error={errors.address || submitErrors?.address}
           {...register('address')}
         />

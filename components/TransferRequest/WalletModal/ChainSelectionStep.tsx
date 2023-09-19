@@ -1,48 +1,48 @@
-import { Button } from 'components/shared/Button'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { SelectNetworkInput } from 'components/shared/SelectNetworkInput'
 import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
-import { getChainByName, isFilecoinEnabled } from 'system.config'
+import yup from 'lib/yup'
+import { useForm } from 'react-hook-form'
 
 interface ChainSelectionProps {
-  onConnectionMethodClick: (method: 'Metamask' | 'Filecoin') => void
-  blockchain: string
+  onConnectionMethodClick: (chainId: string) => void
 }
 
-export function ChainSelection({ onConnectionMethodClick, blockchain }: ChainSelectionProps) {
-  const chainId = getChainByName(blockchain)?.chainId
+export function ChainSelection({ onConnectionMethodClick }: ChainSelectionProps) {
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      chainId: undefined,
+    },
+    resolver: yupResolver(
+      yup.object({
+        chainId: yup.string().required(),
+      }),
+    ),
+  })
+
+  const { chainId } = watch()
+
+  const handleSubmitForm = async (formData: any) => {
+    onConnectionMethodClick(formData.blockchainId)
+  }
+
   return (
-    <div className="w-full h-full flex flex-col justify-center items-center sm:py-2 sm:px-11">
-      <p className="font-medium text-lg text-gray-900 text-center mb-2">Connect Wallet</p>
-      <p className="font-normal text-sm text-gray-500 text-center">Connect a default wallet address.</p>
-      <div className="flex flex-col w-full gap-6 mt-6">
-        <WithMetaMaskButton
-          className="w-full"
-          buttonStyle="flex gap-2 justify-center items-center"
-          onClick={() => onConnectionMethodClick('Metamask')}
-          targetChainId={chainId}
-          connectWalletLabel={
-            <>
-              Connect with MetaMask
-              <br />
-              (0x and f4 wallets)
-            </>
-          }
-        >
-          Continue with MetaMask
-          <br />
-          (0x and f4 wallets)
-        </WithMetaMaskButton>
-        {isFilecoinEnabled && (
-          <>
-            {/* @ts-ignore */}
-            <Button variant="primary-lighter" onClick={() => onConnectionMethodClick('Filecoin')}>
-              Connect Manually
-              <br />
-              (f1, f2, and f3 wallets)
-            </Button>
-            <small className="text-gray-500 text-center font-normal mt-2">*Manually connecting a wallet can lead to errors</small>
-          </>
-        )}
-      </div>
+    <div className="w-full h-full flex flex-col gap-4 justify-center items-center space-y-6 sm:px-11 my-6">
+      <span className='flex flex-col gap-2'>
+        <p className="font-medium text-lg text-gray-900 text-center">Connect Wallet</p>
+        <p className="font-normal text-sm text-gray-500 text-center">Connect a default wallet address.</p>
+      </span>
+      <form onSubmit={handleSubmit(handleSubmitForm)} className="flex flex-col gap-4 w-full h-full space-y-6 ">
+        <SelectNetworkInput control={control} errors={errors.chainId} label="Select Network" placeholder="Choose wallet network" />
+        <div className="flex w-full">
+          <WithMetaMaskButton type="submit" className="w-full" targetChainId={chainId} />
+        </div>
+      </form>
     </div>
   )
 }
