@@ -46,6 +46,11 @@ const defaultTerms = {
 
 let blockchainList: Blockchain[] = []
 
+// Get the information from the database with the ID
+const filecoinId = CONFIG.chains.findIndex(chain => chain.name === 'Filecoin') + 1
+const ethereumId = CONFIG.chains.findIndex(chain => chain.name === 'Ethereum') + 1
+const polygonId = CONFIG.chains.findIndex(chain => chain.name === 'Polygon') + 1
+
 async function main() {
   blockchainList = await getBlockchainValues()
   await Promise.all([createSuperAdmin()])
@@ -98,8 +103,21 @@ async function main() {
   }
 
   for (let i = 0; i < 150; i++) {
-    const { user, t1Wallet, t3Wallet, userRole } = await createUser(i)
+    const { user, t1Wallet, ethWallet, polygonWallet, userRole } = await createUser(i)
+    const chainWallet = {
+      [filecoinId]: {
+        wallet: t1Wallet,
+      },
+      [ethereumId]: {
+        wallet: ethWallet,
+      },
+      [polygonId]: {
+        wallet: polygonWallet,
+      },
+    }
+
     for (let index = 0; index < vestingPrograms.length; index++) {
+      const walletId = chainWallet[vestingPrograms[index].blockchainId].wallet.id
       await Promise.all([
         createTransferRequest({
           receiverId: user.id,
@@ -107,7 +125,7 @@ async function main() {
           amount: 0.1,
           program: oneTimePrograms[index],
           team: 'First team',
-          userWalletId: t1Wallet.id,
+          userWalletId: walletId,
         }),
         createTransferRequest({
           receiverId: user.id,
@@ -115,7 +133,7 @@ async function main() {
           amount: 0.2,
           program: oneTimePrograms[index],
           team: 'Second team',
-          userWalletId: t1Wallet.id,
+          userWalletId: walletId,
           status: 'VOIDED',
         }),
         createTransferRequest({
@@ -124,7 +142,7 @@ async function main() {
           amount: 0.3,
           program: oneTimePrograms[index],
           team: 'Third team',
-          userWalletId: t1Wallet.id,
+          userWalletId: walletId,
           status: 'APPROVED',
           review: {
             approverId: approverRole.id,
@@ -137,7 +155,7 @@ async function main() {
           amount: 0.3,
           program: oneTimePrograms[index],
           team: 'Third team',
-          userWalletId: t1Wallet.id,
+          userWalletId: walletId,
           status: 'APPROVED',
           review: {
             approverId: approverRole.id,
@@ -150,7 +168,7 @@ async function main() {
           amount: 0.32,
           program: oneTimePrograms[index],
           team: 'Third team',
-          userWalletId: t3Wallet.id,
+          userWalletId: walletId,
           status: 'APPROVED',
           review: {
             approverId: approverRole.id,
@@ -163,7 +181,7 @@ async function main() {
           amount: 0.4,
           program: oneTimePrograms[index],
           team: 'Fourth team',
-          userWalletId: t1Wallet.id,
+          userWalletId: walletId,
           status: 'REQUIRES_CHANGES',
           review: {
             approverId: approverRole.id,
@@ -177,7 +195,7 @@ async function main() {
           amount: 0.5,
           program: oneTimePrograms[index],
           team: 'Fifth team',
-          userWalletId: t1Wallet.id,
+          userWalletId: walletId,
           status: 'REJECTED_BY_APPROVER',
           review: {
             approverId: approverRole.id,
@@ -191,7 +209,7 @@ async function main() {
           amount: 0.6,
           program: oneTimePrograms[index],
           team: 'Sixth team',
-          userWalletId: t1Wallet.id,
+          userWalletId: walletId,
           status: 'REJECTED_BY_CONTROLLER',
           review: {
             approverId: approverRole.id,
@@ -209,7 +227,7 @@ async function main() {
           amount: 0.6,
           program: oneTimePrograms[index],
           team: 'Seventh team',
-          userWalletId: t1Wallet.id,
+          userWalletId: walletId,
           status: 'PAID',
           review: {
             approverId: approverRole.id,
@@ -228,7 +246,7 @@ async function main() {
           amount: 0.1,
           program: oneTimePrograms[index],
           team: 'First approver team',
-          userWalletId: t1Wallet.id,
+          userWalletId: walletId,
         }),
         createTransferRequest({
           receiverId: user.id,
@@ -236,7 +254,7 @@ async function main() {
           amount: 0.1,
           program: vestingPrograms[index],
           team: 'First controller team',
-          userWalletId: t1Wallet.id,
+          userWalletId: walletId,
         }),
         createTransferRequestDraft({
           receiverId: user.id,
@@ -497,16 +515,25 @@ async function createUser(index: number) {
     data: {
       address: 't1d6udrjruc3iqhyhrd2rjnjkhzsa6gd6tb63oi6i',
       userId: user.id,
-      blockchainId: 1,
+      blockchainId: filecoinId,
       isDefault: true,
     },
   })
 
-  const t3Wallet = await prisma.userWallet.create({
+  const ethWallet = await prisma.userWallet.create({
     data: {
-      address: 't3vw7ph2pbdvwfmkhjy52pfnjkglspzq45batjybrpgrw7etpii3nc7l2sz6x6uumpc32hnhkf5qc3kj5zimeq',
-      blockchainId: 1,
+      address: '0x16D2aC099Ec23CAD893041652Deca454cd2b96B9',
       userId: user.id,
+      blockchainId: ethereumId,
+      isDefault: false,
+    },
+  })
+
+  const polygonWallet = await prisma.userWallet.create({
+    data: {
+      address: '0x16D2aC099Ec23CAD893041652Deca454cd2b96B9',
+      userId: user.id,
+      blockchainId: polygonId,
       isDefault: false,
     },
   })
@@ -518,7 +545,7 @@ async function createUser(index: number) {
     },
   })
 
-  return { user, userRole, t1Wallet, t3Wallet }
+  return { user, userRole, t1Wallet, ethWallet, polygonWallet }
 }
 
 async function createController() {

@@ -57,19 +57,6 @@ export const setDefault = async (params: SetDefaultParams) => {
     }
   }
 
-  if (
-    data.newDefaultWallet.address.startsWith('0x') ||
-    data.newDefaultWallet.address.startsWith('f4') ||
-    data.newDefaultWallet.address.startsWith('t4')
-  ) {
-    return {
-      error: {
-        status: 400,
-        message: errorsMessages.invalid_default_wallet_ethereum.message,
-      },
-    }
-  }
-
   return await newPrismaTransaction(async prisma => {
     await prisma.userWallet.updateMany({
       where: { userId: data.newDefaultWallet.userId },

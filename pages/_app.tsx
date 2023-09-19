@@ -1,12 +1,11 @@
 import { AuthProvider } from 'components/Authentication/Provider'
-import { CurrencyProvider } from 'components/Currency/Provider'
 import { AlertContainer, AlertDispatcherProvider } from 'components/Layout/Alerts'
 import { OnboardContextProvider, OnboardWrapper } from 'components/OnboardingWrapper'
 import { Button } from 'components/shared/Button'
 import { MetaMaskProvider } from 'components/web3/MetaMaskProvider'
 import { NextPage } from 'next'
 import type { AppProps } from 'next/app'
-import Image from "next/legacy/image"
+import Image from 'next/legacy/image'
 import Router from 'next/router'
 import NProgress from 'nprogress'
 import { ReactElement, ReactNode } from 'react'
@@ -65,19 +64,17 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   }
   return (
     <AuthProvider>
-      <CurrencyProvider>
-        <SWRConfig value={{ provider: () => new Map() }}>
-          <OnboardContextProvider>
-            <MetaMaskProvider>
-              <AlertDispatcherProvider>
-                <AlertContainer />
-                {getLayout(<Component {...pageProps} />)}
-              </AlertDispatcherProvider>
-            </MetaMaskProvider>
-            <OnboardWrapper />
-          </OnboardContextProvider>
-        </SWRConfig>
-      </CurrencyProvider>
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <OnboardContextProvider>
+          <MetaMaskProvider>
+            <AlertDispatcherProvider>
+              <AlertContainer />
+              {getLayout(<Component {...pageProps} />)}
+            </AlertDispatcherProvider>
+          </MetaMaskProvider>
+          <OnboardWrapper />
+        </OnboardContextProvider>
+      </SWRConfig>
     </AuthProvider>
   )
 }

@@ -409,6 +409,8 @@ CREATE TABLE "newsletter_subscriber" (
 CREATE TABLE "blockchain" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
+    "chain_id" TEXT NOT NULL,
+    "currency_id" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -531,6 +533,9 @@ CREATE UNIQUE INDEX "newsletter_subscriber_email_hash_key" ON "newsletter_subscr
 
 -- CreateIndex
 CREATE UNIQUE INDEX "blockchain_name_key" ON "blockchain"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "blockchain_chain_id_key" ON "blockchain"("chain_id");
 
 -- AddForeignKey
 ALTER TABLE "user" ADD CONSTRAINT "user_ban_actioned_by_id_fkey" FOREIGN KEY ("ban_actioned_by_id") REFERENCES "user_role"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -660,3 +665,6 @@ ALTER TABLE "auth_verification" ADD CONSTRAINT "auth_verification_user_id_fkey" 
 
 -- AddForeignKey
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "blockchain" ADD CONSTRAINT "blockchain_currency_id_fkey" FOREIGN KEY ("currency_id") REFERENCES "currency"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

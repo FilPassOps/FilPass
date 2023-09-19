@@ -1,8 +1,10 @@
 import MetaMaskOnboarding from '@metamask/onboarding'
+import { Tooltip } from 'components/Layout/Tooltip'
 import { Button, ButtonProps } from 'components/shared/Button'
 import { useRouter } from 'next/router'
 import { Dispatch, MouseEventHandler, ReactNode, SetStateAction, createContext, useContext, useEffect, useRef, useState } from 'react'
-import { CONFIG, getMetamaskParam } from 'system.config'
+import { getMetamaskParam } from 'system.config'
+import { twMerge } from 'tailwind-merge'
 
 interface ProviderMessage {
   type: string
@@ -197,9 +199,8 @@ export const WithMetaMaskButton: React.FC<React.PropsWithChildren<WithMetaMaskBu
     onClick,
     connectWalletLabel = 'Connect MetaMask',
     switchChainLabel = 'Switch network',
-    defaultLabel,
-    targetChainId = CONFIG.chains[0].chainId, // TODO: OPEN-SOURCE
-    children,
+    targetChainId = props.targetChainId,
+    className,
     ...rest
   } = props
   const { wallet, connect, switchChain, busy, chainId: connectedChainId } = useMetaMask()
@@ -219,22 +220,35 @@ export const WithMetaMaskButton: React.FC<React.PropsWithChildren<WithMetaMaskBu
 
     if (wallet && connectedToTargetChain) {
       onClick?.(event)
-    } else if (wallet && !connectedToTargetChain) {
+    } else if (wallet && targetChainId && !connectedToTargetChain) {
       switchChain(targetChainId)
     } else {
       connect()
     }
   }
 
+  const buttonLabel = () => {
+    if (wallet && connectedToTargetChain) {
+      return props.children || props.defaultLabel || 'Continue with MetaMask'
+    } else if (wallet && targetChainId && !connectedToTargetChain) {
+      return switchChainLabel
+    } else {
+      return connectWalletLabel
+    }
+  }
+
   return (
-    <Button ref={ref} className="flex items-center" {...rest} loading={busy && loading} disabled={busy} onClick={handleClick}>
-      {wallet && connectedToTargetChain
-        ? children
-        : defaultLabel
-        ? defaultLabel
-        : wallet && !connectedToTargetChain
-        ? switchChainLabel
-        : connectWalletLabel}
-    </Button>
+    <Tooltip content="Select a network to continue">
+      <Button
+        {...rest}
+        ref={ref}
+        className={twMerge('flex items-center', className)}
+        loading={busy && loading}
+        disabled={busy || !props.targetChainId}
+        onClick={handleClick}
+      >
+        {buttonLabel()}
+      </Button>
+    </Tooltip>
   )
 }

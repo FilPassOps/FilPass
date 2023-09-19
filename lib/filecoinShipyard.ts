@@ -3,6 +3,7 @@ import { LotusRPC } from '@filecoin-shipyard/lotus-client-rpc'
 import { mainnet } from '@filecoin-shipyard/lotus-client-schema'
 import config from 'chains.config'
 import { logger } from './logger'
+import { utils } from 'ethers'
 
 const LOTUS_LITE_NODE_API_ENDPOINT = process.env.LOTUS_LITE_NODE_API_ENDPOINT
 const LOTUS_LITE_TOKEN = process.env.LOTUS_LITE_TOKEN
@@ -31,8 +32,9 @@ export const matchWalletAddress = async (address: string) => {
   }
 }
 
-export const validateWalletAddress = async (chainName: string, address: string) => {
-  if (chainName !== 'Filecoin') return address
-  if (!address.startsWith(config.coinType)) throw new Error('Invalid address')
-  return client.walletValidateAddress(address)
+export const validateWalletAddress = async (address: string) => {
+  if (address.startsWith('f4') || address.startsWith('t4')) {
+    return client.walletValidateAddress(address)
+  }
+  return utils.isAddress('1x333b5c1e109771432343ca0d4f474e0ac219e929')
 }

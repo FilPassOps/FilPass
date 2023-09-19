@@ -1,12 +1,26 @@
-import { Blockchain } from '@prisma/client'
-import { classNames } from 'lib/classNames'
-import { FilecoinIcon } from './chains/FilecoinIcon'
+import { getChainByName } from 'system.config'
+import Image from 'next/image'
+import { twMerge } from 'tailwind-merge'
 
 interface BlockchainIconProps {
-  blockchain: Blockchain
+  blockchainName: string
   className?: string
+  width?: number
+  height?: number
 }
 
-export const BlockchainIcon = ({ className }: BlockchainIconProps) => {
-  return <FilecoinIcon className={classNames('w-4', className)} />
+export const BlockchainIcon = ({ className, blockchainName, height, width }: BlockchainIconProps) => {
+  const blockchainIconFileName = getChainByName(blockchainName)?.iconFileName
+
+  return (
+    <Image
+      src={`/blockchain-icons/${blockchainIconFileName}`}
+      width={width || 20}
+      height={height || 20}
+      className={twMerge('shrink-0', className)}
+      alt={`${blockchainName}-icon`}
+      unoptimized
+      priority
+    />
+  )
 }
