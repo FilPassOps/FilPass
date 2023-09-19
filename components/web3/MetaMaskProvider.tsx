@@ -192,11 +192,13 @@ interface WithMetaMaskButtonProps extends Omit<ButtonProps, 'loading' | 'disable
   switchChainLabel?: string
   defaultLabel?: string
   targetChainId?: string
+  onBeforeClick?: () => void
 }
 
 export const WithMetaMaskButton: React.FC<React.PropsWithChildren<WithMetaMaskButtonProps>> = props => {
   const {
     onClick,
+    onBeforeClick,
     connectWalletLabel = 'Connect MetaMask',
     switchChainLabel = 'Switch network',
     targetChainId = props.targetChainId,
@@ -217,13 +219,19 @@ export const WithMetaMaskButton: React.FC<React.PropsWithChildren<WithMetaMaskBu
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = event => {
     setLoading(event.currentTarget === ref.current)
-
-    if (wallet && connectedToTargetChain) {
-      onClick?.(event)
-    } else if (wallet && targetChainId && !connectedToTargetChain) {
-      switchChain(targetChainId)
-    } else {
-      connect()
+    try {
+      if (onBeforeClick) {
+        onBeforeClick()
+      }
+      if (wallet && connectedToTargetChain) {
+        onClick?.(event)
+      } else if (wallet && targetChainId && !connectedToTargetChain) {
+        switchChain(targetChainId)
+      } else {
+        connect()
+      }
+    } catch (error: any) {
+      console.error(error?.message)
     }
   }
 
