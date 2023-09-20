@@ -11,9 +11,19 @@ interface SelectNetworkInputProps {
   placeholder?: string
   label?: string
   onChange?: (chainId: string) => void
+  listboxClassName?: string
 }
 
-export const SelectNetworkInput = ({ control, errors, submitErrors, disabled, placeholder, label, onChange }: SelectNetworkInputProps) => {
+export const SelectNetworkInput = ({
+  control,
+  errors,
+  submitErrors,
+  disabled,
+  placeholder,
+  label,
+  onChange,
+  listboxClassName,
+}: SelectNetworkInputProps) => {
   const chainOptions = CONFIG.chains.map(chain => {
     return {
       label: (
@@ -50,6 +60,7 @@ export const SelectNetworkInput = ({ control, errors, submitErrors, disabled, pl
               ref={field.ref}
               value={field.value}
               disabled={disabled}
+              listboxClassName={listboxClassName}
             />
           )}
         />

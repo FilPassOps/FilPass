@@ -5,6 +5,7 @@ import { classNames } from 'lib/classNames'
 import { forwardRef, useEffect, useRef, useState } from 'react'
 
 import { NumericFormat } from 'react-number-format'
+import { twMerge } from 'tailwind-merge'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { Button } from './Button'
 
@@ -44,7 +45,7 @@ export interface SelectInputOption {
   tooltip?: string
 }
 
-interface SelectInputProps {
+export interface SelectInputProps {
   error?: any
   id: string
   label: string
@@ -58,6 +59,7 @@ interface SelectInputProps {
   buttonClasses?: string
   name: string
   isClearable?: boolean
+  listboxClassName?: string
   [key: string]: any
 }
 
@@ -77,6 +79,7 @@ export const SelectInput = forwardRef<HTMLButtonElement, SelectInputProps>(
       buttonClasses,
       isClearable = false,
       name,
+      listboxClassName,
       ...props
     },
     ref,
@@ -121,7 +124,12 @@ export const SelectInput = forwardRef<HTMLButtonElement, SelectInputProps>(
                 )}
               </Listbox.Button>
 
-              <Listbox.Options className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+              <Listbox.Options
+                className={twMerge(
+                  'absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm',
+                  listboxClassName,
+                )}
+              >
                 {emptyState && !options.length && (
                   <Listbox.Option disabled value={undefined}>
                     <div className="flex flex-1 items-center pl-4 pt-3 pb-3">
