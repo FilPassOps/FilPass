@@ -122,6 +122,7 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
                   {request.wallet_address && (
                     <WalletAddress
                       address={request.wallet_address}
+                      delegatedAddress={request.delegated_address}
                       blockchain={request.wallet_blockchain}
                       isVerified={!!request.wallet_is_verified}
                     />

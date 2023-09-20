@@ -1,12 +1,14 @@
 import { NodejsProvider } from '@filecoin-shipyard/lotus-client-provider-nodejs'
 import { LotusRPC } from '@filecoin-shipyard/lotus-client-rpc'
 import { mainnet } from '@filecoin-shipyard/lotus-client-schema'
-import config from 'chains.config'
 import { logger } from './logger'
 import { utils } from 'ethers'
+import { FilecoinChain, getChainByName } from 'system.config'
 
 const LOTUS_LITE_NODE_API_ENDPOINT = process.env.LOTUS_LITE_NODE_API_ENDPOINT
 const LOTUS_LITE_TOKEN = process.env.LOTUS_LITE_TOKEN
+
+const filecoin = getChainByName('Filecoin') as FilecoinChain
 
 if (!LOTUS_LITE_NODE_API_ENDPOINT) {
   throw new Error('Please define LOTUS_LITE_NODE_API_ENDPOINT environment variable')
@@ -22,7 +24,7 @@ const client = new LotusRPC(provider, { schema: mainnet.fullNode })
 
 export const matchWalletAddress = async (address: string) => {
   try {
-    if (!address.startsWith(config.coinType)) return false
+    if (!address.startsWith(filecoin.coinType)) return false
     const validationResult = await client.walletValidateAddress(address)
     if (validationResult !== address) return false
     return true

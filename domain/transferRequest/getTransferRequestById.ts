@@ -82,7 +82,7 @@ export async function getTransferRequestById(params: GetTransferRequestByIdParam
               MAX(CASE WHEN request_user.id = transfer_request.receiver_id THEN request_user.email END) receiver_email,
               MAX(CASE WHEN request_user.id = transfer_request.requester_id THEN request_user.email END) applyer_email,
               MAX(transfer.id)                              transfer_id,
-              MAX(review.id)                                review_id,
+              MAX(review.id)                                review_id
         FROM transfer_request
                 INNER JOIN "user" AS request_user ON request_user.id = transfer_request.receiver_id OR request_user.id = transfer_request.requester_id
                 LEFT JOIN transfer ON transfer.transfer_request_id = transfer_request.id AND transfer.is_active = TRUE
