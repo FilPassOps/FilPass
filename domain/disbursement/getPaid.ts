@@ -63,8 +63,6 @@ export const getPaid = async (params: GetPaidParams) => {
       updatedAt: true,
       amount: true,
       status: true,
-      vestingStartEpoch: true,
-      vestingMonths: true,
       wallet: {
         select: {
           address: true,

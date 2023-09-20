@@ -31,9 +31,7 @@ interface ProgramWithCurrency extends Program {
   programCurrency: ProgramCurrency[]
 }
 
-type CreateTransferRequestProps = Partial<
-  Pick<TransferRequest, 'status' | 'team' | 'amount' | 'isActive' | 'vestingMonths' | 'vestingStartEpoch' | 'createdAt'>
-> &
+type CreateTransferRequestProps = Partial<Pick<TransferRequest, 'status' | 'team' | 'amount' | 'isActive' | 'createdAt'>> &
   Pick<TransferRequest, 'receiverId' | 'requesterId' | 'userWalletId'> & {
     program: ProgramWithCurrency
     review?: Pick<TransferRequestReview, 'status' | 'approverId' | 'notes'>
@@ -135,8 +133,6 @@ export async function createMultisigTransferRequest({
   review,
   payment,
   isActive = true,
-  vestingMonths,
-  vestingStartEpoch,
 }: CreateTransferRequestProps) {
   const request = await prisma.transferRequest.create({
     data: {
@@ -169,8 +165,6 @@ export async function createMultisigTransferRequest({
       terms: defaultTerms,
       robustAddress: 'bafy2bzaceamyexftc2r2vrpfvkg3gicktkelm6e6xpizxh2hbp27eutjbbpec',
       actorAddress: 'f012908',
-      vestingMonths,
-      vestingStartEpoch,
       currency: {
         connect: {
           id: program.programCurrency.find(curr => curr.type === 'REQUEST')?.currencyUnitId,
@@ -267,41 +261,6 @@ export type CreateProgramResult = Program & {
   programCurrency: CreateProgramCurrencyResult[]
 }
 
-export async function createLinearVestingProgram(
-  name: string | undefined = 'LINEAR VESTING USD TO FIL PROGRAM',
-): Promise<CreateProgramResult> {
-  const result = await prisma.program.create({
-    data: {
-      deliveryMethod: 'LINEAR_VESTING',
-      name,
-      visibility: 'EXTERNAL',
-      programCurrency: {
-        create: [
-          {
-            currencyUnitId: 1,
-            type: 'REQUEST',
-          },
-          {
-            currencyUnitId: 1,
-            type: 'PAYMENT',
-          },
-        ],
-      },
-      blockchainId: 1,
-    },
-    include: {
-      programCurrency: {
-        include: {
-          currency: true,
-        },
-      },
-    },
-  })
-  await prisma.$disconnect()
-
-  return result
-}
-
 export async function createOneTimeProgram(name: string | undefined = 'FIL ONE TIME PROGRAM'): Promise<CreateProgramResult> {
   const result = await prisma.program.create({
     data: {
@@ -367,7 +326,6 @@ export async function createUser(email: string): Promise<CreateUserResult> {
       },
     }),
   ])
-
 
   const userRole = await prisma.userRole.create({
     data: {

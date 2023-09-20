@@ -31,8 +31,6 @@ interface Request {
   program_name: string
   team: string
   create_date: string
-  vesting_start_epoch: number
-  vesting_months: number
   notes: string
 }
 
@@ -70,8 +68,6 @@ const TransferList = ({ data = [] }: TransferListProps) => {
             <Header style={{ minWidth: 200 }}>Address</Header>
             <Header>Request Amount</Header>
             <Header style={{ minWidth: 180 }}>Receiver / Requestor</Header>
-            <Header style={{ minWidth: 180 }}>Vesting Start Epoch</Header>
-            <Header style={{ minWidth: 180 }}>Vesting Months</Header>
             <Header>Memo</Header>
           </tr>
         </TableHead>
@@ -111,8 +107,6 @@ const TransferList = ({ data = [] }: TransferListProps) => {
                 <Cell>
                   <PaymentControl applyer={request.applyer} receiver={request.receiver} />
                 </Cell>
-                <LinkedCell href={href}>{request.vesting_start_epoch || '-'}</LinkedCell>
-                <LinkedCell href={href}>{request.vesting_months || '-'}</LinkedCell>
                 <Cell>
                   <Memo notes={request.notes} transfer_hash={request.transfer_hash} blockchain={request.user_wallet_blockchain} />
                 </Cell>

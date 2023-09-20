@@ -46,8 +46,6 @@ export interface ViewTransferRequestProps {
     program_delivery_method: string
     expected_transfer_date: string
     amount: number
-    vesting_start_epoch: number
-    vesting_months: number
     created_at: string
     receiver: string
     receiver_is_banned: boolean
@@ -162,10 +160,6 @@ export const ViewTransferRequest = ({ data, role }: ViewTransferRequestProps) =>
           ) : (
             <TextInput name="wallet" label="Wallet Address" disabled defaultValue="-" />
           )}
-
-          {!!data?.vesting_start_epoch && <TextInput label="Vesting Start Epoch" disabled defaultValue={data.vesting_start_epoch} />}
-
-          {!!data?.vesting_months && <TextInput label="Vesting Month" disabled defaultValue={data.vesting_months} />}
 
           <NumberInput
             label={`Request Amount in ${data?.request_unit}`}

@@ -85,8 +85,6 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
             <Header style={{ minWidth: 200 }}>Address</Header>
             <Header>Request Amount</Header>
             <Header>{query.status === PAID_STATUS ? `Paid Amount` : `Estimated Amount`}</Header>
-            <Header style={{ minWidth: 180 }}>Vesting Start Epoch</Header>
-            <Header style={{ minWidth: 180 }}>Vesting Months</Header>
             <Header>Status</Header>
             <Header />
           </tr>
@@ -146,8 +144,6 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
                     '-'
                   )}
                 </LinkedCell>
-                <LinkedCell href={href}>{request?.vesting_start_epoch ?? '-'}</LinkedCell>
-                <LinkedCell href={href}>{request?.vesting_months ?? '-'}</LinkedCell>
                 <LinkedCell href={href}>
                   <StatusPill status={request.status} />
                 </LinkedCell>

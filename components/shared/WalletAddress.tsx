@@ -39,7 +39,7 @@ export const WalletAddress = ({
   let filecoinDelegatedAddress = delegatedAddress
 
   if (!delegatedAddress && blockchain === 'Filecoin') {
-    const delegatedAddressObj = getDelegatedAddress(address, walletLength)
+    const delegatedAddressObj = getDelegatedAddress(address, walletLength, blockchain)
     filecoinDelegatedAddress = walletLength === WalletSize.FULL ? delegatedAddressObj?.fullAddress : delegatedAddressObj?.shortAddress
   }
   if (walletLength !== WalletSize.FULL) {
@@ -49,7 +49,7 @@ export const WalletAddress = ({
   return (
     <div title={address} className={classNames('flex items-center text-sm text-gray-900', className)}>
       {enableBlockchainIcon && <BlockchainIcon blockchainName={blockchain} className="mr-2" />}
-      <span className="flex flex-col justify-center items-start">
+      <span className="flex flex-shrink-0 flex-col justify-center items-start">
         {blockchain && <p className="text-gray-500 ui-active:text-white truncate">{blockchain}</p>}
         <p className="text-gray-500 ui-active:text-white truncate">{label}</p>
         <p className="ui-active:text-white break-all">{formattedAddress}</p>

@@ -46,8 +46,6 @@ interface TransferRequest {
   team: string
   create_date: Date
   amount: string
-  vesting_start_epoch: number
-  vesting_months: number
   program_name: string
   program_id: number
   request_unit: string
@@ -191,8 +189,6 @@ export async function getApproverTransferRequests(params: GetApproverTransferReq
         request.team                                         team,
         request.created_at                                   create_date,
         request.amount                                       amount,
-        request.vesting_start_epoch                          vesting_start_epoch,
-        request.vesting_months                               vesting_months,
         program.name                                         program_name,
         program.id                                           program_id,
         currency_unit.name                                   request_unit,

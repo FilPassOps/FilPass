@@ -118,8 +118,6 @@ export const getApproved = async (params: GetApprovedParams): Promise<GetApprove
       updatedAt: true,
       amount: true,
       status: true,
-      vestingStartEpoch: true,
-      vestingMonths: true,
       wallet: {
         select: {
           address: true,

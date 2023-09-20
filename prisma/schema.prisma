@@ -32,7 +32,6 @@ enum TransferRequestReviewStatus {
 
 enum DeliveryMethod {
   ONE_TIME
-  LINEAR_VESTING
 }
 
 enum TransferRequestStatus {
@@ -290,8 +289,6 @@ model TransferRequest {
   robustAddress        String                     @default("") @map("robust_address")
   attachment           UserFile?                  @relation(fields: [attachmentId], references: [id], name: "attachment")
   attachmentId         Int?                       @map("attachment_id")
-  vestingStartEpoch    Int?                       @map("vesting_start_epoch")
-  vestingMonths        Int?                       @map("vesting_months")
   reviews              TransferRequestReview[]
   history              TransferRequestHistory[]
   transfers            Transfer[]

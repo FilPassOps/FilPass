@@ -8,13 +8,9 @@ interface PreviewTableProps {
     Custodian: string
     Name: string
     Amount: string
-    'Vesting Start Epoch'?: string
-    'Vesting Months'?: string
     'Wallet Address'?: string
     'Should Receiver Review'?: string
     Addresses?: string
-    VestingStartEpoch?: string
-    VestingMonths?: string
   }[]
   program?: {
     name: string
@@ -30,19 +26,9 @@ interface PreviewTableProps {
 export const PreviewTable = ({ data, program }: PreviewTableProps) => {
   const request_unit = program?.programCurrency.find(p => p.type === 'REQUEST')?.currency?.name
   const payment_unit = program?.programCurrency.find(p => p.type === 'PAYMENT')?.currency?.name
-  const vestingStartEpochSet = new Set()
-
-  for (const item of data) {
-    vestingStartEpochSet.add(item?.['Vesting Start Epoch'] || item?.['VestingStartEpoch'])
-  }
 
   return (
     <>
-      {vestingStartEpochSet.size > 1 && (
-        <div className="my-7 text-sm rounded-lg p-4 space-y-4 text-gamboge-orange bg-papaya-whip">
-          We recommend using the same Vesting Start Epoch for all items uploaded in one CSV file.
-        </div>
-      )}
       <div className="flex flex-col">
         <Table>
           <TableHead>
@@ -52,8 +38,6 @@ export const PreviewTable = ({ data, program }: PreviewTableProps) => {
               <Header style={{ minWidth: 180 }}>Program</Header>
               <Header style={{ minWidth: 180 }}>Name</Header>
               <Header style={{ minWidth: 180 }}>Amount</Header>
-              <Header style={{ minWidth: 200 }}>Vesting Start Epoch</Header>
-              <Header style={{ minWidth: 180 }}>Vesting Months</Header>
               <Header style={{ minWidth: 200, width: '100%' }}>Wallet Address</Header>
               <Header style={{ minWidth: 220 }}>Should Receiver Review</Header>
             </tr>
@@ -70,8 +54,6 @@ export const PreviewTable = ({ data, program }: PreviewTableProps) => {
                   <Cell>
                     <Currency amount={item?.Amount} requestCurrency={request_unit} paymentUnit={payment_unit} />
                   </Cell>
-                  <Cell>{item?.['Vesting Start Epoch'] || item?.['VestingStartEpoch']}</Cell>
-                  <Cell>{item?.['Vesting Months'] || item?.['VestingMonths']}</Cell>
                   <Cell>{middleEllipsis(item?.['Wallet Address'] || item?.['Addresses']) || '-'}</Cell>
                   <Cell>
                     {(shouldReceiverReviewStr === 'true' || shouldReceiverReviewStr === 'yes' || shouldReceiverReviewStr === '1') && (

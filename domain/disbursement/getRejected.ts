@@ -60,8 +60,6 @@ export const getRejected = async (params: GetRejectedParams) => {
       updatedAt: true,
       amount: true,
       status: true,
-      vestingStartEpoch: true,
-      vestingMonths: true,
       wallet: {
         select: {
           address: true,

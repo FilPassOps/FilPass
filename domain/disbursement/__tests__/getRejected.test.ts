@@ -73,8 +73,6 @@ describe('getRejected', () => {
       updatedAt: tr.updatedAt,
       amount: await decrypt(tr.amount),
       status: tr.status,
-      vestingMonths: null,
-      vestingStartEpoch: null,
       wallet: {
         address: userOne.wallets[0].address,
         blockchain: userOne.wallets[0].blockchain,

@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import { parse } from 'csv-parse/sync'
 import fs from 'fs'
 import { matchWalletAddress } from 'lib/filecoinShipyard'
@@ -6,9 +7,7 @@ import { generateEmailHash } from 'lib/password'
 import prisma from 'lib/prisma'
 import yup, { validate } from 'lib/yup'
 import { sortedUniq } from 'lodash'
-import errorsMessages from 'wordings-and-errors/errors-messages'
 import { csvSchemaV1, csvSchemaV2, uploadBatchCsvValidator } from './validation'
-import { Prisma } from '@prisma/client'
 
 interface UploadBatchCsvParams {
   programId: number
@@ -126,21 +125,7 @@ const verifyCsv = async ({ file, prisma, approverId }: VerifyCsvParams) => {
 
 const validateV1SchemaFile = async (validationObject: { records: any; prisma: Prisma.TransactionClient; fileData: string }) => {
   const { records, prisma, fileData } = validationObject
-  let errors: any[] = []
-
-  // TODO: Check vesting later
-  // verifyVesting(program, records, 'Vesting Start Epoch', 'Vesting Months')
-  const vestingVerify = false
-
-  if (vestingVerify) {
-    errors.push(vestingVerify)
-  }
-
-  const vestingMonthRange = verifyVestingMonthRange(records, 'Vesting Months')
-
-  if (vestingMonthRange) {
-    errors = [...errors, ...vestingMonthRange]
-  }
+  const errors: any[] = []
 
   const { error: verifyEmailErrors } = verifyEmail(records)
   if (verifyEmailErrors) {
@@ -166,21 +151,7 @@ const validateV2SchemaFile = async (
 ) => {
   const { records, prisma, fileData } = validationObject
 
-  let errors: any = []
-
-  // TODO: Check vesting later
-  // verifyVesting(program, records, 'VestingStartEpoch', 'VestingMonths')
-  const vestingVerify = false
-
-  if (vestingVerify) {
-    errors.push(vestingVerify)
-  }
-
-  const vestingMonthRange = verifyVestingMonthRange(records, 'VestingMonths')
-
-  if (vestingMonthRange) {
-    errors = [...errors, ...vestingMonthRange]
-  }
+  const errors: any = []
 
   const { error: verifyEmailErrors } = verifyEmail(records)
   if (verifyEmailErrors) {
@@ -320,30 +291,6 @@ const verifyWallet = async (data: Row[], prisma: Prisma.TransactionClient, propN
   )
 
   return { error: errors.length > 0 ? errors : null }
-}
-
-//TODO MSIG 1 of 2
-// previus params (program, records, vestingStartEpochPropName, vestingMonthsPropName)
-// const verifyVesting = () => {
-// const vestginParams = records.filter(row => row[vestingStartEpochPropName] || row[vestingMonthsPropName])
-
-// if (vestginParams.length > 0 && program.deliveryMethod !== MULTISIG_1_OF_2) {
-//   return errorsMessages.program_vesting_not_supported
-// }
-
-// return false
-// }
-
-const verifyVestingMonthRange = (records: Row[], propName: string) => {
-  const errors: any[] = []
-  records.forEach((row, index) => {
-    const vestingMonth = row[propName]
-    if (vestingMonth && (vestingMonth < 0 || vestingMonth > 200)) {
-      errors.push({ message: `${errorsMessages.invalid_vesting_months_range.message} At line ${index + 2}` })
-    }
-  })
-
-  return errors
 }
 
 const verifyApprovalForTransfer = (records: Row[]) => {
