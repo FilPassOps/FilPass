@@ -12,6 +12,7 @@ interface SelectNetworkInputProps {
   label?: string
   onChange?: (chainId: string) => void
   chainIdFilter?: string
+  listboxClassName?: string
 }
 
 export const SelectNetworkInput = ({
@@ -23,6 +24,7 @@ export const SelectNetworkInput = ({
   label,
   onChange,
   chainIdFilter,
+  listboxClassName,
 }: SelectNetworkInputProps) => {
   const chainOptions = CONFIG.chains
     .filter(chain => (chainIdFilter ? chain.chainId === chainIdFilter : true))
@@ -62,6 +64,7 @@ export const SelectNetworkInput = ({
               ref={field.ref}
               value={field.value}
               disabled={disabled}
+              listboxClassName={listboxClassName}
             />
           )}
         />

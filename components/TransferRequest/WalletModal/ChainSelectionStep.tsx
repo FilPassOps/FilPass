@@ -45,6 +45,7 @@ export function ChainSelection({ onConnectionMethodClick, chainIdFilter }: Chain
           errors={errors.chainId}
           label="Select Network"
           placeholder="Choose wallet network"
+          listboxClassName="max-h-28"
         />
         <div className="flex w-full">
           <WithMetaMaskButton type="submit" className="w-full" targetChainId={chainId} />
