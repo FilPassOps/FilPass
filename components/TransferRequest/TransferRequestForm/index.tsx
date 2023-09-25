@@ -190,7 +190,7 @@ export const TransferRequestForm = ({ isEditable = false, data = null, programs 
         }}
         open={openWalletModal}
         onModalClosed={() => setOpenWalletModal(false)}
-        blockchain={selectedProgram?.blockchain.name}
+        chainIdFilter={selectedProgram?.blockchain.chainId}
       />
 
       <SubmittedModal openModal={openSubmittedModal && (!submitErrors || hasUnhandledError)} hasError={hasUnhandledError} />

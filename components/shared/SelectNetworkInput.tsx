@@ -11,20 +11,32 @@ interface SelectNetworkInputProps {
   placeholder?: string
   label?: string
   onChange?: (chainId: string) => void
+  chainIdFilter?: string
 }
 
-export const SelectNetworkInput = ({ control, errors, submitErrors, disabled, placeholder, label, onChange }: SelectNetworkInputProps) => {
-  const chainOptions = CONFIG.chains.map(chain => {
-    return {
-      label: (
-        <div className="flex">
-          <BlockchainIcon blockchainName={chain.name} className="mr-2" />
-          <span className="font-medium">{chain.name}</span>
-        </div>
-      ),
-      value: chain.chainId,
-    }
-  })
+export const SelectNetworkInput = ({
+  control,
+  errors,
+  submitErrors,
+  disabled,
+  placeholder,
+  label,
+  onChange,
+  chainIdFilter,
+}: SelectNetworkInputProps) => {
+  const chainOptions = CONFIG.chains
+    .filter(chain => (chainIdFilter ? chain.chainId === chainIdFilter : true))
+    .map(chain => {
+      return {
+        label: (
+          <div className="flex">
+            <BlockchainIcon blockchainName={chain.name} className="mr-2" />
+            <span className="font-medium">{chain.name}</span>
+          </div>
+        ),
+        value: chain.chainId,
+      }
+    })
 
   return (
     <>
