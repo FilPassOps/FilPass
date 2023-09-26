@@ -81,6 +81,7 @@ export async function findAllExternalPrograms() {
       blockchain: {
         select: {
           name: true,
+          chainId: true,
         },
       },
     },

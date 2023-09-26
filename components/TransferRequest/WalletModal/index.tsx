@@ -14,10 +14,10 @@ interface WalletModalProps {
   open: boolean
   onModalClosed: () => void
   setUserWalletId: (id: number) => void
-  blockchain: string
+  chainIdFilter?: string
 }
 
-export function WalletModal({ open, onModalClosed, setUserWalletId }: WalletModalProps) {
+export function WalletModal({ open, onModalClosed, setUserWalletId, chainIdFilter }: WalletModalProps) {
   const { wallet, chainId } = useMetaMask()
 
   const { refresh, user } = useAuth()
@@ -68,7 +68,7 @@ export function WalletModal({ open, onModalClosed, setUserWalletId }: WalletModa
 
   return (
     <Modal open={open} onModalClosed={handleModalClosed}>
-      {step === 1 && <ChainSelection onConnectionMethodClick={handleChainSelectionClick} />}
+      {step === 1 && <ChainSelection onConnectionMethodClick={handleChainSelectionClick} chainIdFilter={chainIdFilter} />}
 
       {step === 2 && (
         <ConnectStep

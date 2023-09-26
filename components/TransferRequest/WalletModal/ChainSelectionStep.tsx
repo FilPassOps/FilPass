@@ -6,9 +6,10 @@ import { useForm } from 'react-hook-form'
 
 interface ChainSelectionProps {
   onConnectionMethodClick: (chainId: string) => void
+  chainIdFilter?: string
 }
 
-export function ChainSelection({ onConnectionMethodClick }: ChainSelectionProps) {
+export function ChainSelection({ onConnectionMethodClick, chainIdFilter }: ChainSelectionProps) {
   const {
     control,
     handleSubmit,
@@ -39,6 +40,7 @@ export function ChainSelection({ onConnectionMethodClick }: ChainSelectionProps)
       </span>
       <form onSubmit={handleSubmit(handleSubmitForm)} className="flex flex-col gap-4 w-full h-full space-y-6 ">
         <SelectNetworkInput
+          chainIdFilter={chainIdFilter}
           control={control}
           errors={errors.chainId}
           label="Select Network"

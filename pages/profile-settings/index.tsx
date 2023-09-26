@@ -80,7 +80,7 @@ export default function UserSettings({ data }: UserSettingsProps) {
           refresh()
           setOpenWalletModal(false)
         }}
-        blockchain={undefined as any} //TODO OPEN-SOURCE
+        chainIdFilter={undefined}
       />
     </>
   )
