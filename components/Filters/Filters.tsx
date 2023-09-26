@@ -67,7 +67,7 @@ export const Filters = ({ programs, statusOptions, teams, dateFilterLabel = 'Cre
   const [requestNumber, setRequestNumber] = useState(initialRequestNumberFilter)
   const [selectedStatus, setSelectedStatus] = useState<StatusFilterOption | undefined>(initialStatusFilter)
   const [selectedTeams, setSelectedTeams] = useState<SelectOption[]>(initialTeamFilter || [])
-  const [walletAddress, setWalletAdress] = useState(initialWalletAddress)
+  const [walletAddress, setWalletAddress] = useState(initialWalletAddress)
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>(initialDateRange)
   const [pageStatus, setPageStatus] = useState(query.status)
   const [startDate, endDate] = dateRange
@@ -130,7 +130,7 @@ export const Filters = ({ programs, statusOptions, teams, dateFilterLabel = 'Cre
     setSelectedStatus(undefined)
     setSelectedTeams([])
     setDateRange([null, null])
-    setWalletAdress('')
+    setWalletAddress('')
   }
 
   if (selectedNetwork.length > 0) selectedFilters++
@@ -196,7 +196,15 @@ export const Filters = ({ programs, statusOptions, teams, dateFilterLabel = 'Cre
                               {selectedStatus ? (
                                 <div className="w-full flex items-center justify-between">
                                   <div>{statusFilterLabel[selectedStatus]}</div>
-                                  <div role="button" className="mx-2" onClick={() => setSelectedStatus(undefined)}>
+                                  <div
+                                    role="button"
+                                    aria-label="Clear status field"
+                                    className="mx-2"
+                                    onClick={e => {
+                                      e.stopPropagation()
+                                      setSelectedStatus(undefined)
+                                    }}
+                                  >
                                     <XMarkIcon width={16} height={16} />
                                   </div>
                                 </div>
@@ -270,6 +278,7 @@ export const Filters = ({ programs, statusOptions, teams, dateFilterLabel = 'Cre
                 <FilterLabel htmlFor="create-date">{dateFilterLabel}:</FilterLabel>
                 <div className="w-full">
                   <DatePicker
+                    wrapperClassName="w-full"
                     selectsRange={true}
                     startDate={startDate}
                     endDate={endDate}
@@ -290,11 +299,11 @@ export const Filters = ({ programs, statusOptions, teams, dateFilterLabel = 'Cre
                     name="wallet-address"
                     id="wallet-address"
                     value={walletAddress}
-                    onChange={event => setWalletAdress(event.currentTarget.value)}
+                    onChange={event => setWalletAddress(event.currentTarget.value)}
                     placeholder="f1ifoar2uwirdrmr5hylvhpphdph6z6ahrqvxashw"
                   />
-                  <div className={`${requestNumber ? 'absolute' : 'hidden'} top-[10px] right-4`}>
-                    <button type="button" aria-label="Clear wallet address" onClick={() => setWalletAdress('')}>
+                  <div className={`${walletAddress ? 'absolute' : 'hidden'} top-[10px] right-4`}>
+                    <button type="button" aria-label="Clear wallet address" onClick={() => setWalletAddress('')}>
                       <XMarkIcon width={16} height={16} />
                     </button>
                   </div>
@@ -334,12 +343,15 @@ const CustomDatepickInput = forwardRef<any, any>(({ value, onClick, onClear }, r
       className="appearance-none w-full focus:ring-1 focus:ring-indigo-600 focus:border-indigo-600 border-gray-300 border shadow-sm rounded-md px-3 py-2 text-left text-sm bg-white pr-10"
       onClick={onClick}
       ref={ref}
+      type="button"
     >
       {value || <span className="text-slate-500">Select a date interval</span>}
     </button>
-    <button className="absolute right-4" aria-label="Clear options" onClick={() => onClear()}>
-      <XMarkIcon width={16} height={16} />
-    </button>
+    {value && (
+      <button className="absolute right-4" aria-label="Clear options" onClick={() => onClear()}>
+        <XMarkIcon width={16} height={16} />
+      </button>
+    )}
   </div>
 ))
 
@@ -411,6 +423,7 @@ function Select({ name, placeholder, options, onChange, selectedOptions, setSele
                 <div key={option.value} className="flex items-center gap-2 p-2 bg-indigo-600 text-white rounded-md">
                   <div className="border-r border-white pr-2 text-sm">{option.label}</div>
                   <button
+                    type='button'
                     onClick={() => {
                       unselect(option)
                       inputRef.current?.focus()
@@ -438,11 +451,11 @@ function Select({ name, placeholder, options, onChange, selectedOptions, setSele
         </div>
         <div className="flex items-center gap-2 mx-3">
           {selectedOptions.length > 0 && (
-            <button aria-label="Clear options" onClick={() => setSelectedOptions([])}>
+            <button type='button' aria-label="Clear options" onClick={() => setSelectedOptions([])}>
               <XMarkIcon width={16} height={16} />
             </button>
           )}
-          <button aria-label="Toggle options" onClick={() => setOptionsToggle(prev => !prev)}>
+          <button type='button' aria-label="Toggle options" onClick={() => setOptionsToggle(prev => !prev)}>
             {optionsToggle ? (
               <ChevronUpIcon width={20} height={20} aria-hidden="true" />
             ) : (
@@ -461,6 +474,7 @@ function Select({ name, placeholder, options, onChange, selectedOptions, setSele
           .map(option => (
             <button
               className="text-left text-sm px-4 py-1 hover:bg-indigo-600 hover:text-white"
+              type='button'
               key={option.value}
               onClick={() => {
                 select(option)
