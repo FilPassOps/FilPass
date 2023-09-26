@@ -252,7 +252,13 @@ const TransferList = ({
                         className="h-full flex items-center justify-center flex-col space-y-4 2xl:space-y-0 2xl:space-x-4 2xl:flex-row"
                         onClick={e => e.stopPropagation()}
                       >
-                        <WithMetaMaskButton variant="outline-green" onClick={() => onSinglePayClick(request)} defaultLabel="Pay">
+                        <WithMetaMaskButton
+                          variant="outline-green"
+                          onClick={() => onSinglePayClick(request)}
+                          defaultLabel="Pay"
+                          targetChainId={chainId}
+                          className="w-full"
+                        >
                           Pay
                         </WithMetaMaskButton>
 

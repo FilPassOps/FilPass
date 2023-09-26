@@ -49,7 +49,6 @@ interface Transfer {
   transfer_amount_currency_unit: string
   create_date: string
   status: string
-  is_us_resident: boolean
   transfer_hash: string
   wallet_blockchain: string
 }
@@ -138,7 +137,6 @@ export default function Approvals({
       columns.paidFilAmount && headerFile.push('Paid Amount')
       columns.paidFilAmount && headerFile.push('Paid Amount Currency Unit')
       columns.status && headerFile.push('Status')
-      columns.residency && headerFile.push('Residency')
       columns.taxForm && headerFile.push('Tax Form')
       columns.filfoxLink && headerFile.push('Filfox link')
 
@@ -158,7 +156,6 @@ export default function Approvals({
               transfer_amount_currency_unit,
               create_date,
               status,
-              is_us_resident,
               transfer_hash,
               wallet_blockchain,
             }) => {
@@ -175,7 +172,6 @@ export default function Approvals({
               columns.paidFilAmount && row.push(transfer_amount)
               columns.paidFilAmount && row.push(transfer_amount_currency_unit)
               columns.status && row.push(status)
-              columns.residency && row.push(is_us_resident ? 'US' : 'Non-US')
               columns.filfoxLink && row.push(`${chain.blockExplorer.url}/${transfer_hash}`)
               return row
             },

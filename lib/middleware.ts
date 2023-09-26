@@ -87,7 +87,7 @@ export function withMethods<T>(methods: Methods[] = [], handler: NextApiHandlerW
 }
 
 export function withValidation<T extends AnyObjectSchema>(schema: T, handler: NextApiHandler) {
-  return async function (request: NextApiRequest | NextApiRequestWithSession, response: NextApiResponse) {
+  return async function validate(request: NextApiRequest | NextApiRequestWithSession, response: NextApiResponse) {
     try {
       request.body = await schema.validate(request.body)
 

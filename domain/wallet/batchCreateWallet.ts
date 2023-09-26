@@ -1,16 +1,20 @@
 import { TransactionError } from 'lib/errors'
 import { matchWalletAddress } from 'lib/filecoinShipyard'
-import { getDelegatedAddress } from 'lib/getDelegatedAddress'
+import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import prisma, { newPrismaTransaction } from 'lib/prisma'
 import _ from 'lodash'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { Prisma } from '@prisma/client'
+import { utils } from 'ethers'
+import { getChainByName } from 'system.config'
 
 interface Request {
   wallet: {
     created?: boolean
     isDefault: boolean
     address: string
+    shouldUpdate?: boolean
+    id?: number
   }
   receiver: {
     id: number
@@ -19,6 +23,7 @@ interface Request {
   receiverEmail: string
   skipWalletCreation: boolean
   row: number
+  programId: number
 }
 
 interface BatchCreateWalletParams {
@@ -26,6 +31,7 @@ interface BatchCreateWalletParams {
     receiverEmail: string
     wallet?: string
     skipWalletCreation?: boolean
+    programId: number
   }[]
   users: {
     id: number
@@ -59,9 +65,18 @@ export const batchCreateWallet = async ({ requests, users, isBatchCsv }: BatchCr
   const foundRejected = validatedWallets.find(req => req.status === 'rejected')
 
   if (foundRejected) {
-    const errors = validatedWallets.map(result =>
-      result.status === 'rejected' ? { wallet: { message: result.reason?.message ?? errorsMessages.wallet_incorrect.message } } : null,
-    )
+    let errors: ({ message: any } | { wallet: { message: string } } | null)[] = []
+
+    if (isBatchCsv) {
+      errors = validatedWallets.map(result =>
+        result.status === 'rejected' ? { message: result.reason?.message ?? errorsMessages.wallet_incorrect.message } : null,
+      )
+    } else {
+      errors = validatedWallets.map(result =>
+        result.status === 'rejected' ? { wallet: { message: result.reason?.message ?? errorsMessages.wallet_incorrect.message } } : null,
+      )
+    }
+
     return {
       error: {
         status: 400,
@@ -70,7 +85,7 @@ export const batchCreateWallet = async ({ requests, users, isBatchCsv }: BatchCr
     }
   }
 
-  const { data: createdWallets, error } = await createWallets(walletRequests)
+  const { data: createdWallets, error } = await createOrUpdateWallets(walletRequests)
 
   if (error) {
     return { error }
@@ -83,11 +98,23 @@ const checkWallet = async ({ prisma, user, request, isBatchCsv, index }: CheckWa
   const userWallets = await prisma.userWallet.findMany({
     where: {
       userId: user.id,
-      isActive: true,
     },
   })
 
-  const defaultWallet = userWallets.find(wallet => wallet.isDefault)
+  const program = await prisma.program.findUnique({
+    where: {
+      id: request.programId,
+    },
+    select: {
+      blockchain: true,
+    },
+  })
+
+  if (!program) {
+    throw { message: errorsMessages.program_not_found.message }
+  }
+
+  const defaultWallet = userWallets.find(wallet => wallet.isActive && wallet.isDefault && wallet.blockchainId === program.blockchain.id)
 
   if (defaultWallet && !request.wallet) {
     return { ...request, wallet: defaultWallet, receiver: user }
@@ -101,7 +128,9 @@ const checkWallet = async ({ prisma, user, request, isBatchCsv, index }: CheckWa
     throw { wallet: errorsMessages.default_wallet_not_found }
   }
 
-  const storedWallet = userWallets.find(({ address }) => address === request.wallet)
+  const storedWallet = userWallets.find(
+    ({ address, blockchainId, isActive }) => isActive && address === request.wallet && program.blockchain.id === blockchainId,
+  )
 
   if (storedWallet) {
     return {
@@ -115,19 +144,54 @@ const checkWallet = async ({ prisma, user, request, isBatchCsv, index }: CheckWa
     throw { wallet: errorsMessages.wallet_cant_be_empty }
   }
 
-  if (request.wallet?.startsWith('0x')) {
-    const delegatedAddress = getDelegatedAddress(request.wallet).fullAddress
+  const deactivatedWallet = userWallets.find(
+    ({ address, blockchainId, isActive }) =>
+      !isActive && address.toLowerCase() === request.wallet?.toLowerCase() && program.blockchain.id === blockchainId,
+  )
 
-    if (!delegatedAddress) {
-      throw { wallet: errorsMessages.wallet_incorrect }
+  if (deactivatedWallet) {
+    return {
+      ...request,
+      wallet: { ...deactivatedWallet, shouldUpdate: true },
+      receiver: user,
+    }
+  }
+
+  const filecoin = getChainByName('Filecoin')
+
+  if (program.blockchain.chainId === filecoin.chainId && request.wallet?.startsWith('0x')) {
+    const delegatedAddress = getDelegatedAddress(request.wallet, WalletSize.FULL, program.blockchain.name)
+
+    if (!delegatedAddress.fullAddress) {
+      if (isBatchCsv) {
+        throw { message: `${errorsMessages.wallet_incorrect.message} At line ${index + 1}` }
+      }
+      throw { wallet: errorsMessages.wallet_incorrect.message }
     }
 
     request.wallet = request.wallet.toLowerCase()
+  } else if (request.wallet?.startsWith('0x')) {
+    if (utils.isAddress(request.wallet)) {
+      request.wallet = request.wallet.toLowerCase()
+    } else {
+      return { wallet: errorsMessages.wallet_incorrect.message }
+    }
   } else {
+    if (program.blockchain.chainId !== filecoin.chainId) {
+      if (isBatchCsv) {
+        throw { message: `${errorsMessages.wallet_incorrect.message} At line ${index + 1}` }
+      }
+
+      throw { wallet: errorsMessages.wallet_incorrect.message }
+    }
+
     const isWalletValid = await matchWalletAddress(request.wallet as string)
 
     if (!isWalletValid) {
-      throw { wallet: errorsMessages.wallet_not_found }
+      if (isBatchCsv) {
+        throw { message: `${errorsMessages.wallet_incorrect.message} At line ${index + 1}` }
+      }
+      throw { wallet: errorsMessages.wallet_incorrect.message }
     }
   }
 
@@ -138,17 +202,37 @@ const checkWallet = async ({ prisma, user, request, isBatchCsv, index }: CheckWa
   }
 }
 
-const createWallets = async (requests: Request[]) => {
+const createOrUpdateWallets = async (requests: Request[]) => {
   return await newPrismaTransaction(async prisma => {
+    const programs = await prisma.program.findMany({
+      select: {
+        id: true,
+        blockchain: true,
+      },
+    })
+
     const promiseList = requests.map(async singleRequest => {
       if (singleRequest.wallet?.created === false && !singleRequest?.skipWalletCreation) {
+        const requestProgram = programs.find(program => program.id === singleRequest.programId)
+
         const wallet = await prisma.userWallet.create({
           data: {
             userId: singleRequest.receiver.id,
             name: 'created by approver',
             address: singleRequest.wallet.address,
-            blockchainId: 1, // TODO OPEN-SOURCE: should the id of the blockchain table
+            blockchainId: requestProgram?.blockchain.id as number,
             isDefault: false,
+          },
+        })
+
+        return { ...singleRequest, wallet }
+      } else if (singleRequest.wallet?.shouldUpdate && !singleRequest?.skipWalletCreation) {
+        const wallet = await prisma.userWallet.update({
+          where: {
+            id: singleRequest.wallet.id,
+          },
+          data: {
+            isActive: true,
           },
         })
 
@@ -181,7 +265,7 @@ const createWallets = async (requests: Request[]) => {
 const setDefaultWallets = async (requests: Request[]) => {
   return await newPrismaTransaction(async prisma => {
     const promiseList = requests.map(async singleRequest => {
-      if (singleRequest.wallet.isDefault) {
+      if (singleRequest.wallet?.isDefault) {
         return singleRequest
       }
 

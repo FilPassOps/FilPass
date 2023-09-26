@@ -252,7 +252,7 @@ const ModalComponent = ({ openModal, onModalClosed, errors = [] }: ModalComponen
           <div className="flex flex-col justify-center items-center p-2">
             <h1 className="my-4 font-bold text-1xl">Error creating transfer requests:</h1>
             <div className="w-full my-4 text-center space-y-1">
-              {errors?.map(error => (
+              {errors?.map((error)=> (
                 <p key={error?.message} className="text-sm w-full text-red-400 list-disc">
                   {error?.message}
                 </p>
