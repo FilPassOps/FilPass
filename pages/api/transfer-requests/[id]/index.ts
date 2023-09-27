@@ -3,7 +3,6 @@ import { NextApiRequestWithSession, newHandler, withMethods, withUser } from 'li
 import { NextApiResponse } from 'next/types'
 
 async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
-  console.log('passei aqui', req)
   if (req.method === 'PATCH') {
     return await handlePatchRequest(req, res)
   }

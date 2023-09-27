@@ -1,15 +1,15 @@
+import { TransferRequestStatus } from '@prisma/client'
 import { sendCreatedNotification } from 'domain/notifications/sendCreatedNotification'
 import { findAllExternalPrograms } from 'domain/programs/findAll'
+import { termsValidator } from 'domain/user/validation'
 import { encrypt, encryptPII } from 'lib/emissaryCrypto'
 import { generateTeamHash } from 'lib/password'
 import prisma from 'lib/prisma'
 import yup, { validate } from 'lib/yup'
+import errorsMessages from 'wordings-and-errors/errors-messages'
 import { sendSubmittedNotification } from '../notifications/sendSubmittedNotification'
 import { SUBMITTED_STATUS } from './constants'
 import { createTransferRequestValidatorBackend } from './validation'
-import { TransferRequestStatus } from '@prisma/client'
-import errorsMessages from 'wordings-and-errors/errors-messages'
-import { termsValidator } from 'domain/user/validation'
 
 interface CreateTransferRequestParams {
   amount: string
@@ -59,6 +59,15 @@ export async function createTransferRequest(params: CreateTransferRequestParams)
       error: {
         status: 400,
         errors: { programId: errorsMessages.program_not_found.message },
+      },
+    }
+  }
+
+  if (userWallet.blockchainId !== program.blockchainId) {
+    return {
+      error: {
+        status: 400,
+        errors: { userWalletId: errorsMessages.wallet_program_blockchain.message },
       },
     }
   }
