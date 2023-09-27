@@ -38,5 +38,5 @@ export const validateWalletAddress = async (address: string) => {
   if (address.startsWith('f4') || address.startsWith('t4')) {
     return client.walletValidateAddress(address)
   }
-  return utils.isAddress('1x333b5c1e109771432343ca0d4f474e0ac219e929')
+  return utils.isAddress(address)
 }

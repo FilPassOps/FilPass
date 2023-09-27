@@ -6,7 +6,6 @@ import { Button } from 'components/shared/Button'
 import { WalletAddress } from 'components/shared/WalletAddress'
 import { findUserByIdAndEmail } from 'domain/user'
 import { fetcher } from 'lib/fetcher'
-import { getMasterWallet } from 'lib/filecoin'
 import { withUserSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { ReactElement, useState } from 'react'
@@ -106,12 +105,10 @@ UserSettings.getLayout = function getLayout(page: ReactElement) {
 
 export const getServerSideProps = withUserSSR(async function getServerSideProps({ user }) {
   const { data } = await findUserByIdAndEmail({ userId: user.id, email: user.email })
-  const masterWallet = getMasterWallet()
 
   return {
     props: {
       data: JSON.parse(JSON.stringify(data)),
-      masterAddress: masterWallet.address,
     },
   }
 })

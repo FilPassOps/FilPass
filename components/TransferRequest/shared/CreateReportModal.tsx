@@ -70,7 +70,6 @@ export const CreateReportModal = ({
         program: true,
         status: true,
         receiverEmail: isDisbursement && showPaidStatusColumns,
-        residency: showPaidStatusColumns,
         paidFilAmount: showPaidStatusColumns,
         filfoxLink: showPaidStatusColumns,
       },
@@ -143,10 +142,6 @@ export const CreateReportModal = ({
                   <span className="text-gray-700 font-medium text-sm">Receiver Email</span>
                 </CheckboxInput>
               )}
-              {/* @ts-ignore */}
-              <CheckboxInput className="items-center" id="residency" {...register('columns.residency')}>
-                <span className="text-gray-700 font-medium text-sm">Residency</span>
-              </CheckboxInput>
               {/* @ts-ignore */}
               <CheckboxInput className="items-center" id="filAmount" {...register('columns.paidFilAmount')}>
                 <span className="text-gray-700 font-medium text-sm">Paid FIL Amount</span>

@@ -135,13 +135,13 @@ const TransferList = ({ data = [] }: TransferListProps) => {
 export default TransferList
 
 const Memo = ({ notes, transfer_hash, blockchain }: MemoProps) => {
-  const { blockExplorer } = getChainByName(blockchain) || {}
+  const chain = getChainByName(blockchain) || {}
 
   return (
     <>
       {notes && <p className="break-all whitespace-normal 2xl:truncate w-0 min-w-full">{notes}</p>}
       {transfer_hash && (
-        <BlockExplorerLink blockExplorerName={blockExplorer.name} blockExplorerUrl={blockExplorer.url} transactionHash={transfer_hash} />
+        <BlockExplorerLink blockExplorerName={chain?.blockExplorer.name} blockExplorerUrl={chain?.blockExplorer.url} transactionHash={transfer_hash} />
       )}
     </>
   )

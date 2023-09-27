@@ -61,6 +61,7 @@ export async function validateWalletTransferRequests({ prisma, userId, userWalle
     where: {
       userWalletId,
       receiverId: userId,
+      isActive: true,
       status: {
         in: [SUBMITTED_STATUS, SUBMITTED_BY_APPROVER_STATUS, REQUIRES_CHANGES_STATUS],
       },

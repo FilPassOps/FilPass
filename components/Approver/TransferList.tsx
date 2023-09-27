@@ -91,7 +91,7 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
         </TableHead>
         <TableBody>
           {data.map((request, requestIndex) => {
-            const { blockExplorer, chainId } = getChainByName(request.program_blockchain)
+            const chain = getChainByName(request.program_blockchain)
             const href = `/approvals/${request.id}`
 
             return (
@@ -139,7 +139,7 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
                 <LinkedCell href={href}>
                   {request.amount ? (
                     <CryptoAmount>
-                      <CryptoAmountInfo chainId={chainId} request={request} />
+                      <CryptoAmountInfo chainId={chain?.chainId} request={request} />
                     </CryptoAmount>
                   ) : (
                     '-'
@@ -151,8 +151,8 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
                 <Cell>
                   {request.status === PAID_STATUS && request.transfer_hash && (
                     <BlockExplorerLink
-                      blockExplorerName={blockExplorer.name}
-                      blockExplorerUrl={blockExplorer.url}
+                      blockExplorerName={chain?.blockExplorer.name}
+                      blockExplorerUrl={chain?.blockExplorer.url}
                       transactionHash={request.transfer_hash}
                     />
                   )}

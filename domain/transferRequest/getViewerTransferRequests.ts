@@ -72,7 +72,6 @@ export async function getViewerTransferRequests(params: GetViewerTransferRequets
         request.team                                         team,
         request.created_at                                   create_date,
         request.amount                                       amount,
-        request.is_us_resident                               is_us_resident,
         user_file.public_id                                  file_id,
         program.name                                         program_name,
         program.id                                           program_id,
