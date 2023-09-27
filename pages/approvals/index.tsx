@@ -1,5 +1,4 @@
 import { ArrowDownTrayIcon, DocumentDuplicateIcon, DocumentPlusIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import config from 'chains.config'
 import { ApproveModal } from 'components/Approver/Modals/ApproveModal'
 import { RejectModal } from 'components/Approver/Modals/RejectModal'
 import TransferList from 'components/Approver/TransferList'
@@ -10,7 +9,7 @@ import { DeleteModal } from 'components/TransferRequest/shared/DeleteModal'
 import { Button, LinkButton } from 'components/shared/Button'
 import { PaginationCounter } from 'components/shared/PaginationCounter'
 import { PaginationWrapper, getItemsPerPage } from 'components/shared/usePagination'
-import { PLATFORM_NAME } from 'system.config'
+import { PLATFORM_NAME, getChainByName } from 'system.config'
 import { stringify } from 'csv-stringify/sync'
 import { getApprovalsByRole } from 'domain/approvals/service'
 import { APPROVER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
@@ -52,6 +51,7 @@ interface Transfer {
   status: string
   is_us_resident: boolean
   transfer_hash: string
+  wallet_blockchain: string
 }
 
 interface Request {
@@ -160,7 +160,9 @@ export default function Approvals({
               status,
               is_us_resident,
               transfer_hash,
+              wallet_blockchain,
             }) => {
+              const chain = getChainByName(wallet_blockchain)
               const row = []
               columns.number && row.push(id)
               columns.program && row.push(program_name)
@@ -174,7 +176,7 @@ export default function Approvals({
               columns.paidFilAmount && row.push(transfer_amount_currency_unit)
               columns.status && row.push(status)
               columns.residency && row.push(is_us_resident ? 'US' : 'Non-US')
-              columns.filfoxLink && row.push(`${config.chain.blockExplorerUrls[0]}/${transfer_hash}`)
+              columns.filfoxLink && row.push(`${chain.blockExplorer.url}/${transfer_hash}`)
               return row
             },
           ),

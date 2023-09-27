@@ -5,27 +5,6 @@ export const EMAIL_DOMAIN = '@protocol.ai'
 export const EMAIL_FROM_NAME = 'Emissary Support'
 export const SUPPORT_EMAIL = 'emissary@protocol.ai'
 
-export const TOKEN = {
-  name: 'Polygon',
-  symbol: 'MATIC',
-  coinMarketApiCode: 3890, // from https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?symbol=MATIC
-  units: {
-    0: {
-      name: 'MATIC',
-      scale: 0,
-    },
-    '-9': {
-      name: 'GWEI',
-      scale: -9,
-    },
-    '-18': {
-      name: 'WEI',
-      scale: -18,
-    },
-  },
-  paymentUnit: 'USD',
-}
-
 export type Chain = {
   name: string
   networkName: string
@@ -47,9 +26,13 @@ export type Chain = {
   iconFileName: string
 }
 
+export type FilecoinChain = Chain & {
+  coinType: "f" | "t"
+}
+
 type Config = {
   fiatPaymentUnit: string
-  chains: Chain[]
+  chains: Chain[] | FilecoinChain[]
 }
 
 const ethereum = {
@@ -104,7 +87,7 @@ const polygon = {
   iconFileName: 'polygon-icon.svg',
 } //as const
 
-const filecoin = {
+const filecoinCalibration = {
   name: 'Filecoin',
   networkName: 'Calibration',
   symbol: 'FIL',
@@ -128,9 +111,10 @@ const filecoin = {
   blockExplorer: { name: 'Filfox', url: 'https://calibration.filfox.info/en/message' },
   contractAddress: '0xbEF649DB6b4e1b2Ac044492433Bccca4287BE90F',
   iconFileName: 'filecoin-icon.svg',
+  coinType: 't',
 } //as const
 
-export const CONFIG: Config = { fiatPaymentUnit: 'USD', chains: [ethereum, polygon, filecoin] }
+export const CONFIG: Config = { fiatPaymentUnit: 'USD', chains: [ethereum, polygon, filecoinCalibration] }
 
 export const isFilecoinEnabled = CONFIG.chains.some(chain => chain.name === 'Filecoin')
 

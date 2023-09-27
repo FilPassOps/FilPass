@@ -1,9 +1,11 @@
 import axios from 'axios'
-import config from 'chains.config'
 import { logger } from './logger'
+import { getChainByName } from 'system.config'
+
+const filecoin = getChainByName('Filecoin')
 
 export const api = axios.create({
-  baseURL: config.chain.rpcUrls[0],
+  baseURL: filecoin.rpcUrls[0],
   timeout: 60000,
 })
 

@@ -1,7 +1,7 @@
 import { NetworkPrefix, SignatureType, Transaction, Wallet } from '@zondax/izari-filecoin'
 import Big from 'big.js'
-import config from 'chains.config'
 import * as filecoinModule from 'lib/filecoin'
+import { FilecoinChain, getChainByName } from 'system.config'
 
 const NODE_ENV = process.env.NODE_ENV
 const ENV_NAME = process.env.ENV_NAME
@@ -10,9 +10,11 @@ const MASTER_WALLET_PK = process.env.MASTER_WALLET_PK
 type FilecoinScaleType = keyof typeof FILECOIN_SCALE_MAP
 
 export function getMasterWallet() {
+  const filecoin = getChainByName('Filecoin') as FilecoinChain
+
   if (!MASTER_WALLET_PK) throw new Error('Master wallet not found')
 
-  const wallet = Wallet.recoverAccount(config.networkPrefix as NetworkPrefix, SignatureType.SECP256K1, MASTER_WALLET_PK)
+  const wallet = Wallet.recoverAccount(filecoin.coinType as NetworkPrefix, SignatureType.SECP256K1, MASTER_WALLET_PK)
 
   if (!wallet) throw new Error('Master wallet not found')
 
@@ -23,7 +25,9 @@ export function getMasterWallet() {
 
 export async function signMessage(message: unknown) {
   if (!MASTER_WALLET_PK) throw new Error('Master wallet not found')
-  const wallet = Wallet.recoverAccount(config.networkPrefix as NetworkPrefix, SignatureType.SECP256K1, MASTER_WALLET_PK)
+  const filecoin = getChainByName('Filecoin') as FilecoinChain
+
+  const wallet = Wallet.recoverAccount(filecoin.coinType as NetworkPrefix, SignatureType.SECP256K1, MASTER_WALLET_PK)
   if (!wallet) throw new Error('Master wallet not found')
 
   return (await Wallet.signTransaction(wallet, Transaction.fromJSON(message))).toJSON()

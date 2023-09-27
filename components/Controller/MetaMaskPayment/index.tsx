@@ -1,7 +1,6 @@
 import { ArrowLeftIcon } from '@heroicons/react/24/outline'
 import { Blockchain, TransferStatus } from '@prisma/client'
 import Big from 'big.js'
-import config from 'chains.config'
 import { useAlertDispatcher } from 'components/Layout/Alerts'
 import { Button } from 'components/shared/Button'
 import { useMetaMask } from 'components/web3/MetaMaskProvider'
@@ -108,7 +107,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
     const { data, error } = await api.post('/transfers/prepare', {
       requests: requestIds,
       from: wallet,
-      to: config.multiforwarder,
+      to: chain.contractAddress,
     })
 
     if (error) {

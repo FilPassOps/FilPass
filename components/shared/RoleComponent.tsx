@@ -11,5 +11,3 @@ export function RoleComponent({ children, roles = [] }: RoleComponentProps) {
 
   return <>{hasRole && children}</>
 }
-
-export const withRoles = (roles = [], children: React.ReactNode) => <RoleComponent roles={roles}>{children}</RoleComponent>
