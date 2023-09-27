@@ -1,4 +1,11 @@
-import { APPROVED_STATUS, REJECTED_BY_APPROVER_STATUS, REQUIRES_CHANGES_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
+import {
+  APPROVED_STATUS,
+  REJECTED_BY_APPROVER_STATUS,
+  REQUIRES_CHANGES_STATUS,
+  SUBMITTED_STATUS,
+  SUBMITTED_BY_APPROVER_STATUS,
+  PROCESSING_STATUS,
+} from 'domain/transferRequest/constants'
 import { sanitizeText } from 'lib/sanitizeText'
 import { validate } from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
@@ -66,7 +73,7 @@ export async function createTransferRequestReview(params: CreateTransferRequestR
       transferRequestId,
     })
   }
-  if (status === SUBMITTED_STATUS) {
+  if (status === SUBMITTED_STATUS || status === SUBMITTED_BY_APPROVER_STATUS || status === PROCESSING_STATUS) {
     return await submittedTransferRequest({
       approverId,
       transferRequestId,

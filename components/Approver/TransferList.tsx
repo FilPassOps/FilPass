@@ -189,7 +189,11 @@ const CryptoAmountInfo = ({ chainId, request }: CryptoAmountInfoProps) => {
   }
 
   if (request.request_unit === USD) {
-    return `${formatCrypto(new Big(request.amount / Number(currency)).toFixed(2))} ${request.payment_unit}`
+    if(currency){
+      return `${formatCrypto(new Big(request.amount / Number(currency)).toFixed(2))} ${request.payment_unit}`
+    } else {
+      return '-'
+    }
   }
 
   if (request.request_unit !== USD) {

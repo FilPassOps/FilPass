@@ -4,6 +4,7 @@ import { sendBatchEmail } from 'lib/sendEmail'
 import { validate } from 'lib/yup'
 import { baseEmail } from './constants'
 import { sendBatchPaidNotificationValidator } from './validation'
+import errorsMessages from 'wordings-and-errors/errors-messages'
 
 interface SendBatchPaidNotificationParams {
   publicIds: string[]
@@ -25,30 +26,40 @@ export async function sendBatchPaidNotification(params: SendBatchPaidNotificatio
     }
   }
 
-  const { publicIds } = fields
-
-  const transferRequests = await prisma.transferRequest.findMany({
-    where: { publicId: { in: publicIds } },
-    include: {
-      receiver: true,
-      program: true,
-    },
-  })
-
   const recipients: EmailReminderRecipient[] = []
 
-  const recipientsResult = await Promise.allSettled(
-    transferRequests.map(async transferRequest => {
-      const email: string = await decryptPII(transferRequest.receiver.email)
-      return {
-        email,
-      }
-    })
-  )
+  const { publicIds } = fields
 
-  recipientsResult.forEach(item => {
-    if (item.status === 'fulfilled') return recipients.push(item.value)
-  })
+  try {
+    const transferRequests = await prisma.transferRequest.findMany({
+      where: { publicId: { in: publicIds } },
+      include: {
+        receiver: true,
+        program: true,
+      },
+    })
+
+    const recipientsResult = await Promise.allSettled(
+      transferRequests.map(async transferRequest => {
+        const email: string = await decryptPII(transferRequest.receiver.email)
+        return {
+          email,
+        }
+      }),
+    )
+
+    recipientsResult.forEach(item => {
+      if (item.status === 'fulfilled') return recipients.push(item.value)
+    })
+  } catch (error) {
+    console.error(error)
+    return {
+      error: {
+        status: 400,
+        errors: errorsMessages.something_went_wrong,
+      },
+    }
+  }
 
   await sendBatchEmail({
     recipients,

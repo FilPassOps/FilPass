@@ -91,7 +91,16 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
         : tranferRequest.wallet.address
 
       const foundIndex = parsedDataArray.findIndex(item => {
-        return item.address.toLowerCase() === finalAddress.toLowerCase() && Number(item.amount) === Number(tranferRequest.amount)
+        const trRequestUnit = tranferRequest.program.programCurrency.find(({ type }) => type === 'REQUEST') as ProgramCurrency
+
+        if (!currency) {
+          return
+        }
+
+        const trConvertedAmount =
+          trRequestUnit.currency.name === USD ? new Big(Number(tranferRequest.amount) / currency).toFixed(2) : tranferRequest.amount
+
+        return item.address === finalAddress && Number(item.amount) === Number(trConvertedAmount)
       })
 
       if (foundIndex !== -1 && isValidFunctionCall) {
@@ -130,7 +139,9 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
             </div>
             <div className="flex items-center gap-2">
               <CurrencyDollarIcon className="w-6 text-gray-400" />
-              {formatCrypto(new Big(totalDollarAmount).div(currency as number).toFixed(2))} {getChainByName(blockchainName).symbol}
+              {/* Get currency null */}
+              {currency && totalDollarAmount ? formatCrypto(new Big(totalDollarAmount).div(currency).toFixed(2)) : '-'}{' '}
+              {getChainByName(blockchainName).symbol}
               <span className="text-sm "> ≈{formatCurrency(totalDollarAmount)}</span>
             </div>
           </div>
@@ -196,7 +207,9 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
                   <TableDiv>
                     <div className="w-40">
                       <CryptoAmount>
-                        {requestUnit.currency.name === USD ? formatCrypto(new Big(Number(amount) / Number(currency)).toFixed(2)) : amount}{' '}
+                        {requestUnit.currency.name === USD && currency
+                          ? formatCrypto(new Big(Number(amount) / Number(currency)).toFixed(2))
+                          : amount}{' '}
                         {paymentUnit.currency.name}
                       </CryptoAmount>
                     </div>
