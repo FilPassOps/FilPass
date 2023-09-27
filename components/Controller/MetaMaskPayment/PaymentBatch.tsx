@@ -139,7 +139,6 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
             </div>
             <div className="flex items-center gap-2">
               <CurrencyDollarIcon className="w-6 text-gray-400" />
-              {/* Get currency null */}
               {currency && totalDollarAmount ? formatCrypto(new Big(totalDollarAmount).div(currency).toFixed(2)) : '-'}{' '}
               {getChainByName(blockchainName).symbol}
               <span className="text-sm "> ≈{formatCurrency(totalDollarAmount)}</span>
