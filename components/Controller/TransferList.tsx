@@ -307,7 +307,11 @@ const CryptoAmountInfo = ({ chainId, request, requestUnit, paymentUnit, paidTran
   }
 
   if (requestUnit.currency.name === USD) {
-    return `${formatCrypto(new Big(Number(request.amount) / Number(currency)).toFixed(2))} ${paymentUnit.currency.name}`
+    if(currency){
+      return `${formatCrypto(new Big(Number(request.amount) / Number(currency)).toFixed(2))} ${paymentUnit.currency.name}`
+    } else {
+      return '-'
+    }
   }
 
   if (requestUnit.currency.name !== USD) {
