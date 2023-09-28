@@ -130,7 +130,6 @@ export async function findAllProgramsComplete(params: any) {
       name: true,
       deliveryMethod: true,
       createdAt: true,
-      signersWalletAddresses: true,
       visibility: true,
       isArchived: true,
       userRoleProgramGroups: {
@@ -230,7 +229,6 @@ export async function findAllProgramsComplete(params: any) {
         request_unit_name: program.programCurrency.find(c => c.type === 'REQUEST')?.currency.name,
         approversRole,
         viewersRole,
-        signers_wallet_addresses: program.signersWalletAddresses,
         visibility: program.visibility,
         userRoleProgramGroupIds: program.userRoleProgramGroups.map(userRoleProgramGroup => userRoleProgramGroup.id),
         isArchived: program.isArchived,

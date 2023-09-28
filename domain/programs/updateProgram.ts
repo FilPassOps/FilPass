@@ -17,7 +17,6 @@ export interface UpdateProgramParams {
     type: string
   }[]
   name: string
-  signersWalletAddresses?: { address: string }[]
   visibility: ProgramVisibility
   updateApprovers: boolean
   updateViewers: boolean
@@ -105,7 +104,6 @@ export async function updateProgram(params: UpdateProgramParams) {
       },
       data: {
         name,
-        signersWalletAddresses: [],
         visibility,
       },
     })

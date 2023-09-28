@@ -182,7 +182,6 @@ CREATE TABLE "program" (
     "is_archived" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
-    "signers_wallet_addresses" TEXT[],
     "visibility" "ProgramVisibility" DEFAULT 'EXTERNAL',
     "blockchain_id" INTEGER NOT NULL,
 

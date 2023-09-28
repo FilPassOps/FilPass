@@ -40,14 +40,6 @@ export const createProgramValidator = yup
           .required(),
       )
       .required(),
-    signersWalletAddresses: yup
-      .array()
-      .of(
-        yup.object({
-          address: yup.string().optional(),
-        }),
-      )
-      .optional(),
     visibility: yup.mixed<ProgramVisibility>().oneOf([PROGRAM_TYPE_EXTERNAL, PROGRAM_TYPE_INTERNAL]).required(),
   })
   .required()
@@ -88,14 +80,6 @@ export const createProgramFormValidator = yup
           .required(),
       )
       .required(),
-    signersWalletAddresses: yup
-      .array()
-      .of(
-        yup.object({
-          address: yup.string().optional(),
-        }),
-      )
-      .optional(),
   })
   .required()
 
@@ -141,14 +125,6 @@ export const updateProgramValidator = yup
       .required(),
     name: yup.string().required(),
     deliveryMethod: yup.mixed<DeliveryMethod>().oneOf([ONE_TIME]).required(),
-    signersWalletAddresses: yup
-      .array()
-      .of(
-        yup.object({
-          address: yup.string().optional(),
-        }),
-      )
-      .optional(),
     visibility: yup.mixed<ProgramVisibility>().oneOf([PROGRAM_TYPE_EXTERNAL, PROGRAM_TYPE_INTERNAL]).required(),
     updateApprovers: yup.bool().optional().default(false),
     updateViewers: yup.bool().optional().default(false),
