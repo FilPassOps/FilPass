@@ -19,7 +19,6 @@ interface Program {
   viewersRole?: ViewerRole[]
   approversRole?: ApproverRole[][]
   userRoleProgramGroupIds?: number[]
-  signers_wallet_addresses?: string[]
 }
 
 export const generateApproversRoleOptions = (approversData: ApproverRole[]) =>
@@ -105,13 +104,6 @@ export const formatProgramViewersRole = (program: Program) =>
     value: r.email,
     roleId: r.roleId,
   }))
-
-export const formatSignersWalletAddresses = (program: Program) => {
-  if (program?.signers_wallet_addresses?.length === 0) {
-    return [{ address: '' }]
-  }
-  return program?.signers_wallet_addresses?.map(addr => ({ address: addr }))
-}
 
 export const formatProgramApproversRole = (program: Program) => {
   //creates one entry to each group id value

@@ -24,7 +24,6 @@ export interface ProgramValues {
     type: string
   }[]
   name: string
-  signersWalletAddresses?: { address: string }[]
   visibility: ProgramVisibility
   updateApprovers: boolean
   updateViewers: boolean

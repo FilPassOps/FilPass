@@ -82,7 +82,7 @@ export const ApplyForSomeoneForm = () => {
           programId: undefined as any,
           receiverEmail: '',
           team: '',
-          amount: undefined as any,
+          amount: '',
         },
       ],
     },
@@ -288,9 +288,7 @@ const FormComponent = ({
         {...register(`requests[${index}].amount`, {
           setValueAs: (val: string) => {
             const parsedValue = Number(String(val).replaceAll(/[, \s]+/g, ''))
-            // TODO fix the 0 value
-
-            return isNaN(parsedValue) ? 0 : parsedValue
+            return val === '' ? '' : isNaN(parsedValue) ? '' : parsedValue
           },
         })}
       />
