@@ -1,5 +1,5 @@
 import { PAID_STATUS, REJECTED_BY_CONTROLLER_STATUS, REJECTED_STATUS } from 'domain/transferRequest/constants'
-import { getDelegatedAddress } from 'lib/getDelegatedAddress'
+import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { getEthereumAddress } from 'lib/getEthereumAddress'
 import { generateTeamHash } from 'lib/password'
 import { validate } from 'lib/yup'
@@ -43,12 +43,20 @@ export async function getAll(params: GetAllParams) {
 
   const teamHashes = team ? await Promise.all(team.map(team => generateTeamHash(team))) : undefined
 
-  const ethereumWallet = getEthereumAddress(wallet)?.fullAddress.toLowerCase()
-  const delegatedAddress = getDelegatedAddress(wallet)?.fullAddress
+  const addresses = [wallet]
 
-  const addresses = [wallet, ethereumWallet, delegatedAddress].filter((wallet): wallet is string => !!wallet)
+  // TODO: improve to get delegated address only if blockchain is Filecoin
+  if (wallet?.startsWith('0x')) {
+    addresses.push(getDelegatedAddress(wallet, WalletSize.FULL, 'Filecoin')?.fullAddress)
+  }
 
-  const values: GetInput = { ...fields, wallets: addresses, teamHashes }
+  if (wallet?.startsWith('f4') || wallet?.startsWith('t4')) {
+    addresses.push(getEthereumAddress(wallet, WalletSize.FULL)?.fullAddress.toLowerCase())
+  }
+
+  const filteredAddresses = addresses.filter((wallet): wallet is string => !!wallet)
+
+  const values: GetInput = { ...fields, wallets: filteredAddresses, teamHashes }
 
   if (status === PAID_STATUS) {
     return await getPaid(values)

@@ -16,7 +16,7 @@ import { APPROVER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
 import { SUBMITTED_BY_APPROVER_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
 import JsFileDownload from 'js-file-download'
 import { api } from 'lib/api'
-import { getDelegatedAddress } from 'lib/getDelegatedAddress'
+import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { getEthereumAddress } from 'lib/getEthereumAddress'
 import { withRolesSSR } from 'lib/ssr'
 import { DateTime } from 'luxon'
@@ -338,7 +338,6 @@ export const getServerSideProps = withRolesSSR([APPROVER_ROLE, VIEWER_ROLE], asy
   const programId = query.programId || null
   const requestNumber = query.number
   const team = query.team?.toString().split(',')
-  const wallet = query.wallet
 
   const isViewer = roles.some(({ role }) => role === VIEWER_ROLE)
   const isApprover = roles.some(({ role }) => role === APPROVER_ROLE)
@@ -354,10 +353,20 @@ export const getServerSideProps = withRolesSSR([APPROVER_ROLE, VIEWER_ROLE], asy
     toDate.setHours(23, 59, 59, 999)
   }
 
-  const ethereumWallet = getEthereumAddress(wallet as string)?.fullAddress.toLowerCase()
-  const delegatedAddress = getDelegatedAddress(wallet as string)?.fullAddress
+  const wallet = query.wallet as string | undefined
 
-  const wallets = [wallet, ethereumWallet, delegatedAddress].filter(Boolean)
+  const addresses = [wallet]
+
+  // TODO: improve to get delegated address only if blockchain is Filecoin
+  if (wallet?.startsWith('0x')) {
+    addresses.push(getDelegatedAddress(wallet, WalletSize.FULL, 'Filecoin')?.fullAddress)
+  }
+
+  if (wallet?.startsWith('f4') || wallet?.startsWith('t4')) {
+    addresses.push(getEthereumAddress(wallet as string, WalletSize.FULL)?.fullAddress.toLowerCase())
+  }
+
+  const filteredAddresses = addresses.filter((wallet): wallet is string => !!wallet)
 
   const { transfers, totalItems, error, shouldShowHeaderCheckbox, currentStatus, programs } = await getApprovalsByRole({
     roles,
@@ -368,7 +377,7 @@ export const getServerSideProps = withRolesSSR([APPROVER_ROLE, VIEWER_ROLE], asy
     team,
     from: fromDate,
     to: toDate,
-    wallets: wallets as string[],
+    wallets: filteredAddresses,
     size: pageSize,
     sort: query?.sort as 'number' | 'program' | 'create_date',
     order: query?.order as 'asc' | 'desc',

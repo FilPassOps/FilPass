@@ -1,13 +1,14 @@
 import { Prisma } from '@prisma/client'
 import { parse } from 'csv-parse/sync'
 import fs from 'fs'
-import { matchWalletAddress } from 'lib/filecoinShipyard'
-import { getDelegatedAddress } from 'lib/getDelegatedAddress'
+import { validateWalletAddress } from 'lib/filecoinShipyard'
 import { generateEmailHash } from 'lib/password'
 import prisma from 'lib/prisma'
 import yup, { validate } from 'lib/yup'
 import { sortedUniq } from 'lodash'
 import { csvSchemaV1, csvSchemaV2, uploadBatchCsvValidator } from './validation'
+import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
+import { utils } from 'ethers'
 
 interface UploadBatchCsvParams {
   programId: number
@@ -28,6 +29,8 @@ interface VerifyCsvParams {
   file: UploadBatchCsvParams['file']
   prisma: Prisma.TransactionClient
   approverId: number
+  blockchainName: string
+  chainId: string
 }
 
 interface Row {
@@ -48,21 +51,26 @@ export async function uploadBatchCsv(params: UploadBatchCsvParams) {
     }
   }
 
-  const { file, approverId } = fields
+  const { file, approverId, programId } = fields
 
-  // const program = await prisma.program.findUnique({ where: { id: programId } })
-
-  // {
-  //   data: requests,
-  //   file: fileData,
-  //   errors: verifyErrors,
-  //   hasCustodian = false,
-  // }
+  const program = await prisma.program.findUnique({
+    where: { id: programId },
+    select: {
+      blockchain: {
+        select: {
+          name: true,
+          chainId: true,
+        },
+      },
+    },
+  })
 
   const verifyResult = await verifyCsv({
     file,
     prisma,
     approverId,
+    blockchainName: program?.blockchain.name as string,
+    chainId: program?.blockchain.chainId as string,
   })
 
   if (verifyResult.errors.length > 0) {
@@ -79,7 +87,7 @@ export async function uploadBatchCsv(params: UploadBatchCsvParams) {
   }
 }
 
-const verifyCsv = async ({ file, prisma, approverId }: VerifyCsvParams) => {
+const verifyCsv = async ({ file, prisma, approverId, blockchainName, chainId }: VerifyCsvParams) => {
   const fileData = fs.readFileSync(file.path, 'utf8')
   let records
   try {
@@ -107,6 +115,8 @@ const verifyCsv = async ({ file, prisma, approverId }: VerifyCsvParams) => {
     records,
     prisma,
     fileData,
+    blockchainName,
+    chainId,
   }
 
   const isV2 = csvSchemaV2.isValidSync(records[0])
@@ -123,8 +133,14 @@ const verifyCsv = async ({ file, prisma, approverId }: VerifyCsvParams) => {
   return { errors, data: records, file: fileData, hasCustodian: undefined }
 }
 
-const validateV1SchemaFile = async (validationObject: { records: any; prisma: Prisma.TransactionClient; fileData: string }) => {
-  const { records, prisma, fileData } = validationObject
+const validateV1SchemaFile = async (validationObject: {
+  records: any
+  prisma: Prisma.TransactionClient
+  fileData: string
+  blockchainName: string
+  chainId: string
+}) => {
+  const { records, prisma, fileData, blockchainName, chainId } = validationObject
   const errors: any[] = []
 
   const { error: verifyEmailErrors } = verifyEmail(records)
@@ -137,7 +153,7 @@ const validateV1SchemaFile = async (validationObject: { records: any; prisma: Pr
     amountErrors.forEach(error => errors.push(error))
   }
 
-  const { error: walletErrors } = await verifyWallet(records, prisma, 'Wallet Address')
+  const { error: walletErrors } = await verifyWallet(records, prisma, blockchainName, chainId, 'Wallet Address')
   if (walletErrors) {
     walletErrors.forEach(error => errors.push(error))
   }
@@ -146,10 +162,10 @@ const validateV1SchemaFile = async (validationObject: { records: any; prisma: Pr
 }
 
 const validateV2SchemaFile = async (
-  validationObject: { records: any; prisma: Prisma.TransactionClient; fileData: string },
+  validationObject: { records: any; prisma: Prisma.TransactionClient; fileData: string; blockchainName: string; chainId: string },
   approverId: number,
 ) => {
-  const { records, prisma, fileData } = validationObject
+  const { records, prisma, fileData, blockchainName, chainId } = validationObject
 
   const errors: any = []
 
@@ -163,7 +179,7 @@ const validateV2SchemaFile = async (
     amountErrors.forEach(error => errors.push(error))
   }
 
-  const { error: walletErrors } = await verifyWallet(records, prisma, 'Addresses')
+  const { error: walletErrors } = await verifyWallet(records, prisma, blockchainName, chainId, 'Addresses')
   if (walletErrors) {
     walletErrors.forEach(error => errors.push(error))
   }
@@ -234,7 +250,7 @@ const verifyEmail = (data: Row[]) => {
   return { error: errors.length > 0 ? errors : null }
 }
 
-const verifyWallet = async (data: Row[], prisma: Prisma.TransactionClient, propName: string) => {
+const verifyWallet = async (data: Row[], prisma: Prisma.TransactionClient, blockchainName: string, chainId: string, propName: string) => {
   const errors: any[] = []
 
   const walletsWithEmails = await Promise.all(
@@ -261,6 +277,11 @@ const verifyWallet = async (data: Row[], prisma: Prisma.TransactionClient, propN
           id: true,
           address: true,
           isDefault: true,
+          blockchain: {
+            select: {
+              chainId: true,
+            },
+          },
         },
       },
     },
@@ -269,7 +290,9 @@ const verifyWallet = async (data: Row[], prisma: Prisma.TransactionClient, propN
   await Promise.all(
     walletsWithEmails.map(async ({ wallet, email, row }) => {
       if (!wallet) {
-        const userWithDefaultWallet = users.find(user => user.emailHash === email && user.wallets.some(wallet => wallet.isDefault))
+        const userWithDefaultWallet = users.find(
+          user => user.emailHash === email && user.wallets.some(wallet => wallet.isDefault && wallet.blockchain.chainId === chainId),
+        )
 
         if (!userWithDefaultWallet) {
           errors.push({ message: `No wallet or default wallet found on row ${row}` })
@@ -281,10 +304,20 @@ const verifyWallet = async (data: Row[], prisma: Prisma.TransactionClient, propN
       }
 
       if (wallet) {
-        const delegatedAddress = getDelegatedAddress(wallet)?.fullAddress
-        const isWalletValid = await matchWalletAddress(delegatedAddress || wallet)
-        if (!isWalletValid) {
-          errors.push({ message: `Invalid wallet address on row ${row - 1}` })
+        if (blockchainName === 'Filecoin' && wallet.startsWith('0x')) {
+          const delegatedAddress = getDelegatedAddress(wallet, WalletSize.FULL, blockchainName)
+          if (!delegatedAddress.fullAddress) {
+            errors.push({ message: `Invalid wallet address on row ${row}. The wallet is not a valid ${blockchainName} address.` })
+          }
+        } else if (wallet.startsWith('0x') && !utils.isAddress(wallet)) {
+          errors.push({ message: `Invalid wallet address on row ${row}. The wallet is not a valid ${blockchainName} address.` })
+        } else if (blockchainName !== 'Filecoin') {
+          errors.push({ message: `Invalid wallet address on row ${row}. The wallet is not a valid ${blockchainName} address.` })
+        } else {
+          const isValid = await validateWalletAddress(wallet)
+          if (!isValid) {
+            errors.push({ message: `Invalid wallet address on row ${row}. The wallet is not a valid ${blockchainName} address.` })
+          }
         }
       }
     }),

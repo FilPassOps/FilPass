@@ -2,7 +2,7 @@ import { Role } from '@prisma/client'
 import { getApprovalsByRole } from 'domain/approvals/service'
 import { APPROVER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
 import { SUBMITTED_STATUS } from 'domain/transferRequest/constants'
-import { getDelegatedAddress } from 'lib/getDelegatedAddress'
+import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { getEthereumAddress } from 'lib/getEthereumAddress'
 import { NextApiRequestWithSession, newHandler, withMethods, withRoles } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
@@ -16,12 +16,20 @@ const handler = async (req: NextApiRequestWithSession, res: NextApiResponse) => 
   const team = query.team?.toString().split(',')
   const programId = query.programId as string
 
-  const wallet = query.wallet as string
+  const wallet = query.wallet as string | undefined
 
-  const ethereumWallet = getEthereumAddress(wallet)?.fullAddress.toLowerCase()
-  const delegatedAddress = getDelegatedAddress(wallet)?.fullAddress
+  const addresses = [wallet]
 
-  const wallets = [wallet, ethereumWallet, delegatedAddress].filter(Boolean) as string[]
+  // TODO: improve to get delegated address only if blockchain is Filecoin
+  if (wallet?.startsWith('0x')) {
+    addresses.push(getDelegatedAddress(wallet, WalletSize.FULL, 'Filecoin')?.fullAddress)
+  }
+
+  if (wallet?.startsWith('f4') || wallet?.startsWith('t4')) {
+    addresses.push(getEthereumAddress(wallet as string, WalletSize.FULL)?.fullAddress.toLowerCase())
+  }
+
+  const filteredAddresses = addresses.filter((wallet): wallet is string => !!wallet)
 
   let fromDate, toDate
 
@@ -42,7 +50,7 @@ const handler = async (req: NextApiRequestWithSession, res: NextApiResponse) => 
     team,
     from: fromDate,
     to: toDate,
-    wallets,
+    wallets: filteredAddresses,
   })
 
   const data = {
