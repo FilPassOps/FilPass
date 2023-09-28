@@ -53,6 +53,7 @@ const errorsMessages: ErrorsMessages = {
   user_not_found: { message: 'User not found.' },
   applying_for_others_unchek: { message: `To create a transfer request for yourself, go to My Requests page.` },
   user_rejected_payment: { message: 'Payment rejected by the user' },
+  wallet_program_blockchain: { message: 'User wallet blockchain is different from Program blockchain selected' },
   not_enough_funds: {
     message:
       'Sorry, you do not have enough funds in your account to complete the transaction. Please ensure you have sufficient balance and try again.',

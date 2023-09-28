@@ -1,12 +1,12 @@
+import { TransferRequestStatus, User } from '@prisma/client'
 import { sendSubmittedNotification } from 'domain/notifications/sendSubmittedNotification'
 import { SUBMITTED_STATUS } from 'domain/transferRequest/constants'
 import { encrypt, encryptPII } from 'lib/emissaryCrypto'
-import { TransactionError } from 'lib/errors'
 import { generateTeamHash } from 'lib/password'
-import { newPrismaTransaction } from 'lib/prisma'
+import prisma, { newPrismaTransaction } from 'lib/prisma'
 import { validate } from 'lib/yup'
+import errorsMessages from 'wordings-and-errors/errors-messages'
 import { submitDraftTransferRequestByIdValidator } from './validation'
-import { TransferRequestStatus, User } from '@prisma/client'
 
 interface SubmitDraftTransferRequestByIdParams {
   applyerId: number
@@ -39,6 +39,38 @@ export async function submitDraftTransferRequestById(params: SubmitDraftTransfer
 
   const { terms } = user
 
+  const [userWallet, program] = await Promise.all([
+    prisma.userWallet.findUnique({ where: { id: userWalletId, userId: user.id } }),
+    prisma.program.findUnique({ where: { id: programId } }),
+  ])
+
+  if (!userWallet) {
+    return {
+      error: {
+        status: 400,
+        errors: { userWalletId: errorsMessages.wallet_not_found.message },
+      },
+    }
+  }
+
+  if (!program) {
+    return {
+      error: {
+        status: 400,
+        errors: { programId: errorsMessages.program_not_found.message },
+      },
+    }
+  }
+
+  if (userWallet.blockchainId !== program.blockchainId) {
+    return {
+      error: {
+        status: 400,
+        errors: { userWalletId: errorsMessages.wallet_program_blockchain.message },
+      },
+    }
+  }
+
   return await newPrismaTransaction(async fnPrisma => {
     const status: TransferRequestStatus = SUBMITTED_STATUS
 
@@ -68,10 +100,6 @@ export async function submitDraftTransferRequestById(params: SubmitDraftTransfer
       },
     })
 
-    if (!transferRequest) {
-      throw new TransactionError('Transfer request not found', { status: 404, errors: undefined })
-    }
-
     const draft = await fnPrisma.transferRequestDraft.updateMany({
       where: {
         publicId,
@@ -85,7 +113,12 @@ export async function submitDraftTransferRequestById(params: SubmitDraftTransfer
     })
 
     if (draft.count <= 0) {
-      throw new TransactionError('Draft Transfer request not found', { status: 404, errors: undefined })
+      return {
+        error: {
+          status: 400,
+          errors: { id: 'Draft Transfer request not found' },
+        },
+      }
     }
 
     await sendSubmittedNotification({
