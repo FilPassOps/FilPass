@@ -18,7 +18,7 @@ export default function SetDefaultWallet({ error }: SetDefaultWalletProps) {
   return (
     <>
       <Head>
-        <title key='default-wallet'>{`Set default wallet - ${PLATFORM_NAME}`}</title>
+        <title key="default-wallet">{`Set default wallet - ${PLATFORM_NAME}`}</title>
       </Head>
       {error ? (
         <div className="flex flex-col h-screen items-center justify-center">

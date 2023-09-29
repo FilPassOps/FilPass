@@ -14,6 +14,7 @@ interface DecodedData {
     id: number
     userId: number
     address: string
+    blockchainId: number
   }
 }
 
@@ -59,7 +60,11 @@ export const setDefault = async (params: SetDefaultParams) => {
 
   return await newPrismaTransaction(async prisma => {
     await prisma.userWallet.updateMany({
-      where: { userId: data.newDefaultWallet.userId },
+      where: {
+        userId: data.newDefaultWallet.userId,
+        blockchainId: data.newDefaultWallet.blockchainId,
+        id: { not: data.newDefaultWallet.id },
+      },
       data: { isDefault: false },
     })
 

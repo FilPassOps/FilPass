@@ -633,12 +633,7 @@ const InputController = ({ id, label, error, children, name: inputName }: InputC
     <div className="w-full">
       <Label inputId={id}>{label}</Label>
       <div className="mt-1 relative">{children}</div>
-      {error && (
-        <p className="mt-1 text-sm text-red-500">
-          {error.message && error.message}
-          {!error.message && getErrorMessage({ error, inputName })}
-        </p>
-      )}
+      {error && <p className="mt-1 text-sm text-red-500">{error.message ? error.message : getErrorMessage({ error, inputName })}</p>}
     </div>
   )
 }

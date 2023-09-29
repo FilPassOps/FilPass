@@ -34,15 +34,16 @@ export async function sendSetDefaultWalletConfirmation(params: SendSetDefaultWal
 
   const { id, userId, email } = fields
 
+  const [newDefaultWallet] = await prisma.userWallet.findMany({
+    where: { id, userId },
+  })
+
   const [currentDefaultWallet] = await prisma.userWallet.findMany({
     where: {
       userId,
       isDefault: true,
+      blockchainId: newDefaultWallet.blockchainId,
     },
-  })
-
-  const [newDefaultWallet] = await prisma.userWallet.findMany({
-    where: { id, userId },
   })
 
   const secret = process.env.APP_SECRET

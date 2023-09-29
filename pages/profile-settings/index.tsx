@@ -3,7 +3,6 @@ import { Layout } from 'components/Layout'
 import { WalletModal } from 'components/TransferRequest/WalletModal'
 import { WalletList } from 'components/User/WalletList'
 import { Button } from 'components/shared/Button'
-import { WalletAddress } from 'components/shared/WalletAddress'
 import { findUserByIdAndEmail } from 'domain/user'
 import { fetcher } from 'lib/fetcher'
 import { withUserSSR } from 'lib/ssr'
@@ -16,6 +15,16 @@ interface UserSettingsProps {
   data: any
 }
 
+interface Wallet {
+  id: number
+  name?: string | null
+  address: string
+  blockchain: {
+    id: number
+    name: string
+  }
+}
+
 export default function UserSettings({ data }: UserSettingsProps) {
   const [openWalletModal, setOpenWalletModal] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -24,7 +33,7 @@ export default function UserSettings({ data }: UserSettingsProps) {
     fallbackData: data,
   })
 
-  const defaultWallet = user?.wallets?.find((wallet: { isDefault: any }) => wallet.isDefault)
+  const defaultWallets: Wallet[] = user?.wallets?.filter((wallet: { isDefault: any }) => wallet.isDefault)
 
   return (
     <>
@@ -41,27 +50,22 @@ export default function UserSettings({ data }: UserSettingsProps) {
             We may send funds to your default address, so please make sure the address is correct.
           </p>
         </div>
-        <div className="flex flex-col lg:flex-row gap-4 px-6 py-5 bg-gray-50 border-t border-gray-200">
-          <p className="text-gray-500 text-sm font-medium w-full lg:w-1/3 py-2 md:py-0">Default FIL Wallet Address</p>
-          {defaultWallet ? (
-            <div className="flex gap-1 items-center">
-              <WalletAddress
-                address={defaultWallet?.address}
-                blockchain={defaultWallet?.blockchain.name}
-                walletSize="short"
-                enableVerifiedIcon={false}
-                className="sm:hidden"
-              />
-              <WalletAddress
-                address={defaultWallet?.address}
-                blockchain={defaultWallet?.blockchain.name}
-                walletSize="full"
-                enableVerifiedIcon={false}
-                className="hidden sm:flex"
-              />
+        <div className="flex flex-col gap-4 px-6 py-5 bg-gray-50 border-t border-gray-200">
+          {defaultWallets?.map(wallet => {
+            return (
+              <div key={wallet.id} className="flex flex-col md:flex-row">
+                <p className="text-gray-500 text-sm font-medium w-full lg:w-1/3 py-2 md:py-0 break-all">
+                  Default {wallet.blockchain.name} Wallet Addresses
+                </p>
+                <p className="break-all text-gray-900">{wallet.address}</p>
+              </div>
+            )
+          })}
+          {!defaultWallets?.length && (
+            <div className="flex flex-col md:flex-row gap-2">
+              <p className="text-gray-500 text-sm w-full lg:w-1/3 py-2 md:py-0">Default Wallet Address</p>
+              <p className="text-sm">You haven&apos;t set a default wallet address yet.</p>
             </div>
-          ) : (
-            <p className="text-gray-400 text-sm w-full md:w-2/3">Set a default wallet address below.</p>
           )}
         </div>
         <div className="flex flex-col lg:flex-row gap-4 px-6 py-5">

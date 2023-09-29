@@ -33,7 +33,6 @@ export const TransferRequestForm = ({ isEditable = false, data = null, programs 
   const [openWalletModal, setOpenWalletModal] = useState(false)
   const [hasUnhandledError, setHasUnhandledError] = useState(false)
 
-  const defaultUserWallet = user?.wallets?.find(wallet => wallet.isDefault)
   const defaultRequestProgram = useMemo(() => {
     if (!data) {
       return
@@ -62,7 +61,7 @@ export const TransferRequestForm = ({ isEditable = false, data = null, programs 
       amount: data?.amount || '',
       userAttachmentId: data?.attachment_id || undefined,
       programId: data?.program_id || '',
-      userWalletId: data?.wallet_id || defaultUserWallet?.id || '',
+      userWalletId: data?.wallet_id || '',
       team: data?.team || '',
       expectedTransferDate: data?.expected_transfer_date || DateTime.now().plus({ days: 30 }).toISO(),
     },
@@ -96,6 +95,15 @@ export const TransferRequestForm = ({ isEditable = false, data = null, programs 
       )
     }
   }, [submitErrors])
+
+  useEffect(() => {
+    if (selectedProgram) {
+      const defaultWallet =
+        user?.wallets?.find(wallet => wallet.isDefault && wallet.blockchain.id === selectedProgram?.blockchainId) || undefined
+
+      setValue('userWalletId', defaultWallet?.id as number)
+    }
+  }, [setValue, user?.wallets, selectedProgram])
 
   const currencyUnitIdRegister = register('currencyUnitId')
 

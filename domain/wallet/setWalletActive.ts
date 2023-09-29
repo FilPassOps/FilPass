@@ -1,5 +1,5 @@
 import { verify } from 'lib/jwt'
-import prisma from 'lib/prisma'
+import { newPrismaTransaction } from 'lib/prisma'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
 interface SetWalletActiveParams {
@@ -10,26 +10,34 @@ export const setWalletActive = async ({ token }: SetWalletActiveParams) => {
   try {
     const { data: decoded } = verify(token) as any
 
-    const [hasDefaultActive] = await prisma.userWallet.findMany({
-      where: { userId: decoded?.userId, isDefault: true, isActive: true },
-    })
-
-    await prisma.userWallet.update({
-      where: { id: decoded?.id },
-      data: { isActive: true, isDefault: !hasDefaultActive },
-      select: {
-        address: true,
-        user: {
-          select: {
-            email: true,
-          },
+    return await newPrismaTransaction(async prisma => {
+      const newWallet = await prisma.userWallet.findUnique({
+        where: { id: decoded?.id },
+        select: {
+          address: true,
+          blockchainId: true,
         },
-      },
-    })
+      })
 
-    return {
-      error: null,
-    }
+      const [hasDefaultActive] = await prisma.userWallet.findMany({
+        where: {
+          userId: decoded?.userId,
+          isDefault: true,
+          isActive: true,
+          blockchainId: newWallet?.blockchainId,
+          address: { not: newWallet?.address },
+        },
+      })
+
+      await prisma.userWallet.update({
+        where: { id: decoded?.id },
+        data: { isActive: true, isDefault: !hasDefaultActive },
+      })
+
+      return {
+        error: null,
+      }
+    })
   } catch (error: any) {
     const tokenExpired = error?.name === 'TokenExpiredError'
     return {
