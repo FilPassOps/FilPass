@@ -46,7 +46,6 @@ interface CreateOrEditProgramModalProps {
       type: string
     }[]
     visibility: string
-    signersWalletAddresses: { address: string }[]
     isArchived: boolean
   }
 
@@ -85,7 +84,6 @@ export const CreateOrEditProgramModal = ({
       viewersRole: [],
       programCurrency: [],
       visibility: undefined,
-      signersWalletAddresses: [{ address: '' }],
     },
   })
 
@@ -98,16 +96,7 @@ export const CreateOrEditProgramModal = ({
     name: 'approversRole', // unique name for your Field Array
   })
 
-  const {
-    fields: signersWalletAddressesFields,
-    remove: signersWalletAddressesRemove,
-    append: signersWalletAddressesAppend,
-  } = useFieldArray({
-    control: control, // control props comes from useForm (optional: if you are using FormContext)
-    name: 'signersWalletAddresses', // unique name for your Field Array
-  })
-
-  const { paymentMethod, approversRole, signersWalletAddresses } = watch()
+  const { paymentMethod, approversRole } = watch()
 
   useEditableProgram({ program, isEditable, setValue })
 
@@ -269,46 +258,6 @@ export const CreateOrEditProgramModal = ({
               />
             )}
           />
-
-          <fieldset>
-            <div className="flex justify-between items-center text-sm font-medium leading-5">
-              <legend className="text-gray-700">Program Wallet(s)</legend>
-              <div className="max-w-xs">
-                <Button
-                  className="text-indigo-700"
-                  type="button"
-                  variant="none"
-                  toolTipText={program?.isArchived ? '' : 'Add up to five wallets'}
-                  onClick={() => signersWalletAddressesAppend({ address: '' })}
-                  disabled={program?.isArchived || (signersWalletAddresses && signersWalletAddresses.length > 4) || hasAssociatedRequests}
-                >
-                  <div className="flex gap-1">
-                    <PlusCircleIcon width={18} /> Add wallet
-                  </div>
-                </Button>
-              </div>
-            </div>
-            <div className="flex flex-col gap-2">
-              {signersWalletAddressesFields.map((field, idx) => {
-                return (
-                  <div className="flex gap-2" key={field.id} style={{ maxWidth: '464px' }}>
-                    <TextInput
-                      id={`signersWalletAddresses.${idx}.address`}
-                      placeholder="Enter program wallet"
-                      error={errors?.signersWalletAddresses?.[idx]?.address || submitErrors?.signersWalletAddresses?.[idx]?.address}
-                      {...register(`signersWalletAddresses.${idx}.address`)}
-                      disabled={program?.isArchived || hasAssociatedRequests}
-                    />
-                    {idx > 0 && !program?.isArchived && !hasAssociatedRequests && (
-                      <button onClick={() => confirm('Delete this item?') && signersWalletAddressesRemove(idx)}>
-                        <TrashIcon aria-label="Remove wallet" className="w-5 text-red-600" />
-                      </button>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          </fieldset>
 
           <div className="flex space-x-3 mt-1">
             <Button variant="outline" onClick={handleClose}>

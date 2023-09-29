@@ -91,7 +91,7 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
         </TableHead>
         <TableBody>
           {data.map((request, requestIndex) => {
-            const { blockExplorer, chainId } = getChainByName(request.program_blockchain)
+            const chain = getChainByName(request.program_blockchain)
             const href = `/approvals/${request.id}`
 
             return (
@@ -122,6 +122,7 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
                   {request.wallet_address && (
                     <WalletAddress
                       address={request.wallet_address}
+                      delegatedAddress={request.delegated_address}
                       blockchain={request.wallet_blockchain}
                       isVerified={!!request.wallet_is_verified}
                     />
@@ -138,7 +139,7 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
                 <LinkedCell href={href}>
                   {request.amount ? (
                     <CryptoAmount>
-                      <CryptoAmountInfo chainId={chainId} request={request} />
+                      <CryptoAmountInfo chainId={chain?.chainId} request={request} />
                     </CryptoAmount>
                   ) : (
                     '-'
@@ -150,8 +151,8 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
                 <Cell>
                   {request.status === PAID_STATUS && request.transfer_hash && (
                     <BlockExplorerLink
-                      blockExplorerName={blockExplorer.name}
-                      blockExplorerUrl={blockExplorer.url}
+                      blockExplorerName={chain?.blockExplorer.name}
+                      blockExplorerUrl={chain?.blockExplorer.url}
                       transactionHash={request.transfer_hash}
                     />
                   )}
@@ -188,7 +189,11 @@ const CryptoAmountInfo = ({ chainId, request }: CryptoAmountInfoProps) => {
   }
 
   if (request.request_unit === USD) {
-    return `${formatCrypto(new Big(request.amount / Number(currency)).toFixed(2))} ${request.payment_unit}`
+    if(currency){
+      return `${formatCrypto(new Big(request.amount / Number(currency)).toFixed(2))} ${request.payment_unit}`
+    } else {
+      return '-'
+    }
   }
 
   if (request.request_unit !== USD) {

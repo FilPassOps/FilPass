@@ -5,7 +5,6 @@ import { TransferRequestForm } from 'components/TransferRequest/TransferRequestF
 import { PLATFORM_NAME } from 'system.config'
 import { APPROVER_ROLE } from 'domain/auth/constants'
 import { findAllExternalPrograms } from 'domain/programs/findAll'
-import { getMasterWallet } from 'lib/filecoin'
 import { withUserSSR } from 'lib/ssr'
 import { ReactElement } from 'react'
 import Head from 'next/head'
@@ -21,9 +20,7 @@ export default function CreateTransferRequest({ programs, applyingForSomeone }: 
       <Head>
         <title>{`New Transfer Request - ${PLATFORM_NAME}`}</title>
       </Head>
-      <div className="max-w-3xl mx-auto">
-        {applyingForSomeone ? <ApplyForSomeoneForm /> : <TransferRequestForm programs={programs}/>}
-      </div>
+      <div className="max-w-3xl mx-auto">{applyingForSomeone ? <ApplyForSomeoneForm /> : <TransferRequestForm programs={programs} />}</div>
       <GoBackConfirmationWithRouter />
     </>
   )
@@ -37,12 +34,10 @@ export const getServerSideProps = withUserSSR(async function getServerSideProps(
   const { roles } = user
 
   const { data: programs } = await findAllExternalPrograms()
-  const masterWallet = getMasterWallet()
 
   return {
     props: {
       programs: JSON.parse(JSON.stringify(programs)),
-      masterAddress: masterWallet.address,
       applyingForSomeone: query?.batch === 'true' && roles?.some(({ role }) => role === APPROVER_ROLE),
     },
   }

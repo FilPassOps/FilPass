@@ -1,7 +1,6 @@
 import { ArrowLeftIcon } from '@heroicons/react/24/outline'
 import { Blockchain, TransferStatus } from '@prisma/client'
 import Big from 'big.js'
-import config from 'chains.config'
 import { useAlertDispatcher } from 'components/Layout/Alerts'
 import { Button } from 'components/shared/Button'
 import { useMetaMask } from 'components/web3/MetaMaskProvider'
@@ -58,7 +57,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
 
   const currentBatch = paymentBatchList[currentBatchIndex]
   const chain = getChainByName(data[0].program.blockchain.name)
-  const {currency} = useCurrency(chain.chainId)
+  const { currency } = useCurrency(chain.chainId)
 
   useEffect(() => {
     let totalDollarAmount = 0
@@ -108,7 +107,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
     const { data, error } = await api.post('/transfers/prepare', {
       requests: requestIds,
       from: wallet,
-      to: config.multiforwarder,
+      to: chain.contractAddress,
     })
 
     if (error) {
@@ -136,9 +135,21 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
       const addresses = []
       const amounts = []
 
-      for (const { amount, wallet } of batch) {
+      for (const { amount, wallet, program } of batch) {
         addresses.push(wallet.address)
-        amounts.push(amount.toString())
+        const programCurrency = program.programCurrency.find(({ type }) => type === 'REQUEST')
+
+        if (!currency) {
+          throw new Error('Currency not found')
+        }
+
+        const transferAmount = programCurrency?.currency.name === USD ? new Big(Number(amount) / currency).toFixed(2) : amount
+
+        if (!transferAmount) {
+          throw new Error('Invalid amount')
+        }
+
+        amounts.push(transferAmount.toString())
       }
 
       const { hash, from, to } = await forwardFunction(blockchainName, uuid, addresses, amounts)
@@ -244,7 +255,8 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
         )}
         <div className="py-6 md:p-6 border-b border-gray-200">
           <h1 className="text-base md:text-lg text-gray-900 font-medium mb-2">
-            Total payout amount: {formatCrypto(new Big(totalDollarAmount).div(Number(currency)).toFixed(2))} {chain.symbol}
+            Total payout amount:{' '}
+            {totalDollarAmount && currency ? formatCrypto(new Big(totalDollarAmount).div(Number(currency)).toFixed(2)) : '-'} {chain.symbol}
             <span className="text-sm text-gray-500"> ≈{formatCurrency(totalDollarAmount)}</span>
           </h1>
         </div>

@@ -1,16 +1,17 @@
+import { TransferRequest } from '@prisma/client'
 import { APPROVER_ROLE, USER_ROLE } from 'domain/auth/constants'
 import { findAllExternalPrograms } from 'domain/programs/findAll'
 import { createRequestChangeHistory } from 'domain/tranferRequestHistory/createRequestChangeHistory'
+import { termsValidator } from 'domain/user/validation'
 import { encrypt, encryptPII } from 'lib/emissaryCrypto'
 import { TransactionError } from 'lib/errors'
 import prisma, { newPrismaTransaction } from 'lib/prisma'
 import yup, { validate } from 'lib/yup'
+import errorsMessages from 'wordings-and-errors/errors-messages'
 import { sendSubmittedNotification } from '../notifications/sendSubmittedNotification'
 import { REQUIRES_CHANGES_STATUS, SUBMITTED_STATUS } from './constants'
 import { isEditable } from './shared'
 import { updateTransferRequestValidator } from './validation'
-import { TransferRequest } from '@prisma/client'
-import { termsValidator } from 'domain/user/validation'
 
 interface UpdateTransferRequestParams {
   userId: number
@@ -80,12 +81,12 @@ export async function updateTransferRequestById(params: UpdateTransferRequestPar
     const [currentIteration] = transferRequests
     const [userPermission] = userPermissions as UserPermissionResult[]
     if (!currentIteration || !userPermission.id) {
-      throw new TransactionError('Transfer request not found', { status: 404, errors: undefined })
+      throw new TransactionError('Transfer request not found', { status: 404, errors: 'Transfer request not found' })
     }
 
     const canEdit = isEditable({ ...currentIteration })
     if (!canEdit) {
-      throw new TransactionError('Transfer request is not editable', { status: 400, errors: undefined })
+      throw new TransactionError('Transfer request is not editable', { status: 400, errors: 'Transfer request is not editable' })
     }
 
     // If the user that is updating the request is the requester,
@@ -96,16 +97,22 @@ export async function updateTransferRequestById(params: UpdateTransferRequestPar
       const program = programs?.find(program => program.id === programId)
 
       if (!program) {
-        throw new TransactionError('Program not found', { status: 400, errors: undefined })
+        throw new TransactionError('Program not found', { status: 400, errors: 'Program not found' })
       }
     }
 
-    if (userWalletId !== currentIteration.userWalletId) {
-      const userWallet = await prisma.userWallet.findUnique({ where: { id: userWalletId, userId: user.id } })
+    const userWallet = await prisma.userWallet.findUnique({ where: { id: userWalletId, userId: user.id } })
+    if (userWalletId !== currentIteration.userWalletId && !userWallet) {
+      throw new TransactionError('Wallet not found', { status: 400, errors: 'Wallet not found' })
+    }
 
-      if (!userWallet) {
-        throw new TransactionError('Wallet not found', { status: 400, errors: undefined })
-      }
+    const program = await prisma.program.findUnique({ where: { id: programId, isActive: true, isArchived: false } })
+
+    if (program && userWallet && userWallet.blockchainId !== program.blockchainId) {
+      throw new TransactionError(errorsMessages.wallet_program_blockchain.message, {
+        status: 400,
+        errors: errorsMessages.wallet_program_blockchain.message,
+      })
     }
 
     let nextStatus = currentIteration.status

@@ -35,6 +35,9 @@ export const createTransferRequestDraftFormValidator = yup
             amount: yup.string(),
             userAttachmentId: yup.string().max(40),
             currencyUnitId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
+            isBatchCsv: yup.boolean().optional(),
+            approverRoleId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).optional(),
+            requesterId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).optional(),
           })
           .required(),
       )

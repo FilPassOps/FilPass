@@ -1,5 +1,4 @@
 import { ethers } from 'ethers'
-import { decrypt } from 'lib/emissaryCrypto'
 import { validateWalletAddress } from 'lib/filecoinShipyard'
 import { WalletSize, amountConverter, getDelegatedAddress, hexAddressDecoder } from 'lib/getDelegatedAddress'
 import { logger } from 'lib/logger'
@@ -93,13 +92,12 @@ const processPayment = async (
     const transfers = []
     for await (const transfer of pendingTransfers) {
       try {
-        const { actorAddress, robustAddress, wallet, amount } = transfer.transferRequest
-        const decryptedAmount = await decrypt(amount)
+        const { actorAddress, robustAddress, wallet } = transfer.transferRequest
         const finalAddress = getDelegatedAddress(wallet.address, WalletSize.SHORT, chainName)?.fullAddress || wallet.address
         const alias = await validateWalletAddress(finalAddress)
 
         const isAddressValid = actorAddress === receiver || robustAddress === receiver || wallet.address === receiver || alias === receiver
-        if (isAddressValid && Number(decryptedAmount) === Number(paidAmount)) {
+        if (isAddressValid) {
           transfers.push(transfer)
         }
       } catch (error) {

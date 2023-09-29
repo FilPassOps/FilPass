@@ -76,13 +76,13 @@ export async function batchCreateTransferRequest(params: BatchCreateTransferRequ
     return { error: walletError }
   }
 
-  const { data, error: transferRequesterror } = await prismaCreateTransferRequest(
+  const { data, error: transferRequestError } = await prismaCreateTransferRequest(
     completeRequests,
     requesterId as number,
     approverRoleId as number,
   )
-  if (transferRequesterror) {
-    return { error: transferRequesterror }
+  if (transferRequestError) {
+    return { error: transferRequestError }
   }
 
   return { data }
@@ -197,7 +197,7 @@ export async function buildTransferRequestData(requests: CompletedRequest[], req
     },
   })
 
-  const promiseList = requests.map(async (singleRequest, index) => {
+  const promiseList = requests.map(async (singleRequest) => {
     const userRoleProgram = programs.find(program => program.programId === singleRequest.programId)
 
     if (!userRoleProgram) {

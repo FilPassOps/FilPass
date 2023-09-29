@@ -248,7 +248,6 @@ model Program {
   isArchived             Boolean                @default(false) @map("is_archived")
   createdAt              DateTime               @default(now()) @map("created_at")
   updatedAt              DateTime               @updatedAt @map("updated_at")
-  signersWalletAddresses String[]               @map("signers_wallet_addresses")
   visibility             ProgramVisibility?     @default(EXTERNAL) @map("visibility")
   blockchain             Blockchain             @relation(fields: [blockchainId], references: [id])
   blockchainId           Int                    @map("blockchain_id")

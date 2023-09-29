@@ -4,7 +4,6 @@ import {
   formatProgramApproversRole,
   formatProgramCurrency,
   formatProgramViewersRole,
-  formatSignersWalletAddresses,
 } from './utils'
 
 interface UseEditableProgramProps {
@@ -18,7 +17,6 @@ export const useEditableProgram = ({ program, isEditable, setValue }: UseEditabl
   const _paymentMethod = findProgramPaymentMethod(program)?.value
   const _approversRole = formatProgramApproversRole(program)
   const _viewersRole = formatProgramViewersRole(program)
-  const _signersWalletAddresses = formatSignersWalletAddresses(program)
 
   useEffect(() => {
     if (program && isEditable) {
@@ -28,7 +26,6 @@ export const useEditableProgram = ({ program, isEditable, setValue }: UseEditabl
       setValue('approversRole', _approversRole)
       setValue('viewersRole', _viewersRole)
       setValue('programCurrency', _programCurrency)
-      setValue('signersWalletAddresses', _signersWalletAddresses)
       setValue('visibility', program?.visibility)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

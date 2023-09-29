@@ -1,6 +1,5 @@
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline'
 import { Blockchain, TransferStatus } from '@prisma/client'
-import config from 'chains.config'
 import MetamaskPayment from 'components/Controller/MetaMaskPayment'
 import NotifyCorfimationModal from 'components/Controller/Modals/NotifyConfirmationModal'
 import RejectModal from 'components/Controller/Modals/RejectModal'
@@ -55,6 +54,7 @@ interface DisbursementRequest {
   amount: string
   isHexMatch?: boolean
   selected: boolean
+  wallet_blockchain: string
   wallet: {
     address: string
     blockchain: Blockchain
@@ -224,7 +224,9 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
       const csvTemplate = stringify(
         [
           headerFile,
-          ...data.requests.map(({ program, wallet, transfers, currency, receiver, ...request }) => {
+          ...data.requests.map(({ program, wallet, transfers, currency, receiver, wallet_blockchain, ...request }) => {
+            const chain = getChainByName(wallet_blockchain)
+
             const row = []
             columns.number && row.push(request.publicId)
             columns.receiverEmail && row.push(receiver.email)
@@ -238,7 +240,7 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
             columns.paidFilAmount && row.push(transfers[0].amount)
             columns.paidFilAmount && row.push(transfers[0].amountCurrencyUnit?.name ?? 'FIL')
             columns.status && row.push(status)
-            columns.filfoxLink && row.push(`${config.chain.blockExplorerUrls[0]}/${transfers[0].txHash}`)
+            columns.filfoxLink && row.push(`${chain.blockExplorer.url}/${transfers[0].txHash}`)
             return row
           }),
         ],

@@ -15,7 +15,6 @@ interface CreateProgramParams {
     type: string
     blockchain: string
   }[]
-  signersWalletAddresses?: { address: string }[]
   visibility: ProgramVisibility
 }
 
@@ -50,7 +49,6 @@ export async function createProgram(params: CreateProgramParams) {
       data: {
         deliveryMethod,
         name,
-        signersWalletAddresses: [],
         visibility,
         blockchainId: blockchain.id,
         programCurrency: {
