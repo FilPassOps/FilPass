@@ -307,11 +307,11 @@ const verifyWallet = async (data: Row[], prisma: Prisma.TransactionClient, block
         if (blockchainName === 'Filecoin' && wallet.startsWith('0x')) {
           const delegatedAddress = getDelegatedAddress(wallet, WalletSize.FULL, blockchainName)
           if (!delegatedAddress.fullAddress) {
-            errors.push({ message: `Invalid wallet address on row ${row}. The wallet is not a valid ${blockchainName} address.` })
+            errors.push({ message: `Invalid wallet address on row ${row}. The wallet is not a valid Filecoin address.` })
           }
         } else if (wallet.startsWith('0x') && !utils.isAddress(wallet)) {
           errors.push({ message: `Invalid wallet address on row ${row}. The wallet is not a valid ${blockchainName} address.` })
-        } else if (blockchainName !== 'Filecoin') {
+        } else if (!wallet.startsWith('0x') && blockchainName !== 'Filecoin') {
           errors.push({ message: `Invalid wallet address on row ${row}. The wallet is not a valid ${blockchainName} address.` })
         } else {
           const isValid = await validateWalletAddress(wallet)
