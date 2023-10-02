@@ -593,6 +593,7 @@ export const UploadFileButton = ({ children, onChange, disabled, loading, accept
         accept={accept}
         className="hidden"
         aria-label="Upload file"
+        onClick={e => (e.target as HTMLInputElement).value = ''}
         onChange={e => {
           const file = e.target.files?.[0]
           if (file) {
