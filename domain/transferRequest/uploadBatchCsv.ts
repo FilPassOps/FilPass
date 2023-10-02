@@ -1,14 +1,14 @@
 import { Prisma } from '@prisma/client'
 import { parse } from 'csv-parse/sync'
+import { utils } from 'ethers'
 import fs from 'fs'
-import { validateWalletAddress } from 'lib/filecoinShipyard'
+import { validateWalletAddress } from 'lib/blockchainUtils'
+import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { generateEmailHash } from 'lib/password'
 import prisma from 'lib/prisma'
 import yup, { validate } from 'lib/yup'
 import { sortedUniq } from 'lodash'
 import { csvSchemaV1, csvSchemaV2, uploadBatchCsvValidator } from './validation'
-import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
-import { utils } from 'ethers'
 
 interface UploadBatchCsvParams {
   programId: number

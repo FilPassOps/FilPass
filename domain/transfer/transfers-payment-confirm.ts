@@ -1,5 +1,4 @@
 import { ethers } from 'ethers'
-import { validateWalletAddress } from 'lib/filecoinShipyard'
 import { WalletSize, amountConverter, getDelegatedAddress, hexAddressDecoder } from 'lib/getDelegatedAddress'
 import { logger } from 'lib/logger'
 import prisma from 'lib/prisma'
@@ -93,11 +92,11 @@ const processPayment = async (
     for await (const transfer of pendingTransfers) {
       try {
         const { actorAddress, robustAddress, wallet } = transfer.transferRequest
-        const finalAddress = getDelegatedAddress(wallet.address, WalletSize.SHORT, chainName)?.fullAddress || wallet.address
-        const alias = await validateWalletAddress(finalAddress)
+        const delegatedAddress = getDelegatedAddress(wallet.address, WalletSize.SHORT, chainName)?.fullAddress || wallet.address
 
-        const isAddressValid = actorAddress === receiver || robustAddress === receiver || wallet.address === receiver || alias === receiver
-        if (isAddressValid) {
+        const isAddressMatch =
+          actorAddress === receiver || robustAddress === receiver || wallet.address === receiver || delegatedAddress === receiver
+        if (isAddressMatch) {
           transfers.push(transfer)
         }
       } catch (error) {

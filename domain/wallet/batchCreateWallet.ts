@@ -1,12 +1,12 @@
+import { Prisma } from '@prisma/client'
+import { utils } from 'ethers'
+import { validateWalletAddress } from 'lib/blockchainUtils'
 import { TransactionError } from 'lib/errors'
-import { matchWalletAddress } from 'lib/filecoinShipyard'
 import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import prisma, { newPrismaTransaction } from 'lib/prisma'
 import _ from 'lodash'
-import errorsMessages from 'wordings-and-errors/errors-messages'
-import { Prisma } from '@prisma/client'
-import { utils } from 'ethers'
 import { getChainByName } from 'system.config'
+import errorsMessages from 'wordings-and-errors/errors-messages'
 
 interface Request {
   wallet: {
@@ -185,7 +185,7 @@ const checkWallet = async ({ prisma, user, request, isBatchCsv, index }: CheckWa
       throw { wallet: errorsMessages.wallet_incorrect.message }
     }
 
-    const isWalletValid = await matchWalletAddress(request.wallet as string)
+    const isWalletValid = await validateWalletAddress(request.wallet as string)
 
     if (!isWalletValid) {
       if (isBatchCsv) {
