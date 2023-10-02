@@ -78,7 +78,7 @@ export async function getApproverTransferRequestById(params: GetUserTransferRequ
   return {
     data: {
       ...tr,
-      delegated_address: getDelegatedAddress(tr.wallet_address, WalletSize.VERY_SHORT)?.shortAddress,
+      delegated_address: getDelegatedAddress(tr.wallet_address, WalletSize.VERY_SHORT, tr.wallet_blockchain_name)?.shortAddress,
       wallet_address: shortenAddress(tr.wallet_address),
     },
   }

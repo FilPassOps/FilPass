@@ -18,7 +18,7 @@ import { findAllPrograms } from 'domain/programs/findAll'
 import { APPROVED_STATUS, PAID_STATUS } from 'domain/transferRequest/constants'
 import JsFileDownload from 'js-file-download'
 import { api } from 'lib/api'
-import { getDelegatedAddress } from 'lib/getDelegatedAddress'
+import { getDelegatedAddress, WalletSize } from 'lib/getDelegatedAddress'
 import { withControllerSSR } from 'lib/ssr'
 import { DateTime } from 'luxon'
 import Head from 'next/head'
@@ -234,7 +234,10 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
             columns.name && row.push(request.team)
             columns.createDate && row.push(status === PAID_STATUS ? request.updatedAt : request.createdAt)
             columns.address && row.push(wallet.address)
-            columns.address && row.push(request.delegated_address || getDelegatedAddress(wallet.address)?.fullAddress)
+            columns.address &&
+              row.push(
+                request.delegated_address || getDelegatedAddress(wallet.address, WalletSize.FULL, wallet.blockchain.name)?.fullAddress,
+              )
             columns.amount && row.push(request.amount)
             columns.amount && row.push(currency.name)
             columns.paidFilAmount && row.push(transfers[0].amount)

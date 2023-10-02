@@ -7,7 +7,7 @@ import { getItemsPerPage, PaginationWrapper } from 'components/shared/usePaginat
 import TransferList from 'components/User/TransferList'
 import { findReceiverPrograms } from 'domain/programs/findReceiverPrograms'
 import { getUserTransferRequests } from 'domain/transferRequest/getUserTransferRequests'
-import { getDelegatedAddress } from 'lib/getDelegatedAddress'
+import { getDelegatedAddress, WalletSize } from 'lib/getDelegatedAddress'
 import { getEthereumAddress } from 'lib/getEthereumAddress'
 import { withUserSSR } from 'lib/ssr'
 import Head from 'next/head'
@@ -54,7 +54,7 @@ Home.getLayout = function getLayout(page: ReactElement) {
 }
 
 export const getServerSideProps = withUserSSR(async ({ query, user }) => {
-  const { itemsPerPage, programId, number, team, sort, status, order, from, to, wallet } = query
+  const { itemsPerPage, programId, number, team, sort, status, order, from, to } = query
   const pageSize = getItemsPerPage(itemsPerPage)
   const page = query.page && typeof query.page === 'string' ? parseInt(query.page) : 1
 
@@ -73,12 +73,20 @@ export const getServerSideProps = withUserSSR(async ({ query, user }) => {
     toDate.setHours(23, 59, 59, 999)
   }
 
-  const walletTypeCheck = wallet && typeof wallet === 'string'
+  const wallet = query.wallet as string | undefined
 
-  const ethereumWallet = walletTypeCheck ? getEthereumAddress(wallet)?.fullAddress.toLowerCase() : undefined
-  const delegatedAddress = walletTypeCheck ? getDelegatedAddress(wallet)?.fullAddress : undefined
+  const addresses = [wallet]
 
-  const wallets = [wallet, ethereumWallet, delegatedAddress].filter(Boolean)
+  // TODO: improve to get delegated address only if blockchain is Filecoin
+  if (wallet?.startsWith('0x')) {
+    addresses.push(getDelegatedAddress(wallet, WalletSize.FULL, 'Filecoin')?.fullAddress)
+  }
+
+  if (wallet?.startsWith('f4') || wallet?.startsWith('t4')) {
+    addresses.push(getEthereumAddress(wallet as string, WalletSize.FULL)?.fullAddress.toLowerCase())
+  }
+
+  const filteredAddresses = addresses.filter((wallet): wallet is string => !!wallet)
 
   const { data } = await getUserTransferRequests({
     userId: user.id,
@@ -92,7 +100,7 @@ export const getServerSideProps = withUserSSR(async ({ query, user }) => {
     team: team?.toString().split(','),
     from: fromDate,
     to: toDate,
-    wallets: wallets as string[] | undefined,
+    wallets: filteredAddresses,
   })
 
   const programs = await findReceiverPrograms({ receiverId: user.id })

@@ -150,7 +150,7 @@ export async function getViewerTransferRequests(params: GetViewerTransferRequets
         transfer_amount,
         amount,
         team,
-        delegated_address: getDelegatedAddress(request.wallet_address, WalletSize.VERY_SHORT)?.shortAddress,
+        delegated_address: getDelegatedAddress(request.wallet_address, WalletSize.VERY_SHORT, request.wallet_blockchain)?.shortAddress,
         wallet_address: shortenAddress(request.wallet_address),
       }
     }),
