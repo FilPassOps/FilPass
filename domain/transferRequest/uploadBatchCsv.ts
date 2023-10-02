@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client'
 import { parse } from 'csv-parse/sync'
 import fs from 'fs'
-import { matchWalletAddress } from 'lib/filecoinShipyard'
+import { validateWalletAddress } from 'lib/blockchainUtils'
 import { getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { generateEmailHash } from 'lib/password'
 import prisma from 'lib/prisma'
@@ -282,7 +282,7 @@ const verifyWallet = async (data: Row[], prisma: Prisma.TransactionClient, propN
 
       if (wallet) {
         const delegatedAddress = getDelegatedAddress(wallet)?.fullAddress
-        const isWalletValid = await matchWalletAddress(delegatedAddress || wallet)
+        const isWalletValid = await validateWalletAddress(delegatedAddress || wallet)
         if (!isWalletValid) {
           errors.push({ message: `Invalid wallet address on row ${row - 1}` })
         }

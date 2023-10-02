@@ -1,4 +1,4 @@
-import { validateWalletAddress } from 'lib/filecoinShipyard'
+import { validateWalletAddress } from 'lib/blockchainUtils'
 import { NextApiRequestWithSession, newHandler, withLimiter, withMethods, withUser } from 'lib/middleware'
 import { NextApiResponse } from 'next'
 import errorsMessages from 'wordings-and-errors/errors-messages'
