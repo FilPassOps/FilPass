@@ -1,12 +1,12 @@
-import { Prisma } from '@prisma/client'
 import { utils } from 'ethers'
 import { validateWalletAddress } from 'lib/blockchainUtils'
 import { TransactionError } from 'lib/errors'
 import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import prisma, { newPrismaTransaction } from 'lib/prisma'
 import _ from 'lodash'
-import { getChainByName } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
+import { Blockchain, Prisma, Program } from '@prisma/client'
+import { getChainByName } from 'system.config'
 
 interface Request {
   wallet: {
@@ -46,9 +46,21 @@ interface CheckWalletParams {
   request: BatchCreateWalletParams['requests'][0]
   isBatchCsv?: boolean
   index: number
+  programs: ProgramWithBlockchain[]
+}
+
+interface ProgramWithBlockchain extends Program {
+  blockchain: Blockchain
 }
 
 export const batchCreateWallet = async ({ requests, users, isBatchCsv }: BatchCreateWalletParams) => {
+  const programs = (await prisma.program.findMany({
+    select: {
+      id: true,
+      blockchain: true,
+    },
+  })) as ProgramWithBlockchain[]
+
   const validatePromiseList = requests.map(async (singleRequest, index) => {
     const user = users.find(singleUser => singleUser.email === singleRequest.receiverEmail)
 
@@ -56,7 +68,7 @@ export const batchCreateWallet = async ({ requests, users, isBatchCsv }: BatchCr
       throw { message: `${errorsMessages.user_not_found.message} At line ${index + 1}` }
     }
 
-    return await checkWallet({ prisma, user, request: singleRequest, isBatchCsv, index })
+    return await checkWallet({ prisma, user, request: singleRequest, isBatchCsv, index, programs })
   })
 
   const validatedWallets = await Promise.allSettled(validatePromiseList)
@@ -85,30 +97,23 @@ export const batchCreateWallet = async ({ requests, users, isBatchCsv }: BatchCr
     }
   }
 
-  const { data: createdWallets, error } = await createOrUpdateWallets(walletRequests)
+  const { data: createdWallets, error } = await createOrUpdateWallets(walletRequests, programs)
 
   if (error) {
     return { error }
   }
 
-  return await setDefaultWallets(createdWallets as Request[])
+  return await setDefaultWallets(createdWallets as Request[], programs)
 }
 
-const checkWallet = async ({ prisma, user, request, isBatchCsv, index }: CheckWalletParams) => {
+const checkWallet = async ({ prisma, user, request, isBatchCsv, index, programs }: CheckWalletParams) => {
   const userWallets = await prisma.userWallet.findMany({
     where: {
       userId: user.id,
     },
   })
 
-  const program = await prisma.program.findUnique({
-    where: {
-      id: request.programId,
-    },
-    select: {
-      blockchain: true,
-    },
-  })
+  const program = programs.find(program => program.id === request.programId)
 
   if (!program) {
     throw { message: errorsMessages.program_not_found.message }
@@ -202,15 +207,8 @@ const checkWallet = async ({ prisma, user, request, isBatchCsv, index }: CheckWa
   }
 }
 
-const createOrUpdateWallets = async (requests: Request[]) => {
+const createOrUpdateWallets = async (requests: Request[], programs: ProgramWithBlockchain[]) => {
   return await newPrismaTransaction(async prisma => {
-    const programs = await prisma.program.findMany({
-      select: {
-        id: true,
-        blockchain: true,
-      },
-    })
-
     const promiseList = requests.map(async singleRequest => {
       if (singleRequest.wallet?.created === false && !singleRequest?.skipWalletCreation) {
         const requestProgram = programs.find(program => program.id === singleRequest.programId)
@@ -262,7 +260,7 @@ const createOrUpdateWallets = async (requests: Request[]) => {
   })
 }
 
-const setDefaultWallets = async (requests: Request[]) => {
+const setDefaultWallets = async (requests: Request[], programs: ProgramWithBlockchain[]) => {
   return await newPrismaTransaction(async prisma => {
     const promiseList = requests.map(async singleRequest => {
       if (singleRequest.wallet?.isDefault) {
@@ -279,7 +277,9 @@ const setDefaultWallets = async (requests: Request[]) => {
         },
       })
 
-      const defaultWallet = userWallets.find(wallet => wallet.isDefault)
+      const requestProgram = programs.find(program => program.id === singleRequest.programId)
+
+      const defaultWallet = userWallets.find(wallet => wallet.isDefault && wallet.blockchainId === requestProgram?.blockchainId)
 
       if (!defaultWallet) {
         await prisma.userWallet.update({

@@ -3,18 +3,6 @@ import errorsMessages from 'wordings-and-errors/errors-messages'
 
 import { MAX_INTEGER_VALUE } from '../constants'
 
-export const createWalletValidator = yup
-  .object({
-    name: yup.string(),
-    verificationId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).typeError(errorsMessages.required_field.message),
-    userId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).typeError(errorsMessages.required_field.message).required(),
-    address: yup.string().required(),
-    blockchain: yup.string().required(), // TODO OPEN-SOURCE: should the id of the blockchain table
-    isDefault: yup.bool(),
-    email: yup.string().email().required(),
-  })
-  .required()
-
 export const deleteWalletValidator = yup
   .object({
     id: yup.number().integer().positive().max(MAX_INTEGER_VALUE).typeError(errorsMessages.required_field.message).required(),
