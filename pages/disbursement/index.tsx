@@ -24,7 +24,7 @@ import { DateTime } from 'luxon'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
-import { getChainByName, PLATFORM_NAME } from 'system.config'
+import { AppConfig, ChainNames } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
 interface DisbursementProps {
@@ -225,7 +225,7 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
         [
           headerFile,
           ...data.requests.map(({ program, wallet, transfers, currency, receiver, wallet_blockchain, ...request }) => {
-            const chain = getChainByName(wallet_blockchain)
+            const chain = AppConfig.network.getChainByName(wallet_blockchain as ChainNames)
 
             const row = []
             columns.number && row.push(request.publicId)
@@ -254,7 +254,9 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
       const blob = new Blob([csvTemplate])
       return JsFileDownload(
         blob,
-        `${PLATFORM_NAME.toLowerCase()}_${status.toLowerCase()}_disbursement_${DateTime.now().toFormat("yyyy-MM-dd_hh'h'mm'm'ss's'")}.csv`,
+        `${AppConfig.app.name.toLowerCase()}_${status.toLowerCase()}_disbursement_${DateTime.now().toFormat(
+          "yyyy-MM-dd_hh'h'mm'm'ss's'",
+        )}.csv`,
       )
     } catch (error) {
       console.error(error)
@@ -267,7 +269,7 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
   return (
     <>
       <Head>
-        <title>{`Disbursement - ${PLATFORM_NAME}`}</title>
+        <title>{`Disbursement - ${AppConfig.app.name}`}</title>
       </Head>
       {isPayment && paymentModalTransactions.length ? (
         <MetamaskPayment data={paymentModalTransactions} />
@@ -314,7 +316,7 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
                     onBeforeClick={onBeforeMetamaskBatchPayClick}
                     onClick={onMetamaskBatchPayClick}
                     defaultLabel="Pay"
-                    targetChainId={getChainByName(selectedRequests[0].program.blockchain.name).chainId}
+                    targetChainId={AppConfig.network.getChainByName(selectedRequests[0].program.blockchain.name as ChainNames).chainId}
                     switchChainLabel="Switch network to pay"
                   >
                     Pay

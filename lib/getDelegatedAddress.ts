@@ -1,6 +1,6 @@
 import fa, { Address, CoinType } from '@glif/filecoin-address'
 import { ethers } from 'ethers'
-import { FilecoinChain, getChainByName } from 'system.config'
+import { AppConfig, FilecoinChain } from 'system.config'
 
 export enum WalletSize {
   FULL = 20,
@@ -11,7 +11,7 @@ export enum WalletSize {
 export const getDelegatedAddress = (walletAddress?: string, walletSize: WalletSize = WalletSize.SHORT, chainName?: string) => {
   if (walletAddress?.startsWith('0x') && walletAddress.length === 42 && chainName === 'Filecoin') {
     try {
-      const filecoin = getChainByName('Filecoin') as FilecoinChain
+      const filecoin = AppConfig.network.getChainByName('Filecoin') as FilecoinChain
 
       const delegatedAddress = fa.delegatedFromEthAddress(walletAddress, filecoin.coinType as CoinType)
       if (!delegatedAddress) return { fullAddress: '', shortAddress: '' }
@@ -43,7 +43,7 @@ export const hexAddressDecoder = (chainName: string, address: string) => {
     size = 22
   }
 
-  const filecoin = getChainByName('Filecoin') as FilecoinChain
+  const filecoin = AppConfig.network.getChainByName('Filecoin') as FilecoinChain
 
   return new Address(buff.subarray(0, size), filecoin.coinType as CoinType).toString()
 }

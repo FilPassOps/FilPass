@@ -1,10 +1,10 @@
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline'
 import { Button } from 'components/shared/Button'
-import { PLATFORM_NAME } from 'system.config'
 import { setDefault } from 'domain/wallet/setDefault'
+import { GetServerSidePropsContext } from 'next'
 import Head from 'next/head'
 import NextLink from 'next/link'
-import { GetServerSidePropsContext } from 'next'
+import { AppConfig } from 'system.config'
 
 interface SetDefaultWalletProps {
   error?: {
@@ -18,7 +18,7 @@ export default function SetDefaultWallet({ error }: SetDefaultWalletProps) {
   return (
     <>
       <Head>
-        <title key="default-wallet">{`Set default wallet - ${PLATFORM_NAME}`}</title>
+        <title key="default-wallet">{`Set default wallet - ${AppConfig.app.name}`}</title>
       </Head>
       {error ? (
         <div className="flex flex-col h-screen items-center justify-center">

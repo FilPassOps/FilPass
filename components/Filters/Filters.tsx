@@ -8,7 +8,7 @@ import { useRouter } from 'next/router'
 import { DetailedHTMLProps, Dispatch, Fragment, LabelHTMLAttributes, SetStateAction, forwardRef, useEffect, useRef, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
-import { CONFIG } from 'system.config'
+import { AppConfig } from 'system.config'
 import { StatusFilterOption, statusFilterLabel, statusFilterOptions } from './constants'
 
 interface SelectOption {
@@ -33,7 +33,7 @@ export const Filters = ({ programs, statusOptions, teams, dateFilterLabel = 'Cre
     .split(',')
     .map(network => network)
 
-  const initialNetworkFilter: SelectOption[] = CONFIG.chains
+  const initialNetworkFilter: SelectOption[] = AppConfig.network.chains
     .filter(chain => networks?.includes(chain.name))
     .map(chain => ({ value: chain.name, label: chain.name }))
 
@@ -244,7 +244,7 @@ export const Filters = ({ programs, statusOptions, teams, dateFilterLabel = 'Cre
                 <Select
                   name="network"
                   placeholder="Filter and select network"
-                  options={CONFIG.chains.map(chain => ({ value: chain.name, label: chain.name }))}
+                  options={AppConfig.network.chains.map(chain => ({ value: chain.name, label: chain.name }))}
                   onChange={selected => setSelectedNetwork(selected)}
                   selectedOptions={selectedNetwork}
                   setSelectedOptions={setSelectedNetwork}
@@ -423,7 +423,7 @@ function Select({ name, placeholder, options, onChange, selectedOptions, setSele
                 <div key={option.value} className="flex items-center gap-2 p-2 bg-indigo-600 text-white rounded-md">
                   <div className="border-r border-white pr-2 text-sm">{option.label}</div>
                   <button
-                    type='button'
+                    type="button"
                     onClick={() => {
                       unselect(option)
                       inputRef.current?.focus()
@@ -451,11 +451,11 @@ function Select({ name, placeholder, options, onChange, selectedOptions, setSele
         </div>
         <div className="flex items-center gap-2 mx-3">
           {selectedOptions.length > 0 && (
-            <button type='button' aria-label="Clear options" onClick={() => setSelectedOptions([])}>
+            <button type="button" aria-label="Clear options" onClick={() => setSelectedOptions([])}>
               <XMarkIcon width={16} height={16} />
             </button>
           )}
-          <button type='button' aria-label="Toggle options" onClick={() => setOptionsToggle(prev => !prev)}>
+          <button type="button" aria-label="Toggle options" onClick={() => setOptionsToggle(prev => !prev)}>
             {optionsToggle ? (
               <ChevronUpIcon width={20} height={20} aria-hidden="true" />
             ) : (
@@ -474,7 +474,7 @@ function Select({ name, placeholder, options, onChange, selectedOptions, setSele
           .map(option => (
             <button
               className="text-left text-sm px-4 py-1 hover:bg-indigo-600 hover:text-white"
-              type='button'
+              type="button"
               key={option.value}
               onClick={() => {
                 select(option)

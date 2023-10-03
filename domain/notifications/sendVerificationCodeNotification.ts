@@ -1,9 +1,9 @@
 import { sendEmail } from 'lib/sendEmail'
 import { validate } from 'lib/yup'
+import { AppConfig } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
-import { sendVerificationCodeValidator } from './validation'
 import { baseEmail } from './constants'
-import { PLATFORM_NAME } from 'system.config'
+import { sendVerificationCodeValidator } from './validation'
 
 interface SendVerificationCodeNotificationParams {
   email: string
@@ -31,7 +31,7 @@ export async function sendVerificationCodeNotification(params: SendVerificationC
 
   const response = await sendEmail({
     to: email,
-    subject: `${PLATFORM_NAME} security code`,
+    subject: `${AppConfig.app.name} security code`,
     html: emailBody,
   })
 
@@ -56,7 +56,7 @@ const getBody = ({ code }: GetBodyParams) => {
   <tr>
     <td style="padding-left:32px; padding-right: 32px;padding-top: 48px;">
       <h1 style="margin-top:0;margin-bottom:35px;font-size:48px;line-height:48px;font-weight:800;letter-spacing:-0.02em; color:#4F46E5">
-        ${PLATFORM_NAME} security code
+        ${AppConfig.app.name} security code
       </h1>
       <p style="margin:0; color: #6B7280;line-height: 24px;">
         Hello, <br /> <br />
@@ -79,7 +79,7 @@ const getBody = ({ code }: GetBodyParams) => {
     <td style="padding-left:32px; padding-right: 32px;padding-top: 48px;">
       <p style="margin:0; color: #6B7280;line-height: 24px;">
         Your code will expire in 10 minutes. <br /> <br />
-        If you did not attempt to log in, we recommend changing your password on ${PLATFORM_NAME} using the Forgot Password link on the login page.
+        If you did not attempt to log in, we recommend changing your password on ${AppConfig.app.name} using the Forgot Password link on the login page.
       </p>
     </td>
   </tr>

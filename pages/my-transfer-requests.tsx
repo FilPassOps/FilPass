@@ -12,7 +12,7 @@ import { getEthereumAddress } from 'lib/getEthereumAddress'
 import { withUserSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { ReactElement } from 'react'
-import { PLATFORM_NAME } from 'system.config'
+import { AppConfig } from 'system.config'
 
 interface HomeProps {
   data: any[]
@@ -25,7 +25,7 @@ export default function Home({ data = [], pageSize, totalItems = 0, programs }: 
   return (
     <>
       <Head>
-        <title>{`Home - ${PLATFORM_NAME}`}</title>
+        <title>{`Home - ${AppConfig.app.name}`}</title>
       </Head>
       <div className="w-full">
         <div className="flex items-center justify-end md:justify-between gap-2 py-4">

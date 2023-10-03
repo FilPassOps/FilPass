@@ -1,11 +1,11 @@
-import { COMPANY_NAME, PLATFORM_NAME, SUPPORT_EMAIL } from 'system.config'
 import { DateTime } from 'luxon'
+import { AppConfig } from 'system.config'
 
 export const protocolFooterEmail = `
 <p>Best regards,<br />
-${COMPANY_NAME}</p>
-<p>${PLATFORM_NAME} is a system ${COMPANY_NAME} uses for disbursements.</p>
-<p>Please reach out to ${SUPPORT_EMAIL} with any questions.</p>
+${AppConfig.app.companyName}</p>
+<p>${AppConfig.app.name} is a system ${AppConfig.app.name} uses for disbursements.</p>
+<p>Please reach out to ${AppConfig.app.emailConfig.supportAddress} with any questions.</p>
 <p style="opacity: 0;">${DateTime.now().toFormat('dd LLL yyyy - HH:mm:ss')}</p>
 `
 
@@ -93,8 +93,8 @@ export const baseEmail = (content: string) => {
 
                         <tr>
                             <td style="padding-left: 32px; padding-right: 32px; padding-top:48px; color: #6b7280; line-height: 24px">
-                              <p style="margin: 0">${PLATFORM_NAME} is a system ${COMPANY_NAME} uses for disbursements.</p>
-                              <p style="margin: 0; padding-top: 20px">Please reach out to <a style="color: #6b7280;" href="mailto:${SUPPORT_EMAIL}">${SUPPORT_EMAIL}</a> with any questions.</p>
+                              <p style="margin: 0">${AppConfig.app.name} is a system ${AppConfig.app.companyName} uses for disbursements.</p>
+                              <p style="margin: 0; padding-top: 20px">Please reach out to <a style="color: #6b7280;" href="mailto:${AppConfig.app.emailConfig.supportAddress}">${AppConfig.app.emailConfig.supportAddress}</a> with any questions.</p>
                             </td>
                         </tr>
 
@@ -140,7 +140,7 @@ export const baseEmail = (content: string) => {
                         <tr>
                             <td style="text-align:center;font-size:16px;color:#9CA3AF;padding-bottom: 32px;">
                                 <p style="margin:0;font-size:16px;line-height:24px;font-weight:400;">© 2023
-                                    ${COMPANY_NAME}, Inc. <br /> All rights reserved.</p>
+                                    ${AppConfig.app.companyName}, Inc. <br /> All rights reserved.</p>
                             </td>
                         </tr>
                     </table>

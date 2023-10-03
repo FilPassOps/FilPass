@@ -1,6 +1,6 @@
 import { coinmarketcapApi } from 'lib/coinmarketcapApi'
 import { validate } from 'lib/yup'
-import { getChain } from 'system.config'
+import { AppConfig, ChainIds } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { getCurrencyRateFromCoinMarketCapValidator } from './validation'
 
@@ -22,7 +22,7 @@ export async function getCurrencyMarketRate(params: GetCurrencyMarketRateParams)
 
   const { chainId } = fields
 
-  const chain = getChain(chainId)
+  const chain = AppConfig.network.getChain(chainId as ChainIds)
 
   if (!chain.coinMarketApiCode) {
     return {

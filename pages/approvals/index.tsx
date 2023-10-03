@@ -9,7 +9,6 @@ import { DeleteModal } from 'components/TransferRequest/shared/DeleteModal'
 import { Button, LinkButton } from 'components/shared/Button'
 import { PaginationCounter } from 'components/shared/PaginationCounter'
 import { PaginationWrapper, getItemsPerPage } from 'components/shared/usePagination'
-import { PLATFORM_NAME, getChainByName } from 'system.config'
 import { stringify } from 'csv-stringify/sync'
 import { getApprovalsByRole } from 'domain/approvals/service'
 import { APPROVER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
@@ -20,10 +19,11 @@ import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { getEthereumAddress } from 'lib/getEthereumAddress'
 import { withRolesSSR } from 'lib/ssr'
 import { DateTime } from 'luxon'
+import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
+import { AppConfig, ChainNames } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
-import Head from 'next/head'
 
 interface ApprovalsProps {
   initialData: any[]
@@ -159,7 +159,7 @@ export default function Approvals({
               transfer_hash,
               wallet_blockchain,
             }) => {
-              const chain = getChainByName(wallet_blockchain)
+              const chain = AppConfig.network.getChainByName(wallet_blockchain as ChainNames)
               const row = []
               columns.number && row.push(id)
               columns.program && row.push(program_name)
@@ -184,7 +184,7 @@ export default function Approvals({
       const blob = new Blob([csvTemplate])
       return JsFileDownload(
         blob,
-        `${PLATFORM_NAME.toLowerCase()}_${currentStatus.toLowerCase()}_approvals_${DateTime.now().toFormat(
+        `${AppConfig.app.name.toLowerCase()}_${currentStatus.toLowerCase()}_approvals_${DateTime.now().toFormat(
           "yyyy-MM-dd_hh'h'mm'm'ss's'",
         )}.csv`,
       )
@@ -199,7 +199,7 @@ export default function Approvals({
   return (
     <>
       <Head>
-        <title>{`My Approvals - ${PLATFORM_NAME}`}</title>
+        <title>{`My Approvals - ${AppConfig.app.name}`}</title>
       </Head>
       <div className="w-full">
         <div>

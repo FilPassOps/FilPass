@@ -10,7 +10,7 @@ import { WalletAddress } from 'components/shared/WalletAddress'
 import { DRAFT_STATUS } from 'domain/transferRequest/constants'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
-import { getChainByName } from 'system.config'
+import { AppConfig, ChainNames } from 'system.config'
 
 interface Request {
   id: string
@@ -135,13 +135,17 @@ const TransferList = ({ data = [] }: TransferListProps) => {
 export default TransferList
 
 const Memo = ({ notes, transfer_hash, blockchain }: MemoProps) => {
-  const chain = getChainByName(blockchain) || {}
+  const chain = AppConfig.network.getChainByName(blockchain as ChainNames) || {}
 
   return (
     <>
       {notes && <p className="break-all whitespace-normal 2xl:truncate w-0 min-w-full">{notes}</p>}
       {transfer_hash && (
-        <BlockExplorerLink blockExplorerName={chain?.blockExplorer.name} blockExplorerUrl={chain?.blockExplorer.url} transactionHash={transfer_hash} />
+        <BlockExplorerLink
+          blockExplorerName={chain?.blockExplorer.name}
+          blockExplorerUrl={chain?.blockExplorer.url}
+          transactionHash={transfer_hash}
+        />
       )}
     </>
   )

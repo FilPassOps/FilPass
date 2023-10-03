@@ -3,7 +3,7 @@ import { Tooltip } from 'components/Layout/Tooltip'
 import { Button, ButtonProps } from 'components/shared/Button'
 import { useRouter } from 'next/router'
 import { Dispatch, MouseEventHandler, ReactNode, SetStateAction, createContext, useContext, useEffect, useRef, useState } from 'react'
-import { ChainIds, getMetamaskParam } from 'system.config'
+import { AppConfig, ChainIds } from 'system.config'
 import { twMerge } from 'tailwind-merge'
 
 interface ProviderMessage {
@@ -167,7 +167,7 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode | undefined
         try {
           await window.ethereum.request({
             method: 'wallet_addEthereumChain',
-            params: [getMetamaskParam(chainId)],
+            params: [AppConfig.network.getMetamaskParam(chainId)],
           })
         } catch (addError) {
           console.error(addError)

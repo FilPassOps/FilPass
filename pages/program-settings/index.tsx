@@ -3,15 +3,15 @@ import { Layout } from 'components/Layout'
 import { Button } from 'components/shared/Button'
 import { getItemsPerPage, PaginationWrapper } from 'components/shared/usePagination'
 import { ProgramList } from 'components/SuperAdmin/ProgramList'
-import { PLATFORM_NAME } from 'system.config'
 import { ACTIVE_STATUS, ARCHIVED_STATUS } from 'domain/programs/constants'
 import { findAllProgramsComplete } from 'domain/programs/findAll'
 import { findAllApprovers } from 'domain/user/findAllApprovers'
 import { findAllViewers } from 'domain/user/findAllViewers'
 import { withSuperAdminSSR } from 'lib/ssr'
+import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { ReactElement, useState } from 'react'
-import Head from 'next/head'
+import { AppConfig } from 'system.config'
 
 interface ProgramSettingsProps {
   data: any[]
@@ -37,7 +37,7 @@ export default function ProgramSettings({
   return (
     <>
       <Head>
-        <title>{`Program Settings - ${PLATFORM_NAME}`}</title>
+        <title>{`Program Settings - ${AppConfig.app.name}`}</title>
       </Head>
       <div className="w-full">
         <Button

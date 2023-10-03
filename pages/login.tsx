@@ -1,8 +1,8 @@
 import { Login as LoginComponent } from 'components/Authentication/Login'
-import Head from 'next/head'
 import Cookie from 'js-cookie'
+import Head from 'next/head'
 import { useEffect, useState } from 'react'
-import { PLATFORM_NAME } from 'system.config'
+import { AppConfig } from 'system.config'
 
 export default function Login() {
   const [redirect, setRedirect] = useState<any>(null)
@@ -19,7 +19,7 @@ export default function Login() {
   return (
     <>
       <Head>
-        <title key='login'>{`Login - ${PLATFORM_NAME}`}</title>
+        <title key="login">{`Login - ${AppConfig.app.name}`}</title>
       </Head>
       <LoginComponent redirectAfterLogin={redirect} />
     </>

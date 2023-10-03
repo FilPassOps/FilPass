@@ -4,7 +4,7 @@ import { ExternalProvider } from '@ethersproject/providers'
 import filecoinAddress, { CoinType } from '@glif/filecoin-address'
 import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
-import { getChainByName, FilecoinChain } from 'system.config'
+import { AppConfig, ChainNames, FilecoinChain } from 'system.config'
 import { MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
 
 declare const window: CustomWindow
@@ -17,7 +17,7 @@ export const useContract = (blockchainName: string) => {
   const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner>()
   const [multiForwarder, setMultiForwarder] = useState<MultiForwarder>()
 
-  const chain = getChainByName(blockchainName)
+  const chain = AppConfig.network.getChainByName(blockchainName as ChainNames)
 
   const connectedToTargetChain = wallet && chainId === chain.chainId
 
@@ -65,7 +65,7 @@ export const useContract = (blockchainName: string) => {
 
         let address = destination
         if (destination.startsWith('0x')) {
-          const chain = getChainByName(blockchainName) as FilecoinChain
+          const chain = AppConfig.network.getChainByName(blockchainName) as FilecoinChain
 
           address = filecoinAddress.delegatedFromEthAddress(destination, chain.coinType as CoinType)
         }
