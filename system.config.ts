@@ -5,7 +5,7 @@ export const EMAIL_DOMAIN = '@protocol.ai'
 export const EMAIL_FROM_NAME = 'Emissary Support'
 export const SUPPORT_EMAIL = 'emissary@protocol.ai'
 
-export type Chain = {
+export interface Chain {
   name: string
   networkName: string
   symbol: string
@@ -17,7 +17,7 @@ export type Chain = {
       scale: number
     }
   }
-  rpcUrls: string[]
+  rpcUrls: readonly string[]
   blockExplorer: {
     name: string
     url: string
@@ -26,13 +26,13 @@ export type Chain = {
   iconFileName: string
 }
 
-export type FilecoinChain = Chain & {
-  coinType: "f" | "t"
+export interface FilecoinChain extends Chain {
+  coinType: 'f' | 't'
 }
 
 type Config = {
   fiatPaymentUnit: string
-  chains: Chain[] | FilecoinChain[]
+  chains: ReadonlyArray<Chain | FilecoinChain>
 }
 
 const ethereum = {
@@ -59,7 +59,7 @@ const ethereum = {
   blockExplorer: { name: 'Etherscan', url: 'https://sepolia.etherscan.io/tx' },
   contractAddress: '0xA6B0F90E96Ff8E6b79D859E2067afFA190AE8dB5',
   iconFileName: 'ethereum-icon.svg',
-} //as const
+} as const satisfies Chain
 
 const polygon = {
   name: 'Polygon',
@@ -85,7 +85,7 @@ const polygon = {
   blockExplorer: { name: 'Polygonscan', url: 'https://mumbai.polygonscan.com/tx' },
   contractAddress: '0xb63704b534583Eca727d78dde6cCe438171846dc',
   iconFileName: 'polygon-icon.svg',
-} //as const
+} as const satisfies Chain
 
 const filecoinCalibration = {
   name: 'Filecoin',
@@ -112,23 +112,25 @@ const filecoinCalibration = {
   contractAddress: '0xbEF649DB6b4e1b2Ac044492433Bccca4287BE90F',
   iconFileName: 'filecoin-icon.svg',
   coinType: 't',
-} //as const
+} as const satisfies FilecoinChain
 
-export const CONFIG: Config = { fiatPaymentUnit: 'USD', chains: [ethereum, polygon, filecoinCalibration] }
+export const CONFIG = { fiatPaymentUnit: 'USD', chains: [ethereum, polygon, filecoinCalibration] } as const satisfies Config
 
 export const isFilecoinEnabled = CONFIG.chains.some(chain => chain.name === 'Filecoin')
 
-export const getChain = (chainId: string) => {
+export type ChainIds = (typeof CONFIG.chains)[number]['chainId']
+export const getChain = (chainId: ChainIds) => {
   const index = CONFIG.chains.findIndex(chain => chain.chainId === chainId)
   return CONFIG.chains[index]
 }
 
-export const getChainByName = (blockchainName: string) => {
+export type ChainNames = (typeof CONFIG.chains)[number]['name']
+export const getChainByName = (blockchainName: ChainNames) => {
   const index = CONFIG.chains.findIndex(chain => chain.name === blockchainName)
   return CONFIG.chains[index]
 }
 
-export const getMetamaskParam = (chainId: string) => {
+export const getMetamaskParam = (chainId: ChainIds) => {
   const index = CONFIG.chains.findIndex(chain => chain.chainId === chainId)
   return {
     chainId: CONFIG.chains[index].chainId,

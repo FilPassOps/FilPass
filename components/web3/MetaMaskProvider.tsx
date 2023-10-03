@@ -3,7 +3,7 @@ import { Tooltip } from 'components/Layout/Tooltip'
 import { Button, ButtonProps } from 'components/shared/Button'
 import { useRouter } from 'next/router'
 import { Dispatch, MouseEventHandler, ReactNode, SetStateAction, createContext, useContext, useEffect, useRef, useState } from 'react'
-import { getMetamaskParam } from 'system.config'
+import { ChainIds, getMetamaskParam } from 'system.config'
 import { twMerge } from 'tailwind-merge'
 
 interface ProviderMessage {
@@ -57,7 +57,7 @@ interface WalletContext {
   chainId?: string
   busy: boolean
   connect: () => void
-  switchChain: (chainId: string) => void
+  switchChain: (chainId: ChainIds) => void
   setBusy: Dispatch<SetStateAction<boolean>>
 }
 
@@ -153,7 +153,7 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode | undefined
     }
   }
 
-  const switchChain = async (chainId: string) => {
+  const switchChain = async (chainId: ChainIds) => {
     try {
       setBusy(true)
       await window.ethereum.request({
@@ -191,7 +191,7 @@ interface WithMetaMaskButtonProps extends Omit<ButtonProps, 'loading' | 'disable
   connectWalletLabel?: ReactNode
   switchChainLabel?: string
   defaultLabel?: string
-  targetChainId?: string
+  targetChainId?: ChainIds
   onBeforeClick?: () => void
 }
 
