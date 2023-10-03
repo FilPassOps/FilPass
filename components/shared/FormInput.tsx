@@ -593,6 +593,7 @@ export const UploadFileButton = ({ children, onChange, disabled, loading, accept
         accept={accept}
         className="hidden"
         aria-label="Upload file"
+        onClick={e => (e.target as HTMLInputElement).value = ''}
         onChange={e => {
           const file = e.target.files?.[0]
           if (file) {
@@ -633,12 +634,7 @@ const InputController = ({ id, label, error, children, name: inputName }: InputC
     <div className="w-full">
       <Label inputId={id}>{label}</Label>
       <div className="mt-1 relative">{children}</div>
-      {error && (
-        <p className="mt-1 text-sm text-red-500">
-          {error.message && error.message}
-          {!error.message && getErrorMessage({ error, inputName })}
-        </p>
-      )}
+      {error && <p className="mt-1 text-sm text-red-500">{error.message ? error.message : getErrorMessage({ error, inputName })}</p>}
     </div>
   )
 }

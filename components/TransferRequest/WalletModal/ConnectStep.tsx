@@ -33,18 +33,19 @@ export function ConnectStep({ onBackClick, onNextStepClick, wallet, blockchainNa
     defaultValues: {
       blockchain: blockchainName,
       address: wallet,
+      name: '',
     },
     resolver: yupResolver(connectWalletStepValidator),
   })
 
   const handleFormSubmit = async (formData: FormValues) => {
-    const addressIndex = user?.wallets?.findIndex(
+    const existingDefault = user?.wallets?.find(
       wallet => wallet.address.toLowerCase() === formData.address.toLowerCase() && wallet.blockchain.name === formData.blockchain,
     )
 
-    if (addressIndex && addressIndex >= 0) {
+    if (existingDefault) {
       setSubmitErrors({
-        address: errorsMessages.wallet_address_in_use.message,
+        address: { message: errorsMessages.wallet_address_in_use.message },
       })
       return
     }

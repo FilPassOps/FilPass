@@ -83,19 +83,19 @@ const ListItems = ({ items, isLoading, setLoading, refresh }: ListItemsProps) =>
               <>
                 <WalletAddress
                   address={wallet.address}
-                  isVerified={wallet.verification?.isVerified}
                   label={wallet.name}
                   blockchain={wallet.blockchain.name}
                   walletSize="short"
                   className="sm:hidden"
+                  enableVerifiedIcon={false}
                 />
                 <WalletAddress
                   address={wallet.address}
-                  isVerified={wallet.verification?.isVerified}
                   label={wallet.name}
                   blockchain={wallet.blockchain.name}
                   walletSize="full"
                   className="hidden sm:flex"
+                  enableVerifiedIcon={false}
                 />
               </>
               <div className="flex items-center">

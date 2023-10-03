@@ -1,10 +1,8 @@
 import { useAuth } from 'components/Authentication/Provider'
 import { Modal } from 'components/shared/Modal'
 import { useMetaMask } from 'components/web3/MetaMaskProvider'
-import { api } from 'lib/api'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { getChain } from 'system.config'
-import { AlertSkipStep } from './AlertSkipStep'
 import { ChainSelection } from './ChainSelectionStep'
 import { ConnectStep } from './ConnectStep'
 import { NotificationStep } from './NotificationStep'
@@ -23,8 +21,6 @@ export function WalletModal({ open, onModalClosed, setUserWalletId, chainIdFilte
   const { refresh, user } = useAuth()
   const [step, setStep] = useState(1)
   const [form, setForm] = useState<any>({})
-
-  // TODO: the chainId, wallet, or the user can return null/undefined?
 
   const chain = getChain(chainId as string)
 
@@ -56,15 +52,7 @@ export function WalletModal({ open, onModalClosed, setUserWalletId, chainIdFilte
     }
   }, [open, step])
 
-  const showConfirmationStep = (step === 4 && !form?.skipAlert) || (step === 5 && form?.skipAlert)
-
-  const createWallet = useCallback(
-    async (values: any) => {
-      const hasDefaultWallet = user?.wallets?.find(wallet => wallet.isDefault)
-      return await api.post('/wallets', { ...values, isDefault: !hasDefaultWallet })
-    },
-    [user?.wallets],
-  )
+  const showConfirmationStep = step === 4 && !form?.skipAlert
 
   return (
     <Modal open={open} onModalClosed={handleModalClosed}>
@@ -87,16 +75,6 @@ export function WalletModal({ open, onModalClosed, setUserWalletId, chainIdFilte
           formData={form}
           setUserWalletId={setUserWalletId}
           networkName={chain?.networkName}
-        />
-      )}
-
-      {step === 4 && form?.skipAlert && (
-        <AlertSkipStep
-          onNextStepClick={handleNextStepClick}
-          formData={form}
-          setUserWalletId={setUserWalletId}
-          onBackClick={handlePreviousStepClick}
-          createWallet={createWallet}
         />
       )}
 

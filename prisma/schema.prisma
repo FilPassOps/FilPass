@@ -241,21 +241,21 @@ model WalletVerification {
 }
 
 model Program {
-  id                     Int                    @id @default(autoincrement())
-  name                   String                 @unique
-  deliveryMethod         DeliveryMethod         @map("delivery_method")
-  isActive               Boolean                @default(true) @map("is_active")
-  isArchived             Boolean                @default(false) @map("is_archived")
-  createdAt              DateTime               @default(now()) @map("created_at")
-  updatedAt              DateTime               @updatedAt @map("updated_at")
-  visibility             ProgramVisibility?     @default(EXTERNAL) @map("visibility")
-  blockchain             Blockchain             @relation(fields: [blockchainId], references: [id])
-  blockchainId           Int                    @map("blockchain_id")
-  userRolePrograms       UserRoleProgram[]
-  transferRequests       TransferRequest[]
-  programCurrency        ProgramCurrency[]
-  transferRequestDrafts  TransferRequestDraft[]
-  userRoleProgramGroups  UserRoleProgramGroup[]
+  id                    Int                    @id @default(autoincrement())
+  name                  String                 @unique
+  deliveryMethod        DeliveryMethod         @map("delivery_method")
+  isActive              Boolean                @default(true) @map("is_active")
+  isArchived            Boolean                @default(false) @map("is_archived")
+  createdAt             DateTime               @default(now()) @map("created_at")
+  updatedAt             DateTime               @updatedAt @map("updated_at")
+  visibility            ProgramVisibility?     @default(EXTERNAL) @map("visibility")
+  blockchain            Blockchain             @relation(fields: [blockchainId], references: [id])
+  blockchainId          Int                    @map("blockchain_id")
+  userRolePrograms      UserRoleProgram[]
+  transferRequests      TransferRequest[]
+  programCurrency       ProgramCurrency[]
+  transferRequestDrafts TransferRequestDraft[]
+  userRoleProgramGroups UserRoleProgramGroup[]
 
   @@map("program")
 }
@@ -518,7 +518,7 @@ model NewsletterSubscriber {
 model Blockchain {
   id                 Int                  @id @default(autoincrement())
   name               String               @unique
-  chainId            String               @map("chain_id") @unique
+  chainId            String               @unique @map("chain_id")
   Currency           Currency             @relation(fields: [currencyId], references: [id])
   currencyId         Int                  @map("currency_id")
   createdAt          DateTime             @default(now()) @map("created_at")
