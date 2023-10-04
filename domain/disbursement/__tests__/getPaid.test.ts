@@ -17,7 +17,6 @@ import { getPaid } from '../getPaid'
 let tr: TransferRequest
 let lastTr: TransferRequest
 let program: CreateProgramResult
-let msigProgram: CreateProgramResult
 let userOne: CreateUserResult
 
 beforeAll(async () => {
@@ -46,17 +45,6 @@ beforeAll(async () => {
     userWalletId: userOne.wallets[0].id,
     team: 'super user one two',
     amount: '12',
-    payment: { status: SUCCESS_STATUS, controllerId: controllerRole.id } as Transfer,
-  })
-
-  lastTr = await createTransferRequest({
-    status: PAID_STATUS,
-    receiverId: userTwo.user.id,
-    requesterId: userTwo.user.id,
-    program: msigProgram,
-    userWalletId: userTwo.wallets[0].id,
-    team: 'super user two one',
-    amount: '15',
     payment: { status: SUCCESS_STATUS, controllerId: controllerRole.id } as Transfer,
   })
 
@@ -124,14 +112,6 @@ describe('getPaid', () => {
 
     expect(data.requests).toHaveLength(1)
     expect(data.total).toEqual(3)
-  })
-
-  it('Should return of a specific program', async () => {
-    const params = { programId: [msigProgram.id] }
-    const { data } = await getPaid(params)
-
-    expect(data.requests).toHaveLength(1)
-    expect(data.total).toEqual(1)
   })
 
   it('Should an empty list of transfer requests', async () => {

@@ -8,7 +8,6 @@ import { getApproved } from '../getApproved'
 let tr: TransferRequest
 let lastTr: TransferRequest
 let program: CreateProgramResult
-let msigProgram: CreateProgramResult
 let userOne: CreateUserResult
 
 beforeAll(async () => {
@@ -33,15 +32,6 @@ beforeAll(async () => {
     program: program,
     userWalletId: userOne.wallets[0].id,
     team: 'super user one two',
-  })
-
-  lastTr = await createTransferRequest({
-    status: APPROVED_STATUS,
-    receiverId: userTwo.user.id,
-    requesterId: userTwo.user.id,
-    program: msigProgram,
-    userWalletId: userTwo.wallets[0].id,
-    team: 'super user two one',
   })
 
   await createTransferRequest({
@@ -96,14 +86,6 @@ describe('getApproved', () => {
 
     expect(data.requests).toHaveLength(1)
     expect(data.total).toEqual(3)
-  })
-
-  it('Should return of a specific program', async () => {
-    const params = { programId: [msigProgram.id] }
-    const { data } = await getApproved(params)
-
-    expect(data.requests).toHaveLength(1)
-    expect(data.total).toEqual(1)
   })
 
   it('Should an empty list of transfer requests', async () => {

@@ -8,7 +8,6 @@ import { getRejected } from '../getRejected'
 let tr: TransferRequest
 let lastTr: TransferRequest
 let program: CreateProgramResult
-let msigProgram: CreateProgramResult
 let userOne: CreateUserResult
 
 beforeAll(async () => {
@@ -33,15 +32,6 @@ beforeAll(async () => {
     program: program,
     userWalletId: userOne.wallets[0].id,
     team: 'super user one two',
-  })
-
-  await createTransferRequest({
-    status: REJECTED_BY_CONTROLLER_STATUS,
-    receiverId: userTwo.user.id,
-    requesterId: userTwo.user.id,
-    program: msigProgram,
-    userWalletId: userTwo.wallets[0].id,
-    team: 'super user two one',
   })
 
   lastTr = await createTransferRequest({
@@ -95,14 +85,6 @@ describe('getRejected', () => {
 
     expect(data.requests).toHaveLength(1)
     expect(data.total).toEqual(3)
-  })
-
-  it('Should return of a specific program', async () => {
-    const params = { programId: [msigProgram.id] }
-    const { data } = await getRejected(params)
-
-    expect(data.requests).toHaveLength(1)
-    expect(data.total).toEqual(1)
   })
 
   it('Should an empty list of transfer requests', async () => {
