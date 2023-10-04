@@ -21,7 +21,7 @@ import React, {
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import useSWR from 'swr'
-import { CONFIG } from 'system.config'
+import { AppConfig } from 'system.config'
 import { StatusFilterOption, statusFilterLabel, statusFilterOptions } from './constants'
 
 interface SelectOption {
@@ -58,7 +58,7 @@ function FiltersModal({
     .split(',')
     .map(network => network)
 
-  const initialNetworkFilter: SelectOption[] = CONFIG.chains
+  const initialNetworkFilter: SelectOption[] = AppConfig.network.chains
     .filter(chain => networks?.includes(chain.name))
     .map(chain => ({ value: chain.name, label: chain.name }))
 
@@ -103,12 +103,12 @@ function FiltersModal({
     error: errorTransferRequestCountData,
   } = useSWR(showCountByNetworkForController && query.status ? `/transfer-requests-count/${query.status}/count` : null, url =>
     fetcherWithParams(url, {
-      params: { networks: CONFIG.chains.map(chain => chain.name) },
+      params: { networks: AppConfig.network.chains.map(chain => chain.name) },
       paramsSerializer: params => qs.stringify(params),
     }),
   )
 
-  const networkOptions = CONFIG.chains.map(chain => {
+  const networkOptions = AppConfig.network.chains.map(chain => {
     let countLabel = ''
     if (isLoadingTransferRequestCountData) {
       countLabel = ' (Loading...)'
