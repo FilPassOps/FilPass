@@ -9,7 +9,7 @@ import { withUserSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { ReactElement, useState } from 'react'
 import useSWR from 'swr'
-import { PLATFORM_NAME } from 'system.config'
+import { AppConfig } from 'system.config'
 
 interface UserSettingsProps {
   data: any
@@ -38,7 +38,7 @@ export default function UserSettings({ data }: UserSettingsProps) {
   return (
     <>
       <Head>
-        <title>{`Profile & Settings - ${PLATFORM_NAME}`}</title>
+        <title>{`Profile & Settings - ${AppConfig.app.name}`}</title>
       </Head>
 
       <div className="bg-white rounded-lg shadow-md">

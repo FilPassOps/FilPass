@@ -4,13 +4,13 @@ import { verifyAccount } from 'domain/auth/verifyAccount'
 import { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import NextLink from 'next/link'
-import { PLATFORM_NAME } from 'system.config'
+import { AppConfig } from 'system.config'
 
 export default function Activate({ error }: { error: any }) {
   return (
     <>
       <Head>
-        <title key='activate-account'>{`Activate Account - ${PLATFORM_NAME}`}</title>
+        <title key="activate-account">{`Activate Account - ${AppConfig.app.name}`}</title>
       </Head>
       {error ? (
         <div className="flex flex-col h-screen items-center justify-center">

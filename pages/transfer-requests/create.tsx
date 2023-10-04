@@ -1,13 +1,13 @@
 import { Layout } from 'components/Layout'
-import { GoBackConfirmationWithRouter } from 'components/shared/GoBackConfirmation'
 import { ApplyForSomeoneForm } from 'components/TransferRequest/ApplyingForSomeoneForm'
 import { TransferRequestForm } from 'components/TransferRequest/TransferRequestForm'
-import { PLATFORM_NAME } from 'system.config'
+import { GoBackConfirmationWithRouter } from 'components/shared/GoBackConfirmation'
 import { APPROVER_ROLE } from 'domain/auth/constants'
 import { findAllExternalPrograms } from 'domain/programs/findAll'
 import { withUserSSR } from 'lib/ssr'
-import { ReactElement } from 'react'
 import Head from 'next/head'
+import { ReactElement } from 'react'
+import { AppConfig } from 'system.config'
 
 interface CreateTransferRequestProps {
   programs: any[]
@@ -18,7 +18,7 @@ export default function CreateTransferRequest({ programs, applyingForSomeone }: 
   return (
     <>
       <Head>
-        <title>{`New Transfer Request - ${PLATFORM_NAME}`}</title>
+        <title>{`New Transfer Request - ${AppConfig.app.name}`}</title>
       </Head>
       <div className="max-w-3xl mx-auto">{applyingForSomeone ? <ApplyForSomeoneForm /> : <TransferRequestForm programs={programs} />}</div>
       <GoBackConfirmationWithRouter />

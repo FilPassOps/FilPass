@@ -12,7 +12,7 @@ import { USD } from 'domain/currency/constants'
 import { formatCrypto, formatCurrency } from 'lib/currency'
 import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { useState } from 'react'
-import { SUPPORT_EMAIL, getChainByName } from 'system.config'
+import { AppConfig, ChainNames } from 'system.config'
 import { Table, TableDiv, TableHeader } from './Table'
 import { TransactionParser } from './TransactionParser'
 
@@ -60,7 +60,7 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
   const { data, isPaymentSent, isHexMatch, blockchainName } = batchData
   const [isOpen, setIsOpen] = useState(false)
   const { forwardNonBLS } = useContract(blockchainName)
-  const { chainId } = getChainByName(blockchainName)
+  const { chainId } = AppConfig.network.getChainByName(blockchainName as ChainNames)
 
   const { currency } = useCurrency(chainId)
 
@@ -140,7 +140,7 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
             <div className="flex items-center gap-2">
               <CurrencyDollarIcon className="w-6 text-gray-400" />
               {currency && totalDollarAmount ? formatCrypto(new Big(totalDollarAmount).div(currency).toFixed(2)) : '-'}{' '}
-              {getChainByName(blockchainName).symbol}
+              {AppConfig.network.getChainByName(blockchainName as ChainNames).symbol}
               <span className="text-sm "> ≈{formatCurrency(totalDollarAmount)}</span>
             </div>
           </div>
@@ -149,7 +149,7 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
           {!isPaymentSent && (
             <WithMetaMaskButton
               className="w-full md:w-auto"
-              targetChainId={getChainByName(blockchainName).chainId}
+              targetChainId={AppConfig.network.getChainByName(blockchainName as ChainNames).chainId}
               onClick={async () => {
                 const sent = await forwardHandler(data, forwardNonBLS, blockchainName)
                 setIsBatchSent(sent)
@@ -230,7 +230,7 @@ const ParseResultMessage = ({ isSucess }: { isSucess: boolean }) => {
   const Icon = isSucess ? CheckCircleIcon : XCircleIcon
   const message = isSucess
     ? 'All requests match.'
-    : `There are unmatched requests. Since this a security concern, we recommend stopping and reach out to ${SUPPORT_EMAIL}.`
+    : `There are unmatched requests. Since this a security concern, we recommend stopping and reach out to ${AppConfig.app.emailConfig.supportAddress}.`
   return (
     <div className={`w-full p-4 flex items-center gap-3 mb-5 ${isSucess ? 'bg-green-50' : 'bg-red-50'}`}>
       <Icon className={`w-5 h-5 flex-shrink-0 ${isSucess ? 'text-green-400' : 'text-red-400'}`} />

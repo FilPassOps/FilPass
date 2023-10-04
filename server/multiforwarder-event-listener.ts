@@ -1,13 +1,13 @@
 import { transferPaymentConfirm } from 'domain/transfer/transfers-payment-confirm'
 import { ethers } from 'ethers'
 import { logger } from 'lib/logger'
-import { CONFIG } from 'system.config'
+import { AppConfig } from 'system.config'
 import { MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
 import { MultiForwarder } from 'typechain-types/contracts/src'
 
 const map = new Map<string, MultiForwarder>()
 
-CONFIG.chains.forEach(chain => {
+AppConfig.network.chains.forEach(chain => {
   const provider = new ethers.providers.JsonRpcProvider(chain.rpcUrls[0])
   const signer = provider.getSigner()
   map.set(chain.name, MultiForwarderFactory.connect(chain.contractAddress, signer))

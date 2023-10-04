@@ -1,4 +1,4 @@
-import { PLATFORM_NAME, SUPPORT_EMAIL } from 'system.config'
+import { AppConfig } from 'system.config'
 
 interface ErrorsMessages {
   [key: string]: {
@@ -17,7 +17,7 @@ const errorsMessages: ErrorsMessages = {
   required_field: { message: 'This field is required.' },
   checked_field: { message: 'This field must be checked.' },
   confirmation_password: { message: 'Confirmation does not match password.' },
-  invalid_pl_email: { message: `${PLATFORM_NAME} users must sign up with Google.` },
+  invalid_pl_email: { message: `${AppConfig.app.name} users must sign up with Google.` },
   email_must_be_valid: { message: 'Email must be a valid email.' },
   password_min_length: { length: 8, message: 'This field must be at least 8 characters.' },
   positive_number: { message: 'This field must be positive.' },
@@ -63,7 +63,7 @@ const errorsMessages: ErrorsMessages = {
   },
 
   error_during_payment: {
-    message: `An error occurred during payment. Please try again, if the problem persists contact support on ${SUPPORT_EMAIL}.`,
+    message: `An error occurred during payment. Please try again, if the problem persists contact support on ${AppConfig.app.emailConfig.supportAddress}.`,
   },
 }
 

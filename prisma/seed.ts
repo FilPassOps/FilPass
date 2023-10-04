@@ -2,7 +2,7 @@ import { loadEnvConfig } from '@next/env'
 import { PrismaClient } from '@prisma/client'
 import { hash } from 'bcrypt'
 import { encryptPII } from '../lib/emissaryCrypto'
-import { CONFIG, EMAIL_DOMAIN } from '../system.config'
+import { AppConfig } from '../system.config'
 
 loadEnvConfig(process.cwd(), true)
 
@@ -17,8 +17,8 @@ async function main() {
 async function createSystemUser() {
   const systemUser = await prisma.user.create({
     data: {
-      email: await encryptPII(`system${EMAIL_DOMAIN}`),
-      emailHash: await hash(`system${EMAIL_DOMAIN}`, salt),
+      email: await encryptPII(`system${AppConfig.app.emailConfig.domain}`),
+      emailHash: await hash(`system${AppConfig.app.emailConfig}`, salt),
       isActive: true,
       isVerified: true,
     },
@@ -53,7 +53,7 @@ async function createCurrencies() {
     },
   })
 
-  for (const chain of CONFIG.chains) {
+  for (const chain of AppConfig.network.chains) {
     const [blockchain] = await prisma.$transaction([
       prisma.blockchain.create({
         data: {

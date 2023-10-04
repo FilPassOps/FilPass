@@ -1,5 +1,5 @@
 import { deliveryMethod as deliveryMethodConst, ONE_TIME } from 'domain/programs/constants'
-import { CONFIG } from 'system.config'
+import { AppConfig } from 'system.config'
 import { formatPaymentMethod } from './formatPaymentMethod'
 
 interface ApproverRole {
@@ -59,7 +59,7 @@ export const findProgramPaymentMethod = (program: Program) =>
 const createPaymentMethodOptions = () => {
   let index = 1
   const options = []
-  for (const chain of CONFIG.chains) {
+  for (const chain of AppConfig.network.chains) {
     options.push({
       value: index++,
       label: formatPaymentMethod(chain.symbol, chain.symbol),
@@ -78,10 +78,10 @@ const createPaymentMethodOptions = () => {
     })
     options.push({
       value: index++,
-      label: formatPaymentMethod(CONFIG.fiatPaymentUnit, chain.symbol),
+      label: formatPaymentMethod(AppConfig.network.fiatPaymentUnit, chain.symbol),
       programCurrency: [
         {
-          name: CONFIG.fiatPaymentUnit,
+          name: AppConfig.network.fiatPaymentUnit,
           type: 'REQUEST',
           blockchain: chain.name,
         },

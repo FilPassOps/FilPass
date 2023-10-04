@@ -1,11 +1,11 @@
+import { USD } from 'domain/currency/constants'
+import { formatCrypto, formatCurrency } from 'lib/currency'
+import { logger } from 'lib/logger'
 import { sendEmail } from 'lib/sendEmail'
 import { validate } from 'lib/yup'
+import { AppConfig } from 'system.config'
 import { baseEmail } from './constants'
 import { sendCreatedDrafNotificationValidator } from './validation'
-import { formatCurrency, formatCrypto } from 'lib/currency'
-import { USD } from 'domain/currency/constants'
-import { PLATFORM_NAME } from 'system.config'
-import { logger } from 'lib/logger'
 
 interface ProgramCurrency {
   type: string
@@ -53,7 +53,7 @@ export async function sendCreatedDraftNotification(params: SendCreatedDraftNotif
   try {
     await sendEmail({
       to: email,
-      subject: `${PLATFORM_NAME} wants to pay you`,
+      subject: `${AppConfig.app.name} wants to pay you`,
       html: emailBody,
     })
   } catch (error) {
@@ -68,7 +68,7 @@ const getBody = ({ hasAccount, formattedAmount, transferRequestId }: GetBodyPara
         <td style="padding-left:32px; padding-right: 32px; padding-top: 48px;">
           <h1
               style="margin-top:0;margin-bottom:35px;font-size:48px;line-height:48px;font-weight:800;letter-spacing:-0.02em; color:#4F46E5;">
-              ${PLATFORM_NAME} wants to pay you
+              ${AppConfig.app.name} wants to pay you
           </h1>
           <p style="margin:0; color: #6B7280;line-height: 24px;">
             Hello, <br /> <br />
@@ -94,12 +94,12 @@ const getBody = ({ hasAccount, formattedAmount, transferRequestId }: GetBodyPara
     <tr>
       <td style="padding-left:32px; padding-right: 32px;padding-top: 48px;">
         <h1 style="margin-top:0;margin-bottom:35px;font-size:48px;line-height:48px;font-weight:800;letter-spacing:-0.02em; color:#4F46E5;">
-          ${PLATFORM_NAME} wants to pay you
+          ${AppConfig.app.name} wants to pay you
         </h1>
         <p style="margin:0; color: #6B7280;line-height: 24px;">
           Hello, <br /> <br />
           There is a ${formattedAmount} transfer request waiting for you. <br />
-          Please create a ${PLATFORM_NAME} account and complete the request.
+          Please create a ${AppConfig.app.name} account and complete the request.
         </p>
       </td>
     </tr>

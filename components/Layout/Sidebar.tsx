@@ -16,7 +16,6 @@ import { useAuth } from 'components/Authentication/Provider'
 import { TokenPrice } from 'components/Controller/TokenPrice'
 import { LinkButton } from 'components/shared/Button'
 import { RoleComponent } from 'components/shared/RoleComponent'
-import { SUPPORT_EMAIL } from 'system.config'
 import { ADDRESS_MANAGER_ROLE, APPROVER_ROLE, CONTROLLER_ROLE, SUPERADMIN_ROLE, USER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
 import { ACTIVE_STATUS, ARCHIVED_STATUS } from 'domain/programs/constants'
 import {
@@ -30,13 +29,14 @@ import {
   SUBMITTED_STATUS,
   VOIDED_STATUS,
 } from 'domain/transferRequest/constants'
+import { UserResult } from 'domain/user'
 import { classNames } from 'lib/classNames'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { BatchActionsButton } from 'pages/approvals'
 import projectVersion from 'project-version'
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
-import { UserResult } from 'domain/user'
+import { AppConfig } from 'system.config'
 
 const navigation = [
   {
@@ -210,7 +210,7 @@ export const Sidebar = ({ toggle = false, setSidebarToggle }: SidebarProps) => {
           </RoleComponent>
           <RoleComponent roles={[USER_ROLE]}>
             <a
-              href={`mailto:${SUPPORT_EMAIL}`}
+              href={`mailto:${AppConfig.app.emailConfig.supportAddress}`}
               className="flex items-center gap-4 mt-2 py-5 px-4 border-y border-indigo-800 font-medium text-indigo-100"
             >
               <LifebuoyIcon className="h-6 w-6 text-indigo-300" />

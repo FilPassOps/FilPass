@@ -1,10 +1,10 @@
 import { LockClosedIcon } from '@heroicons/react/24/solid'
 import { Button } from 'components/shared/Button'
-import { PLATFORM_NAME, SUPPORT_EMAIL } from 'system.config'
 import { isUserBanned } from 'domain/user/isUserBanned'
 import { withSessionSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
+import { AppConfig } from 'system.config'
 
 export default function BannedUserPage() {
   const { push } = useRouter()
@@ -16,16 +16,16 @@ export default function BannedUserPage() {
   return (
     <>
       <Head>
-        <title key='terms-conditions'>{`Terms and Condition violation - ${PLATFORM_NAME}`}</title>
+        <title key="terms-conditions">{`Terms and Condition violation - ${AppConfig.app.name}`}</title>
       </Head>
       <div className="h-screen flex flex-col justify-center items-center">
         <LockClosedIcon className="w-14 h-14 text-gray-500 mb-3" />
         <h1 className="text-gray-500 text-3xl font-bold mb-3">Terms and Condition violation</h1>
         <p className="text-base font-normal text-gray-500 mb-9 text-center">
-          Your account is prohibited to use the {PLATFORM_NAME} platform because of a violation of our terms and conditions. <br />
+          Your account is prohibited to use the {AppConfig.app.name} platform because of a violation of our terms and conditions. <br />
           If you believe this is a mistake contact{' '}
-          <a className="text-purple-500" href={`mailto:${SUPPORT_EMAIL}`}>
-            {SUPPORT_EMAIL}
+          <a className="text-purple-500" href={`mailto:${AppConfig.app.emailConfig.supportAddress}`}>
+            {AppConfig.app.emailConfig.supportAddress}
           </a>
         </p>
         <div className="w-44">

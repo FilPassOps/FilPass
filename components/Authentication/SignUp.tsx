@@ -6,7 +6,7 @@ import { signupValidator } from 'domain/auth/validation'
 import { api } from 'lib/api'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { PLATFORM_NAME } from 'system.config'
+import { AppConfig } from 'system.config'
 import { GoogleLogin } from './GoogleLogin'
 import { ResendVerificationModal } from './ResendVerificationModal'
 import { Layout } from './Shared'
@@ -52,7 +52,7 @@ export function SignUp() {
     <Layout>
       <div className="h-full w-full flex flex-col justify-center space-y-6 px-8 md:px-0">
         <PageAlert type="info">
-          <p>If you have participated in a {PLATFORM_NAME} event, make sure to use the same registered email address</p>
+          <p>If you have participated in a {AppConfig.app.name} event, make sure to use the same registered email address</p>
         </PageAlert>
 
         <GoogleLogin buttonText="Sign up with Google" />

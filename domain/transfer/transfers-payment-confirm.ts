@@ -2,7 +2,7 @@ import { ethers } from 'ethers'
 import { WalletSize, amountConverter, getDelegatedAddress, hexAddressDecoder } from 'lib/getDelegatedAddress'
 import { logger } from 'lib/logger'
 import prisma from 'lib/prisma'
-import { CONFIG } from 'system.config'
+import { AppConfig } from 'system.config'
 import { TransferResult, select, updateTransfer } from './paymentDbTransferVerificationJob'
 
 interface TransferPaymentConfirmParams {
@@ -26,7 +26,7 @@ export const transferPaymentConfirm = async ({ id, to, from, value, transactionH
     },
   })
 
-  const chainName = CONFIG.chains.find(chain => chain.contractAddress === contractAddress)?.name
+  const chainName = AppConfig.network.chains.find(chain => chain.contractAddress === contractAddress)?.name
 
   if (!chainName) {
     logger.error('Chain name not found')

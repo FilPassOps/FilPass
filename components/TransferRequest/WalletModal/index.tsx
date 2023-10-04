@@ -2,7 +2,7 @@ import { useAuth } from 'components/Authentication/Provider'
 import { Modal } from 'components/shared/Modal'
 import { useMetaMask } from 'components/web3/MetaMaskProvider'
 import { useEffect, useState } from 'react'
-import { getChain } from 'system.config'
+import { AppConfig, ChainIds } from 'system.config'
 import { ChainSelection } from './ChainSelectionStep'
 import { ConnectStep } from './ConnectStep'
 import { NotificationStep } from './NotificationStep'
@@ -22,7 +22,7 @@ export function WalletModal({ open, onModalClosed, setUserWalletId, chainIdFilte
   const [step, setStep] = useState(1)
   const [form, setForm] = useState<any>({})
 
-  const chain = getChain(chainId as string)
+  const chain = AppConfig.network.getChain(chainId as ChainIds)
 
   const handleChainSelectionClick = () => {
     setStep(curr => curr + 1)

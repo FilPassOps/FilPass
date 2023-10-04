@@ -3,6 +3,7 @@ import { SelectNetworkInput } from 'components/shared/SelectNetworkInput'
 import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
 import yup from 'lib/yup'
 import { useForm } from 'react-hook-form'
+import { ChainIds } from 'system.config'
 
 interface ChainSelectionProps {
   onConnectionMethodClick: (chainId: string) => void
@@ -48,7 +49,7 @@ export function ChainSelection({ onConnectionMethodClick, chainIdFilter }: Chain
           listboxClassName="max-h-28"
         />
         <div className="flex w-full">
-          <WithMetaMaskButton type="submit" className="w-full" targetChainId={chainId} />
+          <WithMetaMaskButton type="submit" className="w-full" targetChainId={chainId as ChainIds} />
         </div>
       </form>
     </div>

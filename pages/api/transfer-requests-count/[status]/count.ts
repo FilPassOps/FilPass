@@ -4,7 +4,7 @@ import { NextApiRequestWithSession, newHandler, withController, withLimiter, wit
 import yup, { validate } from 'lib/yup'
 import { NextApiResponse } from 'next/types'
 import qs from 'qs'
-import { CONFIG } from 'system.config'
+import { AppConfig, ChainNames } from 'system.config'
 
 const requestSchema = yup.object({
   status: yup.string().oneOf([APPROVED_STATUS, PAID_STATUS, REJECTED_BY_CONTROLLER_STATUS]).required(),
@@ -12,7 +12,7 @@ const requestSchema = yup.object({
     .array()
     .of(yup.string().required())
     .test('is-valid', 'Networks must be valid', networks => {
-      return networks?.every(network => CONFIG.chains.map(chain => chain.name).includes(network))
+      return networks?.every(network => AppConfig.network.chains.map(chain => chain.name).includes(network as ChainNames))
     })
     .required(),
 })

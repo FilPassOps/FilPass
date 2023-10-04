@@ -3,7 +3,7 @@ import { setWalletActive } from 'domain/wallet/setWalletActive'
 import { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import { useEffect } from 'react'
-import { PLATFORM_NAME } from 'system.config'
+import { AppConfig } from 'system.config'
 export default function WalletActivate({ error }: { error?: { message: string } }) {
   useEffect(() => {
     if (window) {
@@ -15,7 +15,7 @@ export default function WalletActivate({ error }: { error?: { message: string } 
   return (
     <>
       <Head>
-        <title key="activate-account">{`Activate Account - ${PLATFORM_NAME}`}</title>
+        <title key="activate-account">{`Activate Account - ${AppConfig.app.name}`}</title>
       </Head>
       {error ? (
         <div className="flex flex-col h-screen items-center justify-center">

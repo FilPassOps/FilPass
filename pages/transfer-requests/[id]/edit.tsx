@@ -1,16 +1,16 @@
 import { Layout } from 'components/Layout'
+import { TransferRequestForm } from 'components/TransferRequest/TransferRequestForm'
+import { StatusNotes } from 'components/TransferRequest/ViewTransferRequest/StatusNotes'
 import { Divider } from 'components/shared/Divider'
 import { GoBackConfirmationWithRouter } from 'components/shared/GoBackConfirmation'
 import { StatusBadge } from 'components/shared/Status'
-import { TransferRequestForm } from 'components/TransferRequest/TransferRequestForm'
-import { StatusNotes } from 'components/TransferRequest/ViewTransferRequest/StatusNotes'
-import { PLATFORM_NAME } from 'system.config'
 import { findAllExternalPrograms } from 'domain/programs/findAll'
 import { DRAFT_STATUS } from 'domain/transferRequest/constants'
 import { getUserTransferRequestById } from 'domain/transferRequest/getUserTransferRequestById'
 import { withUserSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { ReactElement } from 'react'
+import { AppConfig } from 'system.config'
 
 interface EditTransferRequestProps {
   data: {
@@ -27,7 +27,7 @@ export default function EditTransferRequest({ data, programs }: EditTransferRequ
   return (
     <>
       <Head>
-        <title>{`Edit Transfer Request #${data?.id} - ${PLATFORM_NAME}`}</title>
+        <title>{`Edit Transfer Request #${data?.id} - ${AppConfig.app.name}`}</title>
       </Head>
       <div className="max-w-3xl mx-auto">
         <div className="flex justify-between items-center my-6">

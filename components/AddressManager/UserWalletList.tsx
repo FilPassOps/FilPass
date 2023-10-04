@@ -8,7 +8,7 @@ import JsFileDownload from 'js-file-download'
 import { api } from 'lib/api'
 import { DateTime } from 'luxon'
 import { useState } from 'react'
-import { PLATFORM_NAME } from 'system.config'
+import { AppConfig } from 'system.config'
 
 interface UserWalletListProps {
   data?: any[]
@@ -52,7 +52,10 @@ export const UserWalletList = ({ data = [], totalItems }: UserWalletListProps) =
 
     const blob = new Blob([csvTemplate])
     setIsLoading(false)
-    return JsFileDownload(blob, `${PLATFORM_NAME.toLowerCase()}_user_address_${DateTime.now().toFormat("yyyy-MM-dd_hh'h'mm'm'ss's'")}.csv`)
+    return JsFileDownload(
+      blob,
+      `${AppConfig.app.name.toLowerCase()}_user_address_${DateTime.now().toFormat("yyyy-MM-dd_hh'h'mm'm'ss's'")}.csv`,
+    )
   }
 
   return (

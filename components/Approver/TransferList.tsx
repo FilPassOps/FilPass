@@ -13,7 +13,7 @@ import { formatCrypto } from 'lib/currency'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import { getChainByName } from 'system.config'
+import { AppConfig } from 'system.config'
 
 interface TransferListProps {
   data?: any[]
@@ -91,7 +91,7 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
         </TableHead>
         <TableBody>
           {data.map((request, requestIndex) => {
-            const chain = getChainByName(request.program_blockchain)
+            const chain = AppConfig.network.getChainByName(request.program_blockchain)
             const href = `/approvals/${request.id}`
 
             return (
@@ -174,7 +174,7 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
 export default TransferList
 
 const CryptoAmountInfo = ({ chainId, request }: CryptoAmountInfoProps) => {
-  const {currency, isLoading} = useCurrency(chainId)
+  const { currency, isLoading } = useCurrency(chainId)
 
   if (isLoading) {
     return (
@@ -189,7 +189,7 @@ const CryptoAmountInfo = ({ chainId, request }: CryptoAmountInfoProps) => {
   }
 
   if (request.request_unit === USD) {
-    if(currency){
+    if (currency) {
       return `${formatCrypto(new Big(request.amount / Number(currency)).toFixed(2))} ${request.payment_unit}`
     } else {
       return '-'
