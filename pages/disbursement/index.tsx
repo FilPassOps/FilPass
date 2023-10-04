@@ -338,7 +338,11 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
                     Create Report
                   </div>
                 </Button>
-                <Filters programs={programs} dateFilterLabel={status === PAID_STATUS ? 'Paid Date' : 'Create Date'} />
+                <Filters
+                  programs={programs}
+                  dateFilterLabel={status === PAID_STATUS ? 'Paid Date' : 'Create Date'}
+                  showCountByNetworkForController
+                />
               </div>
             </div>
             <PaginationWrapper totalItems={totalItems} pageSize={pageSize}>
