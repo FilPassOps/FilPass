@@ -4,11 +4,11 @@ import { Button } from 'components/shared/Button'
 import { getItemsPerPage, PaginationWrapper } from 'components/shared/usePagination'
 import { InviteUserModal } from 'components/SuperAdmin/Modals/InviteUserModal'
 import { UserList } from 'components/SuperAdmin/UserList'
-import { PLATFORM_NAME } from 'system.config'
 import { findAllUsers } from 'domain/user/findAll'
 import { withSuperAdminSSR } from 'lib/ssr'
-import { ReactElement, useState } from 'react'
 import Head from 'next/head'
+import { ReactElement, useState } from 'react'
+import { AppConfig } from 'system.config'
 
 interface UserSettingsProps {
   data: any[]
@@ -22,7 +22,7 @@ export default function UserSettings({ data = [], pageSize, totalItems }: UserSe
   return (
     <>
       <Head>
-        <title>{`User Settings - ${PLATFORM_NAME}`}</title>
+        <title>{`User Settings - ${AppConfig.app.name}`}</title>
       </Head>
       <div className="flex justify-between items-center pb-3">
         <p className="text-base font-bold text-gray-900">All users</p>

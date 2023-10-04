@@ -5,18 +5,18 @@ import { useAlertDispatcher } from 'components/Layout/Alerts'
 import { Button } from 'components/shared/Button'
 import { useMetaMask } from 'components/web3/MetaMaskProvider'
 import { ForwardNonBLS } from 'components/web3/useContract'
+import useCurrency from 'components/web3/useCurrency'
 import { USD } from 'domain/currency/constants'
 import { api } from 'lib/api'
 import { formatCrypto, formatCurrency } from 'lib/currency'
 import _ from 'lodash'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { getChainByName } from 'system.config'
+import { AppConfig, ChainNames } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { ErrorAlert, SuccessAlert } from './Alerts'
 import PaymentBatch from './PaymentBatch'
 import { PaymentBatchStep } from './PaymentBatchStep'
-import useCurrency from 'components/web3/useCurrency'
 
 interface ProgramCurrency {
   currency: {
@@ -56,7 +56,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
   const [currentBatchIndex, setCurrentBatchIndex] = useState(0)
 
   const currentBatch = paymentBatchList[currentBatchIndex]
-  const chain = getChainByName(data[0].program.blockchain.name)
+  const chain = AppConfig.network.getChainByName(data[0].program.blockchain.name as ChainNames)
   const { currency } = useCurrency(chain.chainId)
 
   useEffect(() => {
@@ -168,7 +168,11 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
           closeable: true,
         },
         body: () => (
-          <SuccessAlert hash={hash} blockExplorerUrl={getChainByName(blockchainName).blockExplorer.url} handleClose={() => close()} />
+          <SuccessAlert
+            hash={hash}
+            blockExplorerUrl={AppConfig.network.getChainByName(blockchainName as ChainNames).blockExplorer.url}
+            handleClose={() => close()}
+          />
         ),
       })
       return true

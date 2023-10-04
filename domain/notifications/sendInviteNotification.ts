@@ -1,9 +1,9 @@
 import { sendEmail } from 'lib/sendEmail'
 import { validate } from 'lib/yup'
+import { AppConfig } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { baseEmail } from './constants'
 import { sendInviteValidator } from './validation'
-import { PLATFORM_NAME } from 'system.config'
 
 interface SendInviteNotificationParams {
   email: string
@@ -32,7 +32,7 @@ export async function sendInviteNotification(params: SendInviteNotificationParam
 
   const response = await sendEmail({
     to: email,
-    subject: `You were invited to join ${PLATFORM_NAME}`,
+    subject: `You were invited to join ${AppConfig.app.name}`,
     html: emailBody,
   })
 
@@ -57,11 +57,11 @@ const getBody = ({ inviterEmail }: GetBodyParams) => {
   <tr>
     <td style="padding-left:32px; padding-right: 32px;padding-top: 48px;">
       <h1 style="margin-top:0;margin-bottom:35px;font-size:48px;line-height:48px;font-weight:800;letter-spacing:-0.02em; color:#4F46E5">
-        You were invited to join ${PLATFORM_NAME}
+        You were invited to join ${AppConfig.app.name}
       </h1>
       <p style="margin:0; color: #6B7280;line-height: 24px;">
         Hello, <br /> <br />
-        ${inviterEmail} has invited you to join ${PLATFORM_NAME}. Please click the button below to create your account.
+        ${inviterEmail} has invited you to join ${AppConfig.app.name}. Please click the button below to create your account.
       </p>
     </td>
   </tr>

@@ -1,38 +1,11 @@
-export const COMPANY_NAME = 'Protocol Labs'
-export const PLATFORM_NAME = 'Emissary'
-
-export const EMAIL_DOMAIN = '@protocol.ai'
-export const EMAIL_FROM_NAME = 'Emissary Support'
-export const SUPPORT_EMAIL = 'emissary@protocol.ai'
-
-export type Chain = {
-  name: string
-  networkName: string
-  symbol: string
-  chainId: string
-  coinMarketApiCode: number
-  units: {
-    [key: string]: {
-      name: string
-      scale: number
-    }
-  }
-  rpcUrls: string[]
-  blockExplorer: {
-    name: string
-    url: string
-  }
-  contractAddress: string
-  iconFileName: string
-}
-
-export type FilecoinChain = Chain & {
-  coinType: "f" | "t"
-}
-
-type Config = {
-  fiatPaymentUnit: string
-  chains: Chain[] | FilecoinChain[]
+const app: App = {
+  name: 'Emissary',
+  companyName: 'Protocol Labs',
+  emailConfig: {
+    domain: '@protocol.ai',
+    fromName: 'Emissary Support',
+    supportAddress: 'emissary@protocol.ai',
+  },
 }
 
 const ethereum = {
@@ -59,7 +32,7 @@ const ethereum = {
   blockExplorer: { name: 'Etherscan', url: 'https://sepolia.etherscan.io/tx' },
   contractAddress: '0xA6B0F90E96Ff8E6b79D859E2067afFA190AE8dB5',
   iconFileName: 'ethereum-icon.svg',
-} //as const
+} as const satisfies Chain
 
 const polygon = {
   name: 'Polygon',
@@ -85,9 +58,9 @@ const polygon = {
   blockExplorer: { name: 'Polygonscan', url: 'https://mumbai.polygonscan.com/tx' },
   contractAddress: '0xb63704b534583Eca727d78dde6cCe438171846dc',
   iconFileName: 'polygon-icon.svg',
-} //as const
+} as const satisfies Chain
 
-const filecoinCalibration = {
+const calibration = {
   name: 'Filecoin',
   networkName: 'Calibration',
   symbol: 'FIL',
@@ -112,32 +85,120 @@ const filecoinCalibration = {
   contractAddress: '0xbEF649DB6b4e1b2Ac044492433Bccca4287BE90F',
   iconFileName: 'filecoin-icon.svg',
   coinType: 't',
-} //as const
+} as const satisfies FilecoinChain
 
-export const CONFIG: Config = { fiatPaymentUnit: 'USD', chains: [ethereum, polygon, filecoinCalibration] }
+const chains = [ethereum, polygon, calibration] as const satisfies Chains
 
-export const isFilecoinEnabled = CONFIG.chains.some(chain => chain.name === 'Filecoin')
+export const AppConfig = {
+  app,
+  network: {
+    fiatPaymentUnit: 'USD',
+    chains,
+    getChain,
+    getChainByName,
+    getMetamaskParam,
+  },
+} as const satisfies AppParams
 
-export const getChain = (chainId: string) => {
-  const index = CONFIG.chains.findIndex(chain => chain.chainId === chainId)
-  return CONFIG.chains[index]
+interface AppParams {
+  app: App
+  network: {
+    fiatPaymentUnit: string
+    chains: Chains
+    getChain: (chainId: ChainIds) => Chain
+    getChainByName: (blockchainName: ChainNames) => Chain
+    getMetamaskParam: (chainId: ChainIds) => {
+      chainId: string
+      chainName: string
+      nativeCurrency: {
+        name: string
+        symbol: string
+        decimals: number
+      }
+      rpcUrls: readonly string[]
+    }
+  }
 }
 
-export const getChainByName = (blockchainName: string) => {
-  const index = CONFIG.chains.findIndex(chain => chain.name === blockchainName)
-  return CONFIG.chains[index]
+export type ChainIds = (typeof chains)[number]['chainId']
+function getChain(chainId: ChainIds) {
+  const index = chains.findIndex(chain => chain.chainId === chainId)
+  return chains[index]
 }
 
-export const getMetamaskParam = (chainId: string) => {
-  const index = CONFIG.chains.findIndex(chain => chain.chainId === chainId)
+export type ChainNames = (typeof chains)[number]['name']
+function getChainByName(blockchainName: ChainNames) {
+  const index = chains.findIndex(chain => chain.name === blockchainName)
+  return chains[index]
+}
+
+function getMetamaskParam(chainId: ChainIds) {
+  const index = chains.findIndex(chain => chain.chainId === chainId)
   return {
-    chainId: CONFIG.chains[index].chainId,
-    chainName: CONFIG.chains[index].networkName,
+    chainId: chains[index].chainId,
+    chainName: chains[index].networkName,
     nativeCurrency: {
-      name: CONFIG.chains[index].symbol,
-      symbol: CONFIG.chains[index].symbol,
+      name: chains[index].symbol,
+      symbol: chains[index].symbol,
       decimals: 18,
     },
-    rpcUrls: CONFIG.chains[index].rpcUrls,
+    rpcUrls: chains[index].rpcUrls,
   }
+}
+
+export interface AppConfig {
+  app: App
+  network: {
+    fiatPaymentUnit: string
+    chains: Chains
+    getChain: (chainId: ChainIds) => Chain
+    getChainByName: (blockchainName: ChainNames) => Chain
+    getMetamaskParam: (chainId: ChainIds) => {
+      chainId: string
+      chainName: string
+      nativeCurrency: {
+        name: string
+        symbol: string
+        decimals: number
+      }
+      rpcUrls: readonly string[]
+    }
+  }
+}
+
+export interface App {
+  name: string
+  companyName: string
+  emailConfig: {
+    domain: string
+    fromName: string
+    supportAddress: string
+  }
+}
+
+export type Chains = ReadonlyArray<Chain | FilecoinChain>
+
+export interface Chain {
+  name: string
+  networkName: string
+  symbol: string
+  chainId: string
+  coinMarketApiCode: number
+  units: {
+    [key: string]: {
+      name: string
+      scale: number
+    }
+  }
+  rpcUrls: readonly string[]
+  blockExplorer: {
+    name: string
+    url: string
+  }
+  contractAddress: string
+  iconFileName: string
+}
+
+export interface FilecoinChain extends Chain {
+  coinType: 'f' | 't'
 }

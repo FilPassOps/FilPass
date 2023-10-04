@@ -1,12 +1,12 @@
+import { Blockchain, Prisma, Program } from '@prisma/client'
 import { utils } from 'ethers'
 import { validateWalletAddress } from 'lib/blockchainUtils'
 import { TransactionError } from 'lib/errors'
 import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import prisma, { newPrismaTransaction } from 'lib/prisma'
 import _ from 'lodash'
+import { AppConfig } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
-import { Blockchain, Prisma, Program } from '@prisma/client'
-import { getChainByName } from 'system.config'
 
 interface Request {
   wallet: {
@@ -162,7 +162,7 @@ const checkWallet = async ({ prisma, user, request, isBatchCsv, index, programs 
     }
   }
 
-  const filecoin = getChainByName('Filecoin')
+  const filecoin = AppConfig.network.getChainByName('Filecoin')
 
   if (program.blockchain.chainId === filecoin.chainId && request.wallet?.startsWith('0x')) {
     const delegatedAddress = getDelegatedAddress(request.wallet, WalletSize.FULL, program.blockchain.name)

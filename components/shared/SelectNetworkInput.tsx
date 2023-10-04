@@ -1,6 +1,6 @@
 import { SelectInput } from 'components/shared/FormInput'
 import { Controller } from 'react-hook-form'
-import { CONFIG } from 'system.config'
+import { AppConfig } from 'system.config'
 import { BlockchainIcon } from './icons/BlockchainIcon'
 
 interface SelectNetworkInputProps {
@@ -26,7 +26,7 @@ export const SelectNetworkInput = ({
   chainIdFilter,
   listboxClassName,
 }: SelectNetworkInputProps) => {
-  const chainOptions = CONFIG.chains
+  const chainOptions = AppConfig.network.chains
     .filter(chain => (chainIdFilter ? chain.chainId === chainIdFilter : true))
     .map(chain => {
       return {

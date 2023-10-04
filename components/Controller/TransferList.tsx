@@ -10,6 +10,7 @@ import { Cell, Header, LinkedCell, Table, TableBody, TableHead } from 'component
 import Currency, { CryptoAmount } from 'components/shared/Table/Currency'
 import { WalletAddress } from 'components/shared/WalletAddress'
 import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
+import useCurrency from 'components/web3/useCurrency'
 import { USD } from 'domain/currency/constants'
 import { SUCCESS_STATUS } from 'domain/transfer/constants'
 import { APPROVED_STATUS, PAID_STATUS } from 'domain/transferRequest/constants'
@@ -18,8 +19,7 @@ import { formatCrypto } from 'lib/currency'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import { getChainByName } from 'system.config'
-import useCurrency from 'components/web3/useCurrency'
+import { AppConfig, ChainNames } from 'system.config'
 
 interface Request {
   id: number
@@ -174,7 +174,7 @@ const TransferList = ({
               const paymentUnit = request.program.programCurrency.find(({ type }) => type === 'PAYMENT') as Unit
               const requestUnit = request.program.programCurrency.find(({ type }) => type === 'REQUEST') as Unit
               const href = `/disbursement/${request.publicId}`
-              const { blockExplorer, chainId } = getChainByName(request.program.blockchain.name)
+              const { blockExplorer, chainId } = AppConfig.network.getChainByName(request.program.blockchain.name as ChainNames)
 
               const paidTransfer = request?.transfers?.find(({ status }) => status === SUCCESS_STATUS)
               return (
@@ -307,7 +307,7 @@ const CryptoAmountInfo = ({ chainId, request, requestUnit, paymentUnit, paidTran
   }
 
   if (requestUnit.currency.name === USD) {
-    if(currency){
+    if (currency) {
       return `${formatCrypto(new Big(Number(request.amount) / Number(currency)).toFixed(2))} ${paymentUnit.currency.name}`
     } else {
       return '-'

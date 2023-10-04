@@ -13,7 +13,7 @@ import {
 import { hash } from 'bcrypt'
 import { encrypt, encryptPII } from 'lib/emissaryCrypto'
 import prisma from 'lib/prisma'
-import { EMAIL_DOMAIN } from 'system.config'
+import { AppConfig } from 'system.config'
 
 const salt = '$2b$10$.J0sdgSE.in0MgyMhnS/q.'
 const teamSalt = '$2b$10$Qhy1ImEvtwATUFGdoA7g9u'
@@ -256,8 +256,8 @@ export async function createUser(email: string): Promise<CreateUserResult> {
 export async function createController(): Promise<[User, UserRole]> {
   const controller = await prisma.user.create({
     data: {
-      email: await encryptPII(`test-controller${EMAIL_DOMAIN}`),
-      emailHash: await hash(`test-controller${EMAIL_DOMAIN}`, salt),
+      email: await encryptPII(`test-controller${AppConfig.app.emailConfig.domain}`),
+      emailHash: await hash(`test-controller${AppConfig.app.emailConfig.domain}`, salt),
       isActive: true,
       isVerified: true,
       password: '$2b$10$JNEr1LRmoUgPWzbt8ve/a.ZcDIpMQK9II2OCj42kjNdWkG0.yluky',
@@ -282,7 +282,9 @@ export async function createController(): Promise<[User, UserRole]> {
   return [controller, controllerRole]
 }
 
-export async function createApprover(email: string | undefined = `test-approver${EMAIL_DOMAIN}`): Promise<[User, UserRole]> {
+export async function createApprover(
+  email: string | undefined = `test-approver${AppConfig.app.emailConfig.domain}`,
+): Promise<[User, UserRole]> {
   const approver = await prisma.user.create({
     data: {
       email: await encryptPII(email),

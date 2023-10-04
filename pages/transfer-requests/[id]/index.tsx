@@ -1,16 +1,16 @@
 import { Layout } from 'components/Layout'
 import { TransferDetails, TransferRequestDetailsProps } from 'components/User/TransferDetails'
-import { PLATFORM_NAME } from 'system.config'
 import { getUserTransferRequestById } from 'domain/transferRequest/getUserTransferRequestById'
 import { withUserSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { ReactElement } from 'react'
+import { AppConfig } from 'system.config'
 
 export default function TransferRequestDetails({ data }: TransferRequestDetailsProps) {
   return (
     <>
       <Head>
-        <title>{`Transfer Request #${data?.id} - ${PLATFORM_NAME}`}</title>
+        <title>{`Transfer Request #${data?.id} - ${AppConfig.app.name}`}</title>
       </Head>
       <TransferDetails data={data} />
     </>

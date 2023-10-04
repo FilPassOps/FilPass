@@ -1,11 +1,11 @@
 import { ethers } from 'ethers'
-import { CONFIG, Chain } from 'system.config'
+import { AppConfig, Chain } from 'system.config'
 import { MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
 import { processPendingTransfer } from './utils/process-pending-transfer'
 
 const contractMap = new Map<Chain, MultiForwarder>()
 
-CONFIG.chains.forEach(chain => {
+AppConfig.network.chains.forEach(chain => {
   const provider = new ethers.providers.JsonRpcProvider(chain.rpcUrls[0])
   const signer = provider.getSigner()
   contractMap.set(chain, MultiForwarderFactory.connect(chain.contractAddress, signer))

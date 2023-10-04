@@ -1,10 +1,10 @@
 import { SignUp as SignUpComponent } from 'components/Authentication/SignUp'
-import { PLATFORM_NAME } from 'system.config'
 import Cookie from 'js-cookie'
 import { withSessionSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
+import { AppConfig } from 'system.config'
 
 export default function SignUp() {
   const { query } = useRouter()
@@ -18,7 +18,7 @@ export default function SignUp() {
   return (
     <>
       <Head>
-        <title key='sign-up'>{`Sign Up - ${PLATFORM_NAME}`}</title>
+        <title key="sign-up">{`Sign Up - ${AppConfig.app.name}`}</title>
       </Head>
       <SignUpComponent />
     </>

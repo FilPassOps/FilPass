@@ -1,11 +1,11 @@
 import { UserWalletList } from 'components/AddressManager/UserWalletList'
 import { Layout } from 'components/Layout'
 import { getItemsPerPage, PaginationWrapper } from 'components/shared/usePagination'
-import { PLATFORM_NAME } from 'system.config'
 import { findAllWithWallets } from 'domain/user/findAllWithWallets'
 import { withAddressManagerSSR } from 'lib/ssr'
-import { ReactElement } from 'react'
 import Head from 'next/head'
+import { ReactElement } from 'react'
+import { AppConfig } from 'system.config'
 
 interface Wallet {
   user: {
@@ -32,7 +32,7 @@ export default function UserAddress({ data = [], pageSize, totalItems }: UserAdd
   return (
     <>
       <Head>
-        <title>{`User Address - ${PLATFORM_NAME}`}</title>
+        <title>{`User Address - ${AppConfig.app.name}`}</title>
       </Head>
       <PaginationWrapper totalItems={totalItems} pageSize={pageSize} childrenContainerClass="overflow-x-auto overflow-y-hidden">
         <UserWalletList data={data} totalItems={totalItems} />

@@ -1,5 +1,5 @@
-import { getChainByName } from 'system.config'
 import Image from 'next/image'
+import { AppConfig, ChainNames } from 'system.config'
 import { twMerge } from 'tailwind-merge'
 
 interface BlockchainIconProps {
@@ -10,7 +10,7 @@ interface BlockchainIconProps {
 }
 
 export const BlockchainIcon = ({ className, blockchainName, height, width }: BlockchainIconProps) => {
-  const blockchainIconFileName = getChainByName(blockchainName)?.iconFileName
+  const blockchainIconFileName = AppConfig.network.getChainByName(blockchainName as ChainNames)?.iconFileName
 
   return (
     <Image

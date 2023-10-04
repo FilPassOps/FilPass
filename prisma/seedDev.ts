@@ -3,10 +3,9 @@ import { hash } from 'bcrypt'
 
 import { loadEnvConfig } from '@next/env'
 import { PrismaClient } from '@prisma/client'
+import { AppConfig } from 'system.config'
 import { encrypt, encryptPII } from '../lib/emissaryCrypto'
 loadEnvConfig(process.cwd(), true)
-
-import { CONFIG, EMAIL_DOMAIN } from '../system.config'
 
 const prisma = new PrismaClient()
 const salt = process.env.EMAIL_KEY || ''
@@ -381,7 +380,7 @@ async function createTransferRequestDraft({ requesterId, receiverId, program, te
 
 async function createOneTimeProgramIds() {
   const programs = []
-  for (const chain of CONFIG.chains) {
+  for (const chain of AppConfig.network.chains) {
     const blockchainId = blockchainList.find(blockchain => blockchain.name === chain.name)?.id
 
     if (!blockchainId) throw new Error(`Blockchain ${chain.name} not found`)
@@ -429,7 +428,7 @@ async function createUser(index: number) {
     },
   })
 
-  const promises = CONFIG.chains.map((chain, index) => {
+  const promises = AppConfig.network.chains.map((chain, index) => {
     const blockchainId = blockchainList.find(blockchain => blockchain.name === chain.name)?.id
 
     if (!blockchainId) throw new Error(`Blockchain ${chain.name} not found`)
@@ -459,8 +458,8 @@ async function createUser(index: number) {
 async function createController() {
   const controller = await prisma.user.create({
     data: {
-      email: await encryptPII(`test-controller${EMAIL_DOMAIN}`),
-      emailHash: await hash(`test-controller${EMAIL_DOMAIN}`, salt),
+      email: await encryptPII(`test-controller${AppConfig.app.emailConfig.domain}`),
+      emailHash: await hash(`test-controller${AppConfig.app.emailConfig.domain}`, salt),
       isActive: true,
       isVerified: true,
       password: '$2b$10$JNEr1LRmoUgPWzbt8ve/a.ZcDIpMQK9II2OCj42kjNdWkG0.yluky',
@@ -487,8 +486,8 @@ async function createController() {
 async function createViewer() {
   const viewer = await prisma.user.create({
     data: {
-      email: await encryptPII(`test-viewer${EMAIL_DOMAIN}`),
-      emailHash: await hash(`test-viewer${EMAIL_DOMAIN}`, salt),
+      email: await encryptPII(`test-viewer${AppConfig.app.emailConfig.domain}`),
+      emailHash: await hash(`test-viewer${AppConfig.app.emailConfig.domain}`, salt),
       isActive: true,
       isVerified: true,
       password: '$2b$10$JNEr1LRmoUgPWzbt8ve/a.ZcDIpMQK9II2OCj42kjNdWkG0.yluky',
@@ -519,8 +518,8 @@ async function getBlockchainValues() {
 async function createApprover() {
   const approver = await prisma.user.create({
     data: {
-      email: await encryptPII(`test-approver${EMAIL_DOMAIN}`),
-      emailHash: await hash(`test-approver${EMAIL_DOMAIN}`, salt),
+      email: await encryptPII(`test-approver${AppConfig.app.emailConfig.domain}`),
+      emailHash: await hash(`test-approver${AppConfig.app.emailConfig.domain}`, salt),
       isActive: true,
       isVerified: true,
       password: '$2b$10$JNEr1LRmoUgPWzbt8ve/a.ZcDIpMQK9II2OCj42kjNdWkG0.yluky',
@@ -547,8 +546,8 @@ async function createApprover() {
 async function createSuperAdmin() {
   const superAdm = await prisma.user.create({
     data: {
-      email: await encryptPII(`test-super${EMAIL_DOMAIN}`),
-      emailHash: await hash(`test-super${EMAIL_DOMAIN}`, salt),
+      email: await encryptPII(`test-super${AppConfig.app.emailConfig.domain}`),
+      emailHash: await hash(`test-super${AppConfig.app.emailConfig.domain}`, salt),
       isActive: true,
       isVerified: true,
       password: '$2b$10$JNEr1LRmoUgPWzbt8ve/a.ZcDIpMQK9II2OCj42kjNdWkG0.yluky',
