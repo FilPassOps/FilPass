@@ -30,7 +30,7 @@ interface BatchRejectTransferRequestParams {
   notes: string
 }
 
-interface TransferRequestTest extends TransferRequest {
+interface TransferRequestWithReceiver extends TransferRequest {
   receiver: User
 }
 
@@ -278,7 +278,7 @@ export async function batchRejectTransferRequest(params: BatchRejectTransferRequ
     }
   }
 
-  const promiseList = (data as TransferRequestTest[]).map(async tRequest => {
+  const promiseList = (data as TransferRequestWithReceiver[]).map(async tRequest => {
     const currentProgram = tRequest && approverPrograms.find(({ program }) => program.id === tRequest.programId)
     if (currentProgram?.program?.visibility !== PROGRAM_TYPE_INTERNAL) {
       const receiverEmail = await decryptPII(tRequest.receiver.email)
