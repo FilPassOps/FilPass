@@ -6,6 +6,7 @@ const app: App = {
     fromName: 'Emissary Support',
     supportAddress: 'emissary@protocol.ai',
   },
+  enableCoinMarketApi: true,
 }
 
 const ethereum = {
@@ -174,6 +175,7 @@ export interface App {
     fromName: string
     supportAddress: string
   }
+  enableCoinMarketApi: boolean
 }
 
 export type Chains = ReadonlyArray<Chain | FilecoinChain>
@@ -183,7 +185,7 @@ export interface Chain {
   networkName: string
   symbol: string
   chainId: string
-  coinMarketApiCode: number
+  coinMarketApiCode?: number
   units: {
     [key: string]: {
       name: string

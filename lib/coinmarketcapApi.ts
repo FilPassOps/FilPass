@@ -1,14 +1,15 @@
 import axios from 'axios'
+import { AppConfig } from 'system.config'
 import { Api } from './api'
 
 const COIN_MARKET_CAP_API_KEY = process.env.COIN_MARKET_CAP_API_KEY
 const COIN_MARKET_ENDPOINT = process.env.COIN_MARKET_ENDPOINT
 
-if (!COIN_MARKET_ENDPOINT) {
+if (AppConfig.app.enableCoinMarketApi && !COIN_MARKET_ENDPOINT) {
   throw new Error('Please define COIN_MARKET_ENDPOINT environment variable')
 }
 
-if (!COIN_MARKET_CAP_API_KEY) {
+if (AppConfig.app.enableCoinMarketApi && !COIN_MARKET_CAP_API_KEY) {
   throw new Error('Please define COIN_MARKET_CAP_API_KEY environment variable')
 }
 
@@ -42,5 +43,5 @@ coinmarketcapApi.interceptors.response.use(
       }
     }
     return Promise.resolve({ error: err })
-  }
+  },
 )
