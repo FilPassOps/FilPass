@@ -7,10 +7,7 @@ import { Divider } from 'components/shared/Divider'
 import { CheckboxInput, TextInput } from 'components/shared/FormInput'
 import { GoBackConfirmation } from 'components/shared/GoBackConfirmation'
 import { DRAFT_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
-import {
-  createTransferRequestDraftFormValidator,
-  createTransferRequestSubmittedFormValidator,
-} from 'domain/transferRequestDraft/validation'
+import { createTransferRequestSubmittedFormValidator } from 'domain/transferRequestDraft/validation'
 import { api } from 'lib/api'
 import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { useRouter } from 'next/router'
@@ -62,7 +59,7 @@ export const ApplyForSomeoneForm = () => {
   const [genericError, setGenericError] = useState('')
 
   const getResolver = () => {
-    return yupResolver(receiverShouldReview ? createTransferRequestDraftFormValidator : createTransferRequestSubmittedFormValidator)
+    return yupResolver(createTransferRequestSubmittedFormValidator)
   }
 
   const {
@@ -76,6 +73,7 @@ export const ApplyForSomeoneForm = () => {
   } = useForm({
     shouldFocusError: false,
     resolver: getResolver(),
+    context: { receiverShouldReview },
     defaultValues: {
       requests: [
         {

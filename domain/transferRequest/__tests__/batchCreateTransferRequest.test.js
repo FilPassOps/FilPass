@@ -117,7 +117,7 @@ describe('batchCreateTransferRequest', () => {
     })
   })
 
-  it('should return erro, if user transaction fails', async () => {
+  it('should return error, if user transaction fails', async () => {
     mockPrismaUser.mockImplementation(() => ({
       findMany: () => [],
       create: () => {
@@ -144,73 +144,4 @@ describe('batchCreateTransferRequest', () => {
     expect(error).toBeDefined()
     expect(users).toEqual([])
   })
-
-  // it("should create transfer request", async () => {
-  //   mockPrismaUserRoleProgram.mockImplementation(() => ({
-  //     findMany: () => [{}]
-  //   }))
-
-  //   mockEncrypt.mockImplementation(() => 'Encrypted value')
-
-  //   mockPrismaTransferRequest.mockImplementation(() => ({
-  //     create: ({ data }) => {
-  //       return data
-  //     }
-  //   }))
-
-  //   mockPrismaTransaction.mockImplementation(async (fn) => {
-  //     const data = await fn(mockGetPrismaClient())
-  //     return { data }
-  //   })
-
-  //   luxon.DateTime.now.mockImplementation(() => ({
-  //     plus: () => ({
-  //       toISO: () => 'date'
-  //     })
-  //   }))
-
-  //   const requests = [{
-  //     programId: 1,
-  //     wallet: { id: 1 },
-  //     receiver: { id: 1 },
-  //     team: 'team test',
-  //     amount: '0.01',
-  //     currencyUnitId: 1
-  //   }]
-
-  //   const requesterId = 1
-  //   const approverRoleId = 1
-
-  //   const { data, error } = await prismaCreateTransferRequest(requests, requesterId, approverRoleId)
-  //   expect(data).toBeDefined()
-  //   expect(error).toBeUndefined()
-  // })
-
-  // it("should return error, if transfer request transaction fails", async () => {
-  //   mockPrismaUserRoleProgram.mockImplementation(() => ({
-  //     findMany: () => [{}]
-  //   }))
-
-  //   mockPrismaTransferRequest.mockImplementation(() => ({
-  //     create: () => { throw 'An error'}
-  //   }))
-
-  //   mockPrismaTransaction.mockImplementation(async (fn) => {
-  //     try {
-  //       return await fn(mockGetPrismaClient)
-  //     } catch (err) {
-  //       return {error: err}
-  //     }
-  //   })
-
-  //   const requests = [{
-  //     programId: 1
-  //   }]
-  //   const requesterId = 1
-  //   const approverRoleId = 1
-
-  //   const { data, error } = await prismaCreateTransferRequest(requests, requesterId, approverRoleId)
-  //   expect(data).toBeUndefined()
-  //   expect(error).toBeDefined()
-  // })
 })

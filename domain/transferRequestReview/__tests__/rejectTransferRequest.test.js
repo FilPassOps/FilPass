@@ -48,7 +48,7 @@ beforeEach(() => {
 
 describe('rejectTransferRequest', () => {
   it('should return error when validation fails', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       expect(params).toEqual({})
 
       return {
@@ -72,7 +72,7 @@ describe('rejectTransferRequest', () => {
   })
 
   it('transaction should throw error when transfer request is not found', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       expect(params).toEqual({ transferRequestId: 10, approverId: 1, notes: 'testing' })
       return { fields: { transferRequestId: 10, approverId: 1, notes: 'testing' } }
     })
@@ -110,7 +110,7 @@ describe('rejectTransferRequest', () => {
   })
 
   it('transaction should throw error when approver does not have access to the program', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -144,7 +144,7 @@ describe('rejectTransferRequest', () => {
   })
 
   it('should update transfer request status to REJECTED_BY_APPROVER', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -183,8 +183,8 @@ describe('rejectTransferRequest', () => {
     expect(error).toBeUndefined()
   })
 
-  it('should create a tranfer request review', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+  it('should create a transfer request review', async () => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -232,8 +232,8 @@ describe('rejectTransferRequest', () => {
     expect(error).toBeUndefined()
   })
 
-  it('should create a tranfer request history', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+  it('should create a transfer request history', async () => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -276,7 +276,7 @@ describe('rejectTransferRequest', () => {
   })
 
   it('should throw an error if is not possible to send rejected notification', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 

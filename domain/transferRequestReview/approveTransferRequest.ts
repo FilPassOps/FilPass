@@ -102,7 +102,6 @@ export async function batchApproveTransferRequest(params: BatchApproveTransferRe
   for (const request of transferRequests) {
     const { program } = request
 
-    //old programs may not have an approver group - a group can be empty
     const numberOfProgramApproversGroups = program.userRoleProgramGroups.filter(
       group => group.userRoleProgramGroupMembers.length > 0,
     ).length
@@ -137,7 +136,7 @@ export async function batchApproveTransferRequest(params: BatchApproveTransferRe
                   status: request.status,
                 },
                 data: {
-                  status: 'PROCESSING',
+                  status: PROCESSING_STATUS,
                 },
               })
               await tx.transferRequestHistory.create({
@@ -159,14 +158,14 @@ export async function batchApproveTransferRequest(params: BatchApproveTransferRe
             status: request.status,
           },
           data: {
-            status: 'APPROVED',
+            status: APPROVED_STATUS,
           },
         })
         await tx.transferRequestReview.create({
           data: {
             approverId,
             transferRequestId: request.id,
-            status: 'APPROVED',
+            status: APPROVED_STATUS,
           },
         })
         await tx.transferRequestHistory.create({

@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 import prisma from 'lib/prisma'
+import { SUCCESS_STATUS } from './constants'
 
 interface PrepareTransferProps {
   requests: number[]
@@ -34,7 +35,7 @@ export const prepareTransfers = async ({ requests, from, to, controllerUserRoleI
   if (transferRequest.length !== requests.length) {
     throw new Error('Invalid request ids')
   }
-  if (transferRequest.some(req => req.transfers.find(transfer => transfer.status === 'SUCCESS'))) {
+  if (transferRequest.some(req => req.transfers.find(transfer => transfer.status === SUCCESS_STATUS))) {
     throw new Error('Some requests were already paid')
   }
 

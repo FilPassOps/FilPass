@@ -25,7 +25,7 @@ describe('deleteWallet', () => {
   it('should return error when validation fails', async () => {
     const validateWalletSpy = jest.spyOn(deleteWalletModule, 'validateWalletTransferRequests')
 
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       expect(params).toEqual({})
 
       return {
@@ -71,7 +71,7 @@ describe('deleteWallet', () => {
     const validateWalletSpy = jest.spyOn(deleteWalletModule, 'validateWalletTransferRequests')
     validateWalletSpy.mockImplementation(() => undefined)
 
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 

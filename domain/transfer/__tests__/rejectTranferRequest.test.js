@@ -46,7 +46,7 @@ beforeEach(() => {
 
 describe('rejectTransferRequest', () => {
   it('should return error when validation fails', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       expect(params).toEqual({})
 
       return {
@@ -70,7 +70,7 @@ describe('rejectTransferRequest', () => {
   })
 
   it('should transaction throw error when transfer request is not found', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -101,7 +101,7 @@ describe('rejectTransferRequest', () => {
   })
 
   it('should update transfer request status to REJECTED_BY_CONTROLLER', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       expect(params).toEqual({ transferRequestId: [1], controllerId: 1, notes: 'testing' })
       return { fields: { transferRequestId: [1], controllerId: 1, notes: 'testing' } }
     })
@@ -138,7 +138,7 @@ describe('rejectTransferRequest', () => {
   })
 
   it('should throw an error if sending rejected notification fails', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 

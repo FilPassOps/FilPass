@@ -28,7 +28,6 @@ jest.mock('lib/paymentDb', () => ({
   closeConnection: () => mockCloseConnection(),
 }))
 
-const mockPrismaScriptTransaction = jest.fn()
 const mockPrismaTransfer = jest.fn()
 const mockPrismaCurrencyUnit = jest.fn()
 const mockPrismaTransferRequest = jest.fn()
@@ -37,7 +36,6 @@ const mockGetPrismaClient = jest.fn().mockImplementation(() => {
     transfer: mockPrismaTransfer(),
     currencyUnit: mockPrismaCurrencyUnit(),
     transferRequest: mockPrismaTransferRequest(),
-    scriptTransaction: mockPrismaScriptTransaction(),
   }
 })
 
@@ -137,9 +135,6 @@ describe('paymentDbTransferVerificationJob.test', () => {
       }),
       end: () => '',
     }))
-    mockPrismaScriptTransaction.mockImplementation(() => ({
-      updateMany: () => ({ count: 1 }),
-    }))
     mockPrismaCurrencyUnit.mockImplementation(() => ({
       findUnique: () => null,
     }))
@@ -184,9 +179,6 @@ describe('paymentDbTransferVerificationJob.test', () => {
       }),
       end: () => '',
     }))
-    mockPrismaScriptTransaction.mockImplementation(() => ({
-      updateMany: () => ({ count: 1 }),
-    }))
     mockPrismaCurrencyUnit.mockImplementation(() => ({
       findUnique: () => ({ id: 1 }),
     }))
@@ -229,9 +221,6 @@ describe('paymentDbTransferVerificationJob.test', () => {
         rows: [{ id: 1, params: 'params_1', hash: 'hash_1', address: 'address_1', amount: 10 }],
       }),
       end: () => '',
-    }))
-    mockPrismaScriptTransaction.mockImplementation(() => ({
-      updateMany: () => ({ count: 1 }),
     }))
     mockPrismaCurrencyUnit.mockImplementation(() => ({
       findUnique: () => ({ id: 1 }),
@@ -298,9 +287,6 @@ describe('paymentDbTransferVerificationJob.test', () => {
       expect(where).toEqual({ name: FILECOIN_CURRENCY_NAME })
       return { id: 1 }
     })
-    mockPrismaScriptTransaction.mockImplementation(() => ({
-      updateMany: () => ({ count: 1 }),
-    }))
     mockPrismaCurrencyUnit.mockImplementation(() => ({
       findUnique: params => mockFindUniqueCurrencyUnit(params),
     }))

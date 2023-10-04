@@ -1,4 +1,5 @@
 import prisma from 'lib/prisma'
+import { PENDING_STATUS } from './constants'
 
 export const cancelTransfers = async (requestIds: number[], controllerUserRoleId: number, reason?: string) => {
   const transferRequest = await prisma.transferRequest.findMany({
@@ -8,7 +9,7 @@ export const cancelTransfers = async (requestIds: number[], controllerUserRoleId
       },
       transfers: {
         some: {
-          status: 'PENDING',
+          status: PENDING_STATUS,
           isActive: true,
         },
       },
@@ -23,7 +24,7 @@ export const cancelTransfers = async (requestIds: number[], controllerUserRoleId
         where: {
           txHash: null,
           isActive: true,
-          status: 'PENDING',
+          status: PENDING_STATUS,
         },
       },
     },
@@ -42,7 +43,7 @@ export const cancelTransfers = async (requestIds: number[], controllerUserRoleId
       transferRequestId: {
         in: transferRequest.map(req => req.id),
       },
-      status: 'PENDING',
+      status: PENDING_STATUS,
       controllerId: controllerUserRoleId,
       isActive: true,
       transferRef: {

@@ -67,7 +67,7 @@ describe('createOrUpdateTransfers', () => {
   })
 
   it('should transaction throw error when transfer requests are not found', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -94,7 +94,7 @@ describe('createOrUpdateTransfers', () => {
   })
 
   it('should update the transfers if a transfer request has a transfer_id', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       expect(params).toEqual({ requests: [1], controllerId: 1 })
       return { fields: { requests: [1], controllerId: 1 } }
     })
@@ -133,7 +133,7 @@ describe('createOrUpdateTransfers', () => {
   })
 
   it('should create a transfer if a transfer request does not have a transfer_id', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -145,7 +145,7 @@ describe('createOrUpdateTransfers', () => {
           id: 1,
           transfers: [],
           receiver: { email: 'email@email.com' },
-          wallet: { address: 'adress' },
+          wallet: { address: 'address' },
           amount: 0.01,
           createdAt: 'date',
         },

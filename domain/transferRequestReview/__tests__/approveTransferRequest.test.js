@@ -36,22 +36,16 @@ jest.mock('domain/notifications/sendApprovedNotification', () => ({
   sendApprovedNotification: params => mockApprovedNotification(params),
 }))
 
-const mockCreateMsigWallet = jest.fn()
-jest.mock('domain/multisig/createMsigWallet', () => ({
-  createMsigWallet: params => mockCreateMsigWallet(params),
-}))
-
 beforeEach(() => {
   mockValidate.mockReset()
   mockPrismaTransferRequest.mockReset()
   mockPrismaTransaction.mockReset()
   mockApprovedNotification.mockReset()
-  mockCreateMsigWallet.mockReset()
 })
 
 describe('approveTransferRequest', () => {
   it('should return error when validation fails', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       expect(params).toEqual({})
 
       return {
@@ -75,7 +69,7 @@ describe('approveTransferRequest', () => {
   })
 
   it('should return error when transfer request is not found', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       expect(params).toEqual({
         transferRequestId: 10,
         approverId: 1,
@@ -98,7 +92,7 @@ describe('approveTransferRequest', () => {
   })
 
   it('should return error when approver does not have access to the program', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -116,7 +110,7 @@ describe('approveTransferRequest', () => {
   })
 
   it('should return error when transaction fails', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -161,7 +155,7 @@ describe('approveTransferRequest', () => {
   })
 
   it('should update transfer request status to APPROVED', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -211,8 +205,8 @@ describe('approveTransferRequest', () => {
     expect(error).toBeUndefined()
   })
 
-  it('should create a tranfer request review', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+  it('should create a transfer request review', async () => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -259,8 +253,8 @@ describe('approveTransferRequest', () => {
     expect(error).toBeUndefined()
   })
 
-  it('should create a tranfer request history', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+  it('should create a transfer request history', async () => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -323,7 +317,7 @@ describe('approveTransferRequest', () => {
 
 describe('batchApproveTransferRequest', () => {
   it('should return error when validation fails', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       expect(params).toEqual({})
 
       return {
@@ -347,7 +341,7 @@ describe('batchApproveTransferRequest', () => {
   })
 
   it('should return error if one of the request are not found', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -375,7 +369,7 @@ describe('batchApproveTransferRequest', () => {
   })
 
   it('should return error if transaction fails', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -421,7 +415,7 @@ describe('batchApproveTransferRequest', () => {
   })
 
   it('should approve transfer requests', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -460,7 +454,7 @@ describe('batchApproveTransferRequest', () => {
       },
     }))
 
-    mockCreateHistory.mockImplementation((prisma, params) => {
+    mockCreateHistory.mockImplementation((_, params) => {
       expect(params).toEqual({
         newValue: {
           id: 1,

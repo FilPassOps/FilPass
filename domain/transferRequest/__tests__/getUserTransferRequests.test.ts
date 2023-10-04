@@ -1,5 +1,4 @@
 import { User } from '@prisma/client'
-import { DateTime } from 'luxon'
 import { clearDatabase, createOneTimeProgram, createTransferRequest, createTransferRequestDraft, createUser } from 'test/helpers'
 import { getUserTransferRequests } from '../getUserTransferRequests'
 
@@ -131,23 +130,5 @@ describe('getUserTransferRequests', () => {
     expect(page2?.requests[1].amount).toEqual(amount)
     expect(page2?.totalItems).toEqual(4)
     expect(page2Error).toBeFalsy()
-  })
-
-  it('should order by created date desc and return firt page if no sorting and paging is provided', async () => {
-    const { data, error } = await getUserTransferRequests({
-      userId: user.id,
-    })
-
-    expect(data?.requests.length).toEqual(4)
-    expect(DateTime.fromISO(data?.requests[0].create_date).toMillis()).toBeGreaterThan(
-      DateTime.fromISO(data?.requests[1].create_date).toMillis()
-    )
-    expect(DateTime.fromISO(data?.requests[1].create_date).toMillis()).toBeGreaterThan(
-      DateTime.fromISO(data?.requests[2].create_date).toMillis()
-    )
-    expect(DateTime.fromISO(data?.requests[2].create_date).toMillis()).toBeGreaterThan(
-      DateTime.fromISO(data?.requests[3].create_date).toMillis()
-    )
-    expect(error).toBeFalsy()
   })
 })

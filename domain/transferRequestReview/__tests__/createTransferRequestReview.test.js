@@ -36,7 +36,7 @@ beforeEach(() => {
 
 describe('createTransferRequestReview', () => {
   it('should return error when validation fails', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       expect(params).toEqual({})
 
       return {
@@ -62,7 +62,7 @@ describe('createTransferRequestReview', () => {
   })
 
   it('should call approveTransferRequest if the status is APPROVED', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       expect(params).toEqual({
         transferRequestId: 10,
         approverId: 1,
@@ -90,7 +90,7 @@ describe('createTransferRequestReview', () => {
   })
 
   it('should call rejectTransferRequest if the status is REJECTED_BY_APPROVER', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -115,7 +115,7 @@ describe('createTransferRequestReview', () => {
   })
 
   it('should call requireChangeTransferRequest if the status is REQUIRES_CHANGES', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -140,7 +140,7 @@ describe('createTransferRequestReview', () => {
   })
 
   it('should return error if the status is not valid', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 

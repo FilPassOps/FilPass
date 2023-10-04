@@ -45,7 +45,7 @@ jest.mock('domain/transferRequest/shared', () => ({
 }))
 
 const mockCreateHistory = jest.fn()
-jest.mock('domain/tranferRequestHistory/createRequestChangeHistory', () => ({
+jest.mock('domain/transferRequestHistory/createRequestChangeHistory', () => ({
   createRequestChangeHistory: (prisma, params) => mockCreateHistory(prisma, params),
 }))
 
@@ -60,7 +60,7 @@ beforeEach(() => {
 
 describe('updateTransferRequestById', () => {
   it('should return error when validation fails', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       expect(params).toEqual({})
 
       return {
@@ -84,7 +84,7 @@ describe('updateTransferRequestById', () => {
   })
 
   it('should return error when transfer request cannot be found', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -148,7 +148,7 @@ describe('updateTransferRequestById', () => {
   })
 
   it('should return error when transfer quest cannot be edited', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -186,7 +186,7 @@ describe('updateTransferRequestById', () => {
   })
 
   it('should return error when files are not found', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -228,7 +228,7 @@ describe('updateTransferRequestById', () => {
   })
 
   it('should call update replacing request changes status', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -266,7 +266,7 @@ describe('updateTransferRequestById', () => {
   })
 
   it('should call update not replacing current status', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -302,7 +302,7 @@ describe('updateTransferRequestById', () => {
   })
 
   it('should call history without encrypted values', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 

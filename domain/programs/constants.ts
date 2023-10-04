@@ -2,11 +2,6 @@ export const deliveryMethod: Record<string, string> = {
   ONE_TIME: 'One-time',
 }
 
-export const visibility: Record<string, string> = {
-  INTERNAL: 'Internal',
-  EXTERNAL: 'External',
-}
-
 export const ONE_TIME = 'ONE_TIME'
 
 export const PROGRAM_TYPE_INTERNAL = 'INTERNAL'

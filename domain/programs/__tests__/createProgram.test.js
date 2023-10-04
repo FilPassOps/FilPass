@@ -28,17 +28,12 @@ jest.mock('domain/programs/validation', () => ({
   createProgramValidator: () => mockValidator(),
 }))
 
-const mockValidateWallet = jest.fn()
-jest.mock('lib/filecoinApi', () => ({
-  validateWallet: params => mockValidateWallet(params),
-}))
 
 beforeEach(() => {
   mockValidate.mockReset()
   mockPrismaTransaction.mockReset()
   mockUserRoleProgram.mockReset()
   mockProgram.mockReset()
-  mockValidateWallet.mockReset()
 })
 
 describe('createProgram', () => {

@@ -279,7 +279,7 @@ const setDefaultWallets = async (requests: Request[], programs: ProgramWithBlock
 
       const requestProgram = programs.find(program => program.id === singleRequest.programId)
 
-      const defaultWallet = userWallets.find(wallet => wallet.isDefault && wallet.blockchainId === requestProgram?.blockchain.id)
+      const defaultWallet = userWallets.find(wallet => wallet.isDefault && wallet.blockchainId === requestProgram?.blockchainId)
 
       if (!defaultWallet) {
         await prisma.userWallet.update({

@@ -9,12 +9,6 @@ export const getUserByIdAndEmailValidator = yup
   })
   .required()
 
-export const getUserByEmailValidator = yup
-  .object({
-    email: yup.string().email().required(),
-  })
-  .required()
-
 export const findAllValidator = yup.object({
   sort: yup.string(),
   order: yup.string(),

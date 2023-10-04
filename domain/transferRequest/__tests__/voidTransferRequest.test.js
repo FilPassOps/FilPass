@@ -27,7 +27,7 @@ jest.mock('domain/transferRequest/shared', () => ({
 
 describe('voidTransferRequest', () => {
   it('should return error when validation fails', async () => {
-    mockValidate.mockImplementation((validationFn, params) => {
+    mockValidate.mockImplementation((_, params) => {
       expect(params.userId).toEqual(1)
       expect(params.transferRequestId).toEqual(10)
 

@@ -5,6 +5,7 @@ import {
   APPROVED_STATUS,
   PROCESSING_STATUS,
   REJECTED_BY_APPROVER_STATUS,
+  REJECTED_STATUS,
   REQUIRES_CHANGES_STATUS,
   SUBMITTED_BY_APPROVER_STATUS,
   SUBMITTED_STATUS,
@@ -60,7 +61,7 @@ export async function submittedTransferRequest(params: SubmittedTransferRequestP
         userRoleId: approverId,
         userRole: {
           role: {
-            equals: 'APPROVER',
+            equals: APPROVER_ROLE,
           },
         },
         program: {
@@ -107,7 +108,7 @@ export async function submittedTransferRequest(params: SubmittedTransferRequestP
           publicId: transferRequestId,
         },
         data: {
-          status: 'PROCESSING',
+          status: PROCESSING_STATUS,
         },
       })
 
@@ -120,7 +121,7 @@ export async function submittedTransferRequest(params: SubmittedTransferRequestP
     if (currentIteration.status === REJECTED_BY_APPROVER_STATUS || currentIteration.status === REQUIRES_CHANGES_STATUS) {
       const transferRequestReview = await fnPrisma.transferRequestReview.findFirst({
         where: {
-          status: currentIteration.status === REJECTED_BY_APPROVER_STATUS ? 'REJECTED' : currentIteration.status,
+          status: currentIteration.status === REJECTED_BY_APPROVER_STATUS ? REJECTED_STATUS : currentIteration.status,
           transferRequestId: currentIteration.id,
           isActive: true,
         },

@@ -91,7 +91,6 @@ describe('getPaid', () => {
       status: tr.status,
       wallet: {
         address: userOne.wallets[0].address,
-        blockchain: userOne.wallets[0].blockchain,
         verificationId: userOne.wallets[0].verificationId,
       },
       program: {

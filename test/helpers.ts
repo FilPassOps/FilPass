@@ -122,91 +122,6 @@ export async function createTransferRequest({
   return request
 }
 
-export async function createMultisigTransferRequest({
-  status = 'SUBMITTED',
-  receiverId,
-  requesterId,
-  program,
-  userWalletId,
-  team = 'The Test Team',
-  amount = '1000',
-  review,
-  payment,
-  isActive = true,
-}: CreateTransferRequestProps) {
-  const request = await prisma.transferRequest.create({
-    data: {
-      status,
-      isActive,
-      receiver: {
-        connect: {
-          id: receiverId,
-        },
-      },
-      requester: {
-        connect: {
-          id: requesterId,
-        },
-      },
-      program: {
-        connect: {
-          id: program.id,
-        },
-      },
-      wallet: {
-        connect: {
-          id: userWalletId,
-        },
-      },
-      team: await encryptPII(team),
-      teamHash: await hash(team, teamSalt),
-      amount: await encrypt(amount),
-      expectedTransferDate: new Date(),
-      terms: defaultTerms,
-      robustAddress: 'bafy2bzaceamyexftc2r2vrpfvkg3gicktkelm6e6xpizxh2hbp27eutjbbpec',
-      actorAddress: 'f012908',
-      currency: {
-        connect: {
-          id: program.programCurrency.find(curr => curr.type === 'REQUEST')?.currencyUnitId,
-        },
-      },
-    },
-  })
-
-  if (review) {
-    const { approverId, status, notes } = review
-    await prisma.transferRequestReview.create({
-      data: {
-        status,
-        approverId,
-        notes,
-        transferRequestId: request.id,
-      },
-    })
-  }
-
-  if (payment) {
-    const paymentCurrencyUnitId = program.programCurrency.find(curr => curr.type === 'PAYMENT')?.currencyUnitId
-    const { controllerId, status, notes, transferRef, txHash } = payment
-    await prisma.transfer.create({
-      data: {
-        notes,
-        status,
-        controllerId,
-        transferRequestId: request.id,
-        transferRef,
-        txHash,
-        amount: await encrypt(amount),
-        amountCurrencyUnitId: paymentCurrencyUnitId,
-      },
-    })
-  }
-
-  await prisma.$disconnect()
-
-  return request
-}
-
 type CreateTransferRequestDraftProps = Pick<TransferRequestDraft, 'requesterId' | 'receiverId'> &
   Partial<Pick<TransferRequestDraft, 'team' | 'amount' | 'createdAt'>> & {
     program: ProgramWithCurrency
@@ -396,34 +311,6 @@ export async function createApprover(email: string | undefined = `test-approver$
   return [approver, approverRole]
 }
 
-export async function createSuperAdmin(): Promise<[User, UserRole]> {
-  const superAdm = await prisma.user.create({
-    data: {
-      email: await encryptPII(`test-super${EMAIL_DOMAIN}`),
-      emailHash: await hash(`test-super${EMAIL_DOMAIN}`, salt),
-      isActive: true,
-      isVerified: true,
-      password: '$2b$10$JNEr1LRmoUgPWzbt8ve/a.ZcDIpMQK9II2OCj42kjNdWkG0.yluky',
-    },
-  })
-
-  const superAdmRole = await prisma.userRole.create({
-    data: {
-      userId: superAdm.id,
-      role: 'SUPERADMIN',
-    },
-  })
-  await prisma.userRole.create({
-    data: {
-      userId: superAdm.id,
-      role: 'USER',
-    },
-  })
-  await prisma.$disconnect()
-
-  return [superAdm, superAdmRole]
-}
-
 export const addApproverToProgram = async (programId: number, userRoleId: number) => {
   await prisma.userRoleProgram.create({
     data: {
@@ -432,21 +319,6 @@ export const addApproverToProgram = async (programId: number, userRoleId: number
     },
   })
   await prisma.$disconnect()
-}
-
-export const createTemporaryFile = async (userId: number) => {
-  const result = await prisma.temporaryFile.create({
-    data: {
-      publicId: Date.now().toString(),
-      uploaderId: userId,
-      filename: 'file.pdf',
-      key: Date.now().toString(),
-      type: 'ATTACHMENT',
-    },
-  })
-  await prisma.$disconnect()
-
-  return result
 }
 
 export const createWallet = async (userId: number, address: string, isDefault = false): Promise<UserWallet> => {

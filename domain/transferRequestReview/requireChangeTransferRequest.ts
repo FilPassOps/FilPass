@@ -8,6 +8,7 @@ import { newPrismaTransaction } from 'lib/prisma'
 import { validate } from 'lib/yup'
 import { REQUIRES_CHANGES } from './constants'
 import { rejectTransferRequestValidator } from './validation'
+import { APPROVER_ROLE } from 'domain/auth/constants'
 
 interface RequireChangeTransferRequestParams {
   transferRequestId: string
@@ -48,7 +49,7 @@ export async function requireChangeTransferRequest(params: RequireChangeTransfer
           userRoleId: approverId,
           userRole: {
             role: {
-              equals: 'APPROVER',
+              equals: APPROVER_ROLE,
             },
           },
           program: {

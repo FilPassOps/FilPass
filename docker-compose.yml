@@ -2,7 +2,7 @@ version: '3'
 services:
   db_local:
     image: postgres:12
-    container_name: pl-disbursement-db
+    container_name: emissary
     ports:
       - '5432:5432'
     environment:

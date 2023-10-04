@@ -37,7 +37,7 @@ jest.mock('domain/tranferRequestHistory/createRequestChangeHistory', () => ({
 
 describe('approveTransferRequest', () => {
   it('should return error when validation fails', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       expect(params).toEqual({})
 
       return {
@@ -61,7 +61,7 @@ describe('approveTransferRequest', () => {
   })
 
   it('should return error when transfer request is not found', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       expect(params).toEqual({
         transferRequestId: 10,
         approverId: 1,
@@ -84,7 +84,7 @@ describe('approveTransferRequest', () => {
   })
 
   it('should return error when approver does not have access to the program', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -102,7 +102,7 @@ describe('approveTransferRequest', () => {
   })
 
   it('should return error when transaction fails', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -139,7 +139,7 @@ describe('approveTransferRequest', () => {
   })
 
   it('should update transfer request status to SUBMITTED only when it was previously APPROVED_STATUS, REJECTED_BY_APPROVER_STATUS or REQUIRES_CHANGES_STATUS', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -241,8 +241,8 @@ describe('approveTransferRequest', () => {
     }
   })
 
-  it('should create a tranfer request history', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+  it('should create a transfer request history', async () => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 

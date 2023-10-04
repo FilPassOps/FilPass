@@ -3,7 +3,6 @@ import {
   addApproverToProgram,
   clearDatabase,
   createApprover,
-  createLinearVestingProgram,
   createOneTimeProgram,
   CreateProgramResult,
   createTransferRequest,
@@ -16,13 +15,9 @@ import { getApproverTransferRequestById } from '../getApproverTransferRequestByI
 const userEmail = 'user@email.com'
 let createdUser: CreateUserResult
 
-const linearApproverEmail = 'linearapprover@email.com'
-let linearApprover: User
-
 const oneTimeApproverEmail = 'oneTimeApprover@email.com'
 let oneTimeApprover: User
 
-let linearProgram: CreateProgramResult
 let oneTimeProgram: CreateProgramResult
 
 const mockGetTransferRequestById = jest.fn()
@@ -34,16 +29,12 @@ beforeAll(async () => {
   await clearDatabase()
   createdUser = await createUser(userEmail)
 
-  const [linearApproverUser, linearApproverRole] = await createApprover(linearApproverEmail)
   const [oneTimeApproverUser, oneTimeApproverRole] = await createApprover(oneTimeApproverEmail)
 
-  linearApprover = linearApproverUser
   oneTimeApprover = oneTimeApproverUser
 
-  linearProgram = await createLinearVestingProgram()
   oneTimeProgram = await createOneTimeProgram()
 
-  await addApproverToProgram(linearProgram.id, linearApproverRole.id)
   await addApproverToProgram(oneTimeProgram.id, oneTimeApproverRole.id)
 })
 
@@ -70,7 +61,7 @@ describe('getApproverTransferRequestById', () => {
     const linearTransferRequest = await createTransferRequest({
       receiverId: user.id,
       requesterId: user.id,
-      program: linearProgram,
+      program: oneTimeProgram,
       userWalletId: wallets[0].id,
       team,
       amount,
@@ -80,7 +71,7 @@ describe('getApproverTransferRequestById', () => {
 
     await getApproverTransferRequestById({
       transferRequestId: linearTransferRequest.publicId,
-      userId: linearApprover.id,
+      userId: oneTimeProgram.id,
     })
 
     expect(mockGetTransferRequestById).toBeCalledWith({ transferRequestId: linearTransferRequest.publicId })
@@ -116,7 +107,7 @@ describe('getApproverTransferRequestById', () => {
     const linearTransferRequest = await createTransferRequest({
       receiverId: user.id,
       requesterId: user.id,
-      program: linearProgram,
+      program: oneTimeProgram,
       userWalletId: wallets[0].id,
       isActive: false,
     })

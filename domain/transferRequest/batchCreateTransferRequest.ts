@@ -11,6 +11,7 @@ import { validate } from 'lib/yup'
 import { DateTime } from 'luxon'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { SUBMITTED_BY_APPROVER_STATUS } from './constants'
+import { APPROVER_ROLE } from 'domain/auth/constants'
 
 interface BatchCreateTransferRequestParams {
   approverRoleId?: number
@@ -188,7 +189,7 @@ export async function buildTransferRequestData(requests: CompletedRequest[], req
       userRoleId: approverRoleId,
       userRole: {
         role: {
-          equals: 'APPROVER',
+          equals: APPROVER_ROLE,
         },
       },
     },

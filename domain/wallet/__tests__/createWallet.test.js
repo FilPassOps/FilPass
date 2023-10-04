@@ -34,7 +34,7 @@ beforeEach(() => {
 
 describe('createWallet', () => {
   it('should return error when validation fails', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       expect(params).toEqual({})
 
       return {
@@ -59,11 +59,11 @@ describe('createWallet', () => {
   })
 
   it('should return error when wallet is already used', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
-    mockQueryRaw.mockImplementation((data) => {
+    mockQueryRaw.mockImplementation(() => {
       return [{ wallet_exists: 1, verification_used: 0, verification_match: 0 }]
     })
 
@@ -89,11 +89,11 @@ describe('createWallet', () => {
   })
 
   it('should return error when wallet verification is being used', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
-    mockQueryRaw.mockImplementation((data) => {
+    mockQueryRaw.mockImplementation(() => {
       return [{ wallet_exists: 0, verification_used: 1, verification_match: 0 }]
     })
 
@@ -116,12 +116,12 @@ describe('createWallet', () => {
     expect(error).toEqual(expectedError)
   })
 
-  it('should return error when wallet doesnt match verification', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+  it('should return error when wallet does not match verification', async () => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
-    mockQueryRaw.mockImplementation((data) => {
+    mockQueryRaw.mockImplementation(() => {
       return [{ wallet_exists: 0, verification_used: 0, verification_match: 0 }]
     })
 
@@ -145,11 +145,11 @@ describe('createWallet', () => {
   })
 
   it('should return the created wallet with verification', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
-    mockQueryRaw.mockImplementation((data) => {
+    mockQueryRaw.mockImplementation(() => {
       return [{ wallet_exists: 0, verification_used: 0, verification_match: 1 }]
     })
 
@@ -195,11 +195,11 @@ describe('createWallet', () => {
   })
 
   it('should return the created wallet without verification', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
-    mockQueryRaw.mockImplementation((data) => {
+    mockQueryRaw.mockImplementation(() => {
       return [{ wallet_exists: 0, verification_used: 0, verification_match: 0 }]
     })
 

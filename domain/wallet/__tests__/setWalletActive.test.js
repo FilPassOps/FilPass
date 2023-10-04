@@ -34,7 +34,7 @@ beforeEach(() => {
 
 describe('setWalletActive', () => {
   it('should return error when validation fails', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       expect(params).toEqual({})
 
       return {
@@ -56,10 +56,10 @@ describe('setWalletActive', () => {
     expect(error).toEqual(expectedError)
     expect(mockUserWallet).not.toBeCalled()
   })
-  
+
 
   it('should return error when token is invalid', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -76,9 +76,9 @@ describe('setWalletActive', () => {
       message: errorsMessages.expired_token_link.message,
     })
   })
-  
+
   it('should return error when db fails', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 
@@ -101,7 +101,7 @@ describe('setWalletActive', () => {
   })
 
   it('should update user wallet to active', async () => {
-    mockValidate.mockImplementation((validator, params) => {
+    mockValidate.mockImplementation((_, params) => {
       return { fields: params }
     })
 

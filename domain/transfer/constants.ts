@@ -1,5 +1,3 @@
 export const PENDING_STATUS = 'PENDING'
 export const SUCCESS_STATUS = 'SUCCESS'
-export const FAILED_STATUS = 'FAILED'
-export const REJECTED_STATUS = 'REJECTED'
 export const FILECOIN_CURRENCY_NAME = 'FIL'

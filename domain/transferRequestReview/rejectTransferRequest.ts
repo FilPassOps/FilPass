@@ -16,6 +16,7 @@ import { REJECTED } from './constants'
 import { batchRejectTransferRequestValidator, rejectTransferRequestValidator } from './validation'
 import prisma from 'lib/prisma'
 import { TransferRequest, User } from '@prisma/client'
+import { APPROVER_ROLE } from 'domain/auth/constants'
 
 interface RejectTransferRequestParams {
   transferRequestId: string
@@ -66,7 +67,7 @@ export async function rejectTransferRequest(params: RejectTransferRequestParams)
           userRoleId: approverId,
           userRole: {
             role: {
-              equals: 'APPROVER',
+              equals: APPROVER_ROLE,
             },
           },
           program: {
@@ -185,7 +186,7 @@ export async function batchRejectTransferRequest(params: BatchRejectTransferRequ
         userRoleId: approverId,
         userRole: {
           role: {
-            equals: 'APPROVER',
+            equals: APPROVER_ROLE,
           },
         },
         program: {

@@ -1,5 +1,5 @@
 {
-  "name": "pl-disbursement",
+  "name": "emissary",
   "private": true,
   "scripts": {
     "prepare": "husky install",
@@ -15,8 +15,6 @@
     "reset-db": "npx prisma migrate reset",
     "seed": "ts-node ./prisma/seed.ts",
     "seed:dev": "ts-node ./prisma/seedDev.ts",
-    "docker:up": "docker-compose -f docker-compose.test.yml up -d ",
-    "docker:down": "docker-compose -f docker-compose.test.yml down ",
     "test": "npm run docker:up && dotenv -e .env.test -- npm run migrate:test && dotenv -e .env.test -- jest -i --watch --forceExit",
     "test:coverage": "npm run docker:up && dotenv -e .env.test -- npm run migrate:test && dotenv -e .env.test -- jest -i --coverage --forceExit && npm run docker:down",
     "deploy": "npx hardhat run --network filecoin scripts/deploy.ts",

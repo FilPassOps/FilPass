@@ -1,10 +1,12 @@
 import FormData from 'form-data'
 import { chunk } from 'lodash'
 import Mailgun from 'mailgun.js'
+import { PLATFORM_NAME } from 'system.config'
 
 const apiKey = process.env.MAILGUN_API_KEY || ''
 const domain = process.env.MAILGUN_DOMAIN || ''
 const senderEmail = process.env.MAILGUN_SENDER_EMAIL || ''
+const platformName = PLATFORM_NAME || ''
 
 //https://github.com/mailgun/mailgun.js/issues/364
 //@ts-ignore
@@ -21,7 +23,7 @@ interface SendEmailProps {
 export const sendEmail = async ({ to, subject, text = '', html = '' }: SendEmailProps) => {
   return client.messages.create(domain, {
     to,
-    from: `Protocol Labs Support <${senderEmail}>`,
+    from: `${platformName} Support <${senderEmail}>`,
     subject,
     text,
     html,
@@ -47,7 +49,7 @@ export const sendBatchEmail = async ({ recipients, subject, text = '', html = ''
 
     return client.messages.create(domain, {
       to: emails,
-      from: `Protocol Labs Support <${senderEmail}>`,
+      from: `${platformName} Support <${senderEmail}>`,
       subject,
       text,
       html: html,
