@@ -1,6 +1,7 @@
 import { classNames } from 'lib/classNames'
 import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { shortenAddress } from 'lib/shortenAddress'
+import { AppConfig, ChainNames } from 'system.config'
 import { IsVerified } from './IsVerified'
 import { BlockchainIcon } from './icons/BlockchainIcon'
 
@@ -38,7 +39,9 @@ export const WalletAddress = ({
   let formattedAddress = address
   let filecoinDelegatedAddress = delegatedAddress
 
-  if (!delegatedAddress && blockchain === 'Filecoin') {
+  const { getChainByName, isFilecoin } = AppConfig.network
+
+  if (!delegatedAddress && isFilecoin(getChainByName(blockchain as ChainNames))) {
     const delegatedAddressObj = getDelegatedAddress(address, walletLength, blockchain)
     filecoinDelegatedAddress = walletLength === WalletSize.FULL ? delegatedAddressObj?.fullAddress : delegatedAddressObj?.shortAddress
   }

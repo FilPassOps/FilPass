@@ -77,14 +77,20 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
   }
 
   const validateParseData = (parsedData: ParsedData, blockchainName: string) => {
+    const { getChainByName, isFilecoin } = AppConfig.network
     const isValidFunctionCall = contractInterface.getFunction('forward').name
+
+    const test = getChainByName(blockchainName as ChainNames)
+    console.log('🚀 ~ file: PaymentBatch.tsx:84 ~ validateParseData ~ test:', test)
+    const isFilecoinCall = isFilecoin(test)
+    console.log('🚀 ~ file: PaymentBatch.tsx:87 ~ validateParseData ~ isFilecoinCall:', isFilecoinCall)
 
     const parsedDataArray = parsedData.addresses.reduce((acc, address, index) => {
       return [...acc, { address, amount: parsedData.amount[index] }]
     }, Array<{ address: string; amount: string }>())
 
     const newData = data.map(tranferRequest => {
-      const is0xFilecoinAddress = tranferRequest.wallet.address.startsWith('0x') && blockchainName === 'Filecoin'
+      const is0xFilecoinAddress = tranferRequest.wallet.address.startsWith('0x') && isFilecoin(getChainByName(blockchainName as ChainNames))
 
       const finalAddress = is0xFilecoinAddress
         ? getDelegatedAddress(tranferRequest.wallet.address, WalletSize.FULL, blockchainName)?.fullAddress
@@ -116,9 +122,11 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
     setHextMatch(newData)
 
     if (parsedDataArray.length > 0) {
+      console.log('FAIL 1')
       return false
     }
     if (newData.some(item => item.isHexMatch === false)) {
+      console.log('FAIL 2')
       return false
     }
     return true
