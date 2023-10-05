@@ -447,17 +447,6 @@ model ProgramCurrency {
   @@map("program_currency")
 }
 
-model ScriptTransaction {
-  id          Int      @id @default(autoincrement())
-  transaction String   @unique
-  isProcessed Boolean  @default(false) @map("is_processed")
-  isActive    Boolean  @default(true) @map("is_active")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  @@map("script_transaction")
-}
-
 model AuthVerification {
   id         Int      @id @default(autoincrement())
   user       User     @relation(fields: [userId], references: [id])
@@ -503,16 +492,6 @@ model BlockTracker {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@map("block_tracker")
-}
-
-model NewsletterSubscriber {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  emailHash String   @unique @map("email_hash")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@map("newsletter_subscriber")
 }
 
 model Blockchain {

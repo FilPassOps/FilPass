@@ -20,7 +20,7 @@ export const WalletAddress = ({
   address,
   className = '',
   enableBlockchainIcon = true,
-  enableVerifiedIcon = true,
+  enableVerifiedIcon = false,
   isVerified,
   label,
   blockchain,

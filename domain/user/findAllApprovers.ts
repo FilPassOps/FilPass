@@ -1,10 +1,11 @@
+import { APPROVER_ROLE } from 'domain/auth/constants'
 import { decryptPII } from 'lib/emissaryCrypto'
 import prisma from 'lib/prisma'
 
 export async function findAllApprovers() {
   const approvers = await prisma.userRole.findMany({
     where: {
-      role: 'APPROVER',
+      role: APPROVER_ROLE,
       isActive: true,
     },
     select: {

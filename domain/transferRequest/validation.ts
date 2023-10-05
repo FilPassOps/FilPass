@@ -10,7 +10,6 @@ import {
   DRAFT_STATUS,
   PAID_STATUS,
   PROCESSING_STATUS,
-  REJECTED_BY_CONTROLLER_STATUS,
   REJECTED_STATUS,
   REQUIRES_CHANGES_STATUS,
   SUBMITTED_STATUS,
@@ -140,15 +139,6 @@ export const updateTransferRequestValidator = yup
     currencyUnitId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
   })
   .required()
-
-export const getControllerTransferRequestsValidator = yup.object({
-  status: yup.string().oneOf([REJECTED_BY_CONTROLLER_STATUS, APPROVED_STATUS, PAID_STATUS]).required(),
-  programId: yup.number().integer().positive().max(MAX_INTEGER_VALUE),
-  page: yup.number().integer().positive().max(MAX_INTEGER_VALUE),
-  size: yup.number().integer().positive().max(MAX_INTEGER_VALUE),
-  sort: yup.string(),
-  order: yup.string(),
-})
 
 export const voidTransferRequestValidator = yup.object({
   transferRequestId: yup.string().required(),

@@ -16,6 +16,7 @@ import { REJECTED } from './constants'
 import { batchRejectTransferRequestValidator, rejectTransferRequestValidator } from './validation'
 import prisma from 'lib/prisma'
 import { TransferRequest, User } from '@prisma/client'
+import { APPROVER_ROLE } from 'domain/auth/constants'
 
 interface RejectTransferRequestParams {
   transferRequestId: string
@@ -29,7 +30,7 @@ interface BatchRejectTransferRequestParams {
   notes: string
 }
 
-interface TransferRequestTest extends TransferRequest {
+interface TransferRequestWithReceiver extends TransferRequest {
   receiver: User
 }
 
@@ -66,7 +67,7 @@ export async function rejectTransferRequest(params: RejectTransferRequestParams)
           userRoleId: approverId,
           userRole: {
             role: {
-              equals: 'APPROVER',
+              equals: APPROVER_ROLE,
             },
           },
           program: {
@@ -185,7 +186,7 @@ export async function batchRejectTransferRequest(params: BatchRejectTransferRequ
         userRoleId: approverId,
         userRole: {
           role: {
-            equals: 'APPROVER',
+            equals: APPROVER_ROLE,
           },
         },
         program: {
@@ -277,7 +278,7 @@ export async function batchRejectTransferRequest(params: BatchRejectTransferRequ
     }
   }
 
-  const promiseList = (data as TransferRequestTest[]).map(async tRequest => {
+  const promiseList = (data as TransferRequestWithReceiver[]).map(async tRequest => {
     const currentProgram = tRequest && approverPrograms.find(({ program }) => program.id === tRequest.programId)
     if (currentProgram?.program?.visibility !== PROGRAM_TYPE_INTERNAL) {
       const receiverEmail = await decryptPII(tRequest.receiver.email)

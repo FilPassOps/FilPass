@@ -1,5 +1,6 @@
 import { Currency, Program, ProgramCurrency, TransferRequest, UserWallet } from '@prisma/client'
 import { Transfer } from 'aws-sdk'
+import { PENDING_STATUS } from 'domain/transfer/constants'
 import { APPROVED } from 'domain/transferRequestReview/constants'
 import prisma from 'lib/prisma'
 export interface GetApprovedParams {
@@ -69,7 +70,7 @@ export const getApproved = async (params: GetApprovedParams): Promise<GetApprove
       wallet: { address: wallets?.length ? { in: wallets } : undefined },
       transfers: {
         none: {
-          status: 'PENDING',
+          status: PENDING_STATUS,
           txHash: { not: null },
           isActive: true,
         },
@@ -99,7 +100,7 @@ export const getApproved = async (params: GetApprovedParams): Promise<GetApprove
       wallet: { address: wallets?.length ? { in: wallets } : undefined },
       transfers: {
         none: {
-          status: 'PENDING',
+          status: PENDING_STATUS,
           isActive: true,
           txHash: { not: null },
         },

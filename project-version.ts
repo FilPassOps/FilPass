@@ -1,3 +1,3 @@
-const projectVersion = '2.3.0'
+const projectVersion = '1.0.0'
 
 export default projectVersion

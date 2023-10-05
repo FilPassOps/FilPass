@@ -20,7 +20,6 @@ type Methods =
   | 'wallet_addEthereumChain'
   | 'eth_accounts'
   | 'personal_sign'
-  | 'Filecoin.MsigCreate'
   | 'Filecoin.Version'
 
 //prettier-ignore

@@ -4,6 +4,7 @@ import { logger } from 'lib/logger'
 import prisma from 'lib/prisma'
 import { AppConfig } from 'system.config'
 import { TransferResult, select, updateTransfer } from './paymentDbTransferVerificationJob'
+import { PENDING_STATUS } from './constants'
 
 interface TransferPaymentConfirmParams {
   id: string
@@ -19,7 +20,7 @@ export const transferPaymentConfirm = async ({ id, to, from, value, transactionH
     select: select,
     where: {
       isActive: true,
-      status: 'PENDING',
+      status: PENDING_STATUS,
       transferRef: id,
       txHash: transactionHash,
       from: from.toLowerCase(),

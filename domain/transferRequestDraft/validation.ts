@@ -23,28 +23,6 @@ export const createTransferRequestDraftValidator = yup
   })
   .required()
 
-export const createTransferRequestDraftFormValidator = yup
-  .object({
-    requests: yup
-      .array(
-        yup
-          .object({
-            receiverEmail: yup.string().required(),
-            programId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
-            team: yup.string(),
-            amount: yup.string(),
-            userAttachmentId: yup.string().max(40),
-            currencyUnitId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
-            isBatchCsv: yup.boolean().optional(),
-            approverRoleId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).optional(),
-            requesterId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).optional(),
-          })
-          .required(),
-      )
-      .required(),
-  })
-  .required()
-
 export const createTransferRequestSubmittedFormValidator = yup
   .object({
     isBatchCsv: yup.boolean(),

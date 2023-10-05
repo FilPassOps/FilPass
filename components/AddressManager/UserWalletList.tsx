@@ -1,6 +1,5 @@
 import { ArrowDownOnSquareIcon } from '@heroicons/react/24/outline'
 import { Button } from 'components/shared/Button'
-import { IsVerified } from 'components/shared/IsVerified'
 import { Cell, Header, Table, TableBody, TableHead } from 'components/shared/Table'
 import { WalletAddress } from 'components/shared/WalletAddress'
 import { stringify } from 'csv-stringify/sync'
@@ -21,9 +20,6 @@ interface UserWallet {
   user: {
     email: string
   }
-  verification?: {
-    isVerified: boolean
-  }
   createdAt: string
 }
 
@@ -37,11 +33,10 @@ export const UserWalletList = ({ data = [], totalItems }: UserWalletListProps) =
     } = await api.get<{ wallets: UserWallet[] }>(`/users/find-all-wallets?size=${totalItems}`)
     const csvTemplate = stringify(
       [
-        ['User Email', 'Wallet Address', 'Is Verified', 'Creation Time'],
+        ['User Email', 'Wallet Address', 'Creation Time'],
         ...wallets.map(wallet => [
           wallet.user.email,
           wallet.address,
-          `${Boolean(wallet.verification?.isVerified)}`,
           `${DateTime.fromISO(wallet.createdAt).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS)}`,
         ]),
       ],
@@ -65,7 +60,6 @@ export const UserWalletList = ({ data = [], totalItems }: UserWalletListProps) =
           <tr>
             <Header style={{ width: '50%' }}>User Email</Header>
             <Header>Wallet Address</Header>
-            <Header>Is Verified</Header>
             <Header style={{ minWidth: 200 }}>
               <Button onClick={handleDownloadCsv} loading={isLoading} disabled={isLoading}>
                 <div className="flex items-center">
@@ -81,10 +75,14 @@ export const UserWalletList = ({ data = [], totalItems }: UserWalletListProps) =
             <tr key={wallet.id}>
               <Cell className="break-all">{wallet.user.email}</Cell>
               <Cell>
-                <WalletAddress address={wallet.address} enableVerifiedIcon={false} blockchain={wallet.blockchain.name} walletSize="full" />
-              </Cell>
-              <Cell className="break-all">
-                <IsVerified isVerified={wallet.verification?.isVerified} />
+                <WalletAddress address={wallet.address} blockchain={wallet.blockchain.name} walletSize="short" className="sm:hidden" />
+                <WalletAddress
+                  address={wallet.address}
+                  label={wallet.name}
+                  blockchain={wallet.blockchain.name}
+                  walletSize="full"
+                  className="hidden sm:flex"
+                />
               </Cell>
               <Cell></Cell>
             </tr>

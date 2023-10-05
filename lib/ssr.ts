@@ -3,11 +3,11 @@ import { ADDRESS_MANAGER_ROLE, APPROVER_ROLE, CONTROLLER_ROLE, SUPERADMIN_ROLE }
 import { getSession, invalidateSession } from 'domain/auth/session'
 import { findUserByIdAndEmail } from 'domain/user/findByIdAndEmail'
 import { IncomingMessage } from 'http'
-import { withIronSessionApiRoute, withIronSessionSsr } from 'iron-session/next'
+import { withIronSessionSsr } from 'iron-session/next'
 import { extractRoles } from 'lib/auth'
 import { sessionOptions } from 'lib/session'
 import { DateTime } from 'luxon'
-import { GetServerSidePropsContext, GetServerSidePropsResult, NextApiHandler } from 'next/types'
+import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next/types'
 import { SessionUser } from './middleware'
 
 interface User {
@@ -17,9 +17,6 @@ interface User {
   roles: { id: number; role: Role }[]
 }
 
-export function withSessionRoute(handler: NextApiHandler) {
-  return withIronSessionApiRoute(handler, sessionOptions)
-}
 
 export function withSessionSSR<P extends { [key: string]: unknown }>(
   handler: (context: GetServerSidePropsContext) => GetServerSidePropsResult<P> | Promise<GetServerSidePropsResult<P>>,

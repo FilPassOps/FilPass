@@ -20,7 +20,3 @@ export const transferRejectValidator = yup.object({
   controllerId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).typeError(errorsMessages.required_field.message).required(),
   notes: yup.string().required(),
 })
-
-export const scriptTransactionsValidator = yup.object({
-  transactions: yup.array(yup.string().required()).min(1).required(),
-})

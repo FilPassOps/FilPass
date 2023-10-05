@@ -9,9 +9,9 @@ CREATE OR REPLACE FUNCTION getnextpublicidbigint() RETURNS TEXT
   AS $$
     BEGIN
       RETURN CONCAT(
-        NEXTVAL('pl-disbursement."transfer_request_public_id_1_seq"'),
-        NEXTVAL('pl-disbursement."transfer_request_public_id_2_seq"'),
-        NEXTVAL('pl-disbursement."transfer_request_public_id_3_seq"')
+        NEXTVAL('emissary."transfer_request_public_id_1_seq"'),
+        NEXTVAL('emissary."transfer_request_public_id_2_seq"'),
+        NEXTVAL('emissary."transfer_request_public_id_3_seq"')
         );
     END;
 $$;
@@ -335,18 +335,6 @@ CREATE TABLE "program_currency" (
 );
 
 -- CreateTable
-CREATE TABLE "script_transaction" (
-    "id" SERIAL NOT NULL,
-    "transaction" TEXT NOT NULL,
-    "is_processed" BOOLEAN NOT NULL DEFAULT false,
-    "is_active" BOOLEAN NOT NULL DEFAULT true,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "script_transaction_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "auth_verification" (
     "id" SERIAL NOT NULL,
     "user_id" INTEGER NOT NULL,
@@ -389,17 +377,6 @@ CREATE TABLE "block_tracker" (
     "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "block_tracker_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "newsletter_subscriber" (
-    "id" SERIAL NOT NULL,
-    "email" TEXT NOT NULL,
-    "email_hash" TEXT NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "newsletter_subscriber_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -505,9 +482,6 @@ CREATE UNIQUE INDEX "currency_name_key" ON "currency"("name");
 CREATE UNIQUE INDEX "currency_unit_currency_id_name_key" ON "currency_unit"("currency_id", "name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "script_transaction_transaction_key" ON "script_transaction"("transaction");
-
--- CreateIndex
 CREATE INDEX "auth_verification_user_id_code_idx" ON "auth_verification"("user_id", "code");
 
 -- CreateIndex
@@ -521,12 +495,6 @@ CREATE UNIQUE INDEX "session_user_id_id_key" ON "session"("user_id", "id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "notification_settings_name_key" ON "notification_settings"("name");
-
--- CreateIndex
-CREATE UNIQUE INDEX "newsletter_subscriber_email_key" ON "newsletter_subscriber"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "newsletter_subscriber_email_hash_key" ON "newsletter_subscriber"("email_hash");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "blockchain_name_key" ON "blockchain"("name");

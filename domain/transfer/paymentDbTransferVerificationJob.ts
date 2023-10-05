@@ -62,15 +62,6 @@ export async function updateTransfer({ id, transferRequest, hash, amount, sendEm
   const currencyUnitId = program.programCurrency.pop()?.currencyUnitId
   try {
     await prisma.$transaction([
-      prisma.scriptTransaction.updateMany({
-        where: {
-          transaction: hash,
-          isProcessed: false,
-        },
-        data: {
-          isProcessed: true,
-        },
-      }),
       prisma.transfer.update({
         where: {
           id,
