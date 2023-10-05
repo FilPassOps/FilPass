@@ -33,6 +33,15 @@ export async function getCurrencyMarketRate(params: GetCurrencyMarketRateParams)
     }
   }
 
+  if (!AppConfig.app.enableCoinMarketApi) {
+    return {
+      error: {
+        status: 400,
+        message: errorsMessages.coinmarketcap_api_not_enabled.message,
+      },
+    }
+  }
+
   const { data, error: coinmarketcapError } = await coinmarketcapApi.get(`/v2/cryptocurrency/quotes/latest?id=${chain.coinMarketApiCode}`)
 
   if (coinmarketcapError) {

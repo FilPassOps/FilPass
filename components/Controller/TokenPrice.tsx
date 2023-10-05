@@ -10,6 +10,7 @@ import { api } from 'lib/api'
 import yup from 'lib/yup'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { AppConfig } from 'system.config'
 
 type FormValue = yup.InferType<typeof updateCurrencyRateValidator>
 
@@ -51,6 +52,9 @@ export const TokenPrice = () => {
   }
 
   const handleRefreshClick = async () => {
+    if (!chainId) {
+      return
+    }
     setLoadingRefresh(true)
     const { data, error } = await api.get(`/currency/${chainId}/market-rate`)
     if (error) {
@@ -78,6 +82,14 @@ export const TokenPrice = () => {
     setSubmitErrors(undefined)
   }
 
+  const rightIcon = AppConfig.app.enableCoinMarketApi ? (
+    loadingRefresh ? (
+      <LoadingIndicator className="text-indigo-500" />
+    ) : (
+      <ArrowPathIcon className="h-5 w-5 text-indigo-500 cursor-pointer" onClick={handleRefreshClick} />
+    )
+  ) : null
+
   return (
     <div className="flex flex-col bg-gray-100 p-4">
       <h1 className="font-medium mb-2 text-lg">Token Price</h1>
@@ -90,15 +102,7 @@ export const TokenPrice = () => {
             // @ts-ignore
             className="pl-7 pr-10"
             leftIcon={<>$</>}
-            rightIcon={
-              <>
-                {loadingRefresh ? (
-                  <LoadingIndicator className="text-indigo-500" />
-                ) : (
-                  <ArrowPathIcon className="h-5 w-5 text-indigo-500 cursor-pointer" onClick={handleRefreshClick} />
-                )}
-              </>
-            }
+            rightIcon={rightIcon}
             value={rate}
             decimalScale={2}
             thousandSeparator={true}
