@@ -10,7 +10,6 @@ export const loginValidator = yup
   })
   .required()
 
-// TODO: remove the pl email validation or change it?
 export const signupValidator = yup
   .object({
     password: yup

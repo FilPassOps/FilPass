@@ -2,6 +2,7 @@ import { createTransferRequestDraft } from 'domain/transferRequestDraft/createTr
 import { isEmpty } from 'lodash'
 import { batchCreateTransferRequest } from './batchCreateTransferRequest'
 import { payloadContainsRequesterEmail } from './validation'
+import { TransferRequest } from '@prisma/client'
 
 interface CreateForOthersParams {
   requests: any[]
@@ -13,13 +14,11 @@ interface CreateForOthersParams {
   }
 }
 
-// TODO: change any after transforming batchCreateTransferRequest and createTransferRequestDraft to typescript
 interface Result {
-  data: any[]
+  data: TransferRequest[]
+  error: any
 }
 
-
-// TODO: add validator?
 export const createForOthers = async ({ requests, requesterId, approverRoleId, isBatchCsv = false, approver }: CreateForOthersParams) => {
   const containsApproverError = payloadContainsRequesterEmail(requests, approver)
 
@@ -43,7 +42,7 @@ export const createForOthers = async ({ requests, requesterId, approverRoleId, i
     }
   }
 
-  const result: Result = { data: [] }
+  const result: Result = { data: [], error: undefined }
 
   if (draftsBatch.length) {
     const { data, error } = await createTransferRequestDraft({

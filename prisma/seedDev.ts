@@ -3,8 +3,8 @@ import { hash } from 'bcrypt'
 
 import { loadEnvConfig } from '@next/env'
 import { PrismaClient } from '@prisma/client'
-import { AppConfig } from 'system.config'
 import { encrypt, encryptPII } from '../lib/emissaryCrypto'
+import { AppConfig } from '../system.config'
 loadEnvConfig(process.cwd(), true)
 
 const prisma = new PrismaClient()

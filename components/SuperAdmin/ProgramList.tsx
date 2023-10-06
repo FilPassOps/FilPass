@@ -149,6 +149,7 @@ export const ProgramList = ({
         approversData={approversData}
         viewersData={viewersData}
         program={currentProgram}
+        programs={data}
         isEditable={!!currentProgram}
         refreshPrograms={refreshPrograms}
       />

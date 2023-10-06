@@ -198,7 +198,7 @@ export async function buildTransferRequestData(requests: CompletedRequest[], req
     },
   })
 
-  const promiseList = requests.map(async (singleRequest) => {
+  const promiseList = requests.map(async singleRequest => {
     const userRoleProgram = programs.find(program => program.programId === singleRequest.programId)
 
     if (!userRoleProgram) {
@@ -263,8 +263,6 @@ export async function buildTransferRequestData(requests: CompletedRequest[], req
     if (status === 'rejected') {
       if (reason?.field) {
         errors.push({ [reason.field]: { message: reason?.message ?? 'Incorrect field' } })
-      } else {
-        // TODO: do something if it is a generic error
       }
     } else {
       finalData.push(value)
