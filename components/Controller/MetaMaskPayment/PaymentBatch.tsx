@@ -118,11 +118,9 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
     setHextMatch(newData)
 
     if (parsedDataArray.length > 0) {
-      console.log('FAIL 1')
       return false
     }
     if (newData.some(item => item.isHexMatch === false)) {
-      console.log('FAIL 2')
       return false
     }
     return true
