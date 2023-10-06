@@ -1,5 +1,5 @@
 import { Blockchain, Prisma, Program } from '@prisma/client'
-import { utils } from 'ethers'
+import { validateWalletAddress } from 'lib/blockchainUtils'
 import { TransactionError } from 'lib/errors'
 import prisma, { newPrismaTransaction } from 'lib/prisma'
 import _ from 'lodash'
@@ -159,7 +159,7 @@ const checkWallet = async ({ prisma, user, request, isBatchCsv, index, programs 
     }
   }
 
-  if (request.wallet && utils.isAddress(request.wallet)) {
+  if (request.wallet && validateWalletAddress(request.wallet)) {
     request.wallet = request.wallet.toLowerCase()
   } else {
     return { wallet: errorsMessages.wallet_incorrect.message }

@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client'
 import { parse } from 'csv-parse/sync'
-import { utils } from 'ethers'
 import fs from 'fs'
+import { validateWalletAddress } from 'lib/blockchainUtils'
 import { generateEmailHash } from 'lib/password'
 import prisma from 'lib/prisma'
 import yup, { validate } from 'lib/yup'
@@ -301,7 +301,7 @@ const verifyWallet = async (data: Row[], prisma: Prisma.TransactionClient, block
         }
       }
 
-      if (wallet && !utils.isAddress(wallet)) {
+      if (wallet && !validateWalletAddress(wallet)) {
         errors.push({ message: `Invalid wallet address on row ${row}. The wallet is not a valid ${blockchainName} address.` })
       }
     }),

@@ -2,7 +2,7 @@ import { useAlertDispatcher } from 'components/Layout/Alerts'
 import { Button } from 'components/shared/Button'
 import { getInputClasses } from 'components/shared/FormInput'
 import { contractInterface } from 'components/web3/useContract'
-import { amountConverter, hexAddressDecoder } from 'lib/getDelegatedAddress'
+import { amountConverter, hexAddressDecoder } from 'lib/blockchainUtils'
 import { useState } from 'react'
 
 interface ParsedData {

@@ -1,6 +1,6 @@
 import { CoinType } from '@glif/filecoin-address'
 import { ethers } from 'ethers'
-import { amountConverter, getFilecoinDelegatedAddress, hexAddressDecoder } from 'lib/getDelegatedAddress'
+import { amountConverter, getFilecoinDelegatedAddress, hexAddressDecoder } from 'lib/blockchainUtils'
 import { logger } from 'lib/logger'
 import prisma from 'lib/prisma'
 import { AppConfig, ChainNames } from 'system.config'
