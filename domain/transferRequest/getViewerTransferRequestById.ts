@@ -63,7 +63,7 @@ export async function getViewerTransferRequestById(params: GetViewerTransferRequ
   return {
     data: {
       ...tr,
-      wallet_address: shortenAddress(tr.wallet_address),
+      wallet_address: shortenAddress(tr.wallet_address, 'very-short'),
     },
   }
 }

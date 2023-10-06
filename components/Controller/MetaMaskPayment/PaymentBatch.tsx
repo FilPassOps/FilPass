@@ -202,7 +202,12 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
                     </div>
                   </TableDiv>
                   <TableDiv>
-                    <WalletAddress address={wallet.address} blockchain={wallet.blockchain.name} isVerified={!!wallet.verificationId} />
+                    <WalletAddress
+                      address={wallet.address}
+                      blockchain={wallet.blockchain.name}
+                      isVerified={!!wallet.verificationId}
+                      shortenLength="very-short"
+                    />
                   </TableDiv>
                   <TableDiv>
                     <Currency amount={amount} requestCurrency={requestUnit.currency.name} paymentUnit={paymentUnit.currency.name} />

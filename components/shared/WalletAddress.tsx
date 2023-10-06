@@ -1,6 +1,5 @@
 import { classNames } from 'lib/classNames'
-import { WalletSize } from 'lib/getDelegatedAddress'
-import { shortenAddress } from 'lib/shortenAddress'
+import { ShortenLength, shortenAddress } from 'lib/shortenAddress'
 import { IsVerified } from './IsVerified'
 import { BlockchainIcon } from './icons/BlockchainIcon'
 
@@ -12,7 +11,7 @@ interface WalletAddressProps {
   enableVerifiedIcon?: boolean
   className?: string
   label?: string | null
-  walletSize?: 'very-short' | 'short' | 'full'
+  shortenLength?: ShortenLength
 }
 
 export const WalletAddress = ({
@@ -23,20 +22,12 @@ export const WalletAddress = ({
   isVerified,
   label,
   blockchain,
-  walletSize = 'very-short',
+  shortenLength,
 }: WalletAddressProps) => {
-  const sizes = {
-    'very-short': WalletSize.VERY_SHORT,
-    short: WalletSize.SHORT,
-    full: WalletSize.FULL,
-  }
-
-  const walletLength = sizes[walletSize]
-
   let formattedAddress = address
 
-  if (walletLength !== WalletSize.FULL) {
-    formattedAddress = shortenAddress(address, walletLength)
+  if (shortenLength) {
+    formattedAddress = shortenAddress(address, shortenLength)
   }
 
   return (

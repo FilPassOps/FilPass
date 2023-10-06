@@ -76,7 +76,7 @@ export const SelectWalletInput = ({
                     isVerified={wallet.verification?.isVerified}
                     label={wallet?.name}
                     blockchain={wallet.blockchain.name}
-                    walletSize="short"
+                    shortenLength="short"
                     className="sm:hidden"
                   />
                   <WalletAddress
@@ -84,7 +84,6 @@ export const SelectWalletInput = ({
                     isVerified={wallet.verification?.isVerified}
                     label={wallet?.name}
                     blockchain={wallet.blockchain.name}
-                    walletSize="full"
                     className="hidden sm:flex"
                   />
                 </div>
@@ -106,7 +105,7 @@ export const SelectWalletInput = ({
         }
       }) as any
 
-      // TODO: the label should be just an string as above is a JSX Element?
+    // TODO: the label should be just an string as above is a JSX Element?
     if (defaultTransferWallet && !user.wallets.some(wallet => wallet.address === defaultTransferWallet.address)) {
       userWalletOptions.unshift({
         label: defaultTransferWallet.name || defaultTransferWallet.address,

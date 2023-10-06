@@ -149,7 +149,7 @@ export async function getViewerTransferRequests(params: GetViewerTransferRequets
         transfer_amount,
         amount,
         team,
-        wallet_address: shortenAddress(request.wallet_address),
+        wallet_address: shortenAddress(request.wallet_address, 'very-short'),
       }
     }),
   )

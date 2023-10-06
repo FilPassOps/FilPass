@@ -140,6 +140,7 @@ export const ViewTransferRequest = ({ data, role }: ViewTransferRequestProps) =>
                         isVerified={data.wallet_is_verified}
                         label={data.wallet_name}
                         blockchain={data.wallet_blockchain_name}
+                        shortenLength="very-short"
                         className="sm:hidden"
                       />
                       <WalletAddress
@@ -147,7 +148,6 @@ export const ViewTransferRequest = ({ data, role }: ViewTransferRequestProps) =>
                         isVerified={data.wallet_is_verified}
                         label={data.wallet_name}
                         blockchain={data.wallet_blockchain_name}
-                        walletSize="full"
                         className="hidden sm:flex"
                       />
                     </>

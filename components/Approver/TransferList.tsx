@@ -123,6 +123,7 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
                       address={request.wallet_address}
                       blockchain={request.wallet_blockchain}
                       isVerified={!!request.wallet_is_verified}
+                      shortenLength="very-short"
                     />
                   )}
                   {!request.wallet_address && '-'}

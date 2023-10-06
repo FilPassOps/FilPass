@@ -1,28 +1,16 @@
 import fa, { Address, CoinType } from '@glif/filecoin-address'
 import { ethers } from 'ethers'
-import { AppConfig, FilecoinChain } from 'system.config'
-
-export enum WalletSize {
-  FULL = 20,
-  SHORT = 12,
-  VERY_SHORT = 6,
-}
+import { AppConfig, ChainNames } from 'system.config'
 
 export const getFilecoinDelegatedAddress = (walletAddress: string, coinType: CoinType) => {
   return fa.delegatedFromEthAddress(walletAddress, coinType) as Lowercase<string>
 }
 
-export const shortenAddress = (address: string, size: 'short' | 'very-short') => {
-  const mapping = {
-    short: 12,
-    'very-short': 6,
-  } as const
-
-  return `${address.substring(0, mapping[size])}...${address.substring(address.length - mapping[size])}`.toLowerCase() as Lowercase<string>
-}
-
 export const hexAddressDecoder = (chainName: string, address: string) => {
-  if (chainName !== 'Filecoin') {
+  const { getChainByName, isFilecoin } = AppConfig.network
+  const chain = getChainByName(chainName as ChainNames)
+
+  if (!isFilecoin(chain)) {
     return ethers.utils.hexDataSlice(address, 0, 20)
   }
 
@@ -36,9 +24,7 @@ export const hexAddressDecoder = (chainName: string, address: string) => {
     size = 22
   }
 
-  const filecoin = AppConfig.network.getChainByName('Filecoin') as FilecoinChain
-
-  return new Address(buff.subarray(0, size), filecoin.coinType as CoinType).toString()
+  return new Address(buff.subarray(0, size), chain.coinType as CoinType).toString()
 }
 
 export const amountConverter = (amount: ethers.BigNumber) => ethers.utils.formatEther(ethers.BigNumber.from(amount))

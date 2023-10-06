@@ -96,6 +96,7 @@ const TransferList = ({ data = [] }: TransferListProps) => {
                       address={request.user_wallet_address}
                       blockchain={request.user_wallet_blockchain}
                       isVerified={!!request.user_wallet_is_verified}
+                      shortenLength="very-short"
                     />
                   )}
                   {!request.user_wallet_address && '-'}
