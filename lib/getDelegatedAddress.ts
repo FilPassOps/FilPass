@@ -8,26 +8,6 @@ export enum WalletSize {
   VERY_SHORT = 6,
 }
 
-export const getDelegatedAddress = (walletAddress?: string, walletSize: WalletSize = WalletSize.SHORT, chainName?: string) => {
-  if (walletAddress?.startsWith('0x') && walletAddress.length === 42 && chainName === 'Filecoin') {
-    try {
-      const filecoin = AppConfig.network.getChainByName('Filecoin') as FilecoinChain
-
-      const delegatedAddress = fa.delegatedFromEthAddress(walletAddress, filecoin.coinType as CoinType)
-      if (!delegatedAddress) return { fullAddress: '', shortAddress: '' }
-
-      return {
-        fullAddress: delegatedAddress,
-        shortAddress: `${delegatedAddress.substring(0, walletSize)}...${delegatedAddress.substring(delegatedAddress.length - walletSize)}`,
-      }
-    } catch (e) {
-      console.error(e)
-      return { fullAddress: '', shortAddress: '' }
-    }
-  }
-  return { fullAddress: '', shortAddress: '' }
-}
-
 export const getFilecoinDelegatedAddress = (walletAddress: string, coinType: CoinType) => {
   return fa.delegatedFromEthAddress(walletAddress, coinType) as Lowercase<string>
 }

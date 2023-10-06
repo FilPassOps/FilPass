@@ -1,10 +1,11 @@
+import { CoinType } from '@glif/filecoin-address'
 import { ethers } from 'ethers'
-import { WalletSize, amountConverter, getDelegatedAddress, hexAddressDecoder } from 'lib/getDelegatedAddress'
+import { amountConverter, getFilecoinDelegatedAddress, hexAddressDecoder } from 'lib/getDelegatedAddress'
 import { logger } from 'lib/logger'
 import prisma from 'lib/prisma'
-import { AppConfig } from 'system.config'
-import { TransferResult, select, updateTransfer } from './paymentDbTransferVerificationJob'
+import { AppConfig, ChainNames } from 'system.config'
 import { PENDING_STATUS } from './constants'
+import { TransferResult, select, updateTransfer } from './paymentDbTransferVerificationJob'
 
 interface TransferPaymentConfirmParams {
   id: string
@@ -85,6 +86,9 @@ const processPayment = async (
   value: ethers.BigNumber[],
   transactionHash: string,
 ) => {
+  const { getChainByName, isFilecoin } = AppConfig.network
+  const chain = getChainByName(chainName as ChainNames)
+  const isFilecoinChain = isFilecoin(chain)
   for (let i = 0; i < to.length; i++) {
     const receiver = hexAddressDecoder(chainName, to[i])
     const paidAmount = amountConverter(value[i])
@@ -93,7 +97,7 @@ const processPayment = async (
     for await (const transfer of pendingTransfers) {
       try {
         const { actorAddress, robustAddress, wallet } = transfer.transferRequest
-        const delegatedAddress = getDelegatedAddress(wallet.address, WalletSize.SHORT, chainName)?.fullAddress || wallet.address
+        const delegatedAddress = isFilecoinChain ? getFilecoinDelegatedAddress(wallet.address, chain.coinType as CoinType) : undefined
 
         const isAddressMatch =
           actorAddress === receiver || robustAddress === receiver || wallet.address === receiver || delegatedAddress === receiver
