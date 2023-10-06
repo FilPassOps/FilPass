@@ -1,7 +1,6 @@
 import { classNames } from 'lib/classNames'
-import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
+import { WalletSize } from 'lib/getDelegatedAddress'
 import { shortenAddress } from 'lib/shortenAddress'
-import { AppConfig, ChainNames } from 'system.config'
 import { IsVerified } from './IsVerified'
 import { BlockchainIcon } from './icons/BlockchainIcon'
 
@@ -12,7 +11,6 @@ interface WalletAddressProps {
   enableBlockchainIcon?: boolean
   enableVerifiedIcon?: boolean
   className?: string
-  delegatedAddress?: string
   label?: string | null
   walletSize?: 'very-short' | 'short' | 'full'
 }
@@ -25,7 +23,6 @@ export const WalletAddress = ({
   isVerified,
   label,
   blockchain,
-  delegatedAddress,
   walletSize = 'very-short',
 }: WalletAddressProps) => {
   const sizes = {
@@ -37,14 +34,7 @@ export const WalletAddress = ({
   const walletLength = sizes[walletSize]
 
   let formattedAddress = address
-  let filecoinDelegatedAddress = delegatedAddress
 
-  const { getChainByName, isFilecoin } = AppConfig.network
-
-  if (!delegatedAddress && isFilecoin(getChainByName(blockchain as ChainNames))) {
-    const delegatedAddressObj = getDelegatedAddress(address, walletLength, blockchain)
-    filecoinDelegatedAddress = walletLength === WalletSize.FULL ? delegatedAddressObj?.fullAddress : delegatedAddressObj?.shortAddress
-  }
   if (walletLength !== WalletSize.FULL) {
     formattedAddress = shortenAddress(address, walletLength)
   }
@@ -56,7 +46,6 @@ export const WalletAddress = ({
         {blockchain && <p className="text-gray-500 ui-active:text-white truncate">{blockchain}</p>}
         <p className="text-gray-500 ui-active:text-white truncate">{label}</p>
         <p className="ui-active:text-white break-all">{formattedAddress}</p>
-        {filecoinDelegatedAddress ? <p className="text-gray-500 ui-active:text-white break-all">{filecoinDelegatedAddress}</p> : ''}
       </span>
       {enableVerifiedIcon && (
         <span title={isVerified ? 'Verified' : 'Unverified'} className="ml-2">

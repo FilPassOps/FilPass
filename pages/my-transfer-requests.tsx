@@ -7,8 +7,6 @@ import { getItemsPerPage, PaginationWrapper } from 'components/shared/usePaginat
 import TransferList from 'components/User/TransferList'
 import { findReceiverPrograms } from 'domain/programs/findReceiverPrograms'
 import { getUserTransferRequests } from 'domain/transferRequest/getUserTransferRequests'
-import { getDelegatedAddress, WalletSize } from 'lib/getDelegatedAddress'
-import { getEthereumAddress } from 'lib/getEthereumAddress'
 import { withUserSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { ReactElement } from 'react'
@@ -76,15 +74,6 @@ export const getServerSideProps = withUserSSR(async ({ query, user }) => {
   const wallet = query.wallet as string | undefined
 
   const addresses = [wallet]
-
-  // TODO: improve to get delegated address only if blockchain is Filecoin
-  if (wallet?.startsWith('0x')) {
-    addresses.push(getDelegatedAddress(wallet, WalletSize.FULL, 'Filecoin')?.fullAddress)
-  }
-
-  if (wallet?.startsWith('f4') || wallet?.startsWith('t4')) {
-    addresses.push(getEthereumAddress(wallet as string, WalletSize.FULL)?.fullAddress.toLowerCase())
-  }
 
   const filteredAddresses = addresses.filter((wallet): wallet is string => !!wallet)
 

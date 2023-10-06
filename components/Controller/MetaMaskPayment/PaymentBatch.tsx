@@ -80,11 +80,6 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
     const { getChainByName, isFilecoin } = AppConfig.network
     const isValidFunctionCall = contractInterface.getFunction('forward').name
 
-    const test = getChainByName(blockchainName as ChainNames)
-    console.log('🚀 ~ file: PaymentBatch.tsx:84 ~ validateParseData ~ test:', test)
-    const isFilecoinCall = isFilecoin(test)
-    console.log('🚀 ~ file: PaymentBatch.tsx:87 ~ validateParseData ~ isFilecoinCall:', isFilecoinCall)
-
     const parsedDataArray = parsedData.addresses.reduce((acc, address, index) => {
       return [...acc, { address, amount: parsedData.amount[index] }]
     }, Array<{ address: string; amount: string }>())

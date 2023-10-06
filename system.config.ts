@@ -99,6 +99,7 @@ export const AppConfig = {
     getChainByName,
     getMetamaskParam,
     isFilecoin,
+    hasFilecoinChain,
   },
 } as const satisfies AppConfig
 
@@ -116,6 +117,10 @@ function getChainByName(blockchainName: ChainNames) {
 
 function isFilecoin(chain: Chain): chain is FilecoinChain {
   return (chain as FilecoinChain).coinType !== undefined
+}
+
+function hasFilecoinChain() {
+  return chains.some(chain => isFilecoin(chain))
 }
 
 function getMetamaskParam(chainId: ChainIds) {
@@ -150,6 +155,7 @@ export interface AppConfig {
       rpcUrls: readonly string[]
     }
     isFilecoin: (chain: Chain) => chain is FilecoinChain
+    hasFilecoinChain: () => boolean
   }
 }
 

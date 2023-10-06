@@ -53,7 +53,6 @@ export interface ViewTransferRequestProps {
     attachment_filename: string
     attachment_uploader_email: string
     attachment_user_email: string
-    delegated_address: string
     history: any
     applyer: string
     isVoidable?: boolean

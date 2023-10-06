@@ -28,6 +28,19 @@ export const getDelegatedAddress = (walletAddress?: string, walletSize: WalletSi
   return { fullAddress: '', shortAddress: '' }
 }
 
+export const getFilecoinDelegatedAddress = (walletAddress: string, coinType: CoinType) => {
+  return fa.delegatedFromEthAddress(walletAddress, coinType) as Lowercase<string>
+}
+
+export const shortenAddress = (address: string, size: 'short' | 'very-short') => {
+  const mapping = {
+    short: 12,
+    'very-short': 6,
+  } as const
+
+  return `${address.substring(0, mapping[size])}...${address.substring(address.length - mapping[size])}`.toLowerCase() as Lowercase<string>
+}
+
 export const hexAddressDecoder = (chainName: string, address: string) => {
   if (chainName !== 'Filecoin') {
     return ethers.utils.hexDataSlice(address, 0, 20)

@@ -2,13 +2,10 @@ import { Prisma } from '@prisma/client'
 import { parse } from 'csv-parse/sync'
 import { utils } from 'ethers'
 import fs from 'fs'
-import { validateWalletAddress } from 'lib/blockchainUtils'
-import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { generateEmailHash } from 'lib/password'
 import prisma from 'lib/prisma'
 import yup, { validate } from 'lib/yup'
 import { sortedUniq } from 'lodash'
-import { AppConfig, ChainNames } from 'system.config'
 import { csvSchemaV1, csvSchemaV2, uploadBatchCsvValidator } from './validation'
 
 interface UploadBatchCsvParams {
@@ -288,8 +285,6 @@ const verifyWallet = async (data: Row[], prisma: Prisma.TransactionClient, block
     },
   })
 
-  const { getChainByName, isFilecoin } = AppConfig.network
-
   await Promise.all(
     walletsWithEmails.map(async ({ wallet, email, row }) => {
       if (!wallet) {
@@ -306,23 +301,8 @@ const verifyWallet = async (data: Row[], prisma: Prisma.TransactionClient, block
         }
       }
 
-      if (wallet) {
-        const isFilecoinChain = isFilecoin(getChainByName(blockchainName as ChainNames))
-        if (isFilecoinChain && wallet.startsWith('0x')) {
-          const delegatedAddress = getDelegatedAddress(wallet, WalletSize.FULL, blockchainName)
-          if (!delegatedAddress.fullAddress) {
-            errors.push({ message: `Invalid wallet address on row ${row}. The wallet is not a valid Filecoin address.` })
-          }
-        } else if (wallet.startsWith('0x') && !utils.isAddress(wallet)) {
-          errors.push({ message: `Invalid wallet address on row ${row}. The wallet is not a valid ${blockchainName} address.` })
-        } else if (!wallet.startsWith('0x') && !isFilecoinChain) {
-          errors.push({ message: `Invalid wallet address on row ${row}. The wallet is not a valid ${blockchainName} address.` })
-        } else {
-          const isValid = await validateWalletAddress(wallet)
-          if (!isValid) {
-            errors.push({ message: `Invalid wallet address on row ${row}. The wallet is not a valid ${blockchainName} address.` })
-          }
-        }
+      if (wallet && !utils.isAddress(wallet)) {
+        errors.push({ message: `Invalid wallet address on row ${row}. The wallet is not a valid ${blockchainName} address.` })
       }
     }),
   )

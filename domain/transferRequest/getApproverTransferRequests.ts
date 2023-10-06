@@ -1,6 +1,5 @@
 import { Prisma } from '@prisma/client'
 import { decrypt, decryptPII } from 'lib/emissaryCrypto'
-import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import prisma from 'lib/prisma'
 import { shortenAddress } from 'lib/shortenAddress'
 import { validate } from 'lib/yup'
@@ -267,7 +266,6 @@ export async function getApproverTransferRequests(params: GetApproverTransferReq
         transfer_amount,
         amount,
         team,
-        delegated_address: getDelegatedAddress(request.wallet_address, WalletSize.VERY_SHORT, request.wallet_blockchain)?.shortAddress,
         wallet_address: shortenAddress(request.wallet_address),
       }
     }),

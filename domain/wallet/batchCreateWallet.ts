@@ -1,11 +1,8 @@
 import { Blockchain, Prisma, Program } from '@prisma/client'
 import { utils } from 'ethers'
-import { validateWalletAddress } from 'lib/blockchainUtils'
 import { TransactionError } from 'lib/errors'
-import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import prisma, { newPrismaTransaction } from 'lib/prisma'
 import _ from 'lodash'
-import { AppConfig } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
 interface Request {
@@ -162,42 +159,10 @@ const checkWallet = async ({ prisma, user, request, isBatchCsv, index, programs 
     }
   }
 
-  const filecoin = AppConfig.network.getChainByName('Filecoin')
-
-  if (program.blockchain.chainId === filecoin.chainId && request.wallet?.startsWith('0x')) {
-    const delegatedAddress = getDelegatedAddress(request.wallet, WalletSize.FULL, program.blockchain.name)
-
-    if (!delegatedAddress.fullAddress) {
-      if (isBatchCsv) {
-        throw { message: `${errorsMessages.wallet_incorrect.message} At line ${index + 1}` }
-      }
-      throw { wallet: errorsMessages.wallet_incorrect.message }
-    }
-
+  if (request.wallet && utils.isAddress(request.wallet)) {
     request.wallet = request.wallet.toLowerCase()
-  } else if (request.wallet?.startsWith('0x')) {
-    if (utils.isAddress(request.wallet)) {
-      request.wallet = request.wallet.toLowerCase()
-    } else {
-      return { wallet: errorsMessages.wallet_incorrect.message }
-    }
   } else {
-    if (program.blockchain.chainId !== filecoin.chainId) {
-      if (isBatchCsv) {
-        throw { message: `${errorsMessages.wallet_incorrect.message} At line ${index + 1}` }
-      }
-
-      throw { wallet: errorsMessages.wallet_incorrect.message }
-    }
-
-    const isWalletValid = await validateWalletAddress(request.wallet as string)
-
-    if (!isWalletValid) {
-      if (isBatchCsv) {
-        throw { message: `${errorsMessages.wallet_incorrect.message} At line ${index + 1}` }
-      }
-      throw { wallet: errorsMessages.wallet_incorrect.message }
-    }
+    return { wallet: errorsMessages.wallet_incorrect.message }
   }
 
   return {

@@ -30,7 +30,6 @@ interface Request {
   transfer_amount: number
   transfer_amount_currency_unit: string
   transfer_hash: string
-  delegated_address: string
   wallet_address: string
 }
 
@@ -122,7 +121,6 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
                   {request.wallet_address && (
                     <WalletAddress
                       address={request.wallet_address}
-                      delegatedAddress={request.delegated_address}
                       blockchain={request.wallet_blockchain}
                       isVerified={!!request.wallet_is_verified}
                     />

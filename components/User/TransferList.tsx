@@ -21,7 +21,6 @@ interface Request {
   transfer_amount: number
   transfer_amount_currency_unit: string
   transfer_hash: string
-  delegated_address: string
   wallet_address: string
   user_wallet_address: string
   user_wallet_blockchain: string

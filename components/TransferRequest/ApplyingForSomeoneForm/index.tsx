@@ -8,8 +8,8 @@ import { CheckboxInput, TextInput } from 'components/shared/FormInput'
 import { GoBackConfirmation } from 'components/shared/GoBackConfirmation'
 import { DRAFT_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
 import { createTransferRequestSubmittedFormValidator } from 'domain/transferRequestDraft/validation'
+import { UserResult } from 'domain/user/findByIdAndEmail'
 import { api } from 'lib/api'
-import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
@@ -19,7 +19,6 @@ import { RequestAmountInput } from '../shared/RequestAmountInput'
 import { RequestorReceiver } from '../shared/RequestorReceiver'
 import { SelectProgramInput } from '../shared/SelectProgramInput'
 import { useProgramCurrency } from '../shared/useProgramCurrency'
-import { UserResult } from 'domain/user/findByIdAndEmail'
 
 interface FormComponentProps {
   approverPrograms: {
@@ -219,7 +218,6 @@ const FormComponent = ({
     programs: approverPrograms,
     programId: requests?.[index].programId,
   })
-  const delegatedAddress = getDelegatedAddress(requests[index].wallet, WalletSize.SHORT, selectedProgram?.blockchain?.name)
 
   useEffect(() => {
     if (setValue) {
@@ -304,9 +302,6 @@ const FormComponent = ({
               }
               {...register(`requests[${index}].wallet`)}
             />
-            {delegatedAddress?.fullAddress && (
-              <p className="text-gray-500 text-sm break-all">{`Equivalent to: ${delegatedAddress.fullAddress}`}</p>
-            )}
           </span>
         )}
 
