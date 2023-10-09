@@ -1,9 +1,7 @@
 import { Prisma } from '@prisma/client'
 import { parse } from 'csv-parse/sync'
-import { utils } from 'ethers'
 import fs from 'fs'
 import { validateWalletAddress } from 'lib/blockchainUtils'
-import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { generateEmailHash } from 'lib/password'
 import prisma from 'lib/prisma'
 import yup, { validate } from 'lib/yup'
@@ -303,22 +301,8 @@ const verifyWallet = async (data: Row[], prisma: Prisma.TransactionClient, block
         }
       }
 
-      if (wallet) {
-        if (blockchainName === 'Filecoin' && wallet.startsWith('0x')) {
-          const delegatedAddress = getDelegatedAddress(wallet, WalletSize.FULL, blockchainName)
-          if (!delegatedAddress.fullAddress) {
-            errors.push({ message: `Invalid wallet address on row ${row}. The wallet is not a valid Filecoin address.` })
-          }
-        } else if (wallet.startsWith('0x') && !utils.isAddress(wallet)) {
-          errors.push({ message: `Invalid wallet address on row ${row}. The wallet is not a valid ${blockchainName} address.` })
-        } else if (!wallet.startsWith('0x') && blockchainName !== 'Filecoin') {
-          errors.push({ message: `Invalid wallet address on row ${row}. The wallet is not a valid ${blockchainName} address.` })
-        } else {
-          const isValid = await validateWalletAddress(wallet)
-          if (!isValid) {
-            errors.push({ message: `Invalid wallet address on row ${row}. The wallet is not a valid ${blockchainName} address.` })
-          }
-        }
+      if (wallet && !validateWalletAddress(wallet)) {
+        errors.push({ message: `Invalid wallet address on row ${row}. The wallet is not a valid ${blockchainName} address.` })
       }
     }),
   )

@@ -76,7 +76,7 @@ export const SelectWalletInput = ({
                     isVerified={wallet.verification?.isVerified}
                     label={wallet?.name}
                     blockchain={wallet.blockchain.name}
-                    walletSize="short"
+                    shortenLength="short"
                     className="sm:hidden"
                   />
                   <WalletAddress
@@ -84,7 +84,6 @@ export const SelectWalletInput = ({
                     isVerified={wallet.verification?.isVerified}
                     label={wallet?.name}
                     blockchain={wallet.blockchain.name}
-                    walletSize="full"
                     className="hidden sm:flex"
                   />
                 </div>

@@ -1,3 +1,4 @@
+import { CoinType } from '@glif/filecoin-address'
 import { Bars4Icon } from '@heroicons/react/24/outline'
 import { CheckCircleIcon, ChevronDownIcon, ChevronUpIcon, CurrencyDollarIcon, XCircleIcon } from '@heroicons/react/24/solid'
 import { Blockchain, TransferStatus } from '@prisma/client'
@@ -9,8 +10,8 @@ import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
 import { ForwardNonBLS, contractInterface, useContract } from 'components/web3/useContract'
 import useCurrency from 'components/web3/useCurrency'
 import { USD } from 'domain/currency/constants'
+import { getFilecoinDelegatedAddress } from 'lib/blockchainUtils'
 import { formatCrypto, formatCurrency } from 'lib/currency'
-import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { useState } from 'react'
 import { AppConfig, ChainNames } from 'system.config'
 import { Table, TableDiv, TableHeader } from './Table'
@@ -77,17 +78,18 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
   }
 
   const validateParseData = (parsedData: ParsedData, blockchainName: string) => {
+    const { getChainByName, isFilecoin } = AppConfig.network
     const isValidFunctionCall = contractInterface.getFunction('forward').name
+    const chain = getChainByName(blockchainName as ChainNames)
+    const isFilecoinChain = isFilecoin(chain)
 
     const parsedDataArray = parsedData.addresses.reduce((acc, address, index) => {
       return [...acc, { address, amount: parsedData.amount[index] }]
     }, Array<{ address: string; amount: string }>())
 
     const newData = data.map(tranferRequest => {
-      const is0xFilecoinAddress = tranferRequest.wallet.address.startsWith('0x') && blockchainName === 'Filecoin'
-
-      const finalAddress = is0xFilecoinAddress
-        ? getDelegatedAddress(tranferRequest.wallet.address, WalletSize.FULL, blockchainName)?.fullAddress
+      const finalAddress = isFilecoinChain
+        ? getFilecoinDelegatedAddress(tranferRequest.wallet.address, chain.coinType as CoinType)
         : tranferRequest.wallet.address
 
       const foundIndex = parsedDataArray.findIndex(item => {
@@ -198,7 +200,12 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
                     </div>
                   </TableDiv>
                   <TableDiv>
-                    <WalletAddress address={wallet.address} blockchain={wallet.blockchain.name} isVerified={!!wallet.verificationId} />
+                    <WalletAddress
+                      address={wallet.address}
+                      blockchain={wallet.blockchain.name}
+                      isVerified={!!wallet.verificationId}
+                      shortenLength="very-short"
+                    />
                   </TableDiv>
                   <TableDiv>
                     <Currency amount={amount} requestCurrency={requestUnit.currency.name} paymentUnit={paymentUnit.currency.name} />

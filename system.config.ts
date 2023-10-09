@@ -98,28 +98,10 @@ export const AppConfig = {
     getChain,
     getChainByName,
     getMetamaskParam,
+    isFilecoin,
+    hasFilecoinChain,
   },
-} as const satisfies AppParams
-
-interface AppParams {
-  app: App
-  network: {
-    fiatPaymentUnit: string
-    chains: Chains
-    getChain: (chainId: ChainIds) => Chain
-    getChainByName: (blockchainName: ChainNames) => Chain
-    getMetamaskParam: (chainId: ChainIds) => {
-      chainId: string
-      chainName: string
-      nativeCurrency: {
-        name: string
-        symbol: string
-        decimals: number
-      }
-      rpcUrls: readonly string[]
-    }
-  }
-}
+} as const satisfies AppConfig
 
 export type ChainIds = (typeof chains)[number]['chainId']
 function getChain(chainId: ChainIds) {
@@ -131,6 +113,14 @@ export type ChainNames = (typeof chains)[number]['name']
 function getChainByName(blockchainName: ChainNames) {
   const index = chains.findIndex(chain => chain.name === blockchainName)
   return chains[index]
+}
+
+function isFilecoin(chain: Chain): chain is FilecoinChain {
+  return (chain as FilecoinChain).coinType !== undefined
+}
+
+function hasFilecoinChain() {
+  return chains.some(chain => isFilecoin(chain))
 }
 
 function getMetamaskParam(chainId: ChainIds) {
@@ -164,6 +154,8 @@ export interface AppConfig {
       }
       rpcUrls: readonly string[]
     }
+    isFilecoin: (chain: Chain) => chain is FilecoinChain
+    hasFilecoinChain: () => boolean
   }
 }
 
