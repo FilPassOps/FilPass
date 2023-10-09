@@ -12,6 +12,29 @@ import { useEditableProgram } from '../shared/useEditableProgram'
 import { useSetProgramCurrency } from '../shared/useSetProgramCurrency'
 import { deliveryMethodOptions, generateApproversRoleOptions, generateViewersRoleOptions, paymentMethodOptions } from '../shared/utils'
 
+interface Program {
+  id: number
+  name: string
+  paymentMethod: string
+  deliveryMethod: string
+  approversRole: {
+    roleId: number
+    roleName: string
+    roleDescription: string
+  }[]
+  viewersRole: {
+    roleId: number
+    roleName: string
+    roleDescription: string
+  }[]
+  programCurrency: {
+    name: string
+    type: string
+  }[]
+  visibility: string
+  isArchived: boolean
+}
+
 interface CreateOrEditProgramModalProps {
   open: boolean
   onModalClosed: () => void
@@ -25,30 +48,8 @@ interface CreateOrEditProgramModalProps {
     roleName: string
     roleDescription: string
   }[]
-
-  program?: {
-    id: number
-    name: string
-    paymentMethod: string
-    deliveryMethod: string
-    approversRole: {
-      roleId: number
-      roleName: string
-      roleDescription: string
-    }[]
-    viewersRole: {
-      roleId: number
-      roleName: string
-      roleDescription: string
-    }[]
-    programCurrency: {
-      name: string
-      type: string
-    }[]
-    visibility: string
-    isArchived: boolean
-  }
-
+  programs?: any[]
+  program?: Program
   isEditable?: boolean
   refreshPrograms: () => void
 }
@@ -59,6 +60,7 @@ export const CreateOrEditProgramModal = ({
   approversData = [],
   viewersData = [],
   program,
+  programs,
   isEditable = false,
   refreshPrograms,
 }: CreateOrEditProgramModalProps) => {
@@ -106,6 +108,7 @@ export const CreateOrEditProgramModal = ({
     reset,
     isEditable,
     programId: program?.id ? String(program?.id) : undefined,
+    programs: programs || [],
     refreshPrograms,
     dirtyFields,
     isArchived: program?.isArchived,

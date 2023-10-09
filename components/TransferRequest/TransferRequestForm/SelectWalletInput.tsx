@@ -13,7 +13,7 @@ interface SelectWalletInputProps {
   control: any
   errors: any
   submitErrors: any
-  data: {
+  applyingForOthersDefaultWallet: {
     wallet_id: string
     wallet_name: string
     wallet_address: string
@@ -37,7 +37,7 @@ export const SelectWalletInput = ({
   control,
   errors,
   submitErrors,
-  data,
+  applyingForOthersDefaultWallet,
   onCreateWalletClick,
   blockchainIdFilter,
   disabled,
@@ -46,17 +46,17 @@ export const SelectWalletInput = ({
   const [walletData, setWalletData] = useState<Wallet>()
   const [openDeleteWalletAddressModal, setOpenDeleteWalletAddressModal] = useState(false)
 
-  const defaultTransferWallet = useMemo(() => {
-    if (!data || !data?.wallet_id) {
+  const defaultWalletWhenEmpty = useMemo(() => {
+    if (!applyingForOthersDefaultWallet || !applyingForOthersDefaultWallet?.wallet_id) {
       return
     }
 
     return {
-      name: data.wallet_name,
-      address: data.wallet_address,
-      id: data.wallet_id,
+      name: applyingForOthersDefaultWallet.wallet_name,
+      address: applyingForOthersDefaultWallet.wallet_address,
+      id: applyingForOthersDefaultWallet.wallet_id,
     }
-  }, [data])
+  }, [applyingForOthersDefaultWallet])
 
   const walletOptions = useMemo(() => {
     if (!user) {
@@ -105,16 +105,17 @@ export const SelectWalletInput = ({
         }
       }) as any
 
-    // TODO: the label should be just an string as above is a JSX Element?
-    if (defaultTransferWallet && !user.wallets.some(wallet => wallet.address === defaultTransferWallet.address)) {
+    // This block of code is used when creating a request for others, and the wallet field is empty. The users default wallet will be selected
+    // if he has one for the selected blockchain
+    if (defaultWalletWhenEmpty && !user.wallets.some(wallet => wallet.address === defaultWalletWhenEmpty.address)) {
       userWalletOptions.unshift({
-        label: defaultTransferWallet.name || defaultTransferWallet.address,
-        value: Number(defaultTransferWallet.id),
+        label: defaultWalletWhenEmpty.name || defaultWalletWhenEmpty.address,
+        value: Number(defaultWalletWhenEmpty.id),
       })
     }
 
     return userWalletOptions
-  }, [user, defaultTransferWallet, blockchainIdFilter])
+  }, [user, defaultWalletWhenEmpty, blockchainIdFilter])
 
   return (
     <>

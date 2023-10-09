@@ -14,7 +14,6 @@ const secretKey = CRYPTO_SECRET_KEY
 const secretKeyPII = CRYPTO_SECRET_KEY_PII
 
 async function baseEncrypt(key: string, rawData: string) {
-  //TODO open-source: remove this check once there is no more .js files and also the rawData.toString() below
   if (!rawData) {
     return rawData
   }
@@ -23,7 +22,7 @@ async function baseEncrypt(key: string, rawData: string) {
     const initVector = crypto.randomBytes(16)
 
     const cipher = crypto.createCipheriv(algorithm, Buffer.from(key, 'hex'), initVector)
-    const encryptedBuffer = Buffer.concat([initVector, cipher.update(rawData.toString()), cipher.final()])
+    const encryptedBuffer = Buffer.concat([initVector, cipher.update(rawData), cipher.final()])
 
     return encryptedBuffer.toString('base64')
   } catch (error) {
@@ -33,13 +32,12 @@ async function baseEncrypt(key: string, rawData: string) {
 }
 
 async function baseDecrypt(key: string, encryptedData: string) {
-  //TODO open-source: remove this check once there is no more .js files and also the encryptedData.toString() below
   if (!encryptedData) {
     return encryptedData
   }
 
   try {
-    const encryptedDataBuffer = Buffer.from(encryptedData.toString(), 'base64')
+    const encryptedDataBuffer = Buffer.from(encryptedData, 'base64')
     const initVector = encryptedDataBuffer.subarray(0, 16)
     const ciphertext = encryptedDataBuffer.subarray(16)
 
