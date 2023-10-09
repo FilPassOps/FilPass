@@ -25,7 +25,6 @@ async function handlePostRequest(req: NextApiRequestWithSession, res: NextApiRes
 }
 
 async function handleGetRequest(req: NextApiRequestWithSession, res: NextApiResponse) {
-  // TODO: type this properly
   const { requests } = qs.parse(req.query as any, { arrayLimit: 1000 }) as { requests: string[] }
   const { data, error } = await getTransfersByRequestId({ requests })
   if (error) {

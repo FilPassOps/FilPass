@@ -20,7 +20,6 @@ interface BatchCsvParams {
   }
 }
 
-// TODO: add validator?
 export async function batchCsv({ requests, requesterId, approverRoleId, approver }: BatchCsvParams) {
   const cleanedRequests = cleanRequests(requests)
 
