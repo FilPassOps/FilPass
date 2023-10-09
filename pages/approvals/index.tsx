@@ -16,8 +16,6 @@ import { APPROVER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
 import { SUBMITTED_BY_APPROVER_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
 import JsFileDownload from 'js-file-download'
 import { api } from 'lib/api'
-import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
-import { getEthereumAddress } from 'lib/getEthereumAddress'
 import { withRolesSSR } from 'lib/ssr'
 import { DateTime } from 'luxon'
 import Head from 'next/head'
@@ -42,7 +40,6 @@ interface Transfer {
   program_name: string
   team: string
   wallet_address: string
-  delegated_address: string
   amount: number
   request_unit: string
   transfer_amount: number
@@ -62,7 +59,6 @@ interface Request {
   transfer_amount: number
   transfer_amount_currency_unit: string
   transfer_hash: string
-  delegated_address: string
   wallet_address: string
   selected: boolean
 }
@@ -131,7 +127,6 @@ export default function Approvals({
       columns.name && headerFile.push('Name')
       columns.createDate && headerFile.push('Create Date')
       columns.address && headerFile.push('Address')
-      columns.address && headerFile.push('Filecoin Equivalent Address')
       columns.amount && headerFile.push('Request Amount')
       columns.amount && headerFile.push('Request Amount Currency Unit')
       columns.paidFilAmount && headerFile.push('Paid Amount')
@@ -149,7 +144,6 @@ export default function Approvals({
               program_name,
               team,
               wallet_address,
-              delegated_address,
               amount,
               request_unit,
               transfer_amount,
@@ -166,7 +160,6 @@ export default function Approvals({
               columns.name && row.push(team)
               columns.createDate && row.push(create_date)
               columns.address && row.push(wallet_address)
-              columns.address && row.push(delegated_address || getDelegatedAddress(wallet_address)?.fullAddress)
               columns.amount && row.push(amount)
               columns.amount && row.push(request_unit)
               columns.paidFilAmount && row.push(transfer_amount)
@@ -356,15 +349,6 @@ export const getServerSideProps = withRolesSSR([APPROVER_ROLE, VIEWER_ROLE], asy
   const wallet = query.wallet as string | undefined
 
   const addresses = [wallet]
-
-  // TODO: improve to get delegated address only if blockchain is Filecoin
-  if (wallet?.startsWith('0x')) {
-    addresses.push(getDelegatedAddress(wallet, WalletSize.FULL, 'Filecoin')?.fullAddress)
-  }
-
-  if (wallet?.startsWith('f4') || wallet?.startsWith('t4')) {
-    addresses.push(getEthereumAddress(wallet as string, WalletSize.FULL)?.fullAddress.toLowerCase())
-  }
 
   const filteredAddresses = addresses.filter((wallet): wallet is string => !!wallet)
 

@@ -18,7 +18,6 @@ export interface Chain {
   contractAddress: string
   iconFileName: string
 }
-
 export interface FilecoinChain extends Chain {
   coinType: 'f' | 't'
 }
@@ -104,6 +103,6 @@ const calibration = {
   coinType: 't',
 } as const satisfies FilecoinChain
 
-export const chains = [ethereum, polygon, calibration] as const satisfies Chains
+const chains = [ethereum, polygon, calibration] as const satisfies Chains
 
 export default chains

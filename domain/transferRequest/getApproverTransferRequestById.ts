@@ -1,4 +1,3 @@
-import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import prisma from 'lib/prisma'
 import { shortenAddress } from 'lib/shortenAddress'
 import { validate } from 'lib/yup'
@@ -78,8 +77,7 @@ export async function getApproverTransferRequestById(params: GetUserTransferRequ
   return {
     data: {
       ...tr,
-      delegated_address: getDelegatedAddress(tr.wallet_address, WalletSize.VERY_SHORT, tr.wallet_blockchain_name)?.shortAddress,
-      wallet_address: shortenAddress(tr.wallet_address),
+      wallet_address: shortenAddress(tr.wallet_address, 'very-short'),
     },
   }
 }

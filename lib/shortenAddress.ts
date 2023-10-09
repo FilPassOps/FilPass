@@ -1,5 +1,10 @@
-import { WalletSize } from './getDelegatedAddress'
+export type ShortenLength = 'short' | 'very-short'
 
-export function shortenAddress(address = '', walletSize: WalletSize = WalletSize.VERY_SHORT): string {
-  return `${address.substring(0, walletSize)}...${address.substring(address.length - walletSize)}`
+export const shortenAddress = (address: string, size: ShortenLength) => {
+  const mapping = {
+    short: 12,
+    'very-short': 6,
+  } as const
+
+  return `${address.substring(0, mapping[size])}...${address.substring(address.length - mapping[size])}`.toLowerCase() as Lowercase<string>
 }

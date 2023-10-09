@@ -53,7 +53,6 @@ export interface ViewTransferRequestProps {
     attachment_filename: string
     attachment_uploader_email: string
     attachment_user_email: string
-    delegated_address: string
     history: any
     applyer: string
     isVoidable?: boolean
@@ -141,6 +140,7 @@ export const ViewTransferRequest = ({ data, role }: ViewTransferRequestProps) =>
                         isVerified={data.wallet_is_verified}
                         label={data.wallet_name}
                         blockchain={data.wallet_blockchain_name}
+                        shortenLength="very-short"
                         className="sm:hidden"
                       />
                       <WalletAddress
@@ -148,7 +148,6 @@ export const ViewTransferRequest = ({ data, role }: ViewTransferRequestProps) =>
                         isVerified={data.wallet_is_verified}
                         label={data.wallet_name}
                         blockchain={data.wallet_blockchain_name}
-                        walletSize="full"
                         className="hidden sm:flex"
                       />
                     </>

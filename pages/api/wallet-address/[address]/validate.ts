@@ -7,7 +7,7 @@ async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
   const address = req.query.address as string
 
   try {
-    const result = await validateWalletAddress(address)
+    const result = validateWalletAddress(address)
     return res.status(200).json(result)
   } catch (error) {
     return res.status(400).json(errorsMessages.wallet_not_found)

@@ -149,7 +149,7 @@ export const TransferRequestForm = ({ isEditable = false, data = null, programs 
             <SelectWalletInput
               submitErrors={submitErrors?.errors}
               errors={errors}
-              data={data}
+              applyingForOthersDefaultWallet={data}
               control={control}
               onCreateWalletClick={() => setOpenWalletModal(true)}
               blockchainIdFilter={selectedProgram?.blockchainId}

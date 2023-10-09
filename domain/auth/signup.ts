@@ -82,7 +82,6 @@ export async function signup(params: SignupParams) {
 
     const { error } = await sendEmailVerification({ email })
 
-    // TODO: fix the error type
     if (error) {
       // @ts-ignore
       if (error.errors.email.message) {

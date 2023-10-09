@@ -3,7 +3,6 @@ import { CustomWindow, useMetaMask } from './MetaMaskProvider'
 import { ExternalProvider } from '@ethersproject/providers'
 import filecoinAddress, { CoinType } from '@glif/filecoin-address'
 import { AppConfig, ChainNames } from 'config'
-import { FilecoinChain } from 'config/chains'
 import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
 import { MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
@@ -18,7 +17,9 @@ export const useContract = (blockchainName: string) => {
   const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner>()
   const [multiForwarder, setMultiForwarder] = useState<MultiForwarder>()
 
-  const chain = AppConfig.network.getChainByName(blockchainName as ChainNames)
+  const { getChainByName, isFilecoin } = AppConfig.network
+
+  const chain = getChainByName(blockchainName as ChainNames)
 
   const connectedToTargetChain = wallet && chainId === chain.chainId
 
@@ -53,23 +54,22 @@ export const useContract = (blockchainName: string) => {
       throw new Error('Not connected to target chain')
     }
 
+    const chain = getChainByName(blockchainName as ChainNames)
+
     try {
       setBusy(true)
       const weiValues = amounts.map(amount => ethers.utils.parseEther(amount))
       const weiTotal = weiValues.reduce((a, b) => a.add(b), ethers.BigNumber.from(0))
 
       const addresses = destinations.map(destination => {
-        if (blockchainName !== 'Filecoin') {
+        if (!isFilecoin(chain)) {
           const bytes = ethers.utils.arrayify(destination)
           return zeroPad(bytes)
         }
 
         let address = destination
-        if (destination.startsWith('0x')) {
-          const chain = AppConfig.network.getChainByName(blockchainName) as FilecoinChain
 
-          address = filecoinAddress.delegatedFromEthAddress(destination, chain.coinType as CoinType)
-        }
+        address = filecoinAddress.delegatedFromEthAddress(destination, chain.coinType as CoinType)
         const bytes = filecoinAddress.newFromString(address).bytes
         return zeroPad(bytes)
       })

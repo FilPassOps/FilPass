@@ -1,6 +1,5 @@
 import { classNames } from 'lib/classNames'
-import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
-import { shortenAddress } from 'lib/shortenAddress'
+import { ShortenLength, shortenAddress } from 'lib/shortenAddress'
 import { IsVerified } from './IsVerified'
 import { BlockchainIcon } from './icons/BlockchainIcon'
 
@@ -11,9 +10,8 @@ interface WalletAddressProps {
   enableBlockchainIcon?: boolean
   enableVerifiedIcon?: boolean
   className?: string
-  delegatedAddress?: string
   label?: string | null
-  walletSize?: 'very-short' | 'short' | 'full'
+  shortenLength?: ShortenLength
 }
 
 export const WalletAddress = ({
@@ -24,26 +22,12 @@ export const WalletAddress = ({
   isVerified,
   label,
   blockchain,
-  delegatedAddress,
-  walletSize = 'very-short',
+  shortenLength,
 }: WalletAddressProps) => {
-  const sizes = {
-    'very-short': WalletSize.VERY_SHORT,
-    short: WalletSize.SHORT,
-    full: WalletSize.FULL,
-  }
-
-  const walletLength = sizes[walletSize]
-
   let formattedAddress = address
-  let filecoinDelegatedAddress = delegatedAddress
 
-  if (!delegatedAddress && blockchain === 'Filecoin') {
-    const delegatedAddressObj = getDelegatedAddress(address, walletLength, blockchain)
-    filecoinDelegatedAddress = walletLength === WalletSize.FULL ? delegatedAddressObj?.fullAddress : delegatedAddressObj?.shortAddress
-  }
-  if (walletLength !== WalletSize.FULL) {
-    formattedAddress = shortenAddress(address, walletLength)
+  if (shortenLength) {
+    formattedAddress = shortenAddress(address, shortenLength)
   }
 
   return (
@@ -53,7 +37,6 @@ export const WalletAddress = ({
         {blockchain && <p className="text-gray-500 ui-active:text-white truncate">{blockchain}</p>}
         <p className="text-gray-500 ui-active:text-white truncate">{label}</p>
         <p className="ui-active:text-white break-all">{formattedAddress}</p>
-        {filecoinDelegatedAddress ? <p className="text-gray-500 ui-active:text-white break-all">{filecoinDelegatedAddress}</p> : ''}
       </span>
       {enableVerifiedIcon && (
         <span title={isVerified ? 'Verified' : 'Unverified'} className="ml-2">

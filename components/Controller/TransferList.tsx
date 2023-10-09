@@ -219,6 +219,7 @@ const TransferList = ({
                         address={request.wallet.address}
                         blockchain={request.wallet.blockchain.name}
                         isVerified={!!request.wallet.verificationId}
+                        shortenLength="very-short"
                       />
                     )}
                     {!request.wallet && '-'}

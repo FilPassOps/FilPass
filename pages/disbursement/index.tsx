@@ -19,7 +19,6 @@ import { findAllPrograms } from 'domain/programs/findAll'
 import { APPROVED_STATUS, PAID_STATUS } from 'domain/transferRequest/constants'
 import JsFileDownload from 'js-file-download'
 import { api } from 'lib/api'
-import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import { withControllerSSR } from 'lib/ssr'
 import { DateTime } from 'luxon'
 import Head from 'next/head'
@@ -50,7 +49,6 @@ interface DisbursementRequest {
   team: string
   createdAt: string
   updatedAt: string
-  delegated_address: string
   amount: string
   isHexMatch?: boolean
   selected: boolean
@@ -213,7 +211,6 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
       columns.name && headerFile.push('Name')
       columns.createDate && headerFile.push(status === PAID_STATUS ? 'Paid Date' : 'Create Date')
       columns.address && headerFile.push('Address')
-      columns.address && headerFile.push('Filecoin Equivalent Address')
       columns.amount && headerFile.push('Request Amount')
       columns.amount && headerFile.push('Request Amount Currency Unit')
       columns.paidFilAmount && headerFile.push('Paid Amount')
@@ -234,10 +231,6 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
             columns.name && row.push(request.team)
             columns.createDate && row.push(status === PAID_STATUS ? request.updatedAt : request.createdAt)
             columns.address && row.push(wallet.address)
-            columns.address &&
-              row.push(
-                request.delegated_address || getDelegatedAddress(wallet.address, WalletSize.FULL, wallet.blockchain.name)?.fullAddress,
-              )
             columns.amount && row.push(request.amount)
             columns.amount && row.push(currency.name)
             columns.paidFilAmount && row.push(transfers[0].amount)

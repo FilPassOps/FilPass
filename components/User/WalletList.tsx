@@ -85,7 +85,7 @@ const ListItems = ({ items, isLoading, setLoading, refresh }: ListItemsProps) =>
                   address={wallet.address}
                   label={wallet.name}
                   blockchain={wallet.blockchain.name}
-                  walletSize="short"
+                  shortenLength="short"
                   className="sm:hidden"
                   enableVerifiedIcon={false}
                 />
@@ -93,7 +93,6 @@ const ListItems = ({ items, isLoading, setLoading, refresh }: ListItemsProps) =>
                   address={wallet.address}
                   label={wallet.name}
                   blockchain={wallet.blockchain.name}
-                  walletSize="full"
                   className="hidden sm:flex"
                   enableVerifiedIcon={false}
                 />

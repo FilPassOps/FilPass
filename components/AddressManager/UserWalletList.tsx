@@ -75,12 +75,11 @@ export const UserWalletList = ({ data = [], totalItems }: UserWalletListProps) =
             <tr key={wallet.id}>
               <Cell className="break-all">{wallet.user.email}</Cell>
               <Cell>
-                <WalletAddress address={wallet.address} blockchain={wallet.blockchain.name} walletSize="short" className="sm:hidden" />
+                <WalletAddress address={wallet.address} blockchain={wallet.blockchain.name} shortenLength="short" className="sm:hidden" />
                 <WalletAddress
                   address={wallet.address}
                   label={wallet.name}
                   blockchain={wallet.blockchain.name}
-                  walletSize="full"
                   className="hidden sm:flex"
                 />
               </Cell>
