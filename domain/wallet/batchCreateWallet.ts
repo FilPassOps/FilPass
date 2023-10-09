@@ -162,7 +162,10 @@ const checkWallet = async ({ prisma, user, request, isBatchCsv, index, programs 
   if (request.wallet && validateWalletAddress(request.wallet)) {
     request.wallet = request.wallet.toLowerCase()
   } else {
-    return { wallet: errorsMessages.wallet_incorrect.message }
+    if (isBatchCsv) {
+      throw { message: `${errorsMessages.wallet_incorrect.message} At line ${index + 1}` }
+    }
+    throw { wallet: errorsMessages.wallet_incorrect.message }
   }
 
   return {
