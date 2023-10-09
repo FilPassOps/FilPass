@@ -2,9 +2,10 @@ import { CustomWindow, useMetaMask } from './MetaMaskProvider'
 
 import { ExternalProvider } from '@ethersproject/providers'
 import filecoinAddress, { CoinType } from '@glif/filecoin-address'
+import { AppConfig, ChainNames } from 'config'
+import { FilecoinChain } from 'config/chains'
 import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
-import { AppConfig, ChainNames, FilecoinChain } from 'system.config'
 import { MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
 
 declare const window: CustomWindow

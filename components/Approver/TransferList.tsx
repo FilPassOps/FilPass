@@ -7,13 +7,13 @@ import { Cell, Header, LinkedCell, Table, TableBody, TableHead } from 'component
 import Currency, { CryptoAmount } from 'components/shared/Table/Currency'
 import { WalletAddress } from 'components/shared/WalletAddress'
 import useCurrency from 'components/web3/useCurrency'
+import { AppConfig } from 'config'
 import { USD } from 'domain/currency/constants'
 import { PAID_STATUS } from 'domain/transferRequest/constants'
 import { formatCrypto } from 'lib/currency'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import { AppConfig } from 'system.config'
 
 interface TransferListProps {
   data?: any[]

@@ -1,6 +1,6 @@
 import fa, { Address, CoinType } from '@glif/filecoin-address'
+import { AppConfig, FilecoinChain } from 'config'
 import { ethers } from 'ethers'
-import { AppConfig, FilecoinChain } from 'system.config'
 
 export enum WalletSize {
   FULL = 20,

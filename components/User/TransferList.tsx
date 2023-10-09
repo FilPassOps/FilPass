@@ -7,10 +7,10 @@ import { Cell, Header, LinkedCell, Table, TableBody, TableHead } from 'component
 import Currency from 'components/shared/Table/Currency'
 import PaymentControl from 'components/shared/Table/PaymentControl'
 import { WalletAddress } from 'components/shared/WalletAddress'
+import { AppConfig, ChainNames } from 'config'
 import { DRAFT_STATUS } from 'domain/transferRequest/constants'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
-import { AppConfig, ChainNames } from 'system.config'
 
 interface Request {
   id: string

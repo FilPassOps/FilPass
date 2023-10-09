@@ -1,8 +1,8 @@
 import { Login as LoginComponent } from 'components/Authentication/Login'
+import { AppConfig } from 'config'
 import Cookie from 'js-cookie'
 import Head from 'next/head'
 import { useEffect, useState } from 'react'
-import { AppConfig } from 'system.config'
 
 export default function Login() {
   const [redirect, setRedirect] = useState<any>(null)

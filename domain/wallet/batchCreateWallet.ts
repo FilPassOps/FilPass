@@ -1,11 +1,11 @@
 import { Blockchain, Prisma, Program } from '@prisma/client'
+import { AppConfig } from 'config'
 import { utils } from 'ethers'
 import { validateWalletAddress } from 'lib/blockchainUtils'
 import { TransactionError } from 'lib/errors'
 import { WalletSize, getDelegatedAddress } from 'lib/getDelegatedAddress'
 import prisma, { newPrismaTransaction } from 'lib/prisma'
 import _ from 'lodash'
-import { AppConfig } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
 interface Request {

@@ -1,4 +1,4 @@
-import { AppConfig } from 'system.config'
+import { AppConfig } from 'config'
 
 interface ErrorsMessages {
   [key: string]: {

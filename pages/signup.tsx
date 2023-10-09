@@ -1,10 +1,10 @@
 import { SignUp as SignUpComponent } from 'components/Authentication/SignUp'
+import { AppConfig } from 'config'
 import Cookie from 'js-cookie'
 import { withSessionSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { AppConfig } from 'system.config'
 
 export default function SignUp() {
   const { query } = useRouter()

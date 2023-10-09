@@ -2,10 +2,10 @@ import { BatchCSV } from 'components/Approver/UploadBatchCSV'
 import { Layout } from 'components/Layout'
 import { RequestorReceiver } from 'components/TransferRequest/shared/RequestorReceiver'
 import { Divider } from 'components/shared/Divider'
+import { AppConfig } from 'config'
 import { withApproverSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { ReactElement } from 'react'
-import { AppConfig } from 'system.config'
 
 interface CSVTransferRequestsPageProps {
   approver: {

@@ -1,7 +1,7 @@
+import { AppConfig } from 'config'
 import { transferPaymentConfirm } from 'domain/transfer/transfers-payment-confirm'
 import { ethers } from 'ethers'
 import { logger } from 'lib/logger'
-import { AppConfig } from 'system.config'
 import { MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
 import { MultiForwarder } from 'typechain-types/contracts/src'
 

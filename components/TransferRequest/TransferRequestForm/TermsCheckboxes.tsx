@@ -1,5 +1,5 @@
 import { CheckboxInput } from 'components/shared/FormInput'
-import { AppConfig } from 'system.config'
+import { AppConfig } from 'config'
 
 interface TermsCheckboxesProps {
   errors: any

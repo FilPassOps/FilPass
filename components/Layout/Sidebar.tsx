@@ -16,6 +16,7 @@ import { useAuth } from 'components/Authentication/Provider'
 import { TokenPrice } from 'components/Controller/TokenPrice'
 import { LinkButton } from 'components/shared/Button'
 import { RoleComponent } from 'components/shared/RoleComponent'
+import { AppConfig } from 'config'
 import { ADDRESS_MANAGER_ROLE, APPROVER_ROLE, CONTROLLER_ROLE, SUPERADMIN_ROLE, USER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
 import { ACTIVE_STATUS, ARCHIVED_STATUS } from 'domain/programs/constants'
 import {
@@ -36,7 +37,6 @@ import { useRouter } from 'next/router'
 import { BatchActionsButton } from 'pages/approvals'
 import projectVersion from 'project-version'
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
-import { AppConfig } from 'system.config'
 
 const navigation = [
   {

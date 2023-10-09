@@ -1,4 +1,4 @@
-import { compare, genSalt, hash as genHash } from 'bcrypt'
+import { compare, hash as genHash, genSalt } from 'bcrypt'
 
 const salt = process.env.EMAIL_KEY
 const teamSalt = process.env.TEAM_KEY

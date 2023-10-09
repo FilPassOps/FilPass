@@ -1,6 +1,6 @@
+import { AppConfig, ChainIds } from 'config'
 import { coinmarketcapApi } from 'lib/coinmarketcapApi'
 import { validate } from 'lib/yup'
-import { AppConfig, ChainIds } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { getCurrencyRateFromCoinMarketCapValidator } from './validation'
 

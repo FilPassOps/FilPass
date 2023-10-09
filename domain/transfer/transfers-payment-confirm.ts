@@ -1,10 +1,10 @@
+import { AppConfig } from 'config'
 import { ethers } from 'ethers'
 import { WalletSize, amountConverter, getDelegatedAddress, hexAddressDecoder } from 'lib/getDelegatedAddress'
 import { logger } from 'lib/logger'
 import prisma from 'lib/prisma'
-import { AppConfig } from 'system.config'
-import { TransferResult, select, updateTransfer } from './paymentDbTransferVerificationJob'
 import { PENDING_STATUS } from './constants'
+import { TransferResult, select, updateTransfer } from './paymentDbTransferVerificationJob'
 
 interface TransferPaymentConfirmParams {
   id: string

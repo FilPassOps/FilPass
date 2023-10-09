@@ -1,9 +1,9 @@
+import { AppConfig } from 'config'
 import { USD } from 'domain/currency/constants'
 import { formatCrypto, formatCurrency } from 'lib/currency'
 import { logger } from 'lib/logger'
 import { sendEmail } from 'lib/sendEmail'
 import { validate } from 'lib/yup'
-import { AppConfig } from 'system.config'
 import { baseEmail } from './constants'
 import { sendCreatedDrafNotificationValidator } from './validation'
 

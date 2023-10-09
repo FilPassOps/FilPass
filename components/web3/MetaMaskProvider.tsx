@@ -1,9 +1,9 @@
 import MetaMaskOnboarding from '@metamask/onboarding'
 import { Tooltip } from 'components/Layout/Tooltip'
 import { Button, ButtonProps } from 'components/shared/Button'
+import { AppConfig, ChainIds } from 'config'
 import { useRouter } from 'next/router'
 import { Dispatch, MouseEventHandler, ReactNode, SetStateAction, createContext, useContext, useEffect, useRef, useState } from 'react'
-import { AppConfig, ChainIds } from 'system.config'
 import { twMerge } from 'tailwind-merge'
 
 interface ProviderMessage {

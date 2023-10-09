@@ -1,6 +1,6 @@
+import { AppConfig } from 'config'
 import { sendEmail } from 'lib/sendEmail'
 import { validate } from 'lib/yup'
-import { AppConfig } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { baseEmail } from './constants'
 import { sendInviteValidator } from './validation'

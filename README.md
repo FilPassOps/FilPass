@@ -1,4 +1,3 @@
-
 <h1 align="center">Emissary</h1>
 
 <p align="center">
@@ -12,7 +11,6 @@
     <img alt="" src="https://img.shields.io/badge/Join%20the%20community-emissary?style=for-the-badge&logo=slack&color=%234F46E5">
   </a>
 </p>
-
 
 ## Introduction
 
@@ -62,13 +60,13 @@ npm run migrate
 
   - General users
 
-    - user1@email.com to user149@email.com / 123
+    - user1@email.com to user149@test.com / password
 
   - Users with specific roles (the email domain for specific users is defined on the config.js file)
-    - test-approver / 123
-    - test-controller / 123
-    - test-viewer / 123
-    - test-super / 123
+    - test-approver / password
+    - test-controller / password
+    - test-viewer / password
+    - test-super / password
 
 ## Application Start Up
 

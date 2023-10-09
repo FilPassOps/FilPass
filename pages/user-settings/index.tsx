@@ -4,11 +4,11 @@ import { Button } from 'components/shared/Button'
 import { getItemsPerPage, PaginationWrapper } from 'components/shared/usePagination'
 import { InviteUserModal } from 'components/SuperAdmin/Modals/InviteUserModal'
 import { UserList } from 'components/SuperAdmin/UserList'
+import { AppConfig } from 'config'
 import { findAllUsers } from 'domain/user/findAll'
 import { withSuperAdminSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { ReactElement, useState } from 'react'
-import { AppConfig } from 'system.config'
 
 interface UserSettingsProps {
   data: any[]
