@@ -1,5 +1,5 @@
+import { AppConfig } from 'config'
 import { deliveryMethod as deliveryMethodConst, ONE_TIME } from 'domain/programs/constants'
-import { AppConfig } from 'system.config'
 import { formatPaymentMethod } from './formatPaymentMethod'
 
 interface ApproverRole {

@@ -1,12 +1,12 @@
 import { TransferRequestView } from 'components/Approver/TransferRequestView'
 import { Layout } from 'components/Layout'
 import { ViewTransferRequestProps } from 'components/TransferRequest/ViewTransferRequest'
+import { AppConfig } from 'config'
 import { getApprovalDetailsByRole } from 'domain/approvals/service'
 import { APPROVER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
 import { withRolesSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { ReactElement } from 'react'
-import { AppConfig } from 'system.config'
 
 export type TransferRequestViewProps = Omit<ViewTransferRequestProps, 'role'> & {
   role?: string

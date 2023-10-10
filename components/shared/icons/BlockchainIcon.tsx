@@ -1,5 +1,5 @@
+import { AppConfig, ChainNames } from 'config'
 import Image from 'next/image'
-import { AppConfig, ChainNames } from 'system.config'
 import { twMerge } from 'tailwind-merge'
 
 interface BlockchainIconProps {

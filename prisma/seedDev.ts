@@ -3,13 +3,14 @@ import { hash } from 'bcrypt'
 
 import { loadEnvConfig } from '@next/env'
 import { PrismaClient } from '@prisma/client'
+import { AppConfig } from '../config'
 import { encrypt, encryptPII } from '../lib/emissaryCrypto'
-import { AppConfig } from '../system.config'
 loadEnvConfig(process.cwd(), true)
 
 const prisma = new PrismaClient()
 const salt = process.env.EMAIL_KEY || ''
 const teamSalt = process.env.TEAM_KEY || ''
+const password = '$2b$10$uRaqhFBl8ox3GFuZc2GE6euiv3AWKLmN8dbfPUmkSZh2P7u8km6wC' // password
 
 const teamNames = [
   'First team',
@@ -420,11 +421,11 @@ async function createOneTimeProgramIds() {
 async function createUser(index: number) {
   const user = await prisma.user.create({
     data: {
-      email: await encryptPII(`user${index}@email.com`),
-      emailHash: await hash(`user${index}@email.com`, salt),
+      email: await encryptPII(`user${index}@test.com`),
+      emailHash: await hash(`user${index}@test.com`, salt),
       isActive: true,
       isVerified: true,
-      password: '$2b$10$JNEr1LRmoUgPWzbt8ve/a.ZcDIpMQK9II2OCj42kjNdWkG0.yluky',
+      password: password,
     },
   })
 
@@ -462,7 +463,7 @@ async function createController() {
       emailHash: await hash(`test-controller${AppConfig.app.emailConfig.domain}`, salt),
       isActive: true,
       isVerified: true,
-      password: '$2b$10$JNEr1LRmoUgPWzbt8ve/a.ZcDIpMQK9II2OCj42kjNdWkG0.yluky',
+      password: password,
     },
   })
 
@@ -490,7 +491,7 @@ async function createViewer() {
       emailHash: await hash(`test-viewer${AppConfig.app.emailConfig.domain}`, salt),
       isActive: true,
       isVerified: true,
-      password: '$2b$10$JNEr1LRmoUgPWzbt8ve/a.ZcDIpMQK9II2OCj42kjNdWkG0.yluky',
+      password: password,
     },
   })
 
@@ -522,7 +523,7 @@ async function createApprover() {
       emailHash: await hash(`test-approver${AppConfig.app.emailConfig.domain}`, salt),
       isActive: true,
       isVerified: true,
-      password: '$2b$10$JNEr1LRmoUgPWzbt8ve/a.ZcDIpMQK9II2OCj42kjNdWkG0.yluky',
+      password: password,
     },
   })
 
@@ -550,7 +551,7 @@ async function createSuperAdmin() {
       emailHash: await hash(`test-super${AppConfig.app.emailConfig.domain}`, salt),
       isActive: true,
       isVerified: true,
-      password: '$2b$10$JNEr1LRmoUgPWzbt8ve/a.ZcDIpMQK9II2OCj42kjNdWkG0.yluky',
+      password: password,
     },
   })
 

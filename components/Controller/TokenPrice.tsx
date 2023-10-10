@@ -5,12 +5,12 @@ import { NumberInput } from 'components/shared/FormInput'
 import { LoadingIndicator } from 'components/shared/LoadingIndicator'
 import { SelectNetworkInput } from 'components/shared/SelectNetworkInput'
 import useCurrency from 'components/web3/useCurrency'
+import { AppConfig } from 'config'
 import { updateCurrencyRateValidator } from 'domain/currency/validation'
 import { api } from 'lib/api'
 import yup from 'lib/yup'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { AppConfig } from 'system.config'
 
 type FormValue = yup.InferType<typeof updateCurrencyRateValidator>
 

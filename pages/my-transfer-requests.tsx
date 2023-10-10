@@ -5,12 +5,12 @@ import { Layout } from 'components/Layout'
 import { LinkButton } from 'components/shared/Button'
 import { getItemsPerPage, PaginationWrapper } from 'components/shared/usePagination'
 import TransferList from 'components/User/TransferList'
+import { AppConfig } from 'config'
 import { findReceiverPrograms } from 'domain/programs/findReceiverPrograms'
 import { getUserTransferRequests } from 'domain/transferRequest/getUserTransferRequests'
 import { withUserSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { ReactElement } from 'react'
-import { AppConfig } from 'system.config'
 
 interface HomeProps {
   data: any[]

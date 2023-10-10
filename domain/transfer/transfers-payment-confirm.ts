@@ -1,9 +1,9 @@
 import { CoinType } from '@glif/filecoin-address'
+import { AppConfig, ChainNames } from 'config'
 import { ethers } from 'ethers'
 import { amountConverter, getFilecoinDelegatedAddress, hexAddressDecoder } from 'lib/blockchainUtils'
 import { logger } from 'lib/logger'
 import prisma from 'lib/prisma'
-import { AppConfig, ChainNames } from 'system.config'
 import { PENDING_STATUS } from './constants'
 import { TransferResult, select, updateTransfer } from './paymentDbTransferVerificationJob'
 

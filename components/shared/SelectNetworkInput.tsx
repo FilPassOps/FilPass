@@ -1,6 +1,6 @@
 import { SelectInput } from 'components/shared/FormInput'
+import { AppConfig } from 'config'
 import { Controller } from 'react-hook-form'
-import { AppConfig } from 'system.config'
 import { BlockchainIcon } from './icons/BlockchainIcon'
 
 interface SelectNetworkInputProps {

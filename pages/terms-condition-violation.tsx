@@ -1,10 +1,10 @@
 import { LockClosedIcon } from '@heroicons/react/24/solid'
 import { Button } from 'components/shared/Button'
+import { AppConfig } from 'config'
 import { isUserBanned } from 'domain/user/isUserBanned'
 import { withSessionSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { AppConfig } from 'system.config'
 
 export default function BannedUserPage() {
   const { push } = useRouter()

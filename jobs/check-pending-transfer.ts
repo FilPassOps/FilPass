@@ -1,5 +1,5 @@
+import { AppConfig, Chain } from 'config'
 import { ethers } from 'ethers'
-import { AppConfig, Chain } from 'system.config'
 import { MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
 import { processPendingTransfer } from './utils/process-pending-transfer'
 

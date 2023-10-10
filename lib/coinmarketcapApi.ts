@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { AppConfig } from 'system.config'
+import { AppConfig } from 'config'
 import { Api } from './api'
 
 const COIN_MARKET_CAP_API_KEY = process.env.COIN_MARKET_CAP_API_KEY

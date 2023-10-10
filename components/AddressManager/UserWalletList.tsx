@@ -2,12 +2,12 @@ import { ArrowDownOnSquareIcon } from '@heroicons/react/24/outline'
 import { Button } from 'components/shared/Button'
 import { Cell, Header, Table, TableBody, TableHead } from 'components/shared/Table'
 import { WalletAddress } from 'components/shared/WalletAddress'
+import { AppConfig } from 'config'
 import { stringify } from 'csv-stringify/sync'
 import JsFileDownload from 'js-file-download'
 import { api } from 'lib/api'
 import { DateTime } from 'luxon'
 import { useState } from 'react'
-import { AppConfig } from 'system.config'
 
 interface UserWalletListProps {
   data?: any[]

@@ -19,7 +19,8 @@
       "lib/*": ["lib/*"],
       "domain/*": ["domain/*"],
       "components/*": ["components/*"],
-      "wordings-and-errors/*": ["wordings-and-errors/*"]
+      "wordings-and-errors/*": ["wordings-and-errors/*"],
+      "config/*": ["config/*"]
     },
     "incremental": true
   },

@@ -1,5 +1,5 @@
+import { AppConfig } from 'config'
 import { DateTime } from 'luxon'
-import { AppConfig } from 'system.config'
 
 export const protocolFooterEmail = `
 <p>Best regards,<br />

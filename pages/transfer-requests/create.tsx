@@ -2,12 +2,12 @@ import { Layout } from 'components/Layout'
 import { ApplyForSomeoneForm } from 'components/TransferRequest/ApplyingForSomeoneForm'
 import { TransferRequestForm } from 'components/TransferRequest/TransferRequestForm'
 import { GoBackConfirmationWithRouter } from 'components/shared/GoBackConfirmation'
+import { AppConfig } from 'config'
 import { APPROVER_ROLE } from 'domain/auth/constants'
 import { findAllExternalPrograms } from 'domain/programs/findAll'
 import { withUserSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { ReactElement } from 'react'
-import { AppConfig } from 'system.config'
 
 interface CreateTransferRequestProps {
   programs: any[]

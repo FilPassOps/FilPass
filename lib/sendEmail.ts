@@ -1,7 +1,7 @@
+import { AppConfig } from 'config'
 import FormData from 'form-data'
 import { chunk } from 'lodash'
 import Mailgun from 'mailgun.js'
-import { AppConfig } from 'system.config'
 
 const apiKey = process.env.MAILGUN_API_KEY || ''
 const domain = process.env.MAILGUN_DOMAIN || ''

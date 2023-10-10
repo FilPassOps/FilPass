@@ -1,6 +1,6 @@
 import fa, { Address, CoinType } from '@glif/filecoin-address'
+import { AppConfig, ChainNames } from 'config'
 import { ethers, utils } from 'ethers'
-import { AppConfig, ChainNames } from 'system.config'
 
 export const validateWalletAddress = (address: string) => {
   return utils.isAddress(address)

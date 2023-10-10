@@ -1,7 +1,7 @@
 import { JsonRpcProvider } from '@ethersproject/providers'
 import filecoinAddress from '@glif/filecoin-address'
+import { AppConfig } from 'config'
 import { ethers } from 'hardhat'
-import { AppConfig } from 'system.config'
 import { MultiForwarder } from 'typechain-types'
 import config from '../../hardhat.config'
 

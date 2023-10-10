@@ -1,11 +1,11 @@
 import { UserWalletList } from 'components/AddressManager/UserWalletList'
 import { Layout } from 'components/Layout'
 import { getItemsPerPage, PaginationWrapper } from 'components/shared/usePagination'
+import { AppConfig } from 'config'
 import { findAllWithWallets } from 'domain/user/findAllWithWallets'
 import { withAddressManagerSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { ReactElement } from 'react'
-import { AppConfig } from 'system.config'
 
 interface Wallet {
   user: {

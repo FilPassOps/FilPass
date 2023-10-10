@@ -4,13 +4,13 @@ import { StatusNotes } from 'components/TransferRequest/ViewTransferRequest/Stat
 import { Divider } from 'components/shared/Divider'
 import { GoBackConfirmationWithRouter } from 'components/shared/GoBackConfirmation'
 import { StatusBadge } from 'components/shared/Status'
+import { AppConfig } from 'config'
 import { findAllExternalPrograms } from 'domain/programs/findAll'
 import { DRAFT_STATUS } from 'domain/transferRequest/constants'
 import { getUserTransferRequestById } from 'domain/transferRequest/getUserTransferRequestById'
 import { withUserSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { ReactElement } from 'react'
-import { AppConfig } from 'system.config'
 
 interface EditTransferRequestProps {
   data: {

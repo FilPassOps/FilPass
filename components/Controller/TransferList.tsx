@@ -11,6 +11,7 @@ import Currency, { CryptoAmount } from 'components/shared/Table/Currency'
 import { WalletAddress } from 'components/shared/WalletAddress'
 import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
 import useCurrency from 'components/web3/useCurrency'
+import { AppConfig, ChainNames } from 'config'
 import { USD } from 'domain/currency/constants'
 import { SUCCESS_STATUS } from 'domain/transfer/constants'
 import { APPROVED_STATUS, PAID_STATUS } from 'domain/transferRequest/constants'
@@ -19,7 +20,6 @@ import { formatCrypto } from 'lib/currency'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import { AppConfig, ChainNames } from 'system.config'
 
 interface Request {
   id: number
@@ -123,8 +123,8 @@ const TransferList = ({
     if (shouldShowHeaderCheckbox) {
       const selectedRequests = requests.filter(request => request.selected)
       const indeterminate = selectedRequests.length > 0 && selectedRequests.length < requests.length
-      if (shouldShowHeaderCheckbox) {
-        (selectAllRef.current as any).indeterminate = indeterminate
+      if (shouldShowHeaderCheckbox && selectAllRef.current !== null) {
+        selectAllRef.current.indeterminate = indeterminate
       }
     }
   }, [requests, shouldShowHeaderCheckbox])

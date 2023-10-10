@@ -1,10 +1,10 @@
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline'
 import { Button } from 'components/shared/Button'
+import { AppConfig } from 'config'
 import { verifyAccount } from 'domain/auth/verifyAccount'
 import { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import NextLink from 'next/link'
-import { AppConfig } from 'system.config'
 
 export default function Activate({ error }: { error: any }) {
   return (

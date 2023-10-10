@@ -3,13 +3,13 @@ import { Layout } from 'components/Layout'
 import { WalletModal } from 'components/TransferRequest/WalletModal'
 import { WalletList } from 'components/User/WalletList'
 import { Button } from 'components/shared/Button'
+import { AppConfig } from 'config'
 import { findUserByIdAndEmail } from 'domain/user'
 import { fetcher } from 'lib/fetcher'
 import { withUserSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { ReactElement, useState } from 'react'
 import useSWR from 'swr'
-import { AppConfig } from 'system.config'
 
 interface UserSettingsProps {
   data: any

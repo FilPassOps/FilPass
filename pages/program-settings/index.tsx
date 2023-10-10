@@ -3,6 +3,7 @@ import { Layout } from 'components/Layout'
 import { Button } from 'components/shared/Button'
 import { getItemsPerPage, PaginationWrapper } from 'components/shared/usePagination'
 import { ProgramList } from 'components/SuperAdmin/ProgramList'
+import { AppConfig } from 'config'
 import { ACTIVE_STATUS, ARCHIVED_STATUS } from 'domain/programs/constants'
 import { findAllProgramsComplete } from 'domain/programs/findAll'
 import { findAllApprovers } from 'domain/user/findAllApprovers'
@@ -11,7 +12,6 @@ import { withSuperAdminSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { ReactElement, useState } from 'react'
-import { AppConfig } from 'system.config'
 
 interface ProgramSettingsProps {
   data: any[]

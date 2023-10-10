@@ -1,7 +1,7 @@
 import { FaceFrownIcon } from '@heroicons/react/24/outline'
 import { LinkButton } from 'components/shared/Button'
+import { AppConfig } from 'config'
 import Head from 'next/head'
-import { AppConfig } from 'system.config'
 
 export default function NotFoundPage() {
   return (

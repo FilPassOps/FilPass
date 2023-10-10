@@ -7,6 +7,7 @@ import { fetcherWithParams } from 'lib/fetcher'
 import { useRouter } from 'next/router'
 import qs from 'qs'
 
+import { AppConfig } from 'config'
 import React, {
   DetailedHTMLProps,
   Dispatch,
@@ -21,7 +22,6 @@ import React, {
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import useSWR from 'swr'
-import { AppConfig } from 'system.config'
 import { StatusFilterOption, statusFilterLabel, statusFilterOptions } from './constants'
 
 interface SelectOption {

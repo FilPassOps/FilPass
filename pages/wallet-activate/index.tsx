@@ -1,9 +1,9 @@
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline'
+import { AppConfig } from 'config'
 import { setWalletActive } from 'domain/wallet/setWalletActive'
 import { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import { useEffect } from 'react'
-import { AppConfig } from 'system.config'
 
 export default function WalletActivate({ error }: { error?: { message: string } }) {
   useEffect(() => {

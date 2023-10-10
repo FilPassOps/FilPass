@@ -3,12 +3,12 @@ import { Layout } from 'components/Layout'
 import { Button } from 'components/shared/Button'
 import { getItemsPerPage, PaginationWrapper } from 'components/shared/usePagination'
 import { UserList } from 'components/SuperAdmin/UserList'
+import { AppConfig } from 'config'
 import { findAllUsers } from 'domain/user/findAll'
 import { withSuperAdminSSR } from 'lib/ssr'
+import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { ReactElement, useState } from 'react'
-import { AppConfig } from 'system.config'
-import dynamic from 'next/dynamic'
 
 const InviteUserModal = dynamic(() => import('components/SuperAdmin/Modals/InviteUserModal').then(mod => mod.InviteUserModal))
 

@@ -1,7 +1,7 @@
+import { AppConfig } from 'config'
 import jwt from 'jsonwebtoken'
 import { sendEmail } from 'lib/sendEmail'
 import { validate } from 'lib/yup'
-import { AppConfig } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { baseEmail } from './constants'
 import { sendEmailVerificationValidator } from './validation'
