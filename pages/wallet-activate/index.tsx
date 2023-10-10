@@ -4,6 +4,7 @@ import { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import { useEffect } from 'react'
 import { AppConfig } from 'system.config'
+
 export default function WalletActivate({ error }: { error?: { message: string } }) {
   useEffect(() => {
     if (window) {

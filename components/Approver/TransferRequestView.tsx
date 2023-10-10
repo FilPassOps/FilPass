@@ -12,12 +12,14 @@ import {
   SUBMITTED_STATUS,
 } from 'domain/transferRequest/constants'
 import { useState } from 'react'
-import { DeleteModal } from '../TransferRequest/shared/DeleteModal'
-import { ApproveModal } from './Modals/ApproveModal'
-import { RejectModal } from './Modals/RejectModal'
-import { RequireChangeModal } from './Modals/RequireChangeModal'
-import { WithdrawModal } from './Modals/WithdrawModal'
 import { TransferRequestViewProps } from 'components/Controller/TransferRequestView'
+import dynamic from 'next/dynamic'
+
+const ApproveModal = dynamic(() => import('./Modals/ApproveModal').then(mod => mod.ApproveModal))
+const RejectModal = dynamic(() => import('./Modals/RejectModal').then(mod => mod.RejectModal))
+const DeleteModal = dynamic(() => import('../TransferRequest/shared/DeleteModal').then(mod => mod.DeleteModal))
+const RequireChangeModal = dynamic(() => import('./Modals/RequireChangeModal').then(mod => mod.RequireChangeModal))
+const WithdrawModal = dynamic(() => import('./Modals/WithdrawModal').then(mod => mod.WithdrawModal))
 
 export const TransferRequestView = ({ data }: TransferRequestViewProps) => {
   const { user } = useAuth()
@@ -76,16 +78,22 @@ export const TransferRequestView = ({ data }: TransferRequestViewProps) => {
         {showRequiresChangeActions && <Button onClick={() => openWithdrawModal('Requires Change')}>Withdraw Requires Change</Button>}
       </div>
 
-      <ApproveModal open={approveModalOpen} data={data} onModalClosed={() => setApproveModalOpen(false)} />
-      <RejectModal open={rejectModalOpen} data={data} onModalClosed={() => setRejectModalOpen(false)} />
-      <RequireChangeModal open={requireChangeModalOpen} data={data} onModalClosed={() => setRequireChangeModalOpen(false)} />
-      <DeleteModal
-        onModalClosed={() => setDeleteModalOpen(false)}
-        open={deleteModalOpen}
-        data={data}
-        redirectTo={`/approvals?status=${data.status === SUBMITTED_BY_APPROVER_STATUS ? SUBMITTED_STATUS : data.status}`}
-      />
-      <WithdrawModal open={withdrawModalOpen} text={withdrawModalText} data={data} onModalClosed={() => setWithdrawModalOpen(false)} />
+      {approveModalOpen && <ApproveModal open={approveModalOpen} data={data} onModalClosed={() => setApproveModalOpen(false)} />}
+      {rejectModalOpen && <RejectModal open={rejectModalOpen} data={data} onModalClosed={() => setRejectModalOpen(false)} />}
+      {requireChangeModalOpen && (
+        <RequireChangeModal open={requireChangeModalOpen} data={data} onModalClosed={() => setRequireChangeModalOpen(false)} />
+      )}
+      {deleteModalOpen && (
+        <DeleteModal
+          onModalClosed={() => setDeleteModalOpen(false)}
+          open={deleteModalOpen}
+          data={data}
+          redirectTo={`/approvals?status=${data.status === SUBMITTED_BY_APPROVER_STATUS ? SUBMITTED_STATUS : data.status}`}
+        />
+      )}
+      {withdrawModalOpen && (
+        <WithdrawModal open={withdrawModalOpen} text={withdrawModalText} data={data} onModalClosed={() => setWithdrawModalOpen(false)} />
+      )}
     </>
   )
 }

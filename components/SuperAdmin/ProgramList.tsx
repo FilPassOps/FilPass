@@ -7,8 +7,10 @@ import { Cell, Header, Table, TableBody, TableHead } from 'components/shared/Tab
 import { ACTIVE_STATUS, deliveryMethod } from 'domain/programs/constants'
 import { DateTime } from 'luxon'
 import { Fragment, useState } from 'react'
-import { ArchiveProgramModal } from './Modals/ArchiveProgramModal'
-import { CreateOrEditProgramModal } from './Modals/CreateOrEditProgramModal'
+import dynamic from 'next/dynamic'
+
+const ArchiveProgramModal = dynamic(() => import('./Modals/ArchiveProgramModal').then(mod => mod.ArchiveProgramModal))
+const CreateOrEditProgramModal = dynamic(() => import('./Modals/CreateOrEditProgramModal').then(mod => mod.CreateOrEditProgramModal))
 
 interface ProgramListProps {
   data?: {
@@ -134,25 +136,29 @@ export const ProgramList = ({
           <p className="text-center text-sm space-y-7 py-7 text-gray-800 bg-white border border-gray-100 rounded-sm">No data</p>
         )}
       </div>
-      <ArchiveProgramModal
-        onModalClosed={() => setOpenArchiveModal(false)}
-        open={openArchiveModal}
-        program={currentProgram}
-        isActive={isActive}
-      />
-      <CreateOrEditProgramModal
-        open={openCreateOrEditModal}
-        onModalClosed={() => {
-          setOpenCreateOrEditModal(false)
-          setTimeout(() => setCurrentProgram(), 300)
-        }}
-        approversData={approversData}
-        viewersData={viewersData}
-        program={currentProgram}
-        programs={data}
-        isEditable={!!currentProgram}
-        refreshPrograms={refreshPrograms}
-      />
+      {openArchiveModal && (
+        <ArchiveProgramModal
+          onModalClosed={() => setOpenArchiveModal(false)}
+          open={openArchiveModal}
+          program={currentProgram}
+          isActive={isActive}
+        />
+      )}
+      {openCreateOrEditModal && (
+        <CreateOrEditProgramModal
+          open={openCreateOrEditModal}
+          onModalClosed={() => {
+            setOpenCreateOrEditModal(false)
+            setTimeout(() => setCurrentProgram(), 300)
+          }}
+          approversData={approversData}
+          viewersData={viewersData}
+          program={currentProgram}
+          programs={data}
+          isEditable={!!currentProgram}
+          refreshPrograms={refreshPrograms}
+        />
+      )}
     </>
   )
 }

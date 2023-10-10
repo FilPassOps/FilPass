@@ -1,11 +1,7 @@
 import { ArrowDownTrayIcon, DocumentDuplicateIcon, DocumentPlusIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { ApproveModal } from 'components/Approver/Modals/ApproveModal'
-import { RejectModal } from 'components/Approver/Modals/RejectModal'
 import TransferList from 'components/Approver/TransferList'
 import { Filters } from 'components/Filters/Filters'
 import { Layout } from 'components/Layout'
-import { CreateReportModal } from 'components/TransferRequest/shared/CreateReportModal'
-import { DeleteModal } from 'components/TransferRequest/shared/DeleteModal'
 import { Button, LinkButton } from 'components/shared/Button'
 import { PaginationCounter } from 'components/shared/PaginationCounter'
 import { PaginationWrapper, getItemsPerPage } from 'components/shared/usePagination'
@@ -22,6 +18,14 @@ import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
 import { AppConfig, ChainNames } from 'system.config'
 import errorsMessages from 'wordings-and-errors/errors-messages'
+
+import dynamic from 'next/dynamic'
+
+const ApproveModal = dynamic(() => import('components/Approver/Modals/ApproveModal').then(mod => mod.ApproveModal))
+const RejectModal = dynamic(() => import('components/Approver/Modals/RejectModal').then(mod => mod.RejectModal))
+const DeleteModal = dynamic(() => import('components/TransferRequest/shared/DeleteModal').then(mod => mod.DeleteModal))
+const CreateReportModal = dynamic(() => import('components/TransferRequest/shared/CreateReportModal').then(mod => mod.CreateReportModal))
+
 
 interface ApprovalsProps {
   initialData: any[]
