@@ -1,13 +1,10 @@
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline'
 import { Blockchain, TransferStatus } from '@prisma/client'
 import MetamaskPayment from 'components/Controller/MetaMaskPayment'
-import NotifyCorfimationModal from 'components/Controller/Modals/NotifyConfirmationModal'
-import RejectModal from 'components/Controller/Modals/RejectModal'
 import TransferList from 'components/Controller/TransferList'
 import { Filters } from 'components/Filters/Filters'
 import { Layout } from 'components/Layout'
 import { useAlertDispatcher } from 'components/Layout/Alerts'
-import { CreateReportModal } from 'components/TransferRequest/shared/CreateReportModal'
 import { Button } from 'components/shared/Button'
 import { PaginationCounter } from 'components/shared/PaginationCounter'
 import { PaginationWrapper, getItemsPerPage } from 'components/shared/usePagination'
@@ -21,10 +18,15 @@ import JsFileDownload from 'js-file-download'
 import { api } from 'lib/api'
 import { withControllerSSR } from 'lib/ssr'
 import { DateTime } from 'luxon'
+import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { ReactElement, useEffect, useState } from 'react'
 import errorsMessages from 'wordings-and-errors/errors-messages'
+
+const NotifyConfirmationModal = dynamic(() => import('components/Controller/Modals/NotifyConfirmationModal').then(mod => mod.default))
+const RejectModal = dynamic(() => import('components/Controller/Modals/RejectModal').then(mod => mod.default))
+const CreateReportModal = dynamic(() => import('components/TransferRequest/shared/CreateReportModal').then(mod => mod.CreateReportModal))
 
 interface DisbursementProps {
   initialData: any[]
@@ -268,9 +270,13 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
         <MetamaskPayment data={paymentModalTransactions} />
       ) : (
         <>
-          <RejectModal open={openRejectModal} onModalClosed={() => setOpenRejectModal(false)} data={rejectModalTransactions} />
+          {openRejectModal && (
+            <RejectModal open={openRejectModal} onModalClosed={() => setOpenRejectModal(false)} data={rejectModalTransactions} />
+          )}
 
-          <NotifyCorfimationModal open={openNotifyModal} onClose={() => setOpenNotifyModal(false)} data={paymentModalTransactions} />
+          {openNotifyModal && (
+            <NotifyConfirmationModal open={openNotifyModal} onClose={() => setOpenNotifyModal(false)} data={paymentModalTransactions} />
+          )}
 
           {createReportModal && (
             <CreateReportModal

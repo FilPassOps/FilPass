@@ -4,7 +4,7 @@ import { api } from 'lib/api'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-interface NotifyCorfimationModalProps {
+interface NotifyConfirmationModalProps {
   data: {
     publicId: string
   }[]
@@ -12,7 +12,7 @@ interface NotifyCorfimationModalProps {
   onClose: () => void
 }
 
-const NotifyCorfimationModal = ({ data = [], open, onClose }: NotifyCorfimationModalProps) => {
+const NotifyConfirmationModal = ({ data = [], open, onClose }: NotifyConfirmationModalProps) => {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -41,4 +41,4 @@ const NotifyCorfimationModal = ({ data = [], open, onClose }: NotifyCorfimationM
   )
 }
 
-export default NotifyCorfimationModal
+export default NotifyConfirmationModal

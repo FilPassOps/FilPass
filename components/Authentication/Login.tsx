@@ -1,7 +1,4 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import ForgotPasswordModal from 'components/Authentication/ForgotPasswordModal'
-import ResetPasswordModal from 'components/Authentication/ResetPasswordModal'
-import { SecurityCodeModal } from 'components/Authentication/SecurityCodeModal'
 import { Button, LinkButton } from 'components/shared/Button'
 import { PasswordInput, TextInput } from 'components/shared/FormInput'
 import { loginValidator } from 'domain/auth/validation'
@@ -13,8 +10,13 @@ import { useForm } from 'react-hook-form'
 import { KeyedMutator } from 'swr'
 import { GoogleLogin } from './GoogleLogin'
 import { useAuth } from './Provider'
-import { ResendVerificationModal } from './ResendVerificationModal'
 import { Layout } from './Shared'
+import dynamic from 'next/dynamic'
+
+const ForgotPasswordModal = dynamic(() => import('components/Authentication/ForgotPasswordModal').then(mod => mod.default))
+const ResetPasswordModal = dynamic(() => import('components/Authentication/ResetPasswordModal').then(mod => mod.default))
+const SecurityCodeModal = dynamic(() => import('components/Authentication/SecurityCodeModal').then(mod => mod.SecurityCodeModal))
+const ResendVerificationModal = dynamic(() => import('./ResendVerificationModal').then(mod => mod.ResendVerificationModal))
 
 interface LoginProps {
   redirectAfterLogin: string
@@ -148,27 +150,33 @@ export function Login({ redirectAfterLogin }: LoginProps) {
           </div>
         </form>
 
-        <ForgotPasswordModal open={openForgotPassModal} onClose={() => setOpenForgotPassModal(false)} />
+        {openForgotPassModal && <ForgotPasswordModal open={openForgotPassModal} onClose={() => setOpenForgotPassModal(false)} />}
 
-        <ResetPasswordModal open={openResetPassModal} onClose={() => setOpenResetPassModal(false)} token={router.query.token as string} />
+        {openResetPassModal && (
+          <ResetPasswordModal open={openResetPassModal} onClose={() => setOpenResetPassModal(false)} token={router.query.token as string} />
+        )}
 
-        <ResendVerificationModal
-          openModal={openModal}
-          email={email}
-          onModalClosed={() => setOpenModal(false)}
-          setSubmitErrors={setSubmitErrors}
-          errorMessage={submitErrors?.verification?.message}
-        />
+        {openModal && (
+          <ResendVerificationModal
+            openModal={openModal}
+            email={email}
+            onModalClosed={() => setOpenModal(false)}
+            setSubmitErrors={setSubmitErrors}
+            errorMessage={submitErrors?.verification?.message}
+          />
+        )}
 
-        <SecurityCodeModal
-          open={openVerifyModal}
-          onClose={() => {
-            setOpenVerifyModal(false)
-          }}
-          email={email}
-          handleVerifyCode={handleCodeSubmit}
-          onResend={handleResend}
-        />
+        {openVerifyModal && (
+          <SecurityCodeModal
+            open={openVerifyModal}
+            onClose={() => {
+              setOpenVerifyModal(false)
+            }}
+            email={email}
+            handleVerifyCode={handleCodeSubmit}
+            onResend={handleResend}
+          />
+        )}
       </div>
     </Layout>
   )

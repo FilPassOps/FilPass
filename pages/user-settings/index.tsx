@@ -2,13 +2,15 @@ import { PlusCircleIcon } from '@heroicons/react/24/solid'
 import { Layout } from 'components/Layout'
 import { Button } from 'components/shared/Button'
 import { getItemsPerPage, PaginationWrapper } from 'components/shared/usePagination'
-import { InviteUserModal } from 'components/SuperAdmin/Modals/InviteUserModal'
 import { UserList } from 'components/SuperAdmin/UserList'
 import { AppConfig } from 'config'
 import { findAllUsers } from 'domain/user/findAll'
 import { withSuperAdminSSR } from 'lib/ssr'
+import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { ReactElement, useState } from 'react'
+
+const InviteUserModal = dynamic(() => import('components/SuperAdmin/Modals/InviteUserModal').then(mod => mod.InviteUserModal))
 
 interface UserSettingsProps {
   data: any[]
@@ -40,7 +42,7 @@ export default function UserSettings({ data = [], pageSize, totalItems }: UserSe
       <PaginationWrapper totalItems={totalItems} pageSize={pageSize}>
         <UserList data={data} />
       </PaginationWrapper>
-      <InviteUserModal open={openInviteModal} onModalClosed={() => setOpenInviteModal(false)} />
+      {openInviteModal && <InviteUserModal open={openInviteModal} onModalClosed={() => setOpenInviteModal(false)} />}
     </>
   )
 }

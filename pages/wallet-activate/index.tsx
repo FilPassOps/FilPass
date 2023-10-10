@@ -4,6 +4,7 @@ import { setWalletActive } from 'domain/wallet/setWalletActive'
 import { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import { useEffect } from 'react'
+
 export default function WalletActivate({ error }: { error?: { message: string } }) {
   useEffect(() => {
     if (window) {
