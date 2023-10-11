@@ -56,6 +56,8 @@ export const getServerSideProps = withUserSSR(async ({ query, user }) => {
   const pageSize = getItemsPerPage(itemsPerPage)
   const page = query.page && typeof query.page === 'string' ? parseInt(query.page) : 1
 
+  const networks = query.network?.length ? (query.network as string).split(',') : []
+
   const programIds =
     programId
       ?.toString()
@@ -90,6 +92,7 @@ export const getServerSideProps = withUserSSR(async ({ query, user }) => {
     from: fromDate,
     to: toDate,
     wallets: filteredAddresses,
+    networks,
   })
 
   const programs = await findReceiverPrograms({ receiverId: user.id })

@@ -18,6 +18,7 @@ interface GetApproverTransferRequestsParams {
   approverId: number
   status?: string
   programId?: number[]
+  networks?: string[]
   requestNumber?: string
   teamHashes?: string[]
   from?: Date
@@ -70,13 +71,28 @@ export async function getApproverTransferRequests(params: GetApproverTransferReq
     }
   }
 
-  const { approverId, status, programId, requestNumber, teamHashes, size = 100, page = 1, sort, order, wallets, from, to } = fields
+  const {
+    approverId,
+    status,
+    programId,
+    networks,
+    requestNumber,
+    teamHashes,
+    size = 100,
+    page = 1,
+    sort,
+    order,
+    wallets,
+    from,
+    to,
+  } = fields
 
   const currentPage = page - 1 < 0 ? 0 : page - 1
   const pagination = Prisma.sql` LIMIT ${size} OFFSET ${size * currentPage}`
   const { sortType, orderBy } = getSortParams({ sort, order, status })
 
   const programFilter = programId && programId.length ? Prisma.sql`AND program.id IN (${Prisma.join(programId)})` : Prisma.empty
+  const networkFilter = networks && networks.length ? Prisma.sql`AND program_blockchain.name IN (${Prisma.join(networks)})` : Prisma.empty
 
   const draftNumberFilter = requestNumber ? Prisma.sql`AND draft.public_id = '${requestNumber}'` : Prisma.empty
   const draftTeamFilter = teamHashes ? Prisma.sql`AND draft.team_hash IN (${Prisma.join(teamHashes)})` : Prisma.empty
@@ -100,10 +116,12 @@ export async function getApproverTransferRequests(params: GetApproverTransferReq
           INNER JOIN currency_unit ON currency_unit.id = draft.currency_unit_id AND currency_unit.is_active = TRUE
           INNER JOIN program_currency ON program_currency.program_id = program.id AND program_currency.is_active = TRUE AND program_currency.type::text = 'PAYMENT'
           INNER JOIN currency_unit AS payment_unit ON payment_unit.id = program_currency.currency_unit_id AND program.is_active = TRUE
+          INNER JOIN blockchain AS program_blockchain ON program_blockchain.id = program.blockchain_id
     WHERE approver_role.is_active = TRUE
     AND approver_role.role::text = 'APPROVER'
     AND approver_role.user_id = ${approverId}
     ${programFilter}
+    ${networkFilter}
     ${draftNumberFilter}
     ${draftTeamFilter}
     ${draftWalletFilter}
@@ -122,10 +140,12 @@ export async function getApproverTransferRequests(params: GetApproverTransferReq
         INNER JOIN currency_unit ON currency_unit.id = draft.currency_unit_id AND currency_unit.is_active = TRUE
         INNER JOIN program_currency ON program_currency.program_id = program.id AND program_currency.is_active = TRUE AND program_currency.type::text = 'PAYMENT'
         INNER JOIN currency_unit AS payment_unit ON payment_unit.id = program_currency.currency_unit_id AND program.is_active = TRUE
+        INNER JOIN blockchain AS program_blockchain ON program_blockchain.id = program.blockchain_id
       WHERE approver_role.is_active = TRUE
         AND approver_role.role::text = 'APPROVER'
         AND approver_role.user_id = ${approverId}
         ${programFilter}
+    ${networkFilter}
         ${draftNumberFilter}
         ${draftTeamFilter}
         ${draftWalletFilter}
@@ -221,6 +241,7 @@ export async function getApproverTransferRequests(params: GetApproverTransferReq
     ${statusFilter}
     ${numberFilter}
     ${programFilter}
+    ${networkFilter}
     ${teamFilter}
     ${walletFilter}
     ${createDateFilter}
@@ -243,12 +264,14 @@ export async function getApproverTransferRequests(params: GetApproverTransferReq
       INNER JOIN program_currency ON program_currency.program_id = program.id AND program_currency.is_active = TRUE AND program_currency.type::text = 'PAYMENT'
       INNER JOIN currency_unit AS payment_unit
         ON payment_unit.id = program_currency.currency_unit_id AND program.is_active = TRUE
+      INNER JOIN blockchain AS program_blockchain ON program_blockchain.id = program.blockchain_id
       WHERE approver_role.is_active = TRUE
         AND approver_role.role::text = 'APPROVER'
         AND approver_role.user_id = ${approverId}
         ${statusFilter}
         ${numberFilter}
         ${programFilter}
+        ${networkFilter}
         ${teamFilter}
         ${walletFilter}
         ${createDateFilter}

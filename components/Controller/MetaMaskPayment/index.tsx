@@ -46,6 +46,8 @@ interface PaymentBatchData {
   data: TransferRequest[]
 }
 
+const PAYMENT_BATCH_SIZE = 100
+
 const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
   const router = useRouter()
   const { dispatch, close } = useAlertDispatcher()
@@ -74,7 +76,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
 
     setTotalDollarAmount(totalDollarAmount)
 
-    const finalList = _.chunk(data, 10).map(chunk => ({
+    const finalList = _.chunk(data, PAYMENT_BATCH_SIZE).map(chunk => ({
       blockchainName: chunk[0].program.blockchain.name,
       isPaymentSent: false,
       data: chunk,

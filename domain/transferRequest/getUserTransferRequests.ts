@@ -11,6 +11,7 @@ import { getUserTransferRequestsValidator } from './validation'
 interface GetUserTransferRequestsParams {
   userId?: number
   programIds?: number[]
+  networks?: string[]
   requestNumber?: string
   status?: string
   team?: string[]
@@ -52,7 +53,7 @@ export async function getUserTransferRequests(params: GetUserTransferRequestsPar
     }
   }
 
-  const { userId, size = 100, page = 1, sort, order, programIds, requestNumber, status, team, from, to, wallets } = fields
+  const { userId, size = 100, page = 1, sort, order, programIds, requestNumber, status, team, from, to, wallets, networks } = fields
 
   const currentPage = page - 1
   const pagination = Prisma.sql` LIMIT ${size} OFFSET ${size * currentPage}`
@@ -60,11 +61,13 @@ export async function getUserTransferRequests(params: GetUserTransferRequestsPar
   const teamHashes = team ? await Promise.all(team.map(team => generateTeamHash(team))) : undefined
 
   const programFilter =
-    programIds && programIds.length ? Prisma.sql`AND  filter.request_program_id IN (${Prisma.join(programIds)})` : Prisma.empty
+    programIds && programIds.length ? Prisma.sql`AND filter.request_program_id IN (${Prisma.join(programIds)})` : Prisma.empty
   const numberFilter = requestNumber ? Prisma.sql`AND filter.id = ${requestNumber}` : Prisma.empty
   const teamFilter = teamHashes ? Prisma.sql`AND filter.team_hash IN (${Prisma.join(teamHashes)})` : Prisma.empty
   const walletFilter = wallets?.length ? Prisma.sql`AND filter.request_user_wallet_address IN (${Prisma.join(wallets)})` : Prisma.empty
   const createDateFilter = from && to ? Prisma.sql`AND filter.create_date BETWEEN ${from} AND ${to}` : Prisma.empty
+  const networkFilter =
+    networks && networks.length ? Prisma.sql`AND filter.request_user_wallet_blockchain IN (${Prisma.join(networks)})` : Prisma.empty
 
   let statusFilter = Prisma.empty
 
@@ -76,10 +79,12 @@ export async function getUserTransferRequests(params: GetUserTransferRequestsPar
       t.created_at AS create_date,
       t.is_active AS is_active,
       t.status AS status,
-      w.address as request_user_wallet_address
+      w.address as request_user_wallet_address,
+      b.name as request_user_wallet_blockchain
     FROM
       transfer_request t
       LEFT JOIN user_wallet w ON t.user_wallet_id = w.id
+      INNER JOIN blockchain b ON b.id = w.blockchain_id
     WHERE
       t.is_active = TRUE
       AND t.receiver_id = ${userId}
@@ -122,7 +127,8 @@ export async function getUserTransferRequests(params: GetUserTransferRequestsPar
       d.created_at AS create_date,
       d.is_active AS is_active,
       null as status,
-      null as request_user_wallet_address
+      null as request_user_wallet_address,
+      null as request_user_wallet_blockchain
     FROM
       transfer_request_draft d
     WHERE
@@ -189,6 +195,7 @@ export async function getUserTransferRequests(params: GetUserTransferRequestsPar
       ) AS filter
         INNER JOIN program ON program.id = filter.request_program_id
         ${programFilter}
+        ${networkFilter}
         ${createDateFilter}
         ${statusFilter}
         ${numberFilter}
@@ -228,6 +235,7 @@ export async function getUserTransferRequests(params: GetUserTransferRequestsPar
         LEFT JOIN transfer ON transfer.id = filter.transfer_id
         WHERE program.is_active = TRUE
         ${programFilter}
+        ${networkFilter}
         ${createDateFilter}
         ${statusFilter}
         ${numberFilter}
