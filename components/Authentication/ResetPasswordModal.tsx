@@ -72,7 +72,7 @@ const ResetPasswordModal = ({ open = false, onClose, token }: ResetPasswordModal
               />
             </div>
             <div>
-              <input type="hidden" id="token" value={token} defaultValue={token} {...register('token')} />
+              <input type="hidden" id="token" value={token} {...register('token')} />
             </div>
             <div className="flex flex-row mt-16">
               <Button variant="outline" className="mr-3" onClick={handleClose} loading={isSubmitting}>
