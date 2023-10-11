@@ -17,6 +17,7 @@ interface GetApprovalsByRoleParams {
   userId: number
   status?: string
   programId?: string
+  networks?: string[]
   requestNumber?: string
   team?: string[]
   from?: Date
@@ -60,6 +61,7 @@ export const getApprovalsByRole = async ({
   userId,
   status,
   programId,
+  networks,
   requestNumber,
   team,
   from,
@@ -93,6 +95,7 @@ export const getApprovalsByRole = async ({
     const result = await getViewerTransferRequests({
       viewerId: userId,
       programId: programIds,
+      networks,
       requestNumber,
       teamHashes,
       from,
@@ -120,6 +123,7 @@ export const getApprovalsByRole = async ({
     approverId: userId,
     status: currentStatus,
     programId: programIds,
+    networks,
     requestNumber,
     teamHashes,
     from,

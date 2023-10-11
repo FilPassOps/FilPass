@@ -331,6 +331,7 @@ export const getServerSideProps = withRolesSSR([APPROVER_ROLE, VIEWER_ROLE], asy
   const programId = query.programId || null
   const requestNumber = query.number
   const team = query.team?.toString().split(',')
+  const networks = query.network?.length ? (query.network as string).split(',') : []
 
   const isViewer = roles.some(({ role }) => role === VIEWER_ROLE)
   const isApprover = roles.some(({ role }) => role === APPROVER_ROLE)
@@ -358,6 +359,7 @@ export const getServerSideProps = withRolesSSR([APPROVER_ROLE, VIEWER_ROLE], asy
     status: status as string | undefined,
     programId: programId as string | undefined,
     requestNumber: requestNumber as string | undefined,
+    networks,
     team,
     from: fromDate,
     to: toDate,

@@ -15,6 +15,7 @@ interface GetViewerTransferRequetsParams extends SortParams {
   page?: number
   size?: number
   programId?: number[]
+  networks?: string[]
   requestNumber?: string
   teamHashes?: string[]
   from?: Date
@@ -52,13 +53,15 @@ export async function getViewerTransferRequests(params: GetViewerTransferRequets
     }
   }
 
-  const { viewerId, programId, requestNumber, teamHashes, size = 100, page = 1, sort, order, wallets, from, to } = fields
+  const { viewerId, programId, networks, requestNumber, teamHashes, size = 100, page = 1, sort, order, wallets, from, to } = fields
 
   const currentPage = page - 1 < 0 ? 0 : page - 1
   const pagination = Prisma.sql` LIMIT ${size} OFFSET ${size * currentPage}`
   const { sortType, orderBy } = getSortParams({ sort, order } as SortParams)
 
   const programFilter = programId && programId.length ? Prisma.sql`AND program.id IN (${Prisma.join(programId)})` : Prisma.empty
+  const networkFilter = networks && networks.length ? Prisma.sql`AND blockchain.name IN (${Prisma.join(networks)})` : Prisma.empty
+
   const numberFilter = requestNumber ? Prisma.sql`AND request.public_id = ${requestNumber}` : Prisma.empty
   const teamFilter = teamHashes ? Prisma.sql`AND request.team_hash IN (${Prisma.join(teamHashes)})` : Prisma.empty
   const walletFilter = wallets?.length ? Prisma.sql`AND user_wallet.address IN (${Prisma.join(wallets)})` : Prisma.empty
@@ -103,6 +106,7 @@ export async function getViewerTransferRequests(params: GetViewerTransferRequets
     AND user_role.user_id = ${viewerId}
     AND request.status::text = 'PAID'
     ${programFilter}
+    ${networkFilter}
     ${numberFilter}
     ${teamFilter}
     ${walletFilter}
@@ -126,11 +130,14 @@ export async function getViewerTransferRequests(params: GetViewerTransferRequets
       INNER JOIN program_currency ON program_currency.program_id = program.id AND program_currency.is_active = TRUE AND program_currency.type::text = 'PAYMENT'
       INNER JOIN currency_unit AS payment_unit
         ON payment_unit.id = program_currency.currency_unit_id AND program.is_active = TRUE
+      LEFT JOIN wallet_verification ON user_wallet.verification_id = wallet_verification.id
+      LEFT JOIN blockchain ON user_wallet.blockchain_id = blockchain.id
       WHERE user_role.is_active = TRUE
         AND user_role.role::text = 'VIEWER'
         AND user_role.user_id = ${viewerId}
         AND request.status::text = 'PAID'
         ${programFilter}
+        ${networkFilter}
         ${numberFilter}
         ${teamFilter}
         ${walletFilter}

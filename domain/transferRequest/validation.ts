@@ -59,6 +59,7 @@ export const getTransferRequestByIdValidator = yup
 export const getViewerTransferRequestsValidator = yup.object({
   viewerId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).typeError(errorsMessages.required_field.message).required(),
   programId: yup.array(yup.number().integer().positive().max(MAX_INTEGER_VALUE)).optional(),
+  networks: yup.array(yup.string().required()).optional(),
   requestNumber: yup.string().optional(),
   teamHashes: yup.array(yup.string().required()).optional(),
   from: yup.date().optional(),
@@ -90,6 +91,7 @@ export const getApproverTransferRequestsValidator = yup.object({
     ])
     .required(),
   programId: yup.array(yup.number().integer().positive().max(MAX_INTEGER_VALUE)).optional(),
+  networks: yup.array(yup.string().required()).optional(),
   requestNumber: yup.string().optional(),
   teamHashes: yup.array(yup.string().required()).optional(),
   from: yup.date().optional(),
@@ -109,6 +111,7 @@ export const getUserTransferRequestsValidator = yup
   .object({
     userId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).typeError(errorsMessages.required_field.message).required(),
     programIds: yup.array(yup.number().integer().positive().max(MAX_INTEGER_VALUE)).optional(),
+    networks: yup.array(yup.string().required()).optional(),
     requestNumber: yup.string().optional(),
     status: yup.string().oneOf(statusFilterOptions).optional(),
     team: yup.array(yup.string().required()).optional(),
