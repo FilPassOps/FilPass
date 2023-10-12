@@ -1,4 +1,3 @@
-import { CoinType } from '@glif/filecoin-address'
 import { Bars4Icon } from '@heroicons/react/24/outline'
 import { CheckCircleIcon, ChevronDownIcon, ChevronUpIcon, CurrencyDollarIcon, XCircleIcon } from '@heroicons/react/24/solid'
 import { Blockchain, TransferStatus } from '@prisma/client'
@@ -7,11 +6,10 @@ import { Button } from 'components/shared/Button'
 import Currency, { CryptoAmount } from 'components/shared/Table/Currency'
 import { WalletAddress } from 'components/shared/WalletAddress'
 import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
-import { ForwardNonBLS, contractInterface, useContract } from 'components/web3/useContract'
+import { Forward, contractInterface, useContract } from 'components/web3/useContract'
 import useCurrency from 'components/web3/useCurrency'
 import { AppConfig, ChainNames } from 'config'
 import { USD } from 'domain/currency/constants'
-import { getFilecoinDelegatedAddress } from 'lib/blockchainUtils'
 import { formatCrypto, formatCurrency } from 'lib/currency'
 import { useState } from 'react'
 import { Table, TableDiv, TableHeader } from './Table'
@@ -51,7 +49,7 @@ interface ParsedData {
 interface BatchProps {
   index: number
   batchData: PaymentBatchData
-  forwardHandler: (batch: TransferRequest[], forwardFunction: ForwardNonBLS, blockchainName: string) => Promise<boolean>
+  forwardHandler: (batch: TransferRequest[], forwardFunction: Forward, blockchainName: string) => Promise<boolean>
   setIsBatchSent: (isBatchSent: boolean) => void
   setIsChunkHextMatch: (isChunkHextMatch: boolean) => void
   setHextMatch: (transferRequests: TransferRequest[]) => void
@@ -60,7 +58,7 @@ interface BatchProps {
 const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsChunkHextMatch, setHextMatch }: BatchProps) => {
   const { data, isPaymentSent, isHexMatch, blockchainName } = batchData
   const [isOpen, setIsOpen] = useState(false)
-  const { forwardNonBLS } = useContract(blockchainName)
+  const { forward } = useContract(blockchainName)
   const { chainId } = AppConfig.network.getChainByName(blockchainName as ChainNames)
 
   const { currency } = useCurrency(chainId)
@@ -77,21 +75,15 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
     }
   }
 
-  const validateParseData = (parsedData: ParsedData, blockchainName: string) => {
-    const { getChainByName, isFilecoin } = AppConfig.network
+  const validateParseData = (parsedData: ParsedData) => {
     const isValidFunctionCall = contractInterface.getFunction('forward').name
-    const chain = getChainByName(blockchainName as ChainNames)
-    const isFilecoinChain = isFilecoin(chain)
 
     const parsedDataArray = parsedData.addresses.reduce((acc, address, index) => {
       return [...acc, { address, amount: parsedData.amount[index] }]
     }, Array<{ address: string; amount: string }>())
 
     const newData = data.map(tranferRequest => {
-      const finalAddress = isFilecoinChain
-        ? getFilecoinDelegatedAddress(tranferRequest.wallet.address, chain.coinType as CoinType)
-        : tranferRequest.wallet.address
-
+      const address = tranferRequest.wallet.address
       const foundIndex = parsedDataArray.findIndex(item => {
         const trRequestUnit = tranferRequest.program.programCurrency.find(({ type }) => type === 'REQUEST') as ProgramCurrency
 
@@ -102,7 +94,7 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
         const trConvertedAmount =
           trRequestUnit.currency.name === USD ? new Big(Number(tranferRequest.amount) / currency).toFixed(2) : tranferRequest.amount
 
-        return item.address === finalAddress && Number(item.amount) === Number(trConvertedAmount)
+        return item.address === address && Number(item.amount) === Number(trConvertedAmount)
       })
 
       if (foundIndex !== -1 && isValidFunctionCall) {
@@ -125,8 +117,8 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
     }
     return true
   }
-  const handleParseData = async (parsedData: ParsedData, blockchainName: string) => {
-    const isValid = validateParseData(parsedData, blockchainName)
+  const handleParseData = async (parsedData: ParsedData) => {
+    const isValid = validateParseData(parsedData)
     setIsChunkHextMatch(isValid)
   }
 
@@ -153,7 +145,7 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
               className="w-full md:w-auto"
               targetChainId={AppConfig.network.getChainByName(blockchainName as ChainNames).chainId}
               onClick={async () => {
-                const sent = await forwardHandler(data, forwardNonBLS, blockchainName)
+                const sent = await forwardHandler(data, forward, blockchainName)
                 setIsBatchSent(sent)
               }}
             >
@@ -176,7 +168,7 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
       </div>
       <div className={`${isOpen ? 'block' : 'hidden'} py-6 md:p-6`}>
         {isHexMatch !== undefined && <ParseResultMessage isSucess={isHexMatch} />}
-        <TransactionParser onParseData={handleParseData} blockchainName={blockchainName} />
+        <TransactionParser onParseData={handleParseData} />
         <div className="overflow-x-scroll">
           <Table cols="grid-cols-5" className="bg-white">
             <TableHeader>No</TableHeader>

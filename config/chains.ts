@@ -18,11 +18,8 @@ export interface Chain {
   contractAddress: string
   iconFileName: string
 }
-export interface FilecoinChain extends Chain {
-  coinType: 'f' | 't'
-}
 
-export type Chains = ReadonlyArray<Chain | FilecoinChain>
+export type Chains = ReadonlyArray<Chain>
 
 const ethereum = {
   name: 'Ethereum',
@@ -46,7 +43,7 @@ const ethereum = {
   },
   rpcUrls: ['https://ethereum-sepolia.blockpi.network/v1/rpc/public'],
   blockExplorer: { name: 'Etherscan', url: 'https://sepolia.etherscan.io/tx' },
-  contractAddress: '0xA6B0F90E96Ff8E6b79D859E2067afFA190AE8dB5',
+  contractAddress: '0x9697210C47cFb1460eE60809e7a6CB12c90d4a4e',
   iconFileName: 'ethereum-icon.svg',
 } as const satisfies Chain
 
@@ -72,7 +69,7 @@ const polygon = {
   },
   rpcUrls: ['https://rpc-mumbai.maticvigil.com'],
   blockExplorer: { name: 'Polygonscan', url: 'https://mumbai.polygonscan.com/tx' },
-  contractAddress: '0xb63704b534583Eca727d78dde6cCe438171846dc',
+  contractAddress: '0xcFA76fB70B75573CE7c99Cde40011F2F7C144D22',
   iconFileName: 'polygon-icon.svg',
 } as const satisfies Chain
 
@@ -98,10 +95,9 @@ const calibration = {
   },
   rpcUrls: ['https://api.calibration.node.glif.io'],
   blockExplorer: { name: 'Filfox', url: 'https://calibration.filfox.info/en/message' },
-  contractAddress: '0xbEF649DB6b4e1b2Ac044492433Bccca4287BE90F',
+  contractAddress: '0x8Ac6cfB4dBc9d164796E77113277F83D4Dfa3616',
   iconFileName: 'filecoin-icon.svg',
-  coinType: 't',
-} as const satisfies FilecoinChain
+} as const satisfies Chain
 
 const chains = [ethereum, polygon, calibration] as const satisfies Chains
 

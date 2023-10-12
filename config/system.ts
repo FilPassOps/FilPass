@@ -1,4 +1,4 @@
-import chains, { Chain, Chains, FilecoinChain } from './chains'
+import chains, { Chain, Chains } from './chains'
 
 export interface App {
   name: string
@@ -28,8 +28,6 @@ export interface AppConfig {
       }
       rpcUrls: readonly string[]
     }
-    isFilecoin: (chain: Chain) => chain is FilecoinChain
-    hasFilecoinChain: () => boolean
   }
 }
 
@@ -52,8 +50,6 @@ export const AppConfig = {
     getChain,
     getChainByName,
     getMetamaskParam,
-    isFilecoin,
-    hasFilecoinChain,
   },
 } as const satisfies AppConfig
 
@@ -67,14 +63,6 @@ export type ChainNames = (typeof chains)[number]['name']
 function getChainByName(blockchainName: ChainNames) {
   const index = chains.findIndex(chain => chain.name === blockchainName)
   return chains[index]
-}
-
-function isFilecoin(chain: Chain): chain is FilecoinChain {
-  return (chain as FilecoinChain).coinType !== undefined
-}
-
-function hasFilecoinChain() {
-  return chains.some(chain => isFilecoin(chain))
 }
 
 function getMetamaskParam(chainId: ChainIds) {

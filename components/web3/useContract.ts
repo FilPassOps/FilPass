@@ -1,7 +1,6 @@
 import { CustomWindow, useMetaMask } from './MetaMaskProvider'
 
 import { ExternalProvider } from '@ethersproject/providers'
-import filecoinAddress, { CoinType } from '@glif/filecoin-address'
 import { AppConfig, ChainNames } from 'config'
 import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
@@ -17,7 +16,7 @@ export const useContract = (blockchainName: string) => {
   const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner>()
   const [multiForwarder, setMultiForwarder] = useState<MultiForwarder>()
 
-  const { getChainByName, isFilecoin } = AppConfig.network
+  const { getChainByName } = AppConfig.network
 
   const chain = getChainByName(blockchainName as ChainNames)
 
@@ -38,7 +37,7 @@ export const useContract = (blockchainName: string) => {
   }, [chain.contractAddress])
 
   /**
-   * Forward FIL to up to 100 `32 bytes` addresses
+   * Forward FIL to up to 100 addresses
    * @param destinations array of addresses (f1/2/4 0x) - DO NOT USE f3 ADDRESSES
    * @param amounts array of amounts in FIL
    * @throws if dependencies are not set / if the transaction fails
@@ -54,40 +53,18 @@ export const useContract = (blockchainName: string) => {
       throw new Error('Not connected to target chain')
     }
 
-    const chain = getChainByName(blockchainName as ChainNames)
-
     try {
       setBusy(true)
       const weiValues = amounts.map(amount => ethers.utils.parseEther(amount))
       const weiTotal = weiValues.reduce((a, b) => a.add(b), ethers.BigNumber.from(0))
 
-      const addresses = destinations.map(destination => {
-        if (!isFilecoin(chain)) {
-          const bytes = ethers.utils.arrayify(destination)
-          return zeroPad(bytes)
-        }
-
-        let address = destination
-
-        address = filecoinAddress.delegatedFromEthAddress(destination, chain.coinType as CoinType)
-        const bytes = filecoinAddress.newFromString(address).bytes
-        return zeroPad(bytes)
-      })
-
-      return await multiForwarder.forward(id, addresses, weiValues, { value: weiTotal })
+      return await multiForwarder.forward(id, destinations, weiValues, { value: weiTotal })
     } finally {
       setBusy(false)
     }
   }
 
-  return { forwardNonBLS: forward }
+  return { forward }
 }
 
-export type ForwardNonBLS = ReturnType<typeof useContract>['forwardNonBLS']
-
-function zeroPad(bytes: Uint8Array) {
-  const paddedAddress = new Uint8Array(32)
-  paddedAddress.set(bytes)
-  paddedAddress.fill(0, bytes.length, 32)
-  return paddedAddress
-}
+export type Forward = ReturnType<typeof useContract>['forward']

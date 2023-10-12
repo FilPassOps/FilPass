@@ -19,6 +19,6 @@ for (const [chainName, contract] of map.entries()) {
   const filter = contract.filters.Forward()
   contract.on(filter, (id, from, to, value, _total, event) => {
     logger.info(`${chainName} - Forward: ${event.transactionHash}`)
-    transferPaymentConfirm({ id, from, to, value, transactionHash: event.transactionHash, contractAddress: event.address })
+    transferPaymentConfirm({ id, from, to, value, transactionHash: event.transactionHash })
   })
 }
