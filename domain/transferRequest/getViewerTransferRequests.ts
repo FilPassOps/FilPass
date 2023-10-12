@@ -40,6 +40,7 @@ interface ViewerTransferRequest {
   wallet_address: string
   wallet_blockchain: string
   wallet_is_verified: boolean
+  program_blockchain: string
 }
 
 export async function getViewerTransferRequests(params: GetViewerTransferRequetsParams) {
@@ -60,7 +61,7 @@ export async function getViewerTransferRequests(params: GetViewerTransferRequets
   const { sortType, orderBy } = getSortParams({ sort, order } as SortParams)
 
   const programFilter = programId && programId.length ? Prisma.sql`AND program.id IN (${Prisma.join(programId)})` : Prisma.empty
-  const networkFilter = networks && networks.length ? Prisma.sql`AND blockchain.name IN (${Prisma.join(networks)})` : Prisma.empty
+  const networkFilter = networks && networks.length ? Prisma.sql`AND program_blockchain.name IN (${Prisma.join(networks)})` : Prisma.empty
 
   const numberFilter = requestNumber ? Prisma.sql`AND request.public_id = ${requestNumber}` : Prisma.empty
   const teamFilter = teamHashes ? Prisma.sql`AND request.team_hash IN (${Prisma.join(teamHashes)})` : Prisma.empty
@@ -85,7 +86,8 @@ export async function getViewerTransferRequests(params: GetViewerTransferRequets
         transfer_currency_unit.name                          transfer_amount_currency_unit,
         user_wallet.address                                  wallet_address,
         blockchain.name                                      wallet_blockchain,
-        wallet_verification.is_verified                      wallet_is_verified
+        wallet_verification.is_verified                        wallet_is_verified,
+        program_blockchain.name                              program_blockchain
     FROM user_role
             INNER JOIN user_role_program ON user_role_program.user_role_id = user_role.id AND user_role_program.is_active = TRUE
             INNER JOIN transfer_request request ON request.program_id = user_role_program.program_id AND request.is_active = TRUE
@@ -101,6 +103,7 @@ export async function getViewerTransferRequests(params: GetViewerTransferRequets
             LEFT JOIN user_wallet ON request.user_wallet_id = user_wallet.id
             LEFT JOIN wallet_verification ON user_wallet.verification_id = wallet_verification.id
             LEFT JOIN blockchain ON user_wallet.blockchain_id = blockchain.id
+            INNER JOIN blockchain AS program_blockchain ON program_blockchain.id = program.blockchain_id
     WHERE user_role.is_active = TRUE
     AND user_role.role::text = 'VIEWER'
     AND user_role.user_id = ${viewerId}
@@ -132,6 +135,7 @@ export async function getViewerTransferRequests(params: GetViewerTransferRequets
         ON payment_unit.id = program_currency.currency_unit_id AND program.is_active = TRUE
       LEFT JOIN wallet_verification ON user_wallet.verification_id = wallet_verification.id
       LEFT JOIN blockchain ON user_wallet.blockchain_id = blockchain.id
+      INNER JOIN blockchain AS program_blockchain ON program_blockchain.id = program.blockchain_id
       WHERE user_role.is_active = TRUE
         AND user_role.role::text = 'VIEWER'
         AND user_role.user_id = ${viewerId}
