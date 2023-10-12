@@ -289,7 +289,7 @@ export async function getApproverTransferRequests(params: GetApproverTransferReq
         transfer_amount,
         amount,
         team,
-        wallet_address: shortenAddress(request.wallet_address, 'very-short'),
+        wallet_address: request.wallet_address ? shortenAddress(request.wallet_address, 'very-short') : undefined,
       }
     }),
   )

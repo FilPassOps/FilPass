@@ -4,6 +4,7 @@ import { getInputClasses } from 'components/shared/FormInput'
 import { contractInterface } from 'components/web3/useContract'
 import { amountConverter, hexAddressDecoder } from 'lib/blockchainUtils'
 import { useState } from 'react'
+import Image from 'next/image'
 
 interface ParsedData {
   functionName: string
@@ -20,7 +21,7 @@ interface TransactionParserProps {
 export const TransactionParser = ({ onParseData, blockchainName }: TransactionParserProps) => {
   const [hexDataInput, setHexDataInput] = useState('')
   const [error, setError] = useState('')
-  const { dispatch } = useAlertDispatcher()
+  const { dispatch, close } = useAlertDispatcher()
 
   const showMetamaskHexData = () => {
     dispatch({
@@ -29,8 +30,27 @@ export const TransactionParser = ({ onParseData, blockchainName }: TransactionPa
         closeable: true,
       },
       body: () => (
-        <div>
-          <video controls src="https://s3.us-east-2.amazonaws.com/coinemissary.com/metamask-hex-data.mp4" />
+        <div className="pt-4">
+          <p>To retrieve the hexadecimal (hex) data from MetaMask, follow these steps:</p>
+          <ol className="list-decimal list-inside my-4">
+            <li>
+              Click on <strong>Send Payment</strong> button to open the MetaMask payment modal.
+            </li>
+            <li>
+              Click on the <strong>HEX</strong> tab located above the payment amount.
+            </li>
+            <li>Scroll to the bottom of the page.</li>
+            <li>
+              Click the <strong>Copy raw transaction data</strong> button.
+            </li>
+          </ol>
+          <Image alt="Hex data example on MetaMask" src="/examples/hex-payment.png" height={629} width={400} priority />
+          <p className="my-4">
+            Now you can use the copied hex data to verify the payment request on the <strong>Hex Data Parser</strong>.
+          </p>
+          <Button className="self-center" onClick={() => close()}>
+            Close
+          </Button>
         </div>
       ),
     })

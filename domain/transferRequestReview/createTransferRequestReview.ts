@@ -14,6 +14,7 @@ import { rejectTransferRequest } from './rejectTransferRequest'
 import { requireChangeTransferRequest } from './requireChangeTransferRequest'
 import { submittedTransferRequest } from './submittedTransferRequest'
 import { createTransferRequestReviewValidator } from './validation'
+import prisma from 'lib/prisma'
 
 interface CreateTransferRequestReviewParams {
   transferRequestId: string
@@ -59,7 +60,7 @@ export async function createTransferRequestReview(params: CreateTransferRequestR
     })
   }
   if (status === REQUIRES_CHANGES_STATUS) {
-    if (!sanitizedNotes) {
+    if (notes && !sanitizedNotes) {
       return {
         error: {
           status: 400,
@@ -67,8 +68,11 @@ export async function createTransferRequestReview(params: CreateTransferRequestR
         },
       }
     }
+
+    const transferRequestNotes = sanitizedNotes || (await getLastTransferRequestReviewNotes(transferRequestId, approverId))
+
     return await requireChangeTransferRequest({
-      notes: sanitizedNotes,
+      notes: transferRequestNotes as string | undefined,
       approverId,
       transferRequestId,
     })
@@ -86,4 +90,24 @@ export async function createTransferRequestReview(params: CreateTransferRequestR
       message: errorsMessages.error_status_is_not_supported.message,
     },
   }
+}
+
+const getLastTransferRequestReviewNotes = async (transferRequestId: string, approverId: number) => {
+  const result = await prisma.transferRequestReview.findFirst({
+    where: {
+      transferRequest: {
+        publicId: transferRequestId,
+      },
+      approverId,
+      status: REQUIRES_CHANGES_STATUS,
+    },
+    select: {
+      notes: true,
+    },
+    orderBy: {
+      createdAt: 'desc',
+    },
+  })
+
+  return result?.notes || undefined
 }

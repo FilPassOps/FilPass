@@ -31,9 +31,9 @@ export default function Home({ data: { features, socialLinks } }: PageProps) {
       </Head>
       <header className="relative shadow-[0px_1px_3px_rgba(0,0,0,0.1),0px_1px_2px_rgba(0,0,0,0.06)]">
         <span className={twMerge('p-4 py-6 lg:py-9 flex items-center', container)}>
-          <Image src="/logo-small.svg" alt="" width={34} height={34} className="shrink-0" />
+          <Image src="/logo-small.svg" alt="Application logo" width={34} height={34} className="shrink-0" />
           <div className="hidden sm:block shrink-0 w-[163px] h-5 relative ml-3">
-            <Image src="/written-logo.svg" alt="" layout="fill" priority />
+            <Image src="/written-logo.svg" alt="Application name" layout="fill" priority />
           </div>
           <nav className="ml-auto">
             <ul className="flex gap-4">

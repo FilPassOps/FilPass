@@ -1,7 +1,7 @@
 import { sendRequiresChangeNotification } from 'domain/notifications/sendRequiresChangeNotification'
 import { PROGRAM_TYPE_INTERNAL } from 'domain/programs/constants'
 import { createRequestChangeHistory } from 'domain/tranferRequestHistory/createRequestChangeHistory'
-import { PROCESSING_STATUS, REQUIRES_CHANGES_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
+import { PROCESSING_STATUS, REJECTED_BY_APPROVER_STATUS, REQUIRES_CHANGES_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
 import { decryptPII } from 'lib/emissaryCrypto'
 import { TransactionError } from 'lib/errors'
 import { newPrismaTransaction } from 'lib/prisma'
@@ -13,7 +13,7 @@ import { APPROVER_ROLE } from 'domain/auth/constants'
 interface RequireChangeTransferRequestParams {
   transferRequestId: string
   approverId: number
-  notes: string
+  notes?: string
 }
 
 export async function requireChangeTransferRequest(params: RequireChangeTransferRequestParams) {
@@ -35,7 +35,7 @@ export async function requireChangeTransferRequest(params: RequireChangeTransfer
         where: {
           publicId: transferRequestId,
           status: {
-            in: [SUBMITTED_STATUS, PROCESSING_STATUS],
+            in: [SUBMITTED_STATUS, PROCESSING_STATUS, REJECTED_BY_APPROVER_STATUS],
           },
           isActive: true,
         },
