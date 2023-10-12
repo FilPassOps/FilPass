@@ -77,7 +77,7 @@ export async function getApproverTransferRequestById(params: GetUserTransferRequ
   return {
     data: {
       ...tr,
-      wallet_address: shortenAddress(tr.wallet_address, 'very-short'),
+      wallet_address: tr.wallet_address ? shortenAddress(tr.wallet_address, 'very-short') : undefined,
     },
   }
 }
