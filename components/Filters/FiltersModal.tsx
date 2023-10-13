@@ -74,7 +74,7 @@ function FiltersModal({
   const initialRequestNumberFilter = query.number ? parseInt(query.number.toString()) : ''
 
   const initialStatusFilter =
-    query.status && statusOptions?.includes(query.status as StatusFilterOption) ? (query.status as StatusFilterOption) : undefined
+    query.status && statusOptions?.includes(query.status as StatusFilterOption) ? (query.status as StatusFilterOption) : ''
 
   const teamNames = query.team?.toString().split(',')
   const initialTeamFilter = teams?.filter(team => teamNames?.includes(team)).map(team => ({ value: team, label: team }))
@@ -90,7 +90,7 @@ function FiltersModal({
   const [selectedNetwork, setSelectedNetwork] = useState<SelectOption[]>(initialNetworkFilter || [])
   const [selectedPrograms, setSelectedPrograms] = useState<SelectOption[]>(initialProgramsFilter || [])
   const [requestNumber, setRequestNumber] = useState(initialRequestNumberFilter)
-  const [selectedStatus, setSelectedStatus] = useState<StatusFilterOption | undefined>(initialStatusFilter)
+  const [selectedStatus, setSelectedStatus] = useState<StatusFilterOption | string>(initialStatusFilter)
   const [selectedTeams, setSelectedTeams] = useState<SelectOption[]>(initialTeamFilter || [])
   const [walletAddress, setWalletAddress] = useState(initialWalletAddress)
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>(initialDateRange)
@@ -180,7 +180,7 @@ function FiltersModal({
     setSelectedNetwork([])
     setSelectedPrograms([])
     setRequestNumber('')
-    setSelectedStatus(undefined)
+    setSelectedStatus('')
     setSelectedTeams([])
     setDateRange([null, null])
     setWalletAddress('')
@@ -235,14 +235,14 @@ function FiltersModal({
                         <div className="flex items-center justify-between">
                           {selectedStatus ? (
                             <div className="w-full flex items-center justify-between">
-                              <div>{statusFilterLabel[selectedStatus]}</div>
+                              <div>{statusFilterLabel[selectedStatus as StatusFilterOption]}</div>
                               <div
                                 role="button"
                                 aria-label="Clear status field"
                                 className="mx-2"
                                 onClick={e => {
                                   e.stopPropagation()
-                                  setSelectedStatus(undefined)
+                                  setSelectedStatus('')
                                 }}
                               >
                                 <XMarkIcon width={16} height={16} />
