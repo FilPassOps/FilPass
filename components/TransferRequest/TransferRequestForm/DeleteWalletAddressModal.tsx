@@ -1,6 +1,6 @@
 import { useAuth } from 'components/Authentication/Provider'
-import { Button } from 'components/Shared-tmp/Button'
-import { Modal } from 'components/Shared-tmp/Modal'
+import { Button } from 'components/Shared/Button'
+import { Modal } from 'components/Shared/Modal'
 import { BaseApiResult, api } from 'lib/api'
 import { useState } from 'react'
 

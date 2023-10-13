@@ -1,6 +1,6 @@
 import { FunnelIcon } from '@heroicons/react/24/outline'
 import { Program } from '@prisma/client'
-import { Button } from 'components/Shared-tmp/Button'
+import { Button } from 'components/Shared/Button'
 import dynamic from 'next/dynamic'
 import { useState } from 'react'
 import 'react-datepicker/dist/react-datepicker.css'

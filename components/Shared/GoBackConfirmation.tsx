@@ -1,5 +1,5 @@
-import { Button } from 'components/Shared-tmp/Button'
-import { Modal } from 'components/Shared-tmp/Modal'
+import { Button } from 'components/Shared/Button'
+import { Modal } from 'components/Shared/Modal'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Url } from 'node:url'

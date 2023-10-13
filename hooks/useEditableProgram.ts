@@ -4,7 +4,7 @@ import {
   formatProgramApproversRole,
   formatProgramCurrency,
   formatProgramViewersRole,
-} from '../components/SuperAdmin/Shared-tmp/utils'
+} from '../components/SuperAdmin/Shared/utils'
 
 interface UseEditableProgramProps {
   program: any

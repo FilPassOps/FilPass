@@ -1,6 +1,6 @@
 import { DeliveryMethod, ProgramVisibility } from '@prisma/client'
 import { useAlertDispatcher } from 'components/Layout/Alerts'
-import { Button } from 'components/Shared-tmp/Button'
+import { Button } from 'components/Shared/Button'
 import { api } from 'lib/api'
 import { useState } from 'react'
 

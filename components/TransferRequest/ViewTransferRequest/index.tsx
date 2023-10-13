@@ -1,7 +1,7 @@
 import { PhotoIcon } from '@heroicons/react/24/outline'
-import { Divider } from 'components/Shared-tmp/Divider'
-import { NumberInput, SelectInput, TextInput } from 'components/Shared-tmp/FormInput'
-import { StatusBadge } from 'components/Shared-tmp/Status'
+import { Divider } from 'components/Shared/Divider'
+import { NumberInput, SelectInput, TextInput } from 'components/Shared/FormInput'
+import { StatusBadge } from 'components/Shared/Status'
 import {
   REJECTED_BY_APPROVER_STATUS,
   REJECTED_BY_CONTROLLER_STATUS,
@@ -9,11 +9,11 @@ import {
   SUBMITTED_STATUS,
 } from 'domain/transfer-request/constants'
 import { DateTime } from 'luxon'
-import { ProgramInfo } from '../Shared-tmp/ProgramInfo'
-import { RequestorReceiver } from '../Shared-tmp/RequestorReceiver'
+import { ProgramInfo } from '../Shared/ProgramInfo'
+import { RequestorReceiver } from '../Shared/RequestorReceiver'
 import { useDownloadFile } from '../../../hooks/useDownloadFile'
 
-import { WalletAddress } from 'components/Shared-tmp/WalletAddress'
+import { WalletAddress } from 'components/Shared/WalletAddress'
 import { APPROVER_ROLE } from 'domain/auth/constants'
 import { REJECTED } from 'domain/transfer-request-review/constants'
 import { BannedUserReason } from './BannedUserReason'

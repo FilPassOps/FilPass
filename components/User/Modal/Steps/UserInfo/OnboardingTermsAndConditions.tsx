@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Button } from 'components/Shared-tmp/Button'
+import { Button } from 'components/Shared/Button'
 import { TermsCheckboxes } from 'components/TransferRequest/TransferRequestForm/TermsCheckboxes'
 import { termsValidator } from 'domain/user/validation'
 import yup from 'lib/yup'

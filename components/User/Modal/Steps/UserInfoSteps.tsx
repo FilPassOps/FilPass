@@ -1,6 +1,6 @@
 import { CheckIcon } from '@heroicons/react/24/solid'
 import { useAuth } from 'components/Authentication/Provider'
-import { LoadingIndicator } from 'components/Shared-tmp/LoadingIndicator'
+import { LoadingIndicator } from 'components/Shared/LoadingIndicator'
 import { api } from 'lib/api'
 import _ from 'lodash'
 import { UpdateUserResponse } from 'pages/api/users/current'

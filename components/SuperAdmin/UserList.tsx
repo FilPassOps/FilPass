@@ -1,8 +1,8 @@
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
-import { ViewReasonModal } from 'components/Shared-tmp/ViewReasonModal'
-import { Button } from 'components/Shared-tmp/Button'
-import Sortable from 'components/Shared-tmp/Sortable'
-import { Cell, Header, Table, TableBody, TableHead } from 'components/Shared-tmp/Table'
+import { ViewReasonModal } from 'components/Shared/ViewReasonModal'
+import { Button } from 'components/Shared/Button'
+import Sortable from 'components/Shared/Sortable'
+import { Cell, Header, Table, TableBody, TableHead } from 'components/Shared/Table'
 import { APPROVER_ROLE } from 'domain/auth/constants'
 import { classNames } from 'lib/class-names'
 import { DateTime } from 'luxon'
@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react'
 import { ApproverProgramsListModal } from './Modals/ApproverProgramsListModal'
 import { BanUserModal } from './Modals/BanUserModal'
 import { UnbanUserModal } from './Modals/UnbanUserModal'
-import { SelectRoles } from './Shared-tmp/SelectRole'
+import { SelectRoles } from './Shared/SelectRole'
 
 interface UserListProps {
   data?: any[]

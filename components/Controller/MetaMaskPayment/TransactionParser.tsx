@@ -1,6 +1,6 @@
 import { useAlertDispatcher } from 'components/Layout/Alerts'
-import { Button } from 'components/Shared-tmp/Button'
-import { getInputClasses } from 'components/Shared-tmp/FormInput'
+import { Button } from 'components/Shared/Button'
+import { getInputClasses } from 'components/Shared/FormInput'
 import { contractInterface } from 'hooks/useContract'
 import { amountConverter } from 'lib/blockchain-utils'
 import { useState } from 'react'

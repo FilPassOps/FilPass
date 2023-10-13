@@ -1,8 +1,8 @@
 import { PlusCircleIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Button } from 'components/Shared-tmp/Button'
-import { MultipleSelectInput, SelectInput, TextInput } from 'components/Shared-tmp/FormInput'
-import { Modal } from 'components/Shared-tmp/Modal'
+import { Button } from 'components/Shared/Button'
+import { MultipleSelectInput, SelectInput, TextInput } from 'components/Shared/FormInput'
+import { Modal } from 'components/Shared/Modal'
 import { PROGRAM_TYPE_EXTERNAL, PROGRAM_TYPE_INTERNAL } from 'domain/programs/constants'
 import { createProgramFormValidator } from 'domain/programs/validation'
 import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
@@ -10,7 +10,7 @@ import { useAssociatedRequests } from '../../../hooks/useAssociatedRequests'
 import { useCreateOrEditProgramSubmit } from '../../../hooks/useCreateOrEditProgramSubmit'
 import { useEditableProgram } from '../../../hooks/useEditableProgram'
 import { useSetProgramCurrency } from '../../../hooks/useSetProgramCurrency'
-import { deliveryMethodOptions, generateApproversRoleOptions, generateViewersRoleOptions, paymentMethodOptions } from '../Shared-tmp/utils'
+import { deliveryMethodOptions, generateApproversRoleOptions, generateViewersRoleOptions, paymentMethodOptions } from '../Shared/utils'
 
 interface Program {
   id: number

@@ -1,5 +1,5 @@
 import { LockClosedIcon } from '@heroicons/react/24/solid'
-import { Button } from 'components/Shared-tmp/Button'
+import { Button } from 'components/Shared/Button'
 import { AppConfig } from 'config'
 import { isUserBanned } from 'domain/user/is-user-banned'
 import { withSessionSSR } from 'lib/ssr'

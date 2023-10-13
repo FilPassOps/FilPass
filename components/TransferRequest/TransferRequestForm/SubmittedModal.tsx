@@ -1,7 +1,7 @@
-import { LinkButton } from 'components/Shared-tmp/Button'
-import { CheckCircleThinIcon } from 'components/Shared-tmp/icons/CheckCircleThinIcon'
-import { XCircleThinIcon } from 'components/Shared-tmp/icons/XCircleThinIcon'
-import { Modal } from 'components/Shared-tmp/Modal'
+import { LinkButton } from 'components/Shared/Button'
+import { CheckCircleThinIcon } from 'components/Shared/icons/CheckCircleThinIcon'
+import { XCircleThinIcon } from 'components/Shared/icons/XCircleThinIcon'
+import { Modal } from 'components/Shared/Modal'
 
 interface SubmittedModalProps {
   openModal: boolean

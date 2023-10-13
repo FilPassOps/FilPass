@@ -1,4 +1,4 @@
-import { Button } from 'components/Shared-tmp/Button'
+import { Button } from 'components/Shared/Button'
 
 interface NotificationStepProps {
   onCloseClick: () => void

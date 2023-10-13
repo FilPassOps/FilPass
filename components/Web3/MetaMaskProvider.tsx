@@ -1,6 +1,6 @@
 import MetaMaskOnboarding from '@metamask/onboarding'
 import { Tooltip } from 'components/Layout/Tooltip'
-import { Button, ButtonProps } from 'components/Shared-tmp/Button'
+import { Button, ButtonProps } from 'components/Shared/Button'
 import { AppConfig, ChainIds } from 'config'
 import { useRouter } from 'next/router'
 import { Dispatch, MouseEventHandler, ReactNode, SetStateAction, createContext, useContext, useEffect, useRef, useState } from 'react'

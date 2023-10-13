@@ -1,4 +1,4 @@
-import { Button } from 'components/Shared-tmp/Button'
+import { Button } from 'components/Shared/Button'
 import { useState } from 'react'
 
 interface ErrorAlertProps {

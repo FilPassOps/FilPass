@@ -1,7 +1,7 @@
 import { Layout } from 'components/Layout'
 import { ApplyForSomeoneForm } from 'components/TransferRequest/ApplyingForSomeoneForm'
 import { TransferRequestForm } from 'components/TransferRequest/TransferRequestForm'
-import { GoBackConfirmationWithRouter } from 'components/Shared-tmp/GoBackConfirmation'
+import { GoBackConfirmationWithRouter } from 'components/Shared/GoBackConfirmation'
 import { AppConfig } from 'config'
 import { APPROVER_ROLE } from 'domain/auth/constants'
 import { getAllExternalPrograms } from 'domain/programs/get-all'

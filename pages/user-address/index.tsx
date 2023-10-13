@@ -1,6 +1,6 @@
 import { UserWalletList } from 'components/AddressManager/UserWalletList'
 import { Layout } from 'components/Layout'
-import { getItemsPerPage, PaginationWrapper } from 'components/Shared-tmp/PaginationWrapper'
+import { getItemsPerPage, PaginationWrapper } from 'components/Shared/PaginationWrapper'
 import { AppConfig } from 'config'
 import { getAllWithWallets } from 'domain/user/get-all-with-wallets'
 import { withAddressManagerSSR } from 'lib/ssr'

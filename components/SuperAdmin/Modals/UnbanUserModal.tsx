@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios'
-import { Button } from 'components/Shared-tmp/Button'
-import { Modal } from 'components/Shared-tmp/Modal'
+import { Button } from 'components/Shared/Button'
+import { Modal } from 'components/Shared/Modal'
 import { api } from 'lib/api'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
