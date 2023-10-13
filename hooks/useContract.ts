@@ -1,4 +1,4 @@
-import { CustomWindow, useMetaMask } from '../components/Web3-tmp/MetaMaskProvider'
+import { CustomWindow, useMetaMask } from '../components/Web3/MetaMaskProvider'
 
 import { ExternalProvider } from '@ethersproject/providers'
 import { AppConfig, ChainNames } from 'config'

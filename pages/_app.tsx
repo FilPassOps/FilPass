@@ -1,7 +1,7 @@
 import { AuthProvider } from 'components/Authentication/Provider'
 import { AlertContainer, AlertDispatcherProvider } from 'components/Layout/Alerts'
 import { OnboardContextProvider, OnboardWrapper } from 'components/OnboardingWrapper'
-import { MetaMaskProvider } from 'components/Web3-tmp/MetaMaskProvider'
+import { MetaMaskProvider } from 'components/Web3/MetaMaskProvider'
 import { NextPage } from 'next'
 import type { AppProps } from 'next/app'
 import Router from 'next/router'

@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { SelectNetworkInput } from 'components/Shared/SelectNetworkInput'
-import { WithMetaMaskButton } from 'components/Web3-tmp/MetaMaskProvider'
+import { WithMetaMaskButton } from 'components/Web3/MetaMaskProvider'
 import { ChainIds } from 'config'
 import yup from 'lib/yup'
 import { useForm } from 'react-hook-form'

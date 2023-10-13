@@ -1,6 +1,6 @@
 import { useAuth } from 'components/Authentication/Provider'
 import { Modal } from 'components/Shared/Modal'
-import { useMetaMask } from 'components/Web3-tmp/MetaMaskProvider'
+import { useMetaMask } from 'components/Web3/MetaMaskProvider'
 import { AppConfig, ChainIds } from 'config'
 import { useEffect, useState } from 'react'
 import { ChainSelection } from './ChainSelectionStep'
