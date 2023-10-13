@@ -83,7 +83,8 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
     }, Array<{ address: string; amount: string }>())
 
     const newData = data.map(tranferRequest => {
-      const address = tranferRequest.wallet.address
+      const address = tranferRequest.wallet.address.toLowerCase()
+
       const foundIndex = parsedDataArray.findIndex(item => {
         const trRequestUnit = tranferRequest.program.programCurrency.find(({ type }) => type === 'REQUEST') as ProgramCurrency
 
@@ -94,7 +95,7 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
         const trConvertedAmount =
           trRequestUnit.currency.name === USD ? new Big(Number(tranferRequest.amount) / currency).toFixed(2) : tranferRequest.amount
 
-        return item.address === address && Number(item.amount) === Number(trConvertedAmount)
+        return item.address.toLowerCase() === address && Number(item.amount) === Number(trConvertedAmount)
       })
 
       if (foundIndex !== -1 && isValidFunctionCall) {
