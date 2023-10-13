@@ -4,14 +4,14 @@ import { PasswordInput, TextInput } from 'components/shared/FormInput'
 import { loginValidator } from 'domain/auth/validation'
 import Cookie from 'js-cookie'
 import { api } from 'lib/api'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { KeyedMutator } from 'swr'
 import { GoogleLogin } from './GoogleLogin'
 import { useAuth } from './Provider'
 import { Layout } from './Shared'
-import dynamic from 'next/dynamic'
 
 const ForgotPasswordModal = dynamic(() => import('components/Authentication/ForgotPasswordModal').then(mod => mod.default))
 const ResetPasswordModal = dynamic(() => import('components/Authentication/ResetPasswordModal').then(mod => mod.default))
@@ -34,8 +34,12 @@ export function Login({ redirectAfterLogin }: LoginProps) {
   const [openModal, setOpenModal] = useState(false)
   const [openVerifyModal, setOpenVerifyModal] = useState(false)
   const [openForgotPassModal, setOpenForgotPassModal] = useState(false)
-  const [openResetPassModal, setOpenResetPassModal] = useState(!!router?.query?.token || false)
+  const [openResetPassModal, setOpenResetPassModal] = useState(false)
   const [userData, setUserData] = useState<any>()
+
+  useEffect(() => {
+    setOpenResetPassModal(!!router?.query?.token)
+  }, [router?.query?.token])
 
   const {
     register,
