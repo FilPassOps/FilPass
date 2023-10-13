@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { SelectNetworkInput } from 'components/Shared/SelectNetworkInput'
+import { SelectNetworkInput } from 'components/Shared-tmp/SelectNetworkInput'
 import { WithMetaMaskButton } from 'components/Web3/MetaMaskProvider'
 import { ChainIds } from 'config'
 import yup from 'lib/yup'

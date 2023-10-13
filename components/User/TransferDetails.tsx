@@ -1,5 +1,5 @@
 import { useAuth } from 'components/Authentication/Provider'
-import { Button, LinkButton } from 'components/Shared/Button'
+import { Button, LinkButton } from 'components/Shared-tmp/Button'
 import { ViewTransferRequest, ViewTransferRequestProps } from 'components/TransferRequest/ViewTransferRequest'
 import { SUBMITTED_BY_APPROVER_STATUS } from 'domain/transfer-request/constants'
 import { useState } from 'react'

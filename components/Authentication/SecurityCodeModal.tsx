@@ -1,5 +1,5 @@
-import { Modal } from 'components/Shared/Modal'
-import { Button } from 'components/Shared/Button'
+import { Modal } from 'components/Shared-tmp/Modal'
+import { Button } from 'components/Shared-tmp/Button'
 import { useState } from 'react'
 import { DateTime } from 'luxon'
 import CountDownTimer from './CountDownTimer'

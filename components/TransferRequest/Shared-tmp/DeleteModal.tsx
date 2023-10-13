@@ -1,5 +1,5 @@
-import { Button } from 'components/Shared/Button'
-import { Modal } from 'components/Shared/Modal'
+import { Button } from 'components/Shared-tmp/Button'
+import { Modal } from 'components/Shared-tmp/Modal'
 import { DRAFT_STATUS, SUBMITTED_BY_APPROVER_STATUS } from 'domain/transfer-request/constants'
 import { BaseApiResult, api } from 'lib/api'
 import { useRouter } from 'next/router'

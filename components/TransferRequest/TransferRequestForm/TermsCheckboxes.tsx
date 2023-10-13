@@ -1,4 +1,4 @@
-import { CheckboxInput } from 'components/Shared/FormInput'
+import { CheckboxInput } from 'components/Shared-tmp/FormInput'
 import { AppConfig } from 'config'
 
 interface TermsCheckboxesProps {

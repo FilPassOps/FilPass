@@ -1,7 +1,7 @@
 import { Menu, Transition } from '@headlessui/react'
 import { Bars3BottomLeftIcon } from '@heroicons/react/24/solid'
 import { useAuth } from 'components/Authentication/Provider'
-import { UserIcon } from 'components/Shared/icons/UserIcon'
+import { UserIcon } from 'components/Shared-tmp/icons/UserIcon'
 import { api } from 'lib/api'
 import { classNames } from 'lib/class-names'
 import { useRouter } from 'next/router'

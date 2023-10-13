@@ -1,4 +1,4 @@
-import { Divider } from 'components/Shared/Divider'
+import { Divider } from 'components/Shared-tmp/Divider'
 import { USER_ROLE } from 'domain/auth/constants'
 import { DateTime } from 'luxon'
 

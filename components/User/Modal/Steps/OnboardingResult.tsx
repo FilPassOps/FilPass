@@ -1,5 +1,5 @@
 import { CheckIcon } from '@heroicons/react/24/outline'
-import { Button } from 'components/Shared/Button'
+import { Button } from 'components/Shared-tmp/Button'
 
 interface OnboardingResultProps {
   handleSuccess: () => void

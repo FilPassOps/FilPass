@@ -1,5 +1,5 @@
-import { Button } from 'components/Shared/Button'
-import { Modal } from 'components/Shared/Modal'
+import { Button } from 'components/Shared-tmp/Button'
+import { Modal } from 'components/Shared-tmp/Modal'
 import { APPROVED_STATUS, PROCESSING_STATUS } from 'domain/transfer-request/constants'
 import { api } from 'lib/api'
 import Link from 'next/link'

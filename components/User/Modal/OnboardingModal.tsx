@@ -1,6 +1,6 @@
 import { useAuth } from 'components/Authentication/Provider'
 import { useOnboard } from 'components/OnboardingWrapper'
-import { Modal } from 'components/Shared/Modal'
+import { Modal } from 'components/Shared-tmp/Modal'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { OnboardingResult } from './Steps/OnboardingResult'

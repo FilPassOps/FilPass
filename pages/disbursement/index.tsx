@@ -5,9 +5,9 @@ import TransferList from 'components/Controller/TransferList'
 import { Filters } from 'components/Filters/Filters'
 import { Layout } from 'components/Layout'
 import { useAlertDispatcher } from 'components/Layout/Alerts'
-import { Button } from 'components/Shared/Button'
-import { PaginationCounter } from 'components/Shared/PaginationCounter'
-import { PaginationWrapper, getItemsPerPage } from 'components/Shared/PaginationWrapper'
+import { Button } from 'components/Shared-tmp/Button'
+import { PaginationCounter } from 'components/Shared-tmp/PaginationCounter'
+import { PaginationWrapper, getItemsPerPage } from 'components/Shared-tmp/PaginationWrapper'
 import { WithMetaMaskButton } from 'components/Web3/MetaMaskProvider'
 import { AppConfig, ChainNames } from 'config'
 import { stringify } from 'csv-stringify/sync'
@@ -26,7 +26,9 @@ import errorsMessages from 'wordings-and-errors/errors-messages'
 
 const NotifyConfirmationModal = dynamic(() => import('components/Controller/Modals/NotifyConfirmationModal').then(mod => mod.default))
 const RejectModal = dynamic(() => import('components/Controller/Modals/RejectModal').then(mod => mod.default))
-const CreateReportModal = dynamic(() => import('components/TransferRequest/Shared/CreateReportModal').then(mod => mod.CreateReportModal))
+const CreateReportModal = dynamic(() =>
+  import('components/TransferRequest/Shared-tmp/CreateReportModal').then(mod => mod.CreateReportModal),
+)
 
 interface DisbursementProps {
   initialData: any[]

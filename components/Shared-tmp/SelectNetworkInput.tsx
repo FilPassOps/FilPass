@@ -1,4 +1,4 @@
-import { SelectInput } from 'components/Shared/FormInput'
+import { SelectInput } from 'components/Shared-tmp/FormInput'
 import { AppConfig } from 'config'
 import { Controller } from 'react-hook-form'
 import { BlockchainIcon } from './icons/BlockchainIcon'

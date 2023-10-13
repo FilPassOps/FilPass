@@ -2,9 +2,9 @@ import { ArrowDownTrayIcon, DocumentDuplicateIcon, DocumentPlusIcon, XMarkIcon }
 import TransferList from 'components/Approver/TransferList'
 import { Filters } from 'components/Filters/Filters'
 import { Layout } from 'components/Layout'
-import { Button, LinkButton } from 'components/Shared/Button'
-import { PaginationCounter } from 'components/Shared/PaginationCounter'
-import { PaginationWrapper, getItemsPerPage } from 'components/Shared/PaginationWrapper'
+import { Button, LinkButton } from 'components/Shared-tmp/Button'
+import { PaginationCounter } from 'components/Shared-tmp/PaginationCounter'
+import { PaginationWrapper, getItemsPerPage } from 'components/Shared-tmp/PaginationWrapper'
 import { AppConfig, ChainNames } from 'config'
 import { stringify } from 'csv-stringify/sync'
 import { getApprovalsByRole } from 'domain/approvals/service'
@@ -23,8 +23,10 @@ import dynamic from 'next/dynamic'
 
 const ApproveModal = dynamic(() => import('components/Approver/Modals/ApproveModal').then(mod => mod.ApproveModal))
 const RejectModal = dynamic(() => import('components/Approver/Modals/RejectModal').then(mod => mod.RejectModal))
-const DeleteModal = dynamic(() => import('components/TransferRequest/Shared/DeleteModal').then(mod => mod.DeleteModal))
-const CreateReportModal = dynamic(() => import('components/TransferRequest/Shared/CreateReportModal').then(mod => mod.CreateReportModal))
+const DeleteModal = dynamic(() => import('components/TransferRequest/Shared-tmp/DeleteModal').then(mod => mod.DeleteModal))
+const CreateReportModal = dynamic(() =>
+  import('components/TransferRequest/Shared-tmp/CreateReportModal').then(mod => mod.CreateReportModal),
+)
 
 interface ApprovalsProps {
   initialData: any[]

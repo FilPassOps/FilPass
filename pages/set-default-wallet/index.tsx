@@ -1,5 +1,5 @@
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline'
-import { Button } from 'components/Shared/Button'
+import { Button } from 'components/Shared-tmp/Button'
 import { AppConfig } from 'config'
 import { setDefault } from 'domain/wallet/set-default'
 import { GetServerSidePropsContext } from 'next'

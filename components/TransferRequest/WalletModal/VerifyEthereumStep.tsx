@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios'
-import { Button } from 'components/Shared/Button'
-import { BlockchainIcon } from 'components/Shared/icons/BlockchainIcon'
+import { Button } from 'components/Shared-tmp/Button'
+import { BlockchainIcon } from 'components/Shared-tmp/icons/BlockchainIcon'
 import { api } from 'lib/api'
 import { useState } from 'react'
 

@@ -1,5 +1,5 @@
 import { Prisma, ProgramVisibility, UserRoleProgram } from '@prisma/client'
-import { groupProgramApproversRole } from 'components/SuperAdmin/Shared/utils'
+import { groupProgramApproversRole } from 'components/SuperAdmin/Shared-tmp/utils'
 import { submittedTransferRequestsBySuper } from 'domain/transfer-request-review/submitted-transfer-request'
 import { TransactionError } from 'lib/errors'
 import { newPrismaTransaction } from 'lib/prisma'

@@ -1,5 +1,5 @@
 import { FaceFrownIcon } from '@heroicons/react/24/outline'
-import { LinkButton } from 'components/Shared/Button'
+import { LinkButton } from 'components/Shared-tmp/Button'
 import { AppConfig } from 'config'
 import Head from 'next/head'
 

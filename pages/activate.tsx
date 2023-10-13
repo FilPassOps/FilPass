@@ -1,5 +1,5 @@
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline'
-import { Button } from 'components/Shared/Button'
+import { Button } from 'components/Shared-tmp/Button'
 import { AppConfig } from 'config'
 import { verifyAccount } from 'domain/auth/verify-account'
 import { GetServerSideProps } from 'next'
