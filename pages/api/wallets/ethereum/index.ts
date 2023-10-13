@@ -1,4 +1,4 @@
-import { createEthereumWallet } from 'domain/wallet/createEthereumWallet'
+import { createEthereumWallet } from 'domain/wallet/create-ethereum-wallet'
 import { newHandler, NextApiRequestWithSession, withMethods, withUser, withValidation } from 'lib/middleware'
 import yup from 'lib/yup'
 import { NextApiResponse } from 'next'

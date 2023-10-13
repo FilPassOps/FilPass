@@ -1,4 +1,4 @@
-import { Button } from 'components/shared/Button'
+import { Button } from 'components/Shared/Button'
 
 interface OnboardingStartProps {
   handleOnNextClick: () => void

@@ -1,4 +1,4 @@
-import { sendSetDefaultWalletConfirmation } from 'domain/notifications/sendSetDefaultWalletNotification'
+import { sendSetDefaultWalletConfirmation } from 'domain/notifications/send-set-default-wallet-notification'
 import { NextApiRequestWithSession, newHandler, withLimiter, withMethods, withUser } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
 

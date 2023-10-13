@@ -4,23 +4,23 @@ import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { useAuth } from 'components/Authentication/Provider'
-import { createTransferRequestValidator } from 'domain/transferRequest/validation'
+import { createTransferRequestValidator } from 'domain/transfer-request/validation'
 
-import { Divider } from 'components/shared/Divider'
-import { TextInput } from 'components/shared/FormInput'
+import { Divider } from 'components/Shared/Divider'
+import { TextInput } from 'components/Shared/FormInput'
 
 import { ProgramVisibility } from '@prisma/client'
 import { WalletModal } from '../WalletModal'
-import { ProgramInfo } from '../shared/ProgramInfo'
-import { RequestAmountInput } from '../shared/RequestAmountInput'
-import { RequestorReceiver } from '../shared/RequestorReceiver'
-import { SelectProgramInput } from '../shared/SelectProgramInput'
-import { useProgramCurrency } from '../shared/useProgramCurrency'
+import { ProgramInfo } from '../Shared/ProgramInfo'
+import { RequestAmountInput } from '../Shared/RequestAmountInput'
+import { RequestorReceiver } from '../Shared/RequestorReceiver'
+import { SelectProgramInput } from '../Shared/SelectProgramInput'
+import { useProgramCurrency } from '../../../hooks/useProgramCurrency'
 import { AttachmentInput } from './AttachmentInput'
 import { FooterButtons } from './FooterButtons'
 import { SelectWalletInput } from './SelectWalletInput'
 import { SubmittedModal } from './SubmittedModal'
-import { useFormSubmit } from './useFormSubmit'
+import { useFormSubmit } from '../../../hooks/useFormSubmit'
 
 interface TransferRequestFormProps {
   isEditable?: boolean

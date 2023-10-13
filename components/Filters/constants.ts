@@ -10,7 +10,7 @@ import {
   SUBMITTED_BY_APPROVER_STATUS,
   SUBMITTED_STATUS,
   VOIDED_STATUS,
-} from '../../domain/transferRequest/constants'
+} from '../../domain/transfer-request/constants'
 
 export const statusFilterMapping = {
   [APPROVED_STATUS]: [APPROVED_STATUS],

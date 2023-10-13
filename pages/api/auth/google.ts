@@ -1,5 +1,5 @@
 import { generateSession } from 'domain/auth/session'
-import { signinWithGoogle } from 'domain/auth/signinWithGoogle'
+import { signinWithGoogle } from 'domain/auth/signin-with-google'
 import { getGoogleUser } from 'lib/google/login'
 import { logger } from 'lib/logger'
 import { NextApiRequestWithSession, newHandler, withAuthLimiter, withMethods, withSession } from 'lib/middleware'

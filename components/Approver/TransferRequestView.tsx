@@ -1,5 +1,5 @@
 import { useAuth } from 'components/Authentication/Provider'
-import { Button } from 'components/shared/Button'
+import { Button } from 'components/Shared/Button'
 import { ViewTransferRequest } from 'components/TransferRequest/ViewTransferRequest'
 import { APPROVER_ROLE } from 'domain/auth/constants'
 import {
@@ -10,14 +10,14 @@ import {
   REQUIRES_CHANGES_STATUS,
   SUBMITTED_BY_APPROVER_STATUS,
   SUBMITTED_STATUS,
-} from 'domain/transferRequest/constants'
+} from 'domain/transfer-request/constants'
 import { useState } from 'react'
 import { TransferRequestViewProps } from 'components/Controller/TransferRequestView'
 import dynamic from 'next/dynamic'
 
 const ApproveModal = dynamic(() => import('./Modals/ApproveModal').then(mod => mod.ApproveModal))
 const RejectModal = dynamic(() => import('./Modals/RejectModal').then(mod => mod.RejectModal))
-const DeleteModal = dynamic(() => import('../TransferRequest/shared/DeleteModal').then(mod => mod.DeleteModal))
+const DeleteModal = dynamic(() => import('../TransferRequest/Shared/DeleteModal').then(mod => mod.DeleteModal))
 const RequireChangeModal = dynamic(() => import('./Modals/RequireChangeModal').then(mod => mod.RequireChangeModal))
 const WithdrawModal = dynamic(() => import('./Modals/WithdrawModal').then(mod => mod.WithdrawModal))
 

@@ -1,4 +1,4 @@
-import { sendBatchPaidNotification } from 'domain/notifications/sendBatchPaidNotification'
+import { sendBatchPaidNotification } from 'domain/notifications/send-batch-paid-notification'
 import { newHandler, withMethods, withController } from 'lib/middleware'
 import { NextApiResponse } from 'next'
 import errorsMessages from 'wordings-and-errors/errors-messages'

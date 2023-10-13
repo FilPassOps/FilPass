@@ -1,7 +1,7 @@
 import { Role } from '@prisma/client'
 import { ADDRESS_MANAGER_ROLE, APPROVER_ROLE, CONTROLLER_ROLE, SUPERADMIN_ROLE } from 'domain/auth/constants'
 import { getSession, invalidateSession } from 'domain/auth/session'
-import { findUserByIdAndEmail } from 'domain/user/findByIdAndEmail'
+import { getUserByIdAndEmail } from 'domain/user/get-by-id-and-email'
 import { IncomingMessage } from 'http'
 import { withIronSessionSsr } from 'iron-session/next'
 import { extractRoles } from 'lib/auth'
@@ -16,7 +16,6 @@ interface User {
   isOnboarded: boolean
   roles: { id: number; role: Role }[]
 }
-
 
 export function withSessionSSR<P extends { [key: string]: unknown }>(
   handler: (context: GetServerSidePropsContext) => GetServerSidePropsResult<P> | Promise<GetServerSidePropsResult<P>>,
@@ -41,7 +40,7 @@ export function withUserSSR(
 
     const user: SessionUser = req.session?.user
 
-    const { data, error } = await findUserByIdAndEmail({ userId: user?.id, email: user?.email })
+    const { data, error } = await getUserByIdAndEmail({ userId: user?.id, email: user?.email })
 
     if (error || !data) {
       return destroySession(req)

@@ -1,4 +1,4 @@
-import { updateTransferRequestById } from 'domain/transferRequest/updateTransferRequestById'
+import { updateTransferRequestById } from 'domain/transfer-request/update-transfer-request-by-id'
 import { NextApiRequestWithSession, newHandler, withMethods, withUser } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
 

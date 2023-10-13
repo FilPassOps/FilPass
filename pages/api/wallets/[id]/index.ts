@@ -1,4 +1,4 @@
-import { deleteWallet } from 'domain/wallet/deleteWallet'
+import { deleteWallet } from 'domain/wallet/delete-wallet'
 import { NextApiRequestWithSession, newHandler, withLimiter, withMethods, withUser } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
 

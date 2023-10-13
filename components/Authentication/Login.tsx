@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Button, LinkButton } from 'components/shared/Button'
-import { PasswordInput, TextInput } from 'components/shared/FormInput'
+import { Button, LinkButton } from 'components/Shared/Button'
+import { PasswordInput, TextInput } from 'components/Shared/FormInput'
 import { loginValidator } from 'domain/auth/validation'
 import Cookie from 'js-cookie'
 import { api } from 'lib/api'

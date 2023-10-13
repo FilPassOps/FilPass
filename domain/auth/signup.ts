@@ -1,9 +1,9 @@
-import { encryptPII } from 'lib/emissaryCrypto'
+import { encryptPII } from 'lib/emissary-crypto'
 import { generateEmailHash, generatePasswordHash } from 'lib/password'
 import prisma, { newPrismaTransaction } from 'lib/prisma'
 import { validate } from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
-import { sendEmailVerification } from '../notifications/sendEmailVerification'
+import { sendEmailVerification } from '../notifications/send-email-verification'
 import { signupValidator } from './validation'
 
 interface SignupParams {

@@ -2,22 +2,22 @@ import { DocumentTextIcon } from '@heroicons/react/24/outline'
 import { CheckCircleIcon } from '@heroicons/react/24/solid'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useAuth } from 'components/Authentication/Provider'
-import { SelectProgramInput } from 'components/TransferRequest/shared/SelectProgramInput'
-import { useProgramCurrency } from 'components/TransferRequest/shared/useProgramCurrency'
-import { Button, LinkButton } from 'components/shared/Button'
-import { Divider } from 'components/shared/Divider'
-import { UploadFileButton } from 'components/shared/FormInput'
-import { Modal } from 'components/shared/Modal'
-import { CheckCircleThinIcon } from 'components/shared/icons/CheckCircleThinIcon'
+import { SelectProgramInput } from 'components/TransferRequest/Shared/SelectProgramInput'
+import { useProgramCurrency } from 'hooks/useProgramCurrency'
+import { Button, LinkButton } from 'components/Shared/Button'
+import { Divider } from 'components/Shared/Divider'
+import { UploadFileButton } from 'components/Shared/FormInput'
+import { Modal } from 'components/Shared/Modal'
+import { CheckCircleThinIcon } from 'components/Shared/icons/CheckCircleThinIcon'
 import { MAX_INTEGER_VALUE } from 'domain/constants'
 import JsFileDownload from 'js-file-download'
 import { BaseApiResult, api } from 'lib/api'
-import { classNames } from 'lib/classNames'
+import { classNames } from 'lib/class-names'
 import yup from 'lib/yup'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { PreviewTable } from './PreviewTable'
-import { handleDownloadCSVTemplate } from './csvTemplate'
+import { stringify } from 'csv-stringify/sync'
 
 interface FileData {
   file: {
@@ -252,7 +252,7 @@ const ModalComponent = ({ openModal, onModalClosed, errors = [] }: ModalComponen
           <div className="flex flex-col justify-center items-center p-2">
             <h1 className="my-4 font-bold text-1xl">Error creating transfer requests:</h1>
             <div className="w-full my-4 text-center space-y-1">
-              {errors?.map((error)=> (
+              {errors?.map(error => (
                 <p key={error?.message} className="text-sm w-full text-red-400 list-disc">
                   {error?.message}
                 </p>
@@ -283,4 +283,13 @@ const DownloadFile = ({ file }: OpenFileProps) => {
       </button>
     </div>
   )
+}
+
+const csvTemplate = stringify([['Email', 'Name', 'Wallet Address', 'Amount', 'Should Receiver Review']], {
+  delimiter: ',',
+})
+
+export const handleDownloadCSVTemplate = () => {
+  const blob = new Blob([csvTemplate])
+  JsFileDownload(blob, 'Batch-transfer-request-template.csv')
 }

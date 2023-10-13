@@ -1,5 +1,5 @@
-import { getTemporaryFile } from 'domain/files/getTemporaryFile'
-import { deleteTemporaryFile } from 'domain/files/deleteTemporaryFile'
+import { getTemporaryFile } from 'domain/files/get-temporary-file'
+import { deleteTemporaryFile } from 'domain/files/delete-temporary-file'
 import { newHandler, withMethods, withApprover, withLimiter, NextApiRequestWithSession } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
 

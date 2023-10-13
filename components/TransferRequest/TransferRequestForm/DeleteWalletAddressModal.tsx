@@ -1,6 +1,6 @@
 import { useAuth } from 'components/Authentication/Provider'
-import { Button } from 'components/shared/Button'
-import { Modal } from 'components/shared/Modal'
+import { Button } from 'components/Shared/Button'
+import { Modal } from 'components/Shared/Modal'
 import { BaseApiResult, api } from 'lib/api'
 import { useState } from 'react'
 
@@ -21,12 +21,12 @@ export const DeleteWalletAddressModal = ({ openModal, onModalClosed, wallet }: D
 
   const handleDelete = async () => {
     setLoading(true)
-    if(!wallet){
+    if (!wallet) {
       setError('Something went wrong. Please try again.')
       setLoading(false)
       return
     }
-    const { error } = await api.delete(`/wallets/${wallet.id}`) as BaseApiResult
+    const { error } = (await api.delete(`/wallets/${wallet.id}`)) as BaseApiResult
     setLoading(false)
 
     if (error) {

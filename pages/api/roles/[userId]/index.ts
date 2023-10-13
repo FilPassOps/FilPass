@@ -1,4 +1,4 @@
-import { updateRoles } from 'domain/roles/updateRoles'
+import { updateRoles } from 'domain/roles/update-roles'
 import { NextApiRequestWithSession, newHandler, withMethods, withSuperAdmin } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
 

@@ -1,6 +1,6 @@
 import { useAuth } from 'components/Authentication/Provider'
-import { Button } from 'components/shared/Button'
-import { Modal } from 'components/shared/Modal'
+import { Button } from 'components/Shared/Button'
+import { Modal } from 'components/Shared/Modal'
 import { BaseApiResult, api } from 'lib/api'
 import { useState } from 'react'
 
@@ -25,10 +25,10 @@ export const DeleteFileModal = ({
 
   const apiCall = async () => {
     if (uploadingForOthers) {
-      return await api.delete(`/files/temporary/${file.publicId}`) as BaseApiResult
+      return (await api.delete(`/files/temporary/${file.publicId}`)) as BaseApiResult
     }
 
-    return await api.delete(`/files/${file.publicId}`) as BaseApiResult
+    return (await api.delete(`/files/${file.publicId}`)) as BaseApiResult
   }
   const handleDelete = async () => {
     setLoading(true)

@@ -1,5 +1,5 @@
-import { getCurrency } from 'domain/currency/getCurrency'
-import { updateCurrencyRate } from 'domain/currency/updateCurrencyRate'
+import { getCurrency } from 'domain/currency/get-currency'
+import { updateCurrencyRate } from 'domain/currency/update-currency-rate'
 import { NextApiRequestWithSession, newHandler, withLimiter, withMethods, withRoles } from 'lib/middleware'
 import { NextApiResponse } from 'next'
 
@@ -14,7 +14,7 @@ async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
 export default newHandler(withLimiter(withMethods(['PATCH', 'GET'], handler)))
 
 const handlePatchRequest = withRoles(['SUPERADMIN', 'CONTROLLER'], async (req, res) => {
-    const chainId = req.query.chainId as string
+  const chainId = req.query.chainId as string
 
   const { data, error } = await updateCurrencyRate({ ...req.body, chainId })
   if (error) {

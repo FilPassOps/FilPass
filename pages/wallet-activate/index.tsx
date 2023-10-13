@@ -1,6 +1,6 @@
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline'
 import { AppConfig } from 'config'
-import { setWalletActive } from 'domain/wallet/setWalletActive'
+import { setWalletActive } from 'domain/wallet/set-wallet-active'
 import { GetServerSideProps } from 'next'
 import Head from 'next/head'
 import { useEffect } from 'react'

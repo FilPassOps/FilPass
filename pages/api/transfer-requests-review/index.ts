@@ -1,4 +1,4 @@
-import { createTransferRequestReview } from 'domain/transferRequestReview/createTransferRequestReview'
+import { createTransferRequestReview } from 'domain/transfer-request-review/create-transfer-request-review'
 import { newHandler, withMethods, withApprover, NextApiRequestWithSession } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
 

@@ -1,4 +1,4 @@
-import { sendEmailForgotPassword } from 'domain/notifications/sendEmailForgotPassword'
+import { sendEmailForgotPassword } from 'domain/notifications/send-email-forgot-password'
 import { newHandler, withMethods, withAuthLimiter } from 'lib/middleware'
 import { NextApiRequest, NextApiResponse } from 'next/types'
 

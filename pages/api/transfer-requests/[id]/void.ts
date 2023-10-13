@@ -1,4 +1,4 @@
-import { voidTransferRequest } from 'domain/transferRequest/voidTransferRequest'
+import { voidTransferRequest } from 'domain/transfer-request/void-transfer-request'
 import { NextApiRequestWithSession, newHandler, withMethods, withUser } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
 

@@ -1,4 +1,4 @@
-import { getCurrencyMarketRate } from 'domain/currency/getCurrencyMarketRate'
+import { getCurrencyMarketRate } from 'domain/currency/get-currency-market-rate'
 import { NextApiRequestWithSession, newHandler, withMethods, withRoles } from 'lib/middleware'
 import { NextApiResponse } from 'next'
 

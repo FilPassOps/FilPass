@@ -1,4 +1,4 @@
-import { generateCodePublic } from 'domain/auth/generateCode'
+import { generateCodePublic } from 'domain/auth/generate-code'
 import { newHandler, withMethods } from 'lib/middleware'
 import { NextApiRequest, NextApiResponse } from 'next/types'
 

@@ -1,5 +1,5 @@
-import { createProgram } from 'domain/programs/createProgram'
-import { findAllProgramsComplete } from 'domain/programs/findAll'
+import { createProgram } from 'domain/programs/create-program'
+import { getAllProgramsComplete } from 'domain/programs/get-all'
 import { NextApiRequestWithSession, newHandler, withMethods, withSuperAdmin } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
 
@@ -24,9 +24,9 @@ async function handlePostRequest(req: NextApiRequestWithSession, res: NextApiRes
 }
 
 async function handleGetRequest(req: NextApiRequestWithSession, res: NextApiResponse) {
-  const { data, error } = await findAllProgramsComplete({
+  const { data, error } = await getAllProgramsComplete({
     ...req.query,
-    archived: Number(req.query.archived)
+    archived: Number(req.query.archived),
   })
 
   if (error) {

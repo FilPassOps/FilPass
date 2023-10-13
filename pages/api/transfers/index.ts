@@ -1,5 +1,5 @@
-import { createOrUpdateTransfers } from 'domain/transfer/createOrUpdateTransfers'
-import { getTransfersByRequestId } from 'domain/transfer/getTransfersByRequestId'
+import { createOrUpdateTransfers } from 'domain/transfer/create-or-update-transfers'
+import { getTransfersByRequestId } from 'domain/transfer/get-transfers-by-request-id'
 import { NextApiRequestWithSession, newHandler, withController, withMethods } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
 import qs from 'qs'

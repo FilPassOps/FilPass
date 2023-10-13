@@ -1,5 +1,5 @@
-import { Modal } from 'components/shared/Modal'
-import { Button } from 'components/shared/Button'
+import { Modal } from 'components/Shared/Modal'
+import { Button } from 'components/Shared/Button'
 
 interface WarningPopupProps {
   isOpen: boolean

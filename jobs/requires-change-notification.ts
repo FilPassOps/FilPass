@@ -1,9 +1,9 @@
 import { baseEmail } from 'domain/notifications/constants'
-import { REQUIRES_CHANGES_STATUS } from 'domain/transferRequest/constants'
-import { decryptPII } from 'lib/emissaryCrypto'
+import { REQUIRES_CHANGES_STATUS } from 'domain/transfer-request/constants'
+import { decryptPII } from 'lib/emissary-crypto'
 import { logger } from 'lib/logger'
 import prisma from 'lib/prisma'
-import { sendBatchEmail } from 'lib/sendEmail'
+import { sendBatchEmail } from 'lib/send-email'
 
 interface EmailReminderRecipient {
   email: string
@@ -50,7 +50,7 @@ export default async function run() {
       return {
         email,
       }
-    })
+    }),
   )
 
   const recipients: EmailReminderRecipient[] = []

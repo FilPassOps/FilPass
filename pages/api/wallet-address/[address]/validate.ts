@@ -1,4 +1,4 @@
-import { validateWalletAddress } from 'lib/blockchainUtils'
+import { validateWalletAddress } from 'lib/blockchain-utils'
 import { NextApiRequestWithSession, newHandler, withLimiter, withMethods, withUser } from 'lib/middleware'
 import { NextApiResponse } from 'next'
 import errorsMessages from 'wordings-and-errors/errors-messages'

@@ -1,9 +1,9 @@
 import { XMarkIcon } from '@heroicons/react/24/solid'
 
 import { useAuth } from 'components/Authentication/Provider'
-import { Button } from 'components/shared/Button'
-import { SelectInput } from 'components/shared/FormInput'
-import { WalletAddress } from 'components/shared/WalletAddress'
+import { Button } from 'components/Shared/Button'
+import { SelectInput } from 'components/Shared/FormInput'
+import { WalletAddress } from 'components/Shared/WalletAddress'
 import _get from 'lodash/get'
 import { useMemo, useState } from 'react'
 import { Controller } from 'react-hook-form'

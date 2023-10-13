@@ -1,4 +1,4 @@
-import { batchRejectTransferRequest } from 'domain/transferRequestReview/rejectTransferRequest'
+import { batchRejectTransferRequest } from 'domain/transfer-request-review/reject-transfer-request'
 import { newHandler, withMethods, withApprover, NextApiRequestWithSession } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
 

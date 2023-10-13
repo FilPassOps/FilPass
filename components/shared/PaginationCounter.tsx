@@ -1,4 +1,4 @@
-import { APPROVED_STATUS, PAID_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
+import { APPROVED_STATUS, PAID_STATUS, SUBMITTED_STATUS } from 'domain/transfer-request/constants'
 
 interface PaginationCounterProps {
   total?: number

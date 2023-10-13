@@ -1,4 +1,4 @@
-import { uploadBatchCsv } from 'domain/transferRequest/uploadBatchCsv'
+import { uploadBatchCsv } from 'domain/transfer-request/upload-batch-csv'
 import { newHandler, withApprover, withFile, withMethods } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
 import { NextApiRequestWithSessionAndFile } from 'pages/api/files'

@@ -1,8 +1,8 @@
 import { useAlertDispatcher } from 'components/Layout/Alerts'
-import { Button } from 'components/shared/Button'
-import { getInputClasses } from 'components/shared/FormInput'
-import { contractInterface } from 'components/web3/useContract'
-import { amountConverter } from 'lib/blockchainUtils'
+import { Button } from 'components/Shared/Button'
+import { getInputClasses } from 'components/Shared/FormInput'
+import { contractInterface } from 'hooks/useContract'
+import { amountConverter } from 'lib/blockchain-utils'
 import { useState } from 'react'
 import Image from 'next/image'
 

@@ -1,5 +1,5 @@
-import { Button } from 'components/shared/Button'
-import { Modal } from 'components/shared/Modal'
+import { Button } from 'components/Shared/Button'
+import { Modal } from 'components/Shared/Modal'
 import { api } from 'lib/api'
 import { useState } from 'react'
 

@@ -1,11 +1,11 @@
 import { Role } from '@prisma/client'
 import { APPROVER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
-import { findUserRolePrograms } from 'domain/programs/findAll'
-import { PAID_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
-import { getApproverTransferRequestById } from 'domain/transferRequest/getApproverTransferRequestById'
-import { getApproverTransferRequests } from 'domain/transferRequest/getApproverTransferRequests'
-import { getViewerTransferRequestById } from 'domain/transferRequest/getViewerTransferRequestById'
-import { getViewerTransferRequests } from 'domain/transferRequest/getViewerTransferRequests'
+import { getUserRolePrograms } from 'domain/programs/get-all'
+import { PAID_STATUS, SUBMITTED_STATUS } from 'domain/transfer-request/constants'
+import { getApproverTransferRequestById } from 'domain/transfer-request/get-approver-transfer-request-by-id'
+import { getApproverTransferRequests } from 'domain/transfer-request/get-approver-transfer-requests'
+import { getViewerTransferRequestById } from 'domain/transfer-request/get-viewer-transfer-request-by-id'
+import { getViewerTransferRequests } from 'domain/transfer-request/get-viewer-transfer-requests'
 import { generateTeamHash } from 'lib/password'
 import prisma from 'lib/prisma'
 
@@ -107,7 +107,7 @@ export const getApprovalsByRole = async ({
       page,
     })
 
-    const { data: programs } = await findUserRolePrograms(userId)
+    const { data: programs } = await getUserRolePrograms(userId)
 
     return {
       transfers: result.data?.transfers,
@@ -135,7 +135,7 @@ export const getApprovalsByRole = async ({
     page,
   })
 
-  const { data: programs } = await findUserRolePrograms(userId)
+  const { data: programs } = await getUserRolePrograms(userId)
   return {
     transfers: result.data?.transfers,
     totalItems: result.data?.totalItems,

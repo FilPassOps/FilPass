@@ -2,14 +2,14 @@ import { ArrowDownTrayIcon, DocumentDuplicateIcon, DocumentPlusIcon, XMarkIcon }
 import TransferList from 'components/Approver/TransferList'
 import { Filters } from 'components/Filters/Filters'
 import { Layout } from 'components/Layout'
-import { Button, LinkButton } from 'components/shared/Button'
-import { PaginationCounter } from 'components/shared/PaginationCounter'
-import { PaginationWrapper, getItemsPerPage } from 'components/shared/usePagination'
+import { Button, LinkButton } from 'components/Shared/Button'
+import { PaginationCounter } from 'components/Shared/PaginationCounter'
+import { PaginationWrapper, getItemsPerPage } from 'components/Shared/PaginationWrapper'
 import { AppConfig, ChainNames } from 'config'
 import { stringify } from 'csv-stringify/sync'
 import { getApprovalsByRole } from 'domain/approvals/service'
 import { APPROVER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
-import { SUBMITTED_BY_APPROVER_STATUS, SUBMITTED_STATUS } from 'domain/transferRequest/constants'
+import { SUBMITTED_BY_APPROVER_STATUS, SUBMITTED_STATUS } from 'domain/transfer-request/constants'
 import JsFileDownload from 'js-file-download'
 import { api } from 'lib/api'
 import { withRolesSSR } from 'lib/ssr'
@@ -23,9 +23,8 @@ import dynamic from 'next/dynamic'
 
 const ApproveModal = dynamic(() => import('components/Approver/Modals/ApproveModal').then(mod => mod.ApproveModal))
 const RejectModal = dynamic(() => import('components/Approver/Modals/RejectModal').then(mod => mod.RejectModal))
-const DeleteModal = dynamic(() => import('components/TransferRequest/shared/DeleteModal').then(mod => mod.DeleteModal))
-const CreateReportModal = dynamic(() => import('components/TransferRequest/shared/CreateReportModal').then(mod => mod.CreateReportModal))
-
+const DeleteModal = dynamic(() => import('components/TransferRequest/Shared/DeleteModal').then(mod => mod.DeleteModal))
+const CreateReportModal = dynamic(() => import('components/TransferRequest/Shared/CreateReportModal').then(mod => mod.CreateReportModal))
 
 interface ApprovalsProps {
   initialData: any[]

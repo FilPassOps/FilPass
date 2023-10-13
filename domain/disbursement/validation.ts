@@ -1,5 +1,5 @@
-import { APPROVED_STATUS, PAID_STATUS, REJECTED_BY_CONTROLLER_STATUS } from 'domain/transferRequest/constants'
-import { REJECTED } from 'domain/transferRequestReview/constants'
+import { APPROVED_STATUS, PAID_STATUS, REJECTED_BY_CONTROLLER_STATUS } from 'domain/transfer-request/constants'
+import { REJECTED } from 'domain/transfer-request-review/constants'
 import yup from 'lib/yup'
 import { MAX_INTEGER_VALUE } from '../constants'
 

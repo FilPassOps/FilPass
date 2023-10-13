@@ -1,6 +1,5 @@
 import { AppConfig } from 'config'
 import { deliveryMethod as deliveryMethodConst, ONE_TIME } from 'domain/programs/constants'
-import { formatPaymentMethod } from './formatPaymentMethod'
 
 interface ApproverRole {
   roleId: number
@@ -164,3 +163,15 @@ export const deliveryMethodOptions = [
     label: deliveryMethodConst[ONE_TIME],
   },
 ]
+
+export const formatPaymentMethod = (request_unit_name?: string, payment_unit_name?: string) => {
+  if (!request_unit_name && !payment_unit_name) {
+    return '-'
+  }
+
+  if (!request_unit_name && payment_unit_name) {
+    return payment_unit_name
+  }
+
+  return `Request in ${request_unit_name} and Pay in ${payment_unit_name}`
+}

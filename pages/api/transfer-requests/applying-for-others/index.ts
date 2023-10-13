@@ -1,4 +1,4 @@
-import { createForOthers } from 'domain/transferRequest/createForOthers'
+import { createForOthers } from 'domain/transfer-request/create-for-others'
 import { NextApiRequestWithSession, newHandler, withApprover, withMethods } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
 

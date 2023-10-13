@@ -1,7 +1,7 @@
 import { Role } from '@prisma/client'
 import { getApprovalsByRole } from 'domain/approvals/service'
 import { APPROVER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
-import { SUBMITTED_STATUS } from 'domain/transferRequest/constants'
+import { SUBMITTED_STATUS } from 'domain/transfer-request/constants'
 import { NextApiRequestWithSession, newHandler, withMethods, withRoles } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
 

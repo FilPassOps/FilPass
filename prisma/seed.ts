@@ -2,7 +2,7 @@ import { loadEnvConfig } from '@next/env'
 import { PrismaClient } from '@prisma/client'
 import { hash } from 'bcrypt'
 import { AppConfig } from '../config'
-import { encryptPII } from '../lib/emissaryCrypto'
+import { encryptPII } from '../lib/emissary-crypto'
 
 loadEnvConfig(process.cwd(), true)
 

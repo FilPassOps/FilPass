@@ -14,8 +14,8 @@ import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/solid'
 
 import { useAuth } from 'components/Authentication/Provider'
 import { TokenPrice } from 'components/Controller/TokenPrice'
-import { LinkButton } from 'components/shared/Button'
-import { RoleComponent } from 'components/shared/RoleComponent'
+import { LinkButton } from 'components/Shared/Button'
+import { RoleComponent } from 'components/Shared/RoleComponent'
 import { AppConfig } from 'config'
 import { ADDRESS_MANAGER_ROLE, APPROVER_ROLE, CONTROLLER_ROLE, SUPERADMIN_ROLE, USER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
 import { ACTIVE_STATUS, ARCHIVED_STATUS } from 'domain/programs/constants'
@@ -29,9 +29,9 @@ import {
   REQUIRES_CHANGES_STATUS,
   SUBMITTED_STATUS,
   VOIDED_STATUS,
-} from 'domain/transferRequest/constants'
+} from 'domain/transfer-request/constants'
 import { UserResult } from 'domain/user'
-import { classNames } from 'lib/classNames'
+import { classNames } from 'lib/class-names'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { BatchActionsButton } from 'pages/approvals'

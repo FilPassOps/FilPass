@@ -4,7 +4,7 @@ import { hash } from 'bcrypt'
 import { loadEnvConfig } from '@next/env'
 import { PrismaClient } from '@prisma/client'
 import { AppConfig } from '../config'
-import { encrypt, encryptPII } from '../lib/emissaryCrypto'
+import { encrypt, encryptPII } from '../lib/emissary-crypto'
 loadEnvConfig(process.cwd(), true)
 
 const prisma = new PrismaClient()

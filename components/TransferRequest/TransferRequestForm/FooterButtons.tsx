@@ -1,9 +1,9 @@
-import { Button } from 'components/shared/Button'
-import { GoBackConfirmation } from 'components/shared/GoBackConfirmation'
-import { DRAFT_STATUS } from 'domain/transferRequest/constants'
+import { Button } from 'components/Shared/Button'
+import { GoBackConfirmation } from 'components/Shared/GoBackConfirmation'
+import { DRAFT_STATUS } from 'domain/transfer-request/constants'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { DeleteModal } from '../shared/DeleteModal'
+import { DeleteModal } from '../Shared/DeleteModal'
 
 interface FooterButtonsProps {
   isEditable: boolean

@@ -3,7 +3,7 @@ import prisma from 'lib/prisma'
 import { validate } from 'lib/yup'
 import { loginValidator } from './validation'
 import errorsMessages from 'wordings-and-errors/errors-messages'
-import { generateCode } from './generateCode'
+import { generateCode } from './generate-code'
 import { sign } from 'lib/jwt'
 
 interface LoginParams {
