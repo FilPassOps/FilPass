@@ -215,12 +215,6 @@ const createOrUpdateWallets = async (requests: Request[], programs: ProgramWithB
     const foundRejected = createdWallets.find(req => req.status === 'rejected')
 
     if (foundRejected) {
-      if ((foundRejected as PromiseRejectedResult).reason.code === 'P2002') {
-        throw new TransactionError(
-          'Please update the file so you are only adding 1 wallet per user. If you are adding multiple requests for 1 user, add the wallet to the first request and keep wallet on other requests blank.',
-          { status: 400, errors: undefined },
-        )
-      }
       throw new TransactionError('Error while creating wallets', { status: 500, errors: undefined })
     }
 
