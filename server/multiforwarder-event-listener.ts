@@ -2,8 +2,7 @@ import { AppConfig } from 'config'
 import { transferPaymentConfirm } from 'domain/transfer/transfers-payment-confirm'
 import { ethers } from 'ethers'
 import { logger } from 'lib/logger'
-import { MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
-import { MultiForwarder } from 'typechain-types/contracts/src'
+import { MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
 
 const map = new Map<string, MultiForwarder>()
 
