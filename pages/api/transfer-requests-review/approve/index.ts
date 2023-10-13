@@ -1,4 +1,4 @@
-import { batchApproveTransferRequest } from 'domain/transferRequestReview/approveTransferRequest'
+import { batchApproveTransferRequest } from 'domain/transfer-request-review/approve-transfer-request'
 import { newHandler, NextApiRequestWithSession, withApprover, withMethods, withValidation } from 'lib/middleware'
 import yup from 'lib/yup'
 import { NextApiResponse } from 'next'

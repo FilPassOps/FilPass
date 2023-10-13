@@ -1,5 +1,5 @@
 import { TransferRequest } from '@prisma/client'
-import { decryptPII, decrypt } from 'lib/emissaryCrypto'
+import { decryptPII, decrypt } from 'lib/emissary-crypto'
 
 interface DecryptUserParams {
   email: string

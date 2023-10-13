@@ -1,4 +1,4 @@
-import { LinkButton } from 'components/shared/Button'
+import { LinkButton } from 'components/Shared/Button'
 import { ViewTransferRequest, ViewTransferRequestProps } from 'components/TransferRequest/ViewTransferRequest'
 import { CONTROLLER_ROLE } from 'domain/auth/constants'
 

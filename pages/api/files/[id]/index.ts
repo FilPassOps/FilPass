@@ -1,5 +1,5 @@
-import { deleteFile } from 'domain/files/deleteFile'
-import { getUserFile } from 'domain/files/getUserFile'
+import { deleteFile } from 'domain/files/delete-file'
+import { getUserFile } from 'domain/files/get-user-file'
 import { NextApiRequestWithSession, newHandler, withLimiter, withMethods, withUser } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
 
@@ -13,7 +13,10 @@ async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
 
 async function handleGetRequest(req: NextApiRequestWithSession, res: NextApiResponse) {
   const id = req.query.id
-  const { error, data } = await getUserFile({ filePublicId: id as string, user: req.user as any }) as {error: any, data: {file: any, info: any} }
+  const { error, data } = (await getUserFile({ filePublicId: id as string, user: req.user as any })) as {
+    error: any
+    data: { file: any; info: any }
+  }
 
   if (error) {
     return res.status(error.status).json(error)

@@ -1,7 +1,7 @@
 /* eslint-disable react/display-name */
 import { Listbox } from '@headlessui/react'
 import { ChevronDownIcon, ChevronUpIcon, EyeIcon, EyeSlashIcon, XMarkIcon } from '@heroicons/react/24/solid'
-import { classNames } from 'lib/classNames'
+import { classNames } from 'lib/class-names'
 import { forwardRef, useEffect, useRef, useState } from 'react'
 
 import { NumericFormat } from 'react-number-format'
@@ -593,7 +593,7 @@ export const UploadFileButton = ({ children, onChange, disabled, loading, accept
         accept={accept}
         className="hidden"
         aria-label="Upload file"
-        onClick={e => (e.target as HTMLInputElement).value = ''}
+        onClick={e => ((e.target as HTMLInputElement).value = '')}
         onChange={e => {
           const file = e.target.files?.[0]
           if (file) {

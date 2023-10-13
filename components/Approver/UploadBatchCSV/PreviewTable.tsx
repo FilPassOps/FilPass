@@ -1,6 +1,6 @@
 import { CheckCircleIcon } from '@heroicons/react/24/solid'
-import { Cell, Header, Table, TableBody, TableHead } from 'components/shared/Table'
-import Currency from 'components/shared/Table/Currency'
+import { Cell, Header, Table, TableBody, TableHead } from 'components/Shared/Table'
+import Currency from 'components/Shared/Table/Currency'
 
 interface PreviewTableProps {
   data: {

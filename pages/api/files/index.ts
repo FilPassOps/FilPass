@@ -1,4 +1,4 @@
-import { createFile } from 'domain/files/createFile'
+import { createFile } from 'domain/files/create-file'
 import { NextApiRequestWithSession, newHandler, withFile, withLimiter, withMethods, withUser } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
 

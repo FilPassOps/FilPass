@@ -1,4 +1,4 @@
-import { updateUserTerms } from 'domain/user/updateUserTems'
+import { updateUserTerms } from 'domain/user/update-user-terms'
 import { termsValidator } from 'domain/user/validation'
 import { newHandler, NextApiHandlerWithUser, NextApiRequestWithSession, withMethods, withUser } from 'lib/middleware'
 import yup, { validate } from 'lib/yup'

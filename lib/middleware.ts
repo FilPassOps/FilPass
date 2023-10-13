@@ -1,13 +1,7 @@
 import crypto from 'crypto'
-import {
-  ADDRESS_MANAGER_ROLE,
-  APPROVER_ROLE,
-  CONTROLLER_ROLE,
-  SUPERADMIN_ROLE,
-  SystemRoles,
-} from 'domain/auth/constants'
+import { ADDRESS_MANAGER_ROLE, APPROVER_ROLE, CONTROLLER_ROLE, SUPERADMIN_ROLE, SystemRoles } from 'domain/auth/constants'
 import { getSession, invalidateSession } from 'domain/auth/session'
-import { findUserByIdAndEmail } from 'domain/user/findByIdAndEmail'
+import { getUserByIdAndEmail } from 'domain/user/get-by-id-and-email'
 import { Request, RequestHandler } from 'express'
 import rateLimit from 'express-rate-limit'
 import { IronSessionData } from 'iron-session'
@@ -134,7 +128,7 @@ export function withUser<T>(handler: NextApiHandlerWithUser<T>): NextApiHandlerW
       return await destroySession(req, res)
     }
 
-    const { data, error } = await findUserByIdAndEmail({ userId: user.id, email: user.email })
+    const { data, error } = await getUserByIdAndEmail({ userId: user.id, email: user.email })
 
     if (data?.isBanned) {
       return res.status(403).json({ message: 'Forbidden access' })

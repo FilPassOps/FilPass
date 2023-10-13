@@ -1,13 +1,13 @@
 import { PlusCircleIcon } from '@heroicons/react/24/solid'
 import { Layout } from 'components/Layout'
-import { Button } from 'components/shared/Button'
-import { getItemsPerPage, PaginationWrapper } from 'components/shared/usePagination'
+import { Button } from 'components/Shared/Button'
+import { getItemsPerPage, PaginationWrapper } from 'components/Shared/PaginationWrapper'
 import { ProgramList } from 'components/SuperAdmin/ProgramList'
 import { AppConfig } from 'config'
 import { ACTIVE_STATUS, ARCHIVED_STATUS } from 'domain/programs/constants'
-import { findAllProgramsComplete } from 'domain/programs/findAll'
-import { findAllApprovers } from 'domain/user/findAllApprovers'
-import { findAllViewers } from 'domain/user/findAllViewers'
+import { getAllProgramsComplete } from 'domain/programs/get-all'
+import { getAllApprovers } from 'domain/user/get-all-approvers'
+import { getAllViewers } from 'domain/user/get-all-viewers'
 import { withSuperAdminSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
@@ -78,9 +78,9 @@ export const getServerSideProps = withSuperAdminSSR(async ({ user, query }) => {
   const pageSize = getItemsPerPage(query.itemsPerPage)
   const page = query.page && typeof query.page === 'string' ? parseInt(query.page) : 1
   const status = query.status || ACTIVE_STATUS
-  const { data } = await findAllProgramsComplete({ archived: status === ARCHIVED_STATUS, page, size: pageSize })
-  const { data: approversData } = await findAllApprovers()
-  const { data: viewersData } = await findAllViewers()
+  const { data } = await getAllProgramsComplete({ archived: status === ARCHIVED_STATUS, page, size: pageSize })
+  const { data: approversData } = await getAllApprovers()
+  const { data: viewersData } = await getAllViewers()
 
   return {
     props: {

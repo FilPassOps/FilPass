@@ -1,6 +1,6 @@
-import { Modal } from 'components/shared/Modal'
-import { Cell, Header, Table, TableBody, TableHead } from 'components/shared/Table'
-import { formatPaymentMethod } from 'components/SuperAdmin/shared/formatPaymentMethod'
+import { Modal } from 'components/Shared/Modal'
+import { Cell, Header, Table, TableBody, TableHead } from 'components/Shared/Table'
+import { formatPaymentMethod } from 'components/SuperAdmin/Shared/utils'
 
 interface ApproverProgramsListModalProps {
   data: {

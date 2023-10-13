@@ -1,5 +1,5 @@
-import { getAll } from 'domain/disbursement/getAll'
-import { APPROVED_STATUS } from 'domain/transferRequest/constants'
+import { getAll } from 'domain/disbursement/get-all'
+import { APPROVED_STATUS } from 'domain/transfer-request/constants'
 import { NextApiRequestWithSession, newHandler, withController, withMethods } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
 

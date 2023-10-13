@@ -1,8 +1,8 @@
 import { UserWalletList } from 'components/AddressManager/UserWalletList'
 import { Layout } from 'components/Layout'
-import { getItemsPerPage, PaginationWrapper } from 'components/shared/usePagination'
+import { getItemsPerPage, PaginationWrapper } from 'components/Shared/PaginationWrapper'
 import { AppConfig } from 'config'
-import { findAllWithWallets } from 'domain/user/findAllWithWallets'
+import { getAllWithWallets } from 'domain/user/get-all-with-wallets'
 import { withAddressManagerSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { ReactElement } from 'react'
@@ -48,7 +48,7 @@ export const getServerSideProps = withAddressManagerSSR(async function getServer
   const pageSize = getItemsPerPage(query.itemsPerPage)
   const page = query.page && typeof query.page === 'string' ? parseInt(query.page) : 1
 
-  const { data } = await findAllWithWallets({ size: pageSize, page })
+  const { data } = await getAllWithWallets({ size: pageSize, page })
 
   return {
     props: {

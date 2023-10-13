@@ -1,6 +1,6 @@
-import { updateUserBan } from 'domain/user/updateUserBan'
+import { updateUserBan } from 'domain/user/update-user-ban'
 import { newHandler, NextApiRequestWithSession, withMethods, withSuperAdmin, withValidation } from 'lib/middleware'
-import { sanitizeText } from 'lib/sanitizeText'
+import { sanitizeText } from 'lib/sanitize-text'
 import yup from 'lib/yup'
 import { NextApiResponse } from 'next'
 

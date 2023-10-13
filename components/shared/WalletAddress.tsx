@@ -1,5 +1,5 @@
-import { classNames } from 'lib/classNames'
-import { ShortenLength, shortenAddress } from 'lib/shortenAddress'
+import { classNames } from 'lib/class-names'
+import { ShortenLength, shortenAddress } from 'lib/shorten-address'
 import { IsVerified } from './IsVerified'
 import { BlockchainIcon } from './icons/BlockchainIcon'
 

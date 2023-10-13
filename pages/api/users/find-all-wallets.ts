@@ -1,10 +1,10 @@
-import { findAllWithWallets } from 'domain/user/findAllWithWallets'
+import { getAllWithWallets } from 'domain/user/get-all-with-wallets'
 import { NextApiRequestWithSession, newHandler, withAddressManager, withMethods } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
 
 async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
   const query = req.query
-  const { data, error } = await findAllWithWallets(query)
+  const { data, error } = await getAllWithWallets(query)
   if (error) {
     return res.status(error.status).json(error)
   }

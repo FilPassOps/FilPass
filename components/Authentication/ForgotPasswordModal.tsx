@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useForm } from 'react-hook-form'
-import { Modal } from 'components/shared/Modal'
-import { Button } from 'components/shared/Button'
-import { TextInput } from 'components/shared/FormInput'
+import { Modal } from 'components/Shared/Modal'
+import { Button } from 'components/Shared/Button'
+import { TextInput } from 'components/Shared/FormInput'
 import { api } from 'lib/api'
 import { sendEmailForgotPasswordValidator } from 'domain/notifications/validation'
 

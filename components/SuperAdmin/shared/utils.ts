@@ -1,6 +1,5 @@
 import { AppConfig } from 'config'
 import { deliveryMethod as deliveryMethodConst, ONE_TIME } from 'domain/programs/constants'
-import { formatPaymentMethod } from './formatPaymentMethod'
 
 interface ApproverRole {
   roleId: number
@@ -19,6 +18,25 @@ interface Program {
   viewersRole?: ViewerRole[]
   approversRole?: ApproverRole[][]
   userRoleProgramGroupIds?: number[]
+}
+
+export const deliveryMethodOptions = [
+  {
+    value: ONE_TIME,
+    label: deliveryMethodConst[ONE_TIME],
+  },
+]
+
+export const formatPaymentMethod = (request_unit_name?: string, payment_unit_name?: string) => {
+  if (!request_unit_name && !payment_unit_name) {
+    return '-'
+  }
+
+  if (!request_unit_name && payment_unit_name) {
+    return payment_unit_name
+  }
+
+  return `Request in ${request_unit_name} and Pay in ${payment_unit_name}`
 }
 
 export const generateApproversRoleOptions = (approversData: ApproverRole[]) =>
@@ -157,10 +175,3 @@ export const groupProgramApproversRole = (approversRole: { roleId: number }[][],
 
   return Array.from(groupedApproversRole.values())
 }
-
-export const deliveryMethodOptions = [
-  {
-    value: ONE_TIME,
-    label: deliveryMethodConst[ONE_TIME],
-  },
-]

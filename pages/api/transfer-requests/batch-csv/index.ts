@@ -1,4 +1,4 @@
-import { batchCsv } from 'domain/transferRequest/batchCsv'
+import { batchCsv } from 'domain/transfer-request/batch-csv'
 import { NextApiRequestWithSession, newHandler, withApprover, withMethods } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
 
@@ -13,12 +13,12 @@ const handlePostRequest = async (req: NextApiRequestWithSession, res: NextApiRes
   const approverRoleId = req.approverId as number
   const approver = req.user as any
 
-  const { error, data } = await batchCsv({
+  const { error, data } = (await batchCsv({
     requests,
     requesterId,
     approverRoleId,
     approver,
-  }) as any
+  })) as any
 
   if (error) {
     return res.status(error.status).json(error)

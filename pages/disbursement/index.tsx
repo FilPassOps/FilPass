@@ -5,15 +5,15 @@ import TransferList from 'components/Controller/TransferList'
 import { Filters } from 'components/Filters/Filters'
 import { Layout } from 'components/Layout'
 import { useAlertDispatcher } from 'components/Layout/Alerts'
-import { Button } from 'components/shared/Button'
-import { PaginationCounter } from 'components/shared/PaginationCounter'
-import { PaginationWrapper, getItemsPerPage } from 'components/shared/usePagination'
-import { WithMetaMaskButton } from 'components/web3/MetaMaskProvider'
+import { Button } from 'components/Shared/Button'
+import { PaginationCounter } from 'components/Shared/PaginationCounter'
+import { PaginationWrapper, getItemsPerPage } from 'components/Shared/PaginationWrapper'
+import { WithMetaMaskButton } from 'components/Web3/MetaMaskProvider'
 import { AppConfig, ChainNames } from 'config'
 import { stringify } from 'csv-stringify/sync'
-import { getAll } from 'domain/disbursement/getAll'
-import { findAllPrograms } from 'domain/programs/findAll'
-import { APPROVED_STATUS, PAID_STATUS } from 'domain/transferRequest/constants'
+import { getAll } from 'domain/disbursement/get-all'
+import { getAllPrograms } from 'domain/programs/get-all'
+import { APPROVED_STATUS, PAID_STATUS } from 'domain/transfer-request/constants'
 import JsFileDownload from 'js-file-download'
 import { api } from 'lib/api'
 import { withControllerSSR } from 'lib/ssr'
@@ -26,7 +26,7 @@ import errorsMessages from 'wordings-and-errors/errors-messages'
 
 const NotifyConfirmationModal = dynamic(() => import('components/Controller/Modals/NotifyConfirmationModal').then(mod => mod.default))
 const RejectModal = dynamic(() => import('components/Controller/Modals/RejectModal').then(mod => mod.default))
-const CreateReportModal = dynamic(() => import('components/TransferRequest/shared/CreateReportModal').then(mod => mod.CreateReportModal))
+const CreateReportModal = dynamic(() => import('components/TransferRequest/Shared/CreateReportModal').then(mod => mod.CreateReportModal))
 
 interface DisbursementProps {
   initialData: any[]
@@ -413,7 +413,7 @@ export const getServerSideProps = withControllerSSR(async ({ query }) => {
     }
   }
 
-  const { data: programs } = await findAllPrograms({ archived: false })
+  const { data: programs } = await getAllPrograms({ archived: false })
 
   return {
     props: {

@@ -1,5 +1,5 @@
-import { deleteDraftTransferRequestById } from 'domain/transferRequestDraft/deleteDraftTransferRequestById'
-import { submitDraftTransferRequestById } from 'domain/transferRequestDraft/submitDraftTransferRequestById'
+import { deleteDraftTransferRequestById } from 'domain/transfer-request-draft/delete-draft-transfer-request-by-id'
+import { submitDraftTransferRequestById } from 'domain/transfer-request-draft/submit-draft-transfer-request-by-id'
 import { NextApiRequestWithSession, newHandler, withLimiter, withMethods, withUser } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
 

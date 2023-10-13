@@ -1,5 +1,5 @@
-import { archiveProgram, unarchiveProgram } from 'domain/programs/archiveProgram'
-import { updateProgram } from 'domain/programs/updateProgram'
+import { archiveProgram, unarchiveProgram } from 'domain/programs/archive-program'
+import { updateProgram } from 'domain/programs/update-program'
 import { NextApiRequestWithSession, newHandler, withMethods, withSuperAdmin } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
 

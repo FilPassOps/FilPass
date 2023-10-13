@@ -1,6 +1,6 @@
 import { AppConfig, ChainNames } from 'config'
-import { APPROVED_STATUS, PAID_STATUS, REJECTED_BY_CONTROLLER_STATUS } from 'domain/transferRequest/constants'
-import { getCountByNetworkAndStatus } from 'domain/transferRequest/getCountByNetworkAndStatus'
+import { APPROVED_STATUS, PAID_STATUS, REJECTED_BY_CONTROLLER_STATUS } from 'domain/transfer-request/constants'
+import { getCountByNetworkAndStatus } from 'domain/transfer-request/get-count-by-network-and-status'
 import { NextApiRequestWithSession, newHandler, withController, withLimiter, withMethods } from 'lib/middleware'
 import yup, { validate } from 'lib/yup'
 import { NextApiResponse } from 'next/types'

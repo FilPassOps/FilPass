@@ -1,4 +1,4 @@
-import { classNames } from 'lib/classNames'
+import { classNames } from 'lib/class-names'
 import Link from 'next/link'
 
 interface TableProps {
@@ -104,7 +104,7 @@ export const TableHead: React.FunctionComponent<React.PropsWithChildren<TableHea
     <thead
       className={classNames(
         className,
-        'bg-azureish-white border-2 border-b-0 border-azureish-white text-deep-koamaru font-bold text-base flex-none whitespace-nowrap'
+        'bg-azureish-white border-2 border-b-0 border-azureish-white text-deep-koamaru font-bold text-base flex-none whitespace-nowrap',
       )}
     >
       {children}
@@ -117,7 +117,7 @@ export const TableBody: React.FunctionComponent<React.PropsWithChildren<TableBod
     <tbody
       className={classNames(
         className,
-        'bg-white text-sm text-deep-koamaru divide-y-2 divide-y-azureish-white border-l-2 border-r-2 border-b-2 border-azureish-white'
+        'bg-white text-sm text-deep-koamaru divide-y-2 divide-y-azureish-white border-l-2 border-r-2 border-b-2 border-azureish-white',
       )}
     >
       {children}

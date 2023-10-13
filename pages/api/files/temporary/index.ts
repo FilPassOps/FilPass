@@ -1,4 +1,4 @@
-import { createTemporaryFile } from 'domain/files/createTemporaryFile'
+import { createTemporaryFile } from 'domain/files/create-temporary-file'
 import { newHandler, withFile, withMethods, withApprover, withLimiter } from 'lib/middleware'
 import { NextApiRequestWithSessionAndFile } from '..'
 import { NextApiResponse } from 'next/types'

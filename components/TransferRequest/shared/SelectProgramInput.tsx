@@ -1,5 +1,5 @@
 import { Controller } from 'react-hook-form'
-import { SelectInput } from 'components/shared/FormInput'
+import { SelectInput } from 'components/Shared/FormInput'
 import { useMemo } from 'react'
 
 interface SelectProgramInputProps {

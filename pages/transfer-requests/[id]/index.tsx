@@ -1,7 +1,7 @@
 import { Layout } from 'components/Layout'
 import { TransferDetails, TransferRequestDetailsProps } from 'components/User/TransferDetails'
 import { AppConfig } from 'config'
-import { getUserTransferRequestById } from 'domain/transferRequest/getUserTransferRequestById'
+import { getUserTransferRequestById } from 'domain/transfer-request/get-user-transfer-request-by-id'
 import { withUserSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { ReactElement } from 'react'

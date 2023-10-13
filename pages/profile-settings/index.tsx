@@ -2,9 +2,9 @@ import { PlusCircleIcon } from '@heroicons/react/24/solid'
 import { Layout } from 'components/Layout'
 import { WalletModal } from 'components/TransferRequest/WalletModal'
 import { WalletList } from 'components/User/WalletList'
-import { Button } from 'components/shared/Button'
+import { Button } from 'components/Shared/Button'
 import { AppConfig } from 'config'
-import { findUserByIdAndEmail } from 'domain/user'
+import { getUserByIdAndEmail } from 'domain/user'
 import { fetcher } from 'lib/fetcher'
 import { withUserSSR } from 'lib/ssr'
 import Head from 'next/head'
@@ -108,7 +108,7 @@ UserSettings.getLayout = function getLayout(page: ReactElement) {
 }
 
 export const getServerSideProps = withUserSSR(async function getServerSideProps({ user }) {
-  const { data } = await findUserByIdAndEmail({ userId: user.id, email: user.email })
+  const { data } = await getUserByIdAndEmail({ userId: user.id, email: user.email })
 
   return {
     props: {

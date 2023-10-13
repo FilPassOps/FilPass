@@ -4,8 +4,8 @@ import {
   REJECTED_BY_CONTROLLER_STATUS,
   REQUIRES_CHANGES_STATUS,
   SUBMITTED_STATUS,
-} from 'domain/transferRequest/constants'
-import { classNames } from 'lib/classNames'
+} from 'domain/transfer-request/constants'
+import { classNames } from 'lib/class-names'
 import { DateTime } from 'luxon'
 import { useState } from 'react'
 

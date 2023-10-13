@@ -1,9 +1,9 @@
 import { Chain } from 'config'
 import { baseEmail } from 'domain/notifications/constants'
 import { transferPaymentConfirm } from 'domain/transfer/transfers-payment-confirm'
-import { decryptPII } from 'lib/emissaryCrypto'
+import { decryptPII } from 'lib/emissary-crypto'
 import prisma from 'lib/prisma'
-import { sendBatchEmail } from 'lib/sendEmail'
+import { sendBatchEmail } from 'lib/send-email'
 import { MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
 
 interface EmailReminderRecipient {

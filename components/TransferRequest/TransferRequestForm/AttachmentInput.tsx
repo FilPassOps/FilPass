@@ -1,10 +1,10 @@
 import { DocumentMagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { DocumentTextIcon } from '@heroicons/react/24/solid'
-import { Button } from 'components/shared/Button'
-import { UploadFileButton } from 'components/shared/FormInput'
+import { Button } from 'components/Shared/Button'
+import { UploadFileButton } from 'components/Shared/FormInput'
 import { BaseApiResult, api } from 'lib/api'
 import { useEffect, useState } from 'react'
-import { useDownloadFile } from '../shared/useDownloadFile'
+import { useDownloadFile } from '../../../hooks/useDownloadFile'
 import { DeleteFileModal } from './DeleteFileModal'
 
 interface AttachmentInputProps {

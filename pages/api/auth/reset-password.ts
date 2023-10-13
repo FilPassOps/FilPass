@@ -1,9 +1,9 @@
-import { resetPassword } from 'domain/auth/resetPassword'
+import { resetPassword } from 'domain/auth/reset-password'
 import { newHandler, withAuthLimiter, withMethods, withSession } from 'lib/middleware'
 import { NextApiRequest, NextApiResponse } from 'next/types'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { error, data } = await resetPassword(req.body) as { error: any; data: any}
+  const { error, data } = (await resetPassword(req.body)) as { error: any; data: any }
   if (error) {
     return res.status(error.status).json(error)
   }

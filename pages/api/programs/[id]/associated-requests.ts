@@ -1,4 +1,4 @@
-import { programAssociatedRequests } from 'domain/programs/programAssociatedRequests'
+import { programAssociatedRequests } from 'domain/programs/program-associated-requests'
 import { NextApiRequestWithSession, newHandler, withMethods, withSuperAdmin } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
 

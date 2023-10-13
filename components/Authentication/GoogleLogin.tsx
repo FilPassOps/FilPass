@@ -1,5 +1,5 @@
-import { LinkButton } from 'components/shared/Button'
-import { GoogleIcon } from 'components/shared/icons/GoogleIcon'
+import { LinkButton } from 'components/Shared/Button'
+import { GoogleIcon } from 'components/Shared/icons/GoogleIcon'
 import { api } from 'lib/api'
 import { googleLoginUrl } from 'lib/google/google-oauth-url'
 import { useRouter } from 'next/router'

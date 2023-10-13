@@ -1,9 +1,9 @@
 import { ethers } from 'ethers'
-import { amountConverter } from 'lib/blockchainUtils'
+import { amountConverter } from 'lib/blockchain-utils'
 import { logger } from 'lib/logger'
 import prisma from 'lib/prisma'
 import { PENDING_STATUS } from './constants'
-import { TransferResult, select, updateTransfer } from './paymentDbTransferVerificationJob'
+import { TransferResult, select, updateTransfer } from './payment-db-transfer-verification-job'
 
 interface TransferPaymentConfirmParams {
   id: string

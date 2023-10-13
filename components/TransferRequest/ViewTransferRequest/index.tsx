@@ -1,21 +1,21 @@
 import { PhotoIcon } from '@heroicons/react/24/outline'
-import { Divider } from 'components/shared/Divider'
-import { NumberInput, SelectInput, TextInput } from 'components/shared/FormInput'
-import { StatusBadge } from 'components/shared/Status'
+import { Divider } from 'components/Shared/Divider'
+import { NumberInput, SelectInput, TextInput } from 'components/Shared/FormInput'
+import { StatusBadge } from 'components/Shared/Status'
 import {
   REJECTED_BY_APPROVER_STATUS,
   REJECTED_BY_CONTROLLER_STATUS,
   SUBMITTED_BY_APPROVER_STATUS,
   SUBMITTED_STATUS,
-} from 'domain/transferRequest/constants'
+} from 'domain/transfer-request/constants'
 import { DateTime } from 'luxon'
-import { ProgramInfo } from '../shared/ProgramInfo'
-import { RequestorReceiver } from '../shared/RequestorReceiver'
-import { useDownloadFile } from '../shared/useDownloadFile'
+import { ProgramInfo } from '../Shared/ProgramInfo'
+import { RequestorReceiver } from '../Shared/RequestorReceiver'
+import { useDownloadFile } from '../../../hooks/useDownloadFile'
 
-import { WalletAddress } from 'components/shared/WalletAddress'
+import { WalletAddress } from 'components/Shared/WalletAddress'
 import { APPROVER_ROLE } from 'domain/auth/constants'
-import { REJECTED } from 'domain/transferRequestReview/constants'
+import { REJECTED } from 'domain/transfer-request-review/constants'
 import { BannedUserReason } from './BannedUserReason'
 import { StatusNotes } from './StatusNotes'
 import { TransferRequestHistory } from './TransferRequestHistory'

@@ -1,6 +1,6 @@
 import { Role } from '@prisma/client'
-import { sendInviteNotification } from 'domain/notifications/sendInviteNotification'
-import { encryptPII } from 'lib/emissaryCrypto'
+import { sendInviteNotification } from 'domain/notifications/send-invite-notification'
+import { encryptPII } from 'lib/emissary-crypto'
 import { generateEmailHash } from 'lib/password'
 import prisma, { newPrismaTransaction } from 'lib/prisma'
 import { validate } from 'lib/yup'

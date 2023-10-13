@@ -1,5 +1,5 @@
 import { generateSession } from 'domain/auth/session'
-import { verifyCode } from 'domain/auth/verifyCode'
+import { verifyCode } from 'domain/auth/verify-code'
 import { NextApiRequestWithSession, newHandler, withMethods, withSession } from 'lib/middleware'
 import { NextApiResponse } from 'next/types'
 

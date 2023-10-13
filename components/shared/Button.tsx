@@ -1,4 +1,4 @@
-import { classNames } from 'lib/classNames'
+import { classNames } from 'lib/class-names'
 import Link from 'next/link'
 import { ButtonHTMLAttributes, DetailedHTMLProps, forwardRef } from 'react'
 import { LoadingIndicator } from './LoadingIndicator'
@@ -39,7 +39,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     toolTipText = '',
     buttonStyle = '',
   },
-  ref
+  ref,
 ) {
   return (
     <div className={classNames(toolTipText.length > 0 && styles.trigger, toolTipText.length > 0 && 'relative', className)}>
@@ -71,13 +71,10 @@ export function LinkButton({
   className = '',
 }: LinkButtonProps) {
   return (
-    <Link
-      href={href}
-      passHref={true}
-      className={classNames(getButtonClasses({ disabled, variant, defaultStyle }), className)}>
+    <Link href={href} passHref={true} className={classNames(getButtonClasses({ disabled, variant, defaultStyle }), className)}>
       {children}
     </Link>
-  );
+  )
 }
 
 interface getButtonClassesParams {
@@ -103,6 +100,6 @@ function getButtonClasses({ variant, disabled, defaultStyle }: getButtonClassesP
     variant === 'red' && 'bg-red-600 hover:bg-red-700 text-white',
     variant === 'green' && 'bg-green-600 hover:bg-green-700 text-white',
     variant === 'opacity-red' && 'bg-red-100 hover:bg-red-200 text-red-400 shadow-none border-none font-light',
-    variant === 'none' && 'border-none shadow-none'
+    variant === 'none' && 'border-none shadow-none',
   )
 }

@@ -1,5 +1,5 @@
-import { Button } from 'components/shared/Button'
-import { Modal } from 'components/shared/Modal'
+import { Button } from 'components/Shared/Button'
+import { Modal } from 'components/Shared/Modal'
 import { api } from 'lib/api'
 import { useState } from 'react'
 import errorsMessages from 'wordings-and-errors/errors-messages'
@@ -26,7 +26,7 @@ export const ArchiveProgramModal = ({ onModalClosed, open, program, isActive }: 
 
     const actionHandler = isActive ? api.delete : api.patch
 
-    const { data } = (await actionHandler(`/programs/${program.id}?unarchive=${isActive}`))
+    const { data } = await actionHandler(`/programs/${program.id}?unarchive=${isActive}`)
 
     if (data?.error) {
       setError(data.error?.message || data.error?.errors)
