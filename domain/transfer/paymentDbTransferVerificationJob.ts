@@ -106,6 +106,7 @@ export async function updateTransfer({ id, transferRequest, hash, amount, sendEm
     }
     return true
   } catch (error: any) {
+    console.error(error)
     throw new Error('Failed to update transfer: ' + error?.message)
   }
 }

@@ -1,7 +1,5 @@
-import { CoinType } from '@glif/filecoin-address'
-import { AppConfig, ChainNames } from 'config'
 import { ethers } from 'ethers'
-import { amountConverter, getFilecoinDelegatedAddress, hexAddressDecoder } from 'lib/blockchainUtils'
+import { amountConverter } from 'lib/blockchainUtils'
 import { logger } from 'lib/logger'
 import prisma from 'lib/prisma'
 import { PENDING_STATUS } from './constants'
@@ -13,10 +11,9 @@ interface TransferPaymentConfirmParams {
   from: string
   value: ethers.BigNumber[]
   transactionHash: string
-  contractAddress: string
 }
 
-export const transferPaymentConfirm = async ({ id, to, from, value, transactionHash, contractAddress }: TransferPaymentConfirmParams) => {
+export const transferPaymentConfirm = async ({ id, to, from, value, transactionHash }: TransferPaymentConfirmParams) => {
   const pendingTransfers = await prisma.transfer.findMany({
     select: select,
     where: {
@@ -28,14 +25,7 @@ export const transferPaymentConfirm = async ({ id, to, from, value, transactionH
     },
   })
 
-  const chainName = AppConfig.network.chains.find(chain => chain.contractAddress === contractAddress)?.name
-
-  if (!chainName) {
-    logger.error('Chain name not found')
-    throw new Error('Chain name not found')
-  }
-
-  processPayment(chainName, pendingTransfers, to, value, transactionHash)
+  processPayment(pendingTransfers, to, value, transactionHash)
 
   if (pendingTransfers.length > 0) {
     return
@@ -68,7 +58,7 @@ export const transferPaymentConfirm = async ({ id, to, from, value, transactionH
     },
   })
 
-  processPayment(chainName, pendingTransfersWithNoTxHash, to, value, transactionHash)
+  processPayment(pendingTransfersWithNoTxHash, to, value, transactionHash)
 
   if (pendingTransfersWithNoTxHash.length > 0) {
     logger.warning('Transfer request with no transaction hash set as Paid', {
@@ -79,29 +69,20 @@ export const transferPaymentConfirm = async ({ id, to, from, value, transactionH
   }
 }
 
-const processPayment = async (
-  chainName: string,
-  pendingTransfers: TransferResult[],
-  to: string[],
-  value: ethers.BigNumber[],
-  transactionHash: string,
-) => {
-  const { getChainByName, isFilecoin } = AppConfig.network
-  const chain = getChainByName(chainName as ChainNames)
-  const isFilecoinChain = isFilecoin(chain)
+const processPayment = async (pendingTransfers: TransferResult[], to: string[], value: ethers.BigNumber[], transactionHash: string) => {
   for (let i = 0; i < to.length; i++) {
-    const receiver = hexAddressDecoder(chainName, to[i])
+    const receiver = to[i].toLowerCase()
     const paidAmount = amountConverter(value[i])
-
     const transfers = []
     for await (const transfer of pendingTransfers) {
       try {
         const { actorAddress, robustAddress, wallet } = transfer.transferRequest
-        const delegatedAddress = isFilecoinChain ? getFilecoinDelegatedAddress(wallet.address, chain.coinType as CoinType) : undefined
 
-        const isAddressMatch =
-          actorAddress === receiver || robustAddress === receiver || wallet.address === receiver || delegatedAddress === receiver
-        if (isAddressMatch) {
+        if (
+          actorAddress.toLowerCase() === receiver ||
+          robustAddress.toLowerCase() === receiver ||
+          wallet.address.toLowerCase() === receiver
+        ) {
           transfers.push(transfer)
         }
       } catch (error) {

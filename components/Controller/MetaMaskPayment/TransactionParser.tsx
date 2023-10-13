@@ -2,7 +2,7 @@ import { useAlertDispatcher } from 'components/Layout/Alerts'
 import { Button } from 'components/shared/Button'
 import { getInputClasses } from 'components/shared/FormInput'
 import { contractInterface } from 'components/web3/useContract'
-import { amountConverter, hexAddressDecoder } from 'lib/blockchainUtils'
+import { amountConverter } from 'lib/blockchainUtils'
 import { useState } from 'react'
 import Image from 'next/image'
 
@@ -14,11 +14,10 @@ interface ParsedData {
 }
 
 interface TransactionParserProps {
-  onParseData: (data: ParsedData, blockchainName: string) => void
-  blockchainName: string
+  onParseData: (data: ParsedData) => void
 }
 
-export const TransactionParser = ({ onParseData, blockchainName }: TransactionParserProps) => {
+export const TransactionParser = ({ onParseData }: TransactionParserProps) => {
   const [hexDataInput, setHexDataInput] = useState('')
   const [error, setError] = useState('')
   const { dispatch, close } = useAlertDispatcher()
@@ -65,15 +64,12 @@ export const TransactionParser = ({ onParseData, blockchainName }: TransactionPa
       const functionName = transactionDescription.name
       const [id, addresses, amount] = transactionDescription.args
 
-      onParseData(
-        {
-          functionName,
-          id,
-          addresses: addresses.map((address: string) => hexAddressDecoder(blockchainName, address)),
-          amount: amount.map(amountConverter),
-        },
-        blockchainName,
-      )
+      onParseData({
+        functionName,
+        id,
+        addresses: addresses,
+        amount: amount.map(amountConverter),
+      })
     } catch (error) {
       setError('Invalid hex data')
     }

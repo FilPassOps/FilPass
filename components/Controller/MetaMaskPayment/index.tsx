@@ -4,7 +4,7 @@ import Big from 'big.js'
 import { useAlertDispatcher } from 'components/Layout/Alerts'
 import { Button } from 'components/shared/Button'
 import { useMetaMask } from 'components/web3/MetaMaskProvider'
-import { ForwardNonBLS } from 'components/web3/useContract'
+import { Forward } from 'components/web3/useContract'
 import useCurrency from 'components/web3/useCurrency'
 import { AppConfig, ChainNames } from 'config'
 import { USD } from 'domain/currency/constants'
@@ -93,7 +93,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
     }
   }, [])
 
-  const doForward = async (batch: TransferRequest[], forwardFunction: ForwardNonBLS, blockchainName: string) => {
+  const doForward = async (batch: TransferRequest[], forwardFunction: Forward, blockchainName: string) => {
     if (!wallet) {
       dispatch({
         type: 'warning',

@@ -17,8 +17,8 @@
     "seed:dev": "ts-node ./prisma/seedDev.ts",
     "test": "npm run docker:up && dotenv -e .env.test -- npm run migrate:test && dotenv -e .env.test -- jest -i --watch --forceExit",
     "test:coverage": "npm run docker:up && dotenv -e .env.test -- npm run migrate:test && dotenv -e .env.test -- jest -i --coverage --forceExit && npm run docker:down",
-    "deploy": "npx hardhat run --network filecoin scripts/deploy.ts",
-    "test-contract": "npx hardhat --network calibration test",
+    "deploy": "npx hardhat run scripts/deploy.ts --network",
+    "test-contract": "npx hardhat test",
     "pre-dev": "docker compose up -d && npm run migrate && npm run seed && npm run seed:dev"
   },
   "prisma": {
