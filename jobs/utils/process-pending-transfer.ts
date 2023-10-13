@@ -57,7 +57,7 @@ export async function processPendingTransfer(chain: Chain, contract: MultiForwar
         const parsed = contractInterface.parseLog(log)
         if (parsed.name !== forwardEvent.name) return
         const { id, from, to, value } = parsed.args
-        transferPaymentConfirm({ id, from, to, value, transactionHash: txHash, contractAddress: chain.contractAddress })
+        transferPaymentConfirm({ id, from, to, value, transactionHash: txHash })
       })
     } else {
       await prisma.transfer.updateMany({
