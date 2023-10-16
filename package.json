@@ -28,8 +28,8 @@
     "@types/react": "17.0.36"
   },
   "engines": {
-    "node": ">=16.0.0 <=18.17.1",
-    "npm": ">=8.0.0 <=9.6.7"
+    "node": ">=20",
+    "npm": ">=10"
   },
   "dependencies": {
     "@filecoin-shipyard/lotus-client-provider-nodejs": "1.1.1",
@@ -68,7 +68,7 @@
     "magic-bytes.js": "^1.0.15",
     "mailgun.js": "^9.2.0",
     "multer": "^1.4.5-lts.1",
-    "next": "^13.4.12",
+    "next": "^13.5.5",
     "node-cron": "^3.0.2",
     "node-schedule": "^2.1.0",
     "nprogress": "^0.2.0",

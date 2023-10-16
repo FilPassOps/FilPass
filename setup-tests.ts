@@ -20,14 +20,6 @@ process.env.MAILGUN_SENDER_EMAIL = 'MAILGUN_SENDER_EMAIL'
 // GOOGLE
 process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID = 'NEXT_PUBLIC_GOOGLE_CLIENT_ID='
 
-//DATABASE
-process.env.DB_NAME = 'emissary'
-process.env.DB_PORT = '5433'
-process.env.DB_HOSTNAME = 'localhost'
-process.env.DB_SCHEMA = 'emissary'
-process.env.DB_USERNAME = 'test'
-process.env.DB_PASSWORD = 'test'
-
 //AWS
 process.env.BUCKET_REGION = 'BUCKET_REGION'
 process.env.BUCKET_NAME = 'BUCKET_NAME'
