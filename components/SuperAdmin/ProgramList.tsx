@@ -3,6 +3,7 @@ import { Popover } from '@headlessui/react'
 import { ArrowUturnLeftIcon, InformationCircleIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { Button } from 'components/Shared/Button'
 import { Cell, Header, Table, TableBody, TableHead } from 'components/Shared/Table'
+import Timestamp from 'components/Shared/Timestamp'
 import { formatPaymentMethod } from 'components/SuperAdmin/Shared/utils'
 import { ACTIVE_STATUS, deliveryMethod } from 'domain/programs/constants'
 import { DateTime } from 'luxon'
@@ -117,9 +118,7 @@ export const ProgramList = ({
                   )}
                 </Cell>
                 <Cell>
-                  <span suppressHydrationWarning>
-                    {DateTime.fromISO(program.created_at).toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS)}
-                  </span>{' '}
+                  <Timestamp date={program.created_at} format={DateTime.DATETIME_SHORT_WITH_SECONDS} />
                 </Cell>
                 <Cell style={{ minWidth: 80 }}>
                   <Button variant="none" onClick={() => handleOpenEditModal(program)}>

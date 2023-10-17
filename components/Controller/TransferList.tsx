@@ -8,6 +8,7 @@ import Sortable from 'components/Shared/Sortable'
 import { StatusPill } from 'components/Shared/Status'
 import { Cell, Header, LinkedCell, Table, TableBody, TableHead } from 'components/Shared/Table'
 import Currency, { CryptoAmount } from 'components/Shared/Table/Currency'
+import Timestamp from 'components/Shared/Timestamp'
 import { WalletAddress } from 'components/Shared/WalletAddress'
 import { WithMetaMaskButton } from 'components/Web3/MetaMaskProvider'
 import { AppConfig, ChainNames } from 'config'
@@ -209,11 +210,10 @@ const TransferList = ({
                   <LinkedCell href={href}>{request.program.name}</LinkedCell>
                   <LinkedCell href={href}>{request.team}</LinkedCell>
                   <LinkedCell href={href}>
-                    <span suppressHydrationWarning>
-                      {DateTime.fromISO(request.status === PAID_STATUS ? request.updatedAt : request.createdAt).toLocaleString(
-                        DateTime.DATETIME_SHORT_WITH_SECONDS,
-                      )}
-                    </span>
+                    <Timestamp
+                      date={request.status === PAID_STATUS ? request.updatedAt : request.createdAt}
+                      format={DateTime.DATETIME_SHORT_WITH_SECONDS}
+                    />
                   </LinkedCell>
                   <LinkedCell href={href}>
                     {request?.wallet?.address && (

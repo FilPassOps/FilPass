@@ -2,6 +2,7 @@ import { InformationCircleIcon } from '@heroicons/react/24/outline'
 import { Button } from 'components/Shared/Button'
 import Sortable from 'components/Shared/Sortable'
 import { Cell, Header, Table, TableBody, TableHead } from 'components/Shared/Table'
+import Timestamp from 'components/Shared/Timestamp'
 import { ViewReasonModal } from 'components/Shared/ViewReasonModal'
 import { APPROVER_ROLE } from 'domain/auth/constants'
 import { classNames } from 'lib/class-names'
@@ -79,9 +80,7 @@ export const UserList = ({ data = [] }: UserListProps) => {
                 <SelectRoles user={user} scrolled={scrolled} />
               </Cell>
               <Cell className="break-all">
-                <span suppressHydrationWarning>
-                  {DateTime.fromISO(user.created_at).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS)}
-                </span>
+                <Timestamp date={user.created_at} format={DateTime.DATETIME_SHORT_WITH_SECONDS} />
               </Cell>
               <Cell>{user.programs_assigned}</Cell>
               <Cell>

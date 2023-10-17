@@ -1,4 +1,5 @@
 import { Divider } from 'components/Shared/Divider'
+import Timestamp from 'components/Shared/Timestamp'
 import { USER_ROLE } from 'domain/auth/constants'
 import { DateTime } from 'luxon'
 
@@ -54,8 +55,8 @@ export const TransferRequestHistory = ({ history = [], role = USER_ROLE, owner }
                 <span>to</span>
                 <strong>{formatFieldValue({ field: item.field, value: item.new_value, role })}</strong>
               </div>
-              <p className="col-span-3 text-right" suppressHydrationWarning>
-                {DateTime.fromISO(item.created_at).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS)}
+              <p className="col-span-3 text-right">
+                <Timestamp date={item.created_at} format={DateTime.DATETIME_SHORT_WITH_SECONDS} />
               </p>
             </div>
           ))}

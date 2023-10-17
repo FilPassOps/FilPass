@@ -1,3 +1,4 @@
+import Timestamp from 'components/Shared/Timestamp'
 import { deliveryMethod } from 'domain/programs/constants'
 import { DateTime } from 'luxon'
 
@@ -27,8 +28,8 @@ export const ProgramInfo = ({ paymentCurrency, selectedProgram, expectedTransfer
       </p>
       <p className="text-sm text-gray-500">
         Expected payment date:{' '}
-        <strong className="text-black font-semibold" suppressHydrationWarning>
-          {`Before ${DateTime.fromISO(_expectedTransferDate).toLocaleString(DateTime.DATE_SHORT)}`}
+        <strong className="text-black font-semibold">
+          Before <Timestamp date={_expectedTransferDate} format={DateTime.DATE_SHORT} />
         </strong>
       </p>
     </div>
