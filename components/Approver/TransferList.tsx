@@ -5,11 +5,12 @@ import Sortable from 'components/Shared/Sortable'
 import { StatusPill } from 'components/Shared/Status'
 import { Cell, Header, LinkedCell, Table, TableBody, TableHead } from 'components/Shared/Table'
 import Currency, { CryptoAmount } from 'components/Shared/Table/Currency'
+import Timestamp from 'components/Shared/Timestamp'
 import { WalletAddress } from 'components/Shared/WalletAddress'
-import useCurrency from 'hooks/useCurrency'
 import { AppConfig } from 'config'
 import { USD } from 'domain/currency/constants'
 import { PAID_STATUS } from 'domain/transfer-request/constants'
+import useCurrency from 'hooks/useCurrency'
 import { formatCrypto } from 'lib/currency'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
@@ -115,7 +116,7 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
                 <LinkedCell href={href}>{request.program_name}</LinkedCell>
                 <LinkedCell href={href}>{request.team ? request.team : '-'}</LinkedCell>
                 <LinkedCell href={href}>
-                  {DateTime.fromISO(request.create_date).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS)}
+                  <Timestamp date={request.create_date} format={DateTime.DATETIME_SHORT_WITH_SECONDS} />
                 </LinkedCell>
                 <LinkedCell href={href}>
                   {request.wallet_address && (

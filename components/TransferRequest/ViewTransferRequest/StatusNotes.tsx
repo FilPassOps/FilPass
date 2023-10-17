@@ -1,3 +1,4 @@
+import Timestamp from 'components/Shared/Timestamp'
 import {
   DRAFT_STATUS,
   REJECTED_BY_APPROVER_STATUS,
@@ -62,7 +63,9 @@ const RequiresChanges = ({ changesRequested }: RequiresChangesProps) => {
       {filteredReviews.map(change => (
         <div key={change.id} className="flex justify-between">
           <p className="whitespace-pre-line">{change.notes}</p>
-          <p className="whitespace-nowrap">{DateTime.fromISO(change.createdAt).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS)}</p>
+          <p className="whitespace-nowrap">
+            <Timestamp date={change.createdAt} format={DateTime.DATETIME_SHORT_WITH_SECONDS} />
+          </p>
         </div>
       ))}
       {changesRequested.length > 2 && !showAll && (

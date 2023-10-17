@@ -1,13 +1,14 @@
 import { flip, useFloating } from '@floating-ui/react-dom'
 import { Popover } from '@headlessui/react'
 import { ArrowUturnLeftIcon, InformationCircleIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline'
-import { formatPaymentMethod } from 'components/SuperAdmin/Shared/utils'
 import { Button } from 'components/Shared/Button'
 import { Cell, Header, Table, TableBody, TableHead } from 'components/Shared/Table'
+import Timestamp from 'components/Shared/Timestamp'
+import { formatPaymentMethod } from 'components/SuperAdmin/Shared/utils'
 import { ACTIVE_STATUS, deliveryMethod } from 'domain/programs/constants'
 import { DateTime } from 'luxon'
-import { Fragment, useState } from 'react'
 import dynamic from 'next/dynamic'
+import { Fragment, useState } from 'react'
 
 const ArchiveProgramModal = dynamic(() => import('./Modals/ArchiveProgramModal').then(mod => mod.ArchiveProgramModal))
 const CreateOrEditProgramModal = dynamic(() => import('./Modals/CreateOrEditProgramModal').then(mod => mod.CreateOrEditProgramModal))
@@ -116,7 +117,9 @@ export const ProgramList = ({
                     '-'
                   )}
                 </Cell>
-                <Cell>{DateTime.fromISO(program.created_at).toLocaleString(DateTime.DATETIME_MED_WITH_SECONDS)}</Cell>
+                <Cell>
+                  <Timestamp date={program.created_at} format={DateTime.DATETIME_SHORT_WITH_SECONDS} />
+                </Cell>
                 <Cell style={{ minWidth: 80 }}>
                   <Button variant="none" onClick={() => handleOpenEditModal(program)}>
                     <PencilIcon className="w-5 text-sky-600" />

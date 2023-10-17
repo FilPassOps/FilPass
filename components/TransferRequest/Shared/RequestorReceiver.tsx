@@ -1,3 +1,4 @@
+import Timestamp from 'components/Shared/Timestamp'
 import { DateTime } from 'luxon'
 
 interface RequestorReceiverProps {
@@ -8,8 +9,8 @@ interface RequestorReceiverProps {
 }
 
 export const RequestorReceiver = ({ applyer, issuedOn, receiver, expectedTransferDate }: RequestorReceiverProps) => {
-  const _issuedOn = issuedOn || DateTime.now().toISO() as string
-  const _expectedTransferDate = expectedTransferDate || DateTime.now().plus({ days: 30 }).toISO() as string
+  const _issuedOn = issuedOn || (DateTime.now().toISO() as string)
+  const _expectedTransferDate = expectedTransferDate || (DateTime.now().plus({ days: 30 }).toISO() as string)
   const renderReceiver = receiver && applyer !== receiver
 
   return (
@@ -27,11 +28,15 @@ export const RequestorReceiver = ({ applyer, issuedOn, receiver, expectedTransfe
       <div className="mt-4 sm:mt-0 text-sm text-gray-500">
         <div className="flex sm:justify-end">
           <dt>Issued on:</dt>
-          <dd>{DateTime.fromISO(_issuedOn).toLocaleString(DateTime.DATE_SHORT)}</dd>
+          <dd>
+            <Timestamp date={_issuedOn} format={DateTime.DATE_SHORT} />
+          </dd>
         </div>
         <div className="flex sm:justify-end">
           <dt>Expected Payment Date:</dt>
-          <dd>{DateTime.fromISO(_expectedTransferDate).toLocaleString(DateTime.DATE_SHORT)}</dd>
+          <dd>
+            <Timestamp date={_expectedTransferDate} format={DateTime.DATE_SHORT} />
+          </dd>
         </div>
       </div>
     </dl>
