@@ -88,7 +88,9 @@ const TransferList = ({ data = [] }: TransferListProps) => {
                 <LinkedCell href={href}>{request.program_name}</LinkedCell>
                 <LinkedCell href={href}>{request.team}</LinkedCell>
                 <LinkedCell href={href}>
-                  {DateTime.fromISO(request.create_date).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS)}
+                  <span suppressHydrationWarning>
+                    {DateTime.fromISO(request.create_date).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS)}
+                  </span>
                 </LinkedCell>
                 <LinkedCell href={href}>
                   {request.user_wallet_address && (

@@ -13,7 +13,7 @@ interface ProgramInfoProps {
 }
 
 export const ProgramInfo = ({ paymentCurrency, selectedProgram, expectedTransferDate, requestCurrency }: ProgramInfoProps) => {
-  const _expectedTransferDate = expectedTransferDate || DateTime.now().plus({ days: 30 }).toISO() as string
+  const _expectedTransferDate = expectedTransferDate || (DateTime.now().plus({ days: 30 }).toISO() as string)
   return (
     <div className="bg-light-gray w-full p-4 rounded-md mb-7">
       <p className="text-sm text-gray-500 mb-4">
@@ -27,7 +27,7 @@ export const ProgramInfo = ({ paymentCurrency, selectedProgram, expectedTransfer
       </p>
       <p className="text-sm text-gray-500">
         Expected payment date:{' '}
-        <strong className="text-black font-semibold">
+        <strong className="text-black font-semibold" suppressHydrationWarning>
           {`Before ${DateTime.fromISO(_expectedTransferDate).toLocaleString(DateTime.DATE_SHORT)}`}
         </strong>
       </p>

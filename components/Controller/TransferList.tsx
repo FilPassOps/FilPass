@@ -10,11 +10,11 @@ import { Cell, Header, LinkedCell, Table, TableBody, TableHead } from 'component
 import Currency, { CryptoAmount } from 'components/Shared/Table/Currency'
 import { WalletAddress } from 'components/Shared/WalletAddress'
 import { WithMetaMaskButton } from 'components/Web3/MetaMaskProvider'
-import useCurrency from 'hooks/useCurrency'
 import { AppConfig, ChainNames } from 'config'
 import { USD } from 'domain/currency/constants'
-import { SUCCESS_STATUS } from 'domain/transfer/constants'
 import { APPROVED_STATUS, PAID_STATUS } from 'domain/transfer-request/constants'
+import { SUCCESS_STATUS } from 'domain/transfer/constants'
+import useCurrency from 'hooks/useCurrency'
 import { classNames } from 'lib/class-names'
 import { formatCrypto } from 'lib/currency'
 import { DateTime } from 'luxon'
@@ -209,9 +209,11 @@ const TransferList = ({
                   <LinkedCell href={href}>{request.program.name}</LinkedCell>
                   <LinkedCell href={href}>{request.team}</LinkedCell>
                   <LinkedCell href={href}>
-                    {DateTime.fromISO(request.status === PAID_STATUS ? request.updatedAt : request.createdAt).toLocaleString(
-                      DateTime.DATETIME_SHORT_WITH_SECONDS,
-                    )}
+                    <span suppressHydrationWarning>
+                      {DateTime.fromISO(request.status === PAID_STATUS ? request.updatedAt : request.createdAt).toLocaleString(
+                        DateTime.DATETIME_SHORT_WITH_SECONDS,
+                      )}
+                    </span>
                   </LinkedCell>
                   <LinkedCell href={href}>
                     {request?.wallet?.address && (
