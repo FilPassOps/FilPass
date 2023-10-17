@@ -1,13 +1,10 @@
-import { XMarkIcon } from '@heroicons/react/24/solid'
-
 import { useAuth } from 'components/Authentication/Provider'
 import { Button } from 'components/Shared/Button'
 import { SelectInput } from 'components/Shared/FormInput'
 import { WalletAddress } from 'components/Shared/WalletAddress'
 import _get from 'lodash/get'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Controller } from 'react-hook-form'
-import { DeleteWalletAddressModal } from './DeleteWalletAddressModal'
 
 interface SelectWalletInputProps {
   control: any
@@ -23,16 +20,6 @@ interface SelectWalletInputProps {
   disabled?: boolean
 }
 
-interface Wallet {
-  id: number
-  name?: string | null
-  address: string
-  blockchain: {
-    id: number
-    name: string
-  }
-}
-
 export const SelectWalletInput = ({
   control,
   errors,
@@ -43,8 +30,6 @@ export const SelectWalletInput = ({
   disabled,
 }: SelectWalletInputProps) => {
   const { user } = useAuth()
-  const [walletData, setWalletData] = useState<Wallet>()
-  const [openDeleteWalletAddressModal, setOpenDeleteWalletAddressModal] = useState(false)
 
   const defaultWalletWhenEmpty = useMemo(() => {
     if (!applyingForOthersDefaultWallet || !applyingForOthersDefaultWallet?.wallet_id) {
@@ -91,17 +76,7 @@ export const SelectWalletInput = ({
             </div>
           ),
           value: wallet.id,
-          rightElement: (
-            <span
-              className="ml-auto cursor-pointer h-6 w-6 bg-gray-200 rounded-full flex items-center justify-center shrink-0"
-              onClick={() => {
-                setOpenDeleteWalletAddressModal(true)
-                setWalletData(wallet)
-              }}
-            >
-              <XMarkIcon className="h-5 w-5 text-indigo-500" />
-            </span>
-          ),
+          rightElement: null,
         }
       }) as any
 
@@ -148,12 +123,6 @@ export const SelectWalletInput = ({
           Connect Wallet
         </Button>
       </div>
-
-      <DeleteWalletAddressModal
-        openModal={openDeleteWalletAddressModal}
-        onModalClosed={() => setOpenDeleteWalletAddressModal(false)}
-        wallet={walletData}
-      />
     </>
   )
 }
