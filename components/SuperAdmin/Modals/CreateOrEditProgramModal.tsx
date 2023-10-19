@@ -107,7 +107,7 @@ export const CreateOrEditProgramModal = ({
     onModalClosed,
     reset,
     isEditable,
-    programId: program?.id ? String(program?.id) : undefined,
+    programId: program?.id ? String(program?.id) : '',
     programs: programs || [],
     refreshPrograms,
     dirtyFields,
@@ -135,7 +135,7 @@ export const CreateOrEditProgramModal = ({
             autoComplete="off"
             label="Program Name"
             placeholder="Enter program name"
-            error={errors.name || submitErrors?.name}
+            error={errors.name || submitErrors}
             disabled={program?.isArchived}
             {...register('name')}
           />

@@ -49,7 +49,7 @@ export const createProgramFormValidator = yup
     paymentMethod: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
     name: yup.string().required(),
     deliveryMethod: yup.mixed<DeliveryMethod>().oneOf([ONE_TIME]).required(),
-    visibility: yup.mixed<ProgramVisibility>().oneOf([PROGRAM_TYPE_EXTERNAL, PROGRAM_TYPE_INTERNAL]).required(),
+    visibility: yup.string().oneOf([PROGRAM_TYPE_EXTERNAL, PROGRAM_TYPE_INTERNAL]).required(),
     approversRole: yup
       .array()
       .min(1, errorsMessages.required_field.message)

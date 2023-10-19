@@ -2,7 +2,7 @@ import { Prisma, ProgramVisibility, UserRoleProgram } from '@prisma/client'
 import { groupProgramApproversRole } from 'components/SuperAdmin/Shared/utils'
 import { submittedTransferRequestsBySuper } from 'domain/transfer-request-review/submitted-transfer-request'
 import { TransactionError } from 'lib/errors'
-import { newPrismaTransaction } from 'lib/prisma'
+import prisma, { newPrismaTransaction } from 'lib/prisma'
 import { validate } from 'lib/yup'
 import { programAssociatedRequests } from './program-associated-requests'
 import { updateProgramValidator } from './validation'
@@ -54,6 +54,41 @@ export async function updateProgram(params: UpdateProgramParams) {
 
   const approversRole: ProgramRole[] = groupProgramApproversRole(approversRoleMatrix, id)
 
+  const trimmedName = name.trim()
+
+  const existingProgram = await prisma.program.findFirst({
+    where: { name: trimmedName },
+  })
+
+  if (existingProgram) {
+    return {
+      error: {
+        status: 400,
+        errors: {
+          name: 'Program name already exists',
+          type: 'internal',
+        },
+      },
+    }
+  }
+
+  const userRolePrograms = await prisma.userRoleProgram.findMany({
+    where: { programId: id },
+    select: {
+      id: true,
+      userRoleId: true,
+      isActive: true,
+      userRole: {
+        select: {
+          role: true,
+        },
+      },
+    },
+  })
+
+  const prevViewersRole = userRolePrograms.filter(urp => urp.userRole.role === 'VIEWER')
+  const prevApproversRole = userRolePrograms.filter(urp => urp.userRole.role === 'APPROVER')
+
   return await newPrismaTransaction(async fnPrisma => {
     if (isArchived) {
       const count = await fnPrisma.program.count({
@@ -68,29 +103,13 @@ export async function updateProgram(params: UpdateProgramParams) {
         throw new TransactionError('Archived program not found', { status: 404, errors: undefined })
       }
 
-      const userRolePrograms = await fnPrisma.userRoleProgram.findMany({
-        where: { programId: id },
-        select: {
-          id: true,
-          userRoleId: true,
-          isActive: true,
-          userRole: {
-            select: {
-              role: true,
-            },
-          },
-        },
-      })
-
-      const prevViewersRole = userRolePrograms.filter(urp => urp.userRole.role === 'VIEWER')
-
       if (updateViewers) {
         const programRoles: ProgramRole[] =
           viewersRole?.map(vr => ({
             userRoleId: vr.roleId,
             programId: id,
           })) ?? []
-        await deactiveProgramRoles({ fnPrisma, programId: id, programRoles: programRoles, prevProgramRoles: prevViewersRole })
+        await deactivateProgramRoles({ fnPrisma, programId: id, programRoles: programRoles, prevProgramRoles: prevViewersRole })
         await setNewProgramRoles({ fnPrisma, programId: id, programRoles: programRoles, prevProgramRoles: prevViewersRole })
       }
       return count
@@ -103,7 +122,7 @@ export async function updateProgram(params: UpdateProgramParams) {
         isArchived,
       },
       data: {
-        name,
+        name: trimmedName,
         visibility,
       },
     })
@@ -112,25 +131,8 @@ export async function updateProgram(params: UpdateProgramParams) {
       throw new TransactionError('Error updating program', { status: 404, errors: undefined })
     }
 
-    const userRolePrograms = await fnPrisma.userRoleProgram.findMany({
-      where: { programId: id },
-      select: {
-        id: true,
-        userRoleId: true,
-        isActive: true,
-        userRole: {
-          select: {
-            role: true,
-          },
-        },
-      },
-    })
-
-    const prevApproversRole = userRolePrograms.filter(urp => urp.userRole.role === 'APPROVER')
-    const prevViewersRole = userRolePrograms.filter(urp => urp.userRole.role === 'VIEWER')
-
     if (updateApprovers) {
-      await deactiveProgramRoles({ fnPrisma, programId: id, programRoles: approversRole, prevProgramRoles: prevApproversRole })
+      await deactivateProgramRoles({ fnPrisma, programId: id, programRoles: approversRole, prevProgramRoles: prevApproversRole })
       await setNewProgramRoles({ fnPrisma, programId: id, programRoles: approversRole, prevProgramRoles: prevApproversRole })
       await updateUserRoleProgramGroupMembers({ fnPrisma, programId: id, approversRoleMatrix, superId })
     }
@@ -141,7 +143,7 @@ export async function updateProgram(params: UpdateProgramParams) {
           userRoleId: vr.roleId,
           programId: id,
         })) ?? []
-      await deactiveProgramRoles({ fnPrisma, programId: id, programRoles: programRoles, prevProgramRoles: prevViewersRole })
+      await deactivateProgramRoles({ fnPrisma, programId: id, programRoles: programRoles, prevProgramRoles: prevViewersRole })
       await setNewProgramRoles({ fnPrisma, programId: id, programRoles: programRoles, prevProgramRoles: prevViewersRole })
     }
 
@@ -258,7 +260,7 @@ interface UpdateProgramRolesParams {
   prevProgramRoles: PrevProgramRole[]
 }
 
-const deactiveProgramRoles = async ({ fnPrisma, programId, programRoles, prevProgramRoles }: UpdateProgramRolesParams) => {
+const deactivateProgramRoles = async ({ fnPrisma, programId, programRoles, prevProgramRoles }: UpdateProgramRolesParams) => {
   const deletedProgramRoles = prevProgramRoles.filter(
     prev => !programRoles.find(curr => curr.userRoleId === prev.userRoleId) && prev.isActive,
   )
