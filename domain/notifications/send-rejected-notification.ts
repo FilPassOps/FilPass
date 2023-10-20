@@ -1,8 +1,8 @@
 import { sendEmail } from 'lib/send-email'
 import { validate } from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
-import { sendRejectNotificationValidator } from './validation'
 import { baseEmail } from './constants'
+import { sendRejectNotificationValidator } from './validation'
 
 interface SendRejectNotificationParams {
   email: string
@@ -65,9 +65,7 @@ const getBody = ({ transferRequestId, notes }: GetBodyParams) => {
         Thanks for submitting a transfer request. After careful review, an approver has rejected the transfer request for the following reason:
       </p>
 
-      <p style="padding: 16px 10px; margin: 20px 0px; background: #4f46e5; color: white; border-radius: 6px; line-height:24px; font-weight: 500; white-space: pre-line;">
-        ${notes}
-      </p>
+      <p style="padding: 16px 10px; margin: 20px 0px; background: #4f46e5; color: white; border-radius: 6px; line-height:24px; font-weight: 500; white-space: pre-line;">${notes}</p>
 
       <p style="margin:0; color: #6B7280;line-height: 24px;">
         Click the button below to view more details:
