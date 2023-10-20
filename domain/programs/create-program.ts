@@ -4,6 +4,7 @@ import { TransactionError } from 'lib/errors'
 import { newPrismaTransaction } from 'lib/prisma'
 import { validate } from 'lib/yup'
 import { createProgramValidator } from './validation'
+import prisma from 'lib/prisma'
 
 interface CreateProgramParams {
   name: string
@@ -30,9 +31,25 @@ export async function createProgram(params: CreateProgramParams) {
     }
   }
 
-  // TODO OPEN-SOURCE: add unique name validation
-
   const { name, deliveryMethod, approversRole, programCurrency, visibility, viewersRole } = fields
+
+  const trimmedName = name.trim()
+
+  const existingProgram = await prisma.program.findFirst({
+    where: { name: trimmedName },
+  })
+
+  if (existingProgram) {
+    return {
+      error: {
+        status: 400,
+        errors: {
+          name: 'Program name already exists',
+          type: 'internal',
+        },
+      },
+    }
+  }
 
   return await newPrismaTransaction(async fnPrisma => {
     const [request, payment, blockchain] = await Promise.all([
@@ -48,7 +65,7 @@ export async function createProgram(params: CreateProgramParams) {
     const createdProgram = await fnPrisma.program.create({
       data: {
         deliveryMethod,
-        name,
+        name: trimmedName,
         visibility,
         blockchainId: blockchain.id,
         programCurrency: {
