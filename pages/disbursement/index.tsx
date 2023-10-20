@@ -9,7 +9,7 @@ import { Button } from 'components/Shared/Button'
 import { PaginationCounter } from 'components/Shared/PaginationCounter'
 import { PaginationWrapper, getItemsPerPage } from 'components/Shared/PaginationWrapper'
 import { WithMetaMaskButton } from 'components/Web3/MetaMaskProvider'
-import { AppConfig, ChainNames } from 'config'
+import { AppConfig, ChainIds, ChainNames } from 'config'
 import { stringify } from 'csv-stringify/sync'
 import { getAll } from 'domain/disbursement/get-all'
 import { getAllPrograms } from 'domain/programs/get-all'
@@ -215,16 +215,16 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
       columns.address && headerFile.push('Address')
       columns.amount && headerFile.push('Request Amount')
       columns.amount && headerFile.push('Request Amount Currency Unit')
-      columns.paidFilAmount && headerFile.push('Paid Amount')
-      columns.paidFilAmount && headerFile.push('Paid Amount Currency Unit')
+      columns.paidAmount && headerFile.push('Paid Amount')
+      columns.paidAmount && headerFile.push('Paid Amount Currency Unit')
       columns.status && headerFile.push('Status')
-      columns.filfoxLink && headerFile.push('Filfox link')
+      columns.blockExplorerLink && headerFile.push('Block Explorer Link')
 
       const csvTemplate = stringify(
         [
           headerFile,
-          ...data.requests.map(({ program, wallet, transfers, currency, receiver, wallet_blockchain, ...request }) => {
-            const chain = AppConfig.network.getChainByName(wallet_blockchain as ChainNames)
+          ...data.requests.map(({ program, wallet, transfers, currency, receiver, ...request }) => {
+            const chain = AppConfig.network.getChain(program.blockchain.chainId as ChainIds)
 
             const row = []
             columns.number && row.push(request.publicId)
@@ -235,10 +235,10 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
             columns.address && row.push(wallet.address)
             columns.amount && row.push(request.amount)
             columns.amount && row.push(currency.name)
-            columns.paidFilAmount && row.push(transfers[0].amount)
-            columns.paidFilAmount && row.push(transfers[0].amountCurrencyUnit?.name ?? 'FIL')
+            columns.paidAmount && row.push(transfers[0].amount)
+            columns.paidAmount && row.push(transfers[0].amountCurrencyUnit?.name ?? 'FIL')
             columns.status && row.push(status)
-            columns.filfoxLink && row.push(`${chain.blockExplorer.url}/${transfers[0].txHash}`)
+            columns.blockExplorerLink && row.push(`${chain.blockExplorer.url}/${transfers[0].txHash}`)
             return row
           }),
         ],

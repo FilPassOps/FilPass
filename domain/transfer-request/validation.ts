@@ -209,10 +209,10 @@ export const createReportValidator = yup.object({
       createDate: yup.boolean().required(),
       address: yup.boolean().required(),
       amount: yup.boolean().required(),
-      paidFilAmount: yup.boolean().required(),
+      paidAmount: yup.boolean().required(),
       status: yup.boolean().required(),
       receiverEmail: yup.boolean().required(),
-      filfoxLink: yup.boolean().required(),
+      blockExplorerLink: yup.boolean().required(),
     })
     .test('oneColumnRequired', 'Select at least one column', value => Object.values(value).includes(true)),
 })

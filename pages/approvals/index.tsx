@@ -132,11 +132,10 @@ export default function Approvals({
       columns.address && headerFile.push('Address')
       columns.amount && headerFile.push('Request Amount')
       columns.amount && headerFile.push('Request Amount Currency Unit')
-      columns.paidFilAmount && headerFile.push('Paid Amount')
-      columns.paidFilAmount && headerFile.push('Paid Amount Currency Unit')
+      columns.paidAmount && headerFile.push('Paid Amount')
+      columns.paidAmount && headerFile.push('Paid Amount Currency Unit')
       columns.status && headerFile.push('Status')
-      columns.taxForm && headerFile.push('Tax Form')
-      columns.filfoxLink && headerFile.push('Filfox link')
+      columns.blockExplorerLink && headerFile.push('Block Explorer Link')
 
       const csvTemplate = stringify(
         [
@@ -165,10 +164,10 @@ export default function Approvals({
               columns.address && row.push(wallet_address)
               columns.amount && row.push(amount)
               columns.amount && row.push(request_unit)
-              columns.paidFilAmount && row.push(transfer_amount)
-              columns.paidFilAmount && row.push(transfer_amount_currency_unit)
+              columns.paidAmount && row.push(transfer_amount)
+              columns.paidAmount && row.push(transfer_amount_currency_unit)
               columns.status && row.push(status)
-              columns.filfoxLink && row.push(`${chain.blockExplorer.url}/${transfer_hash}`)
+              columns.blockExplorerLink && row.push(`${chain.blockExplorer.url}/${transfer_hash}`)
               return row
             },
           ),

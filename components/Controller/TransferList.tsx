@@ -130,6 +130,14 @@ const TransferList = ({
     }
   }, [requests, shouldShowHeaderCheckbox])
 
+  let transferDetail: string | undefined = undefined
+
+  if (query.status === PAID_STATUS) {
+    transferDetail = 'Block Explorer Link'
+  } else if (query.status === APPROVED_STATUS) {
+    transferDetail = 'Actions'
+  }
+
   return (
     <div className="flex flex-col w-full">
       <Table>
@@ -166,7 +174,7 @@ const TransferList = ({
             <Header>Request Amount</Header>
             <Header>{query.status === PAID_STATUS ? `Paid Amount` : `Estimated Amount`}</Header>
             <Header style={{ minWidth: 190 }}>Status</Header>
-            <Header />
+            {transferDetail && <Header style={{ minWidth: 190 }}>{transferDetail}</Header>}
           </tr>
         </TableHead>
         <TableBody>
@@ -249,35 +257,37 @@ const TransferList = ({
                   <LinkedCell href={href}>
                     <StatusPill status={request.status} />
                   </LinkedCell>
-                  <Cell>
-                    {request.status === APPROVED_STATUS && (
-                      <div
-                        className="h-full flex items-center justify-center flex-col space-y-4 2xl:space-y-0 2xl:space-x-4 2xl:flex-row"
-                        onClick={e => e.stopPropagation()}
-                      >
-                        <WithMetaMaskButton
-                          variant="outline-green"
-                          onClick={() => onSinglePayClick(request)}
-                          defaultLabel="Pay"
-                          targetChainId={chainId}
-                          className="w-full"
+                  {transferDetail && (
+                    <Cell>
+                      {request.status === APPROVED_STATUS && (
+                        <div
+                          className="h-full flex items-center justify-center flex-col space-y-4 2xl:space-y-0 2xl:space-x-4 2xl:flex-row"
+                          onClick={e => e.stopPropagation()}
                         >
-                          Pay
-                        </WithMetaMaskButton>
+                          <WithMetaMaskButton
+                            variant="outline-green"
+                            onClick={() => onSinglePayClick(request)}
+                            defaultLabel="Pay"
+                            targetChainId={chainId}
+                            className="w-full"
+                          >
+                            Pay
+                          </WithMetaMaskButton>
 
-                        <Button variant="outline-red" onClick={() => onSingleRejectClick(request)}>
-                          Reject
-                        </Button>
-                      </div>
-                    )}
-                    {request.status === PAID_STATUS && paidTransfer?.txHash && (
-                      <BlockExplorerLink
-                        blockExplorerName={blockExplorer.name}
-                        blockExplorerUrl={blockExplorer.url}
-                        transactionHash={paidTransfer?.txHash}
-                      />
-                    )}
-                  </Cell>
+                          <Button variant="outline-red" onClick={() => onSingleRejectClick(request)}>
+                            Reject
+                          </Button>
+                        </div>
+                      )}
+                      {request.status === PAID_STATUS && paidTransfer?.txHash && (
+                        <BlockExplorerLink
+                          blockExplorerName={blockExplorer.name}
+                          blockExplorerUrl={blockExplorer.url}
+                          transactionHash={paidTransfer?.txHash}
+                        />
+                      )}
+                    </Cell>
+                  )}
                 </tr>
               )
             })}
