@@ -135,7 +135,6 @@ export default function Approvals({
       columns.paidAmount && headerFile.push('Paid Amount')
       columns.paidAmount && headerFile.push('Paid Amount Currency Unit')
       columns.status && headerFile.push('Status')
-      columns.taxForm && headerFile.push('Tax Form')
       columns.blockExplorerLink && headerFile.push('Block Explorer Link')
 
       const csvTemplate = stringify(

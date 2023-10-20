@@ -35,7 +35,7 @@ export const useDownloadFile = ({ fileId, uploadingForOthers = false, fileName }
 
     const buffer = Buffer.from(data.file.data, 'base64')
 
-    return JsFileDownload(buffer, fileName || `${DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss')}-tax`, data.info[0])
+    return JsFileDownload(buffer, fileName || `${DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss')}`, data.info[0])
   }
 
   return {
