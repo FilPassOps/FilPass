@@ -70,8 +70,8 @@ export const CreateReportModal = ({
         program: true,
         status: true,
         receiverEmail: isDisbursement && showPaidStatusColumns,
-        paidFilAmount: showPaidStatusColumns,
-        filfoxLink: showPaidStatusColumns,
+        paidAmount: showPaidStatusColumns,
+        blockExplorerLink: showPaidStatusColumns,
       },
     },
   })
@@ -143,12 +143,12 @@ export const CreateReportModal = ({
                 </CheckboxInput>
               )}
               {/* @ts-ignore */}
-              <CheckboxInput className="items-center" id="filAmount" {...register('columns.paidFilAmount')}>
-                <span className="text-gray-700 font-medium text-sm">Paid FIL Amount</span>
+              <CheckboxInput className="items-center" id="amount" {...register('columns.paidAmount')}>
+                <span className="text-gray-700 font-medium text-sm">Paid Amount</span>
               </CheckboxInput>
               {/* @ts-ignore */}
-              <CheckboxInput className="items-center" id="filfoxLink" {...register('columns.filfoxLink')}>
-                <span className="text-gray-700 font-medium text-sm">Filfox link</span>
+              <CheckboxInput className="items-center" id="blockExplorerLink" {...register('columns.blockExplorerLink')}>
+                <span className="text-gray-700 font-medium text-sm">Block Explorer Link</span>
               </CheckboxInput>
             </>
           )}

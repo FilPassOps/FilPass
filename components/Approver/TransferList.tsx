@@ -62,6 +62,12 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
     }
   }, [data, shouldShowHeaderCheckbox])
 
+  let transferDetail: string | undefined = undefined
+
+  if (query.status === PAID_STATUS) {
+    transferDetail = 'Block Explorer Link'
+  }
+
   return (
     <div className="flex flex-col">
       <Table>
@@ -86,7 +92,7 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
             <Header>Request Amount</Header>
             <Header>{query.status === PAID_STATUS ? `Paid Amount` : `Estimated Amount`}</Header>
             <Header>Status</Header>
-            <Header />
+            {transferDetail && <Header>{transferDetail}</Header>}
           </tr>
         </TableHead>
         <TableBody>
@@ -148,15 +154,18 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
                 <LinkedCell href={href}>
                   <StatusPill status={request.status} />
                 </LinkedCell>
-                <Cell>
-                  {request.status === PAID_STATUS && request.transfer_hash && (
-                    <BlockExplorerLink
-                      blockExplorerName={chain?.blockExplorer.name}
-                      blockExplorerUrl={chain?.blockExplorer.url}
-                      transactionHash={request.transfer_hash}
-                    />
-                  )}
-                </Cell>
+
+                {transferDetail && (
+                  <Cell>
+                    {request.status === PAID_STATUS && request.transfer_hash && (
+                      <BlockExplorerLink
+                        blockExplorerName={chain?.blockExplorer.name}
+                        blockExplorerUrl={chain?.blockExplorer.url}
+                        transactionHash={request.transfer_hash}
+                      />
+                    )}
+                  </Cell>
+                )}
               </tr>
             )
           })}
