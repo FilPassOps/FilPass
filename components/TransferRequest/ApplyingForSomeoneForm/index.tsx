@@ -266,7 +266,12 @@ const FormComponent = ({
       />
 
       <TextInput
-        label="Project Name"
+      label={
+        <>
+          Project Name
+          <Asterisk />
+        </>
+      }
         id="name"
         type="text"
         placeholder="Project/team (as was submitted in the event)"
@@ -280,7 +285,7 @@ const FormComponent = ({
         submitErrors={submitErrors}
         placeholder="Requested amount"
         value={requests[index].amount}
-        required={!receiverShouldReview ? <Asterisk /> : ''}
+        required={<Asterisk />}
         {...register(`requests[${index}].amount`, {
           setValueAs: (val: string) => {
             const parsedValue = Number(String(val).replaceAll(/[, \s]+/g, ''))

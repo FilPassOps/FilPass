@@ -18,5 +18,5 @@ export const getTransfersByRequestIdValidator = yup
 export const transferRejectValidator = yup.object({
   transferRequestId: yup.array(yup.string().required()).typeError(errorsMessages.required_field.message).required(),
   controllerId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).typeError(errorsMessages.required_field.message).required(),
-  notes: yup.string().required(),
+  notes: yup.string().trim().required(),
 })

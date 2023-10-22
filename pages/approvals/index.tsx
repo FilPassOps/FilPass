@@ -218,7 +218,7 @@ export default function Approvals({
                 </div>
                 <div>
                   <Button
-                    variant="opacity-red"
+                    variant={hasOnlySubmittedByApprover ? "dark-red" : "opacity-red"}
                     onClick={() => setDeleteModalOpen(true)}
                     disabled={!hasOnlySubmittedByApprover}
                     toolTipText={!hasOnlySubmittedByApprover ? 'At least one of the requests you selected cannot be deleted.' : ''}

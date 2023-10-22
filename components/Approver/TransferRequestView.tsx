@@ -69,7 +69,7 @@ export const TransferRequestView = ({ data }: TransferRequestViewProps) => {
 
         {showApprove && <Button onClick={() => setApproveModalOpen(true)}>Approve</Button>}
         {showDeleteButton && (
-          <Button variant="primary-lighter" onClick={() => setDeleteModalOpen(true)}>
+          <Button variant="dark-red" onClick={() => setDeleteModalOpen(true)}>
             Delete
           </Button>
         )}

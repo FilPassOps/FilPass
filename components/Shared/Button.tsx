@@ -14,6 +14,7 @@ type Variant =
   | 'outline-red'
   | 'outline-blue'
   | 'red'
+  | 'dark-red'
   | 'green'
   | 'opacity-red'
   | 'none'
@@ -100,6 +101,7 @@ function getButtonClasses({ variant, disabled, defaultStyle }: getButtonClassesP
     variant === 'red' && 'bg-red-600 hover:bg-red-700 text-white',
     variant === 'green' && 'bg-green-600 hover:bg-green-700 text-white',
     variant === 'opacity-red' && 'bg-red-100 hover:bg-red-200 text-red-400 shadow-none border-none font-light',
+    variant === 'dark-red' && 'bg-red-700 hover:bg-red-900 text-white',
     variant === 'none' && 'border-none shadow-none',
   )
 }

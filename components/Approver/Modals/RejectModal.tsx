@@ -48,7 +48,7 @@ export const RejectModal = ({ data, open, onModalClosed, isBatch = false }: Requ
 
       if (error) {
         if (typeof error === 'object' && error.errors) {
-          return setError(error?.errors.requests)
+          return setError(error?.errors.requests || error)
         }
         return setError(error)
       }
