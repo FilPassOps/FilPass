@@ -71,7 +71,7 @@ function FiltersModal({
     .filter(program => programIds?.includes(program.id))
     .map(program => ({ value: program.id, label: program.name }))
 
-  const initialRequestNumberFilter = query.number ? parseInt(query.number.toString()) : ''
+  const initialRequestNumberFilter = query.number ?? ''
 
   const initialStatusFilter =
     query.status && statusOptions?.includes(query.status as StatusFilterOption) ? (query.status as StatusFilterOption) : ''
@@ -207,8 +207,9 @@ function FiltersModal({
                 type="number"
                 name="request-number"
                 id="request-number"
+                onWheel={() => (document.activeElement as any)?.blur()}
                 value={requestNumber}
-                onChange={event => setRequestNumber(parseInt(event.currentTarget.value))}
+                onChange={event => setRequestNumber(event.currentTarget.value)}
                 placeholder="1234567890"
               />
               <div className={`${requestNumber ? 'absolute' : 'hidden'} top-[10px] right-4`}>

@@ -21,7 +21,7 @@ export const RequestAmountInput = forwardRef<HTMLInputElement, RequestAmountInpu
       name={name}
       label={
         <>
-          Request Amount {requestCurrency ? `in  ${requestCurrency.name}` : ''}
+          Request Amount{requestCurrency ? ` in  ${requestCurrency.name}` : ''}
           {required}
         </>
       }

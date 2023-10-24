@@ -7,6 +7,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import qs from 'qs'
 import { ParamsSerializerOptions } from 'axios'
+import React from 'react'
 
 interface DeleteModalProps {
   onModalClosed: () => void
@@ -71,12 +72,12 @@ export const DeleteModal = ({ onModalClosed, open, data, redirectTo }: DeleteMod
         <>
           {`requests `}
           {data.map(({ id }, index) => (
-            <>
-              <Link key={`${id}-${index}`} href={`/approvals/${id}`} passHref={true} className="text-sky-700 underline" target="_blank">
+            <React.Fragment key={id}>
+              <Link href={`/approvals/${id}`} passHref={true} className="text-sky-700 underline" target="_blank">
                 #{id}
               </Link>
               {index === data.length - 1 ? '' : `, `}
-            </>
+            </React.Fragment>
           ))}
         </>
       )

@@ -43,7 +43,7 @@ export const FooterButtons = ({ isEditable, data, isSubmitting, reset }: FooterB
         )}
         {showDeleteButton && (
           <div>
-            <Button variant="primary-lighter" onClick={() => setDeleteModalOpen(true)}>
+            <Button variant="dark-red" onClick={() => setDeleteModalOpen(true)}>
               Delete
             </Button>
           </div>
