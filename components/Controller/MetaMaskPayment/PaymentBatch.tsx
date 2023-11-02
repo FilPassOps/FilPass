@@ -2,16 +2,20 @@ import { Bars4Icon } from '@heroicons/react/24/outline'
 import { CheckCircleIcon, ChevronDownIcon, ChevronUpIcon, CurrencyDollarIcon, XCircleIcon } from '@heroicons/react/24/solid'
 import { Blockchain, TransferStatus } from '@prisma/client'
 import Big from 'big.js'
+import { useAlertDispatcher } from 'components/Layout/Alerts'
 import { Button } from 'components/Shared/Button'
 import Currency, { CryptoAmount } from 'components/Shared/Table/Currency'
 import { WalletAddress } from 'components/Shared/WalletAddress'
-import { WithMetaMaskButton } from 'components/Web3/MetaMaskProvider'
-import { Forward, contractInterface, useContract } from 'hooks/useContract'
-import useCurrency from 'hooks/useCurrency'
+import { WithMetaMaskButton, useMetaMask } from 'components/Web3/MetaMaskProvider'
 import { AppConfig, ChainNames } from 'config'
 import { USD } from 'domain/currency/constants'
+import { Forward, contractInterface, useContract } from 'hooks/useContract'
+import useCurrency from 'hooks/useCurrency'
+import { getBalance } from 'lib/blockchain-utils'
 import { formatCrypto, formatCurrency } from 'lib/currency'
 import { useState } from 'react'
+import errorsMessages from 'wordings-and-errors/errors-messages'
+import { ErrorAlert } from './Alerts'
 import { Table, TableDiv, TableHeader } from './Table'
 import { TransactionParser } from './TransactionParser'
 
@@ -58,8 +62,10 @@ interface BatchProps {
 const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsChunkHextMatch, setHextMatch }: BatchProps) => {
   const { data, isPaymentSent, isHexMatch, blockchainName } = batchData
   const [isOpen, setIsOpen] = useState(false)
+  const { wallet } = useMetaMask()
   const { forward } = useContract(blockchainName)
   const { chainId } = AppConfig.network.getChainByName(blockchainName as ChainNames)
+  const { dispatch, close } = useAlertDispatcher()
 
   const { currency } = useCurrency(chainId)
 
@@ -74,6 +80,8 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
       totalDollarAmount += Number(item.amount) * Number(currency)
     }
   }
+
+  const totalTokenAmount = currency && totalDollarAmount && new Big(totalDollarAmount).div(currency)
 
   const validateParseData = (parsedData: ParsedData) => {
     const isValidFunctionCall = contractInterface.getFunction('forward').name
@@ -123,6 +131,34 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
     setIsChunkHextMatch(isValid)
   }
 
+  async function hasSufficientBalance() {
+    const balance = await getBalance(wallet ?? '', AppConfig.network.getChainByName(blockchainName as ChainNames))
+    if (!totalTokenAmount) return false
+    return new Big(balance).gte(totalTokenAmount)
+  }
+
+  async function checkBalance() {
+    const hasBalance = await hasSufficientBalance()
+
+    if (!hasBalance) {
+      dispatch({
+        type: 'error',
+        title: 'Payment failed',
+        config: {
+          closeable: true,
+        },
+        body: () => (
+          <ErrorAlert handleClose={() => close()}>
+            <span className="text-sm text-gray-600 text-center first-letter:uppercase pt-2">
+              {errorsMessages.check_account_balance.message}
+            </span>
+          </ErrorAlert>
+        ),
+      })
+      throw new Error('No balance')
+    }
+  }
+
   return (
     <div key={index} className="text-gray-900">
       <div className="md:p-6 flex flex-wrap items-center justify-between border-b border-gray-200 gap-4 py-5">
@@ -134,7 +170,7 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
             </div>
             <div className="flex items-center gap-2">
               <CurrencyDollarIcon className="w-6 text-gray-400" />
-              {currency && totalDollarAmount ? formatCrypto(new Big(totalDollarAmount).div(currency).toFixed(2)) : '-'}{' '}
+              {totalTokenAmount ? formatCrypto(totalTokenAmount.toFixed(2)) : '-'}{' '}
               {AppConfig.network.getChainByName(blockchainName as ChainNames).symbol}
               <span className="text-sm "> ≈{formatCurrency(totalDollarAmount)}</span>
             </div>
@@ -145,6 +181,7 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
             <WithMetaMaskButton
               className="w-full md:w-auto"
               targetChainId={AppConfig.network.getChainByName(blockchainName as ChainNames).chainId}
+              onBeforeClick={checkBalance}
               onClick={async () => {
                 const sent = await forwardHandler(data, forward, blockchainName)
                 setIsBatchSent(sent)
