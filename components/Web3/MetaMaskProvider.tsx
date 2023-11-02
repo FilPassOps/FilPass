@@ -191,7 +191,7 @@ interface WithMetaMaskButtonProps extends Omit<ButtonProps, 'loading' | 'disable
   switchChainLabel?: string
   defaultLabel?: string
   targetChainId?: ChainIds
-  onBeforeClick?: () => Promise<void>
+  onBeforeClick?: () => Promise<void> | void
 }
 
 export const WithMetaMaskButton: React.FC<React.PropsWithChildren<WithMetaMaskButtonProps>> = props => {
