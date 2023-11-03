@@ -92,7 +92,7 @@ const Alert: React.FC<React.PropsWithChildren<AlertProps>> = ({ alert }) => {
   )
 }
 
-const AlertIcon = ({ type }: { type?: AlertType }) => {
+export const AlertIcon = ({ type }: { type?: AlertType }) => {
   switch (type) {
     case 'success':
       return (
