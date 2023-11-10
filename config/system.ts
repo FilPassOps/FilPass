@@ -9,6 +9,9 @@ export interface App {
     supportAddress: string
   }
   enableCoinMarketApi: boolean
+  youtubeChannelUrl?: string
+  twitterUrl?: string
+  linkedinUrl?: string
 }
 
 export interface AppConfig {
@@ -40,6 +43,9 @@ const app: App = {
     supportAddress: 'emissary@protocol.ai',
   },
   enableCoinMarketApi: true,
+  twitterUrl: 'https://twitter.com/protocollabs/',
+  linkedinUrl: 'https://www.linkedin.com/company/protocollabs/',
+  youtubeChannelUrl: 'https://www.youtube.com/ProtocolLabs/'
 }
 
 export const AppConfig = {

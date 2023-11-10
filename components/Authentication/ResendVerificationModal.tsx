@@ -1,3 +1,4 @@
+import { AlertIcon } from 'components/Layout/Alerts'
 import { Button } from 'components/Shared/Button'
 import { Modal } from 'components/Shared/Modal'
 import { api } from 'lib/api'
@@ -34,21 +35,30 @@ export const ResendVerificationModal = ({
 
   return (
     <Modal open={openModal} onModalClosed={onModalClosed}>
-      <div className="h-96 flex flex-col justify-center space-y-8">
-        {errorMessage && <p className="text-center font-bold text-xl text-red-500">Error: {errorMessage}</p>}
-        <p className="text-center font-bold text-xl">
-          We just sent an activation email to <span className="text-indigo-500 block">{email},</span>
-          please check your inbox.
-        </p>
-        <div className="w-full flex justify-center items-center space-x-4">
-          <span className="font-bold"> {`Didn't get a email?`}</span>{' '}
-          <div className="flex-0">
-            <Button onClick={handleResendEmailVerification} loading={isResendLoading} disabled={isResendLoading}>
+      <>
+        <div className="flex justify-center items-center pb-2">
+          <AlertIcon type={'success'} />
+        </div>
+        <div className="flex items-center justify-center"></div>
+        <h1 className="my-2 font-medium text-lg leading-6 text-center">Please check your email</h1>
+        <div className="text-sm leading-5 text-gray-500">
+          <p className="text-gray-500 text-sm text-center mb-8">
+            We just sent an activation email to <span className="text-indigo-500 block">{email},</span>
+            please check your inbox.
+          </p>
+          {errorMessage && <p className="text-red-600 text-center text-sm mt-4">{errorMessage}</p>}
+          <span className="flex justify-center w-full">
+            <Button
+              className="max-w-xs w-full"
+              onClick={handleResendEmailVerification}
+              loading={isResendLoading}
+              disabled={isResendLoading}
+            >
               Resend
             </Button>
-          </div>
+          </span>
         </div>
-      </div>
+      </>
     </Modal>
   )
 }

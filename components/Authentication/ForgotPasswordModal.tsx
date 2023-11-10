@@ -6,6 +6,7 @@ import { Button } from 'components/Shared/Button'
 import { TextInput } from 'components/Shared/FormInput'
 import { api } from 'lib/api'
 import { sendEmailForgotPasswordValidator } from 'domain/notifications/validation'
+import { AlertIcon } from 'components/Layout/Alerts'
 
 interface ForgotPasswordModalProps {
   open: boolean
@@ -76,11 +77,17 @@ const ForgotPasswordModal = ({ open, onClose }: ForgotPasswordModalProps) => {
 
       {showSuccess && (
         <>
-          <h2 className="text-lg font-medium text-gray-900 mb-16 text-center">Please check your email</h2>
-          <p className="text-gray-500 text-sm text-center mb-8">
-            We’ve sent you an email to reset your password if there’s a matched account in our system. Follow the instructions in the email
-            to complete the process.
-          </p>
+          <div className="flex justify-center items-center pb-2">
+            <AlertIcon type={'success'} />
+          </div>
+          <div className="flex items-center justify-center"></div>
+          <h1 className="my-2 font-medium text-lg leading-6 text-center">Please check your email</h1>
+          <div className="text-sm leading-5 text-gray-500">
+            <p className="text-gray-500 text-sm text-center mb-8">
+              We have sent you an email to reset your password if there is a matched account in our system. Follow the instructions in the
+              email to complete the process.
+            </p>
+          </div>
         </>
       )}
     </Modal>
