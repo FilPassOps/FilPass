@@ -40,6 +40,7 @@ const errorsMessages: ErrorsMessages = {
   error_status_is_not_supported: { message: 'Status is not supported.' },
   wallet_not_found: { message: 'This wallet address does not exist' },
   wallet_incorrect: { message: 'This wallet address appears to be incorrect.' },
+  wallet_incorrect_user_default_wallet: { message: 'Invalid address or user does not have a default wallet' },
   program_not_found: { message: 'Program not found' },
   user_already_invited: { message: 'This user has already been invited.' },
   default_wallet_not_found: { message: 'Default Wallet not found, please specify a wallet.' },
