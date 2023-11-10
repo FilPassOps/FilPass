@@ -191,7 +191,7 @@ interface WithMetaMaskButtonProps extends Omit<ButtonProps, 'loading' | 'disable
   switchChainLabel?: string
   defaultLabel?: string
   targetChainId?: ChainIds
-  onBeforeClick?: () => void
+  onBeforeClick?: () => Promise<void> | void
 }
 
 export const WithMetaMaskButton: React.FC<React.PropsWithChildren<WithMetaMaskButtonProps>> = props => {
@@ -216,11 +216,11 @@ export const WithMetaMaskButton: React.FC<React.PropsWithChildren<WithMetaMaskBu
     }
   }, [busy])
 
-  const handleClick: MouseEventHandler<HTMLButtonElement> = event => {
+  const handleClick: MouseEventHandler<HTMLButtonElement> = async event => {
     setLoading(event.currentTarget === ref.current)
     try {
       if (onBeforeClick) {
-        onBeforeClick()
+        await onBeforeClick()
       }
       if (wallet && connectedToTargetChain) {
         onClick?.(event)
@@ -231,6 +231,8 @@ export const WithMetaMaskButton: React.FC<React.PropsWithChildren<WithMetaMaskBu
       }
     } catch (error: any) {
       console.error(error?.message)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -250,8 +252,8 @@ export const WithMetaMaskButton: React.FC<React.PropsWithChildren<WithMetaMaskBu
         {...rest}
         ref={ref}
         className={twMerge('flex items-center', className)}
-        loading={busy && loading}
-        disabled={busy || !props.targetChainId}
+        loading={busy || loading}
+        disabled={busy || loading || !props.targetChainId}
         onClick={handleClick}
       >
         {buttonLabel()}
