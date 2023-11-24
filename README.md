@@ -12,22 +12,19 @@
   </a>
 </p>
 
-## Introduction
-
-Emissary streamlines your invoicing workflow, making cryptocurrency transfer management effortless!
-
 ## Table of Contents
 
-- [Introduction](#introduction)
 - [Table of Contents](#table-of-contents)
-- [Database Setup](#database-setup)
-  - [Starting the container](#starting-the-container)
-  - [Running migrations](#running-migrations)
-  - [Seeding the database](#seeding-the-database)
-- [Application Start Up](#application-start-up)
+- [Introduction](#introduction)
+- [Getting Started](#getting-started)
+  - [Requirements](#requirements)
+  - [Application Start Up](#application-start-up)
+  - [Database Setup](#database-setup)
+    - [Starting the container](#starting-the-container)
+    - [Running migrations](#running-migrations)
+    - [Seeding the database](#seeding-the-database)
   - [Installing dependencies](#installing-dependencies)
   - [Running the application](#running-the-application)
-- [Scripts](#scripts)
 - [Database Migrations](#database-migrations)
   - [DDL Migrations (Structural changes)](#ddl-migrations-structural-changes)
   - [DML Migrations (Data changes)](#dml-migrations-data-changes)
@@ -36,21 +33,53 @@ Emissary streamlines your invoicing workflow, making cryptocurrency transfer man
 - [License](#license)
 - [Security](#security)
 
-## Database Setup
+## Introduction
 
-### Starting the container
+Emissary streamlines your invoicing workflow, making cryptocurrency transfer management effortless!
+
+## Getting Started
+
+To start using Emissary locally, follow the steps below.
+
+### Requirements
+
+Before we follow to the setting up of the application, make sure you have the following tools installed:
+
+- [Node.js](https://nodejs.org/en/)
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
+
+You will also need to have the following services set up:
+
+- [AWS S3 Bucket](https://aws.amazon.com/s3/)
+
+
+### Application Start Up
+
+Before starting the application, make sure you have the following files set up:
+
+- Environment: Create a file named `.env` in the root folder containing all environment variables defined at [env-vars](env-vars.md), also found in the root folder.
+
+- Chains: If needed, change the `chains.ts` file to match your desired chains. The default chains are `filecoin` and `ethereum`.
+
+- System: Change the app information on the `system.ts` file to match your company information.
+
+
+### Database Setup
+
+#### Starting the container
 
 ```shell
 docker-compose up -d
 ```
 
-### Running migrations
+#### Running migrations
 
 ```shell
 npm run migrate
 ```
 
-### Seeding the database
+#### Seeding the database
 
 - With essential data only: `npm run seed`
 
@@ -68,10 +97,6 @@ npm run migrate
     - test-viewer / password
     - test-super / password
 
-## Application Start Up
-
-Before starting the application, make sure you have a file named `.env` in the root folder containing all environment variables defined at [env-vars](env-vars.md), also found in the root folder.
-
 ### Installing dependencies
 
 ```shell
@@ -86,19 +111,6 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Scripts
-
-- `node scripts/getDatabaseUsers.js`
-  - Generates an AWS RDS IAM auth token based on the current DB environment variables
-- `node scripts/importFromCSV.js <file_path>`
-  - Imports users that are on the CSV file to the database
-  - **File template:**
-    ```
-    Email;FIL Address
-    email;address
-    email;address
-    email;address
-    ```
 
 ## Database Migrations
 

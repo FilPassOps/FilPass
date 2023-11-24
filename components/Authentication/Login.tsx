@@ -37,6 +37,8 @@ export function Login({ redirectAfterLogin }: LoginProps) {
   const [openResetPassModal, setOpenResetPassModal] = useState(false)
   const [userData, setUserData] = useState<any>()
 
+  const NEXT_PUBLIC_GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
+
   useEffect(() => {
     setOpenResetPassModal(!!router?.query?.token)
   }, [router?.query?.token])
@@ -116,9 +118,13 @@ export function Login({ redirectAfterLogin }: LoginProps) {
   return (
     <Layout>
       <div className="h-full w-full flex flex-col justify-center space-y-6 px-8 md:px-0">
-        <GoogleLogin buttonText="Login with Google" />
+        {NEXT_PUBLIC_GOOGLE_CLIENT_ID && (
+          <>
+            <GoogleLogin buttonText="Login with Google" />
+            <p className="text-center">or</p>
+          </>
+        )}
 
-        <p className="text-center">or</p>
         <form noValidate={true} className="h-full w-full flex flex-col justify-center space-y-6" onSubmit={handleSubmit(handleFormSubmit)}>
           <TextInput
             // @ts-ignore
