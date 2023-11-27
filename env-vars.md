@@ -16,7 +16,7 @@
 | `MAILGUN_SENDER_EMAIL`         | `no-reply@example.com`  | The Mailgun sender email if using the default implementation.                       | NO       |
 | `GOOGLE_CLIENT_SECRET`         | ` `                     | The Google client secret used to login with Google.                                 | NO       |
 | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | ` `                     | The public google client id used to login with Google.                              | NO       |
-| `PRIVATE_KEY`                  | ` `                     |                                                                                     | YES      |
+| `PRIVATE_KEY`                  | ` `                     |                                                                                     | NO      |
 | `COIN_MARKET_CAP_API_KEY`      | ` `                     | The API Key of the service that will be used to get the actual value of the tokens  | NO       |
 | `COIN_MARKET_ENDPOINT`         | ` `                     | The Endpoint of the service that will be used to get the actual value of the tokens | NO       |
 | `BUCKET_ACCESS_KEY_ID`         | ` `                     | The AWS S3 bucket access key id if using the default implementation.                | YES      |

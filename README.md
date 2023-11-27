@@ -22,7 +22,8 @@
   - [Database Setup](#database-setup)
     - [Starting the container](#starting-the-container)
     - [Running migrations](#running-migrations)
-    - [Seeding the database](#seeding-the-database)
+    - [Seeding the database with essential data](#seeding-the-database-with-essential-data)
+    - [Seeding the database with development data](#seeding-the-database-with-development-data)
   - [Installing dependencies](#installing-dependencies)
   - [Running the application](#running-the-application)
 - [Database Migrations](#database-migrations)
@@ -79,9 +80,13 @@ docker-compose up -d
 npm run migrate
 ```
 
-#### Seeding the database
+#### Seeding the database with essential data
 
-- With essential data only: `npm run seed`
+```shell
+npm run seed
+```
+
+#### Seeding the database with development data
 
 - With test data `npm run seed:dev`
 
