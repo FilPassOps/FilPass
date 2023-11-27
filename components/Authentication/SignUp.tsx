@@ -16,6 +16,8 @@ export function SignUp() {
   const [submitErrors, setSubmitErrors] = useState<any>()
   const [genericError, setGenericError] = useState<any>()
 
+  const NEXT_PUBLIC_GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
+
   const {
     register,
     handleSubmit,
@@ -55,9 +57,13 @@ export function SignUp() {
           <p>If you have participated in a {AppConfig.app.name} event, make sure to use the same registered email address</p>
         </PageAlert>
 
-        <GoogleLogin buttonText="Sign up with Google" />
+        {NEXT_PUBLIC_GOOGLE_CLIENT_ID && (
+          <>
+            <GoogleLogin buttonText="Sign up with Google" />
+            <p className="text-center">or</p>
+          </>
+        )}
 
-        <p className="text-center">or</p>
         <form noValidate={true} className="h-full w-full flex flex-col justify-center space-y-6" onSubmit={handleSubmit(handleFormSubmit)}>
           <TextInput
             id="email"
