@@ -76,7 +76,7 @@ const polygon = {
 const calibration = {
   name: 'Filecoin',
   networkName: 'Calibration',
-  symbol: 'FIL',
+  symbol: 'tFIL',
   chainId: '0x4cb2f',
   coinMarketApiCode: 2280, // from https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?symbol=FIL
   units: {
