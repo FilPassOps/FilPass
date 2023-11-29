@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const NEXT_PUBLIC_GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
-const APP_URL = process.env.APP_URL
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET
 
 interface GetAccessTokenFromCodeParams {

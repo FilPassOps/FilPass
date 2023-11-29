@@ -52,7 +52,7 @@ const getBody = ({ transferRequestId }: GetBodyParams) => {
   <tr>
     <td align="center" style="padding: 48px 32px 0px 32px;">
       <div style="display:inline-block;width:100%;max-width:400px;vertical-align:top;font-family:Inter,sans-serif;font-size:16px;line-height:24px;font-weight: 500;">
-        <a href="${process.env.APP_URL}/transfer-requests/${transferRequestId}"
+        <a href="${process.env.NEXT_PUBLIC_APP_URL}/transfer-requests/${transferRequestId}"
            style="background:#4F46E5;text-decoration: none; padding: 13px 33px; color: #ffffff; border-radius: 6px; display:inline-block;">
            View details
         </a>
