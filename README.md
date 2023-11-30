@@ -89,7 +89,7 @@ Before starting the application, make sure you have the following files set up:
 ### Running the application
 
 ```shell
-npm run dev
+npm run dev:server
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
