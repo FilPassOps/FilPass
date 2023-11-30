@@ -131,7 +131,8 @@ const checkWallet = async ({ prisma, user, request, isBatchCsv, index, programs 
   }
 
   const storedWallet = userWallets.find(
-    ({ address, blockchainId, isActive }) => isActive && address === request.wallet && program.blockchain.id === blockchainId,
+    ({ address, blockchainId, isActive }) =>
+      isActive && address === request.wallet?.toLowerCase() && program.blockchain.id === blockchainId,
   )
 
   if (storedWallet) {
