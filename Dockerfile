@@ -16,9 +16,6 @@ RUN npm install
 # Build the application
 RUN npm run build
 
-# Install PostgreSQL client
-RUN apk add --no-cache postgresql-client
-
 # Expose the port that Next.js will run on
 EXPOSE 3000
 

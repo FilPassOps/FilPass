@@ -20,7 +20,7 @@
     "deploy": "npx hardhat run scripts/deploy.ts --network",
     "test-contract": "npx hardhat test",
     "pre-dev": "docker compose up -d && npm run migrate && npm run seed && npm run seed:dev",
-    "start:migrate": "npm run migrate && node dist/server/index.js"
+    "start:migrate": "npm run migrate && npm run seed && node dist/server/index.js"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
