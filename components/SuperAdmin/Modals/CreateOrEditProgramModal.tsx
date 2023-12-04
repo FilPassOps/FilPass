@@ -135,7 +135,7 @@ export const CreateOrEditProgramModal = ({
             autoComplete="off"
             label="Program Name"
             placeholder="Enter program name"
-            error={errors.name || submitErrors}
+            error={errors.name || submitErrors?.name}
             disabled={program?.isArchived}
             {...register('name')}
           />
