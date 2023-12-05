@@ -40,7 +40,6 @@ export const useCreateOrEditProgramSubmit = ({
   isEditable,
   dirtyFields,
   isArchived,
-  programs,
 }: UseCreateOrEditProgramSubmitProps) => {
   const [submitErrors, setSubmitErrors] = useState<any>()
   const { dispatch, close } = useAlertDispatcher()
@@ -48,13 +47,6 @@ export const useCreateOrEditProgramSubmit = ({
   const handleFormSubmit = async (values: ProgramValues, e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault()
     setSubmitErrors(null)
-
-    const existingProgramName = programs.find(program => program.program_name === values.name)
-
-    if (existingProgramName) {
-      setSubmitErrors({ ['name']: { message: 'Program name already exists' } })
-      return
-    }
 
     const handleCreateOrEditProgramError = (error: any) => {
       if (error) {
