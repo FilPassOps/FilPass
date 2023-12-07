@@ -3,7 +3,7 @@ import { TextDecoder, TextEncoder } from 'util'
 global.TextDecoder = TextDecoder as any
 global.TextEncoder = TextEncoder
 
-process.env.APP_URL = 'http://localhost:3000'
+process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000'
 process.env.APP_SECRET = 'APP_SECRET'
 
 //HASHING

@@ -107,7 +107,7 @@ const getBody = ({ oldAddress, newDefaultWallet, token }: GetBodyParams) => {
   <tr>
     <td align="center" style="padding: 48px 32px 0px 32px;">
       <div style="display:inline-block;width:100%;max-width:400px;vertical-align:top;font-family:Inter,sans-serif;font-size:16px;line-height:24px;font-weight: 500;">
-        <a href="${process.env.APP_URL}/set-default-wallet?token=${token}"
+        <a href="${process.env.NEXT_PUBLIC_APP_URL}/set-default-wallet?token=${token}"
            style="background:#4F46E5;text-decoration: none; padding: 13px 33px; color: #ffffff; border-radius: 6px; display:inline-block;">
            Confirm
         </a>
@@ -120,7 +120,7 @@ const getBody = ({ oldAddress, newDefaultWallet, token }: GetBodyParams) => {
       <p style="margin:0; color: #6B7280;line-height: 24px; word-break: break-all;">
         If you did not request to change your default address, please do NOT click the button above and change your password as soon as possible. <br/><br/>
         If you have a problem clicking on this link, paste this into your browser:
-         ${process.env.APP_URL}/set-default-wallet?token=${token}
+         ${process.env.NEXT_PUBLIC_APP_URL}/set-default-wallet?token=${token}
       </p>
     </td>
   </tr>
