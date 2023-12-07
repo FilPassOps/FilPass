@@ -1,5 +1,6 @@
 import { Divider } from 'components/Shared/Divider'
 import Timestamp from 'components/Shared/Timestamp'
+import { AppConfig } from 'config/system'
 import { USER_ROLE } from 'domain/auth/constants'
 import { DateTime } from 'luxon'
 
@@ -67,11 +68,13 @@ export const TransferRequestHistory = ({ history = [], role = USER_ROLE, owner }
 }
 
 const formatUserEmail = ({ item, owner, role }: FormatUserEmailProps) => {
+  const matchingEmail = item.email.includes('@') && item.email.endsWith(AppConfig.app.emailConfig.domain)
+
   if (
     role === USER_ROLE &&
-    ((item.email.match(/(@protocol\.ai)/gi) && owner !== item.email) || (item.email.match(/(@protocol\.ai)/gi) && item.field === 'status'))
+    ((matchingEmail && owner !== item.email) || matchingEmail && item.field === 'status')
   ) {
-    return 'Protocol Labs'
+    return AppConfig.app.companyName
   }
   return item.email
 }

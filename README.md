@@ -12,65 +12,43 @@
   </a>
 </p>
 
+## Table of Contents
+
+- [Table of Contents](#table-of-contents)
+- [Introduction](#introduction)
+- [Getting Started](#getting-started)
+  - [Requirements](#requirements)
+  - [Installing dependencies](#installing-dependencies)
+  - [Database Setup](#database-setup)
+    - [Starting the container](#starting-the-container)
+    - [Running migrations](#running-migrations)
+    - [Seeding the database with essential data](#seeding-the-database-with-essential-data)
+  - [Application Start Up](#application-start-up)
+  - [Running the application](#running-the-application)
+- [Developer](#developer)
+- [License](#license)
+- [Security](#security)
+
 ## Introduction
 
 Emissary streamlines your invoicing workflow, making cryptocurrency transfer management effortless!
 
-## Table of Contents
+## Getting Started
 
-- [Introduction](#introduction)
-- [Table of Contents](#table-of-contents)
-- [Database Setup](#database-setup)
-  - [Starting the container](#starting-the-container)
-  - [Running migrations](#running-migrations)
-  - [Seeding the database](#seeding-the-database)
-- [Application Start Up](#application-start-up)
-  - [Installing dependencies](#installing-dependencies)
-  - [Running the application](#running-the-application)
-- [Scripts](#scripts)
-- [Database Migrations](#database-migrations)
-  - [DDL Migrations (Structural changes)](#ddl-migrations-structural-changes)
-  - [DML Migrations (Data changes)](#dml-migrations-data-changes)
-- [Tests](#tests)
-- [Contract Tests](#contract-tests)
-- [License](#license)
-- [Security](#security)
+To start using Emissary locally, follow the steps below.
 
-## Database Setup
+### Requirements
 
-### Starting the container
+Before we follow to the setting up of the application, make sure you have the following tools installed:
 
-```shell
-docker-compose up -d
-```
+- [Node.js](https://nodejs.org/en/)
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
 
-### Running migrations
+You will also need to have the following services set up:
 
-```shell
-npm run migrate
-```
-
-### Seeding the database
-
-- With essential data only: `npm run seed`
-
-- With test data `npm run seed:dev`
-
-  - The seed:dev create the following test users:
-
-  - General users
-
-    - user1@email.com to user149@test.com / password
-
-  - Users with specific roles (the email domain for specific users is defined on the config.js file)
-    - test-approver / password
-    - test-controller / password
-    - test-viewer / password
-    - test-super / password
-
-## Application Start Up
-
-Before starting the application, make sure you have a file named `.env` in the root folder containing all environment variables defined at [env-vars](env-vars.md), also found in the root folder.
+- [AWS S3 Bucket](https://aws.amazon.com/s3/)
+- [Mailgun](https://www.mailgun.com/)
 
 ### Installing dependencies
 
@@ -78,69 +56,48 @@ Before starting the application, make sure you have a file named `.env` in the r
 npm install
 ```
 
+### Database Setup
+
+#### Starting the container
+
+```shell
+docker-compose up -d
+```
+
+#### Running migrations
+
+```shell
+npm run migrate
+```
+
+#### Seeding the database with essential data
+
+```shell
+npm run seed
+```
+
+### Application Start Up
+
+Before starting the application, make sure you have the following files set up:
+
+- Environment: Create a file named `.env` in the root folder containing all environment variables defined at [env-vars](env-vars.md), also found in the root folder.
+
+- Chains: If needed, change the `chains.ts` file to match your desired chains. The default chains are `filecoin` and `ethereum`.
+
+- System: Change the app information on the `system.ts` file to match your company information.
+
 ### Running the application
 
 ```shell
-npm run dev
+npm run dev:server
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Scripts
 
-- `node scripts/getDatabaseUsers.js`
-  - Generates an AWS RDS IAM auth token based on the current DB environment variables
-- `node scripts/importFromCSV.js <file_path>`
-  - Imports users that are on the CSV file to the database
-  - **File template:**
-    ```
-    Email;FIL Address
-    email;address
-    email;address
-    email;address
-    ```
+## Developer
 
-## Database Migrations
-
-Migration files can be found under the `/prisma/migrations` folder and are executed by the `vercel-build` hook script whenever a new build is triggered.
-
-They can be executed locally by running the `npm run migrate` script.
-
-Migrations that were already run are stored in the `_prisma_migrations` database table and are executed only once.
-
-Check [Prisma documentation](https://www.prisma.io/docs/guides/database) for more info.
-
-### DDL Migrations (Structural changes)
-
-1. Make the desired changes to the `/prisma/schema.prisma` file.
-2. Run `npx prisma migrate dev --create-only` to create the migration. A new folder will be added to the migrations folder containing a migration file with all the changes made to the schema.
-
-### DML Migrations (Data changes)
-
-1. Run `npx prisma migrate dev --create-only` to create the migration file. A new folder will be added to the migrations folder with an empty migration file.
-2. Add the desired changes to the migration file.
-
-## Tests
-
-To run tests in watch mode:
-
-```shell
-npm run test
-```
-
-To run tests only once:
-
-```shell
-npm run test:ci
-```
-
-## Contract Tests
-
-To run contract tests:
-
-```shell
-npm run test-contract
-```
+If you are a developer and want some useful commands to contribute to Emissary, check the [Developer Helpers](developer-helpers.md) page for more information.
 
 <!-- temporary license -->
 

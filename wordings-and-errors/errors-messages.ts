@@ -75,7 +75,7 @@ export const parametrizedErrorsMessages: ParametrizedErrorMessages = {
       `This file is used by transfer requests ${ids
         .map(
           id =>
-            `<a style="text-decoration: underline;color: rgba(3, 105, 161, 1);" href="${process.env.APP_URL}/transfer-requests/${id}" target="_blank">#${id}</a>`,
+            `<a style="text-decoration: underline;color: rgba(3, 105, 161, 1);" href="${process.env.NEXT_PUBLIC_APP_URL}/transfer-requests/${id}" target="_blank">#${id}</a>`,
         )
         .join(', ')}. Please change the file of those requests before deleting.`,
   },
@@ -84,7 +84,7 @@ export const parametrizedErrorsMessages: ParametrizedErrorMessages = {
       `Wallet is used by transfer requests ${ids
         .map(
           id =>
-            `<a style="text-decoration: underline;color: rgba(3, 105, 161, 1);" href="${process.env.APP_URL}/transfer-requests/${id}" target="_blank">#${id}</a>`,
+            `<a style="text-decoration: underline;color: rgba(3, 105, 161, 1);" href="${process.env.NEXT_PUBLIC_APP_URL}/transfer-requests/${id}" target="_blank">#${id}</a>`,
         )
         .join(', ')}. Please change the wallet addresses of those requests before deleting the wallet.`,
   },

@@ -1,7 +1,7 @@
 import { IronSessionOptions } from 'iron-session'
 
 const APP_SECRET = process.env.APP_SECRET
-const APP_URL = process.env.APP_URL
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL
 
 if (!APP_SECRET) {
   throw new Error('Please define the APP_SECRET environment variable.')

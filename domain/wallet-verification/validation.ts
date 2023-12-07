@@ -25,9 +25,3 @@ export const getWalletVerificationsValidator = yup
     userId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).typeError(errorsMessages.required_field.message).required(),
   })
   .required()
-
-export const checkVerificationValidator = yup
-  .object({
-    from: yup.string().required(),
-  })
-  .required()

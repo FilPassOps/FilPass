@@ -1,26 +1,26 @@
 # Environment Variables
 
-| ENV Var                        | Default/Example         | Description                                                                         |
-| ------------------------------ | ----------------------- | ----------------------------------------------------------------------------------- |
-| `NPM_CONFIG_UNSAFE_PERM`       | ` `                     | Run within the context of the running script.                                       |
-| `NODE_ENV`                     | `development`           | The actual node environment.                                                        |
-| `IS_DEV`                       | `true`                  |                                                                                     |
-| `ENV_NAME`                     | `development`           |                                                                                     |
-| `APP_SECRET`                   | `super-secret`          |                                                                                     |
-| `APP_URL`                      | `http://localhost:3000` |                                                                                     |
-| `NEXT_PUBLIC_APP_URL`          | `http://localhost:3000` |                                                                                     |
-| `DATABASE_URL`                 | ` `                     | The Emissary database.                                                              |
-| `EMAIL_KEY`                    | ` `                     | Salt used for email encryption.                                                     |
-| `TEAM_KEY`                     | ` `                     | Salt used for team encryption.                                                      |
-| `MAILGUN_DOMAIN`               | ` `                     | The Mailgun domain if using the default implementation.                             |
-| `MAILGUN_API_KEY`              | ` `                     | The Mailgun API key if using the default implementation.                            |
-| `MAILGUN_SENDER_EMAIL`         | `no-reply@example.com`  | The Mailgun sender email if using the default implementation.                       |
-| `GOOGLE_CLIENT_SECRET`         | ` `                     | The Google client secret used to login with Google.                                 |
-| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | ` `                     | The public google client id used to login with Google.                              |
-| `PRIVATE_KEY`                  | ` `                     |                                                                                     |
-| `COIN_MARKET_CAP_API_KEY`      | ` `                     | The API Key of the service that will be used to get the actual value of the tokens  |
-| `COIN_MARKET_ENDPOINT`         | ` `                     | The Endpoint of the service that will be used to get the actual value of the tokens |
-| `BUCKET_ACCESS_KEY_ID`         | ` `                     | The AWS S3 bucket access key id if using the default implementation.                |
-| `BUCKET_NAME`                  | ` `                     | The AWS S3 bucket name if using the default implementation.                         |
-| `BUCKET_REGION`                | ` `                     | The AWS S3 bucket region if using the default implementation.                       |
-| `BUCKET_SECRET_ACCESS_KEY`     | ` `                     | The AWS S3 bucket secret access key if using the default implementation.            |
+| ENV Var                        | Example                                                                      | Description                                                                                          | Required |
+| ------------------------------ | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | -------- |
+| `NODE_ENV`                     | `development`                                                                | The actual node environment.                                                                         | NO       |
+| `IS_DEV`                       | `true`                                                                       | Control variable to set dev settings                                                                 | NO       |
+| `ENV_NAME`                     | `development`                                                                | The environment used to generate the reference for the transfer request.                             | NO       |
+| `APP_SECRET`                   | `super-secret`                                                               |                                                                                                      | YES      |
+| `NEXT_PUBLIC_APP_URL`          | `http://localhost:3000`                                                      | The application URL.                                                                                 | YES      |
+| `DATABASE_URL`                 | `postgresql://admin:super_secret_pw@localhost:5432/emissary?schema=emissary` | The Emissary database. (Remind to add the emissary after the port)                                   | YES      |
+| `EMAIL_KEY`                    | `\$2b\$10\$x57L63SfVZazvxuCNpQ4\.e`                                          | Salt used for email encryption. (Need to be generated with bcrypt for example)                       | YES      |
+| `TEAM_KEY`                     | `\$2b\$10\$NGPjfASmoecxPQMp64O3Ru`                                           | Salt used for team encryption. (Need to be generated with bcrypt for example)                        | YES      |
+| `MAILGUN_DOMAIN`               | ` `                                                                          | The Mailgun domain if using the default implementation.                                              | YES      |
+| `MAILGUN_API_KEY`              | ` `                                                                          | The Mailgun API key if using the default implementation.                                             | YES      |
+| `MAILGUN_SENDER_EMAIL`         | `no-reply@example.com`                                                       | The Mailgun sender email if using the default implementation.                                        | YES      |
+| `GOOGLE_CLIENT_SECRET`         | ` `                                                                          | The Google client secret used to login with Google. (Required if want to enable the Google Login)    | NO       |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | ` `                                                                          | The public google client id used to login with Google. (Required if want to enable the Google Login) | NO       |
+| `COIN_MARKET_CAP_API_KEY`      | ` `                                                                          | The API Key of market cap. (Required  if want to get the actual value of the token as Admin)         | NO       |
+| `COIN_MARKET_ENDPOINT`         | ` `                                                                          | The Endpoint of the market cap. (Required  if want to get the actual value of the token as Admin)    | NO       |
+| `BUCKET_ACCESS_KEY_ID`         | ` `                                                                          | The AWS S3 bucket access key id if using the default implementation.                                 | YES      |
+| `BUCKET_NAME`                  | ` `                                                                          | The AWS S3 bucket name if using the default implementation.                                          | YES      |
+| `BUCKET_REGION`                | ` `                                                                          | The AWS S3 bucket region if using the default implementation.                                        | YES      |
+| `BUCKET_SECRET_ACCESS_KEY`     | ` `                                                                          | The AWS S3 bucket secret access key if using the default implementation.                             | YES      |
+| `CRYPTO_ALGORITHM`             | `aes-256-cbc`                                                                | The algorithm used to encrypt the data.                                                              | YES      |
+| `CRYPTO_SECRET_KEY`            | ` `                                                                          | The secret key used to encrypt the data. (Need to be generated. 256 bit 32 Byte Hex)                 | YES      |
+| `CRYPTO_SECRET_KEY_PII`        | ` `                                                                          | The secret key used to encrypt the PII data.  (Need to be generated256 bit 32 Byte Hex)              | YES      |

@@ -1,10 +1,16 @@
 version: '3'
 services:
-  db_local:
+  db:
     image: postgres:12
-    container_name: emissary
     ports:
       - '5432:5432'
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: my_super_secret_pw
+      POSTGRES_DB: emissary
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db

@@ -55,19 +55,17 @@ export const UserWalletList = ({ data = [], totalItems }: UserWalletListProps) =
 
   return (
     <div className="flex flex-col">
+      <Button className="w-56 my-4 ml-auto" onClick={handleDownloadCsv} loading={isLoading} disabled={isLoading}>
+        <div className="flex items-center gap-2 text-white text-sm font-medium whitespace-nowrap">
+          <ArrowDownOnSquareIcon className="h-4 mr-2" />
+          Download CSV
+        </div>
+      </Button>
       <Table style={{ display: 'table' }}>
         <TableHead>
           <tr>
             <Header style={{ width: '50%' }}>User Email</Header>
             <Header>Wallet Address</Header>
-            <Header style={{ minWidth: 200 }}>
-              <Button onClick={handleDownloadCsv} loading={isLoading} disabled={isLoading}>
-                <div className="flex items-center">
-                  <ArrowDownOnSquareIcon className="h-4 mr-2" />
-                  Download CSV
-                </div>
-              </Button>
-            </Header>
           </tr>
         </TableHead>
         <TableBody>
@@ -83,7 +81,6 @@ export const UserWalletList = ({ data = [], totalItems }: UserWalletListProps) =
                   className="hidden sm:flex"
                 />
               </Cell>
-              <Cell></Cell>
             </tr>
           ))}
         </TableBody>

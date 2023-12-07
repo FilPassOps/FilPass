@@ -20,6 +20,7 @@ interface ProgramListProps {
     request_unit_name: string
     payment_unit_name: string
     delivery_method: string
+    isArchived: boolean
     approversRole: {
       id: number
       email: string
