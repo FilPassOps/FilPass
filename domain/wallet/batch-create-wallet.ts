@@ -82,7 +82,9 @@ export const batchCreateWallet = async ({ requests, users, isBatchCsv }: BatchCr
       )
     } else {
       errors = validatedWallets.map(result =>
-        result.status === 'rejected' ? { wallet: { message: result.reason?.message ?? errorsMessages.wallet_incorrect.message } } : null,
+        result.status === 'rejected'
+          ? { wallet: { message: result.reason?.message ?? errorsMessages.wallet_incorrect_user_default_wallet.message } }
+          : null,
       )
     }
 
@@ -132,8 +134,9 @@ const checkWallet = async ({ prisma, user, request, isBatchCsv, index, programs 
 
   const storedWallet = userWallets.find(
     ({ address, blockchainId, isActive }) =>
-      isActive && address === request.wallet?.toLowerCase() && program.blockchain.id === blockchainId,
+      isActive && address.toLowerCase() === request.wallet?.toLowerCase() && program.blockchain.id === blockchainId,
   )
+  // TODO it should check for inactive wallets too if so, should update isActive to true
 
   if (storedWallet) {
     return {
