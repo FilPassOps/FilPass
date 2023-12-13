@@ -1,4 +1,4 @@
-import chains, { Chain, Chains } from './chains'
+import chains, { Chain, Chains, NativeToken, isERC20Token } from './chains'
 
 export interface App {
   name: string
@@ -45,7 +45,7 @@ const app: App = {
   enableCoinMarketApi: true,
   twitterUrl: 'https://twitter.com/protocollabs/',
   linkedinUrl: 'https://www.linkedin.com/company/protocollabs/',
-  youtubeChannelUrl: 'https://www.youtube.com/ProtocolLabs/'
+  youtubeChannelUrl: 'https://www.youtube.com/ProtocolLabs/',
 }
 
 export const AppConfig = {
@@ -73,13 +73,17 @@ function getChainByName(blockchainName: ChainNames) {
 
 function getMetamaskParam(chainId: ChainIds) {
   const index = chains.findIndex(chain => chain.chainId === chainId)
+  const chain = chains[index]
+  const tokens = chain.tokens
+  const nativeToken = tokens.filter(isERC20Token).at(0) as NativeToken
+
   return {
     chainId: chains[index].chainId,
     chainName: chains[index].networkName,
     nativeCurrency: {
-      name: chains[index].symbol,
-      symbol: chains[index].symbol,
-      decimals: 18,
+      name: nativeToken.symbol,
+      symbol: nativeToken.symbol,
+      decimals: nativeToken.decimals,
     },
     rpcUrls: chains[index].rpcUrls,
   }

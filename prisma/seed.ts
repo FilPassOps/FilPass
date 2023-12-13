@@ -54,27 +54,29 @@ async function createCurrencies() {
   })
 
   for (const chain of AppConfig.network.chains) {
-    const [blockchain] = await prisma.$transaction([
-      prisma.blockchain.create({
-        data: {
-          name: chain.name,
-          chainId: chain.chainId,
-          Currency: {
-            create: {
-              name: chain.symbol,
-              rate: 1,
-            },
-          },
-        },
-      }),
-    ])
-    await prisma.currencyUnit.createMany({
-      data: [
-        { currencyId: blockchain.currencyId, name: chain.symbol, scale: 0 },
-        { currencyId: blockchain.currencyId, name: chain.units['-9'].name, scale: chain.units['-9'].scale },
-        { currencyId: blockchain.currencyId, name: chain.units['-18'].name, scale: chain.units['-18'].scale },
-      ],
+    const blockchain = await prisma.blockchain.create({
+      data: {
+        name: chain.name,
+        chainId: chain.chainId,
+      },
     })
+
+    for (const token of chain.tokens) {
+      const currency = await prisma.currency.create({
+        data: {
+          name: token.symbol,
+          rate: 1,
+          blockchainId: blockchain.id,
+        },
+      })
+      await prisma.currencyUnit.createMany({
+        data: [
+          { currencyId: currency.id, name: token.symbol, scale: 0 },
+          { currencyId: currency.id, name: token.units['-9'].name, scale: token.units['-9'].scale },
+          { currencyId: currency.id, name: token.units['-18'].name, scale: token.units['-18'].scale },
+        ],
+      })
+    }
   }
 }
 

@@ -48,6 +48,7 @@ let blockchainList: Blockchain[] = []
 
 async function main() {
   blockchainList = await getBlockchainValues()
+
   await Promise.all([createSuperAdmin()])
   const [[approver, approverRole], controllerRole, viewerRole, oneTimePrograms] = await Promise.all([
     createApprover(),
@@ -84,7 +85,7 @@ async function main() {
     const { user, userRole, userWallets } = await createUser(i)
 
     for (let index = 0; index < oneTimePrograms.length; index++) {
-      const walletId = userWallets.find(wallet => wallet.blockchainId === oneTimePrograms[index].blockchainId)?.id
+      const walletId = userWallets.find(wallet => wallet.blockchainId === oneTimePrograms[index].currency.blockchainId)?.id
 
       if (!walletId) throw new Error(`Wallet not found for user ${user.id}`)
 
@@ -382,38 +383,37 @@ async function createTransferRequestDraft({ requesterId, receiverId, program, te
 async function createOneTimeProgramIds() {
   const programs = []
   for (const chain of AppConfig.network.chains) {
-    const blockchainId = blockchainList.find(blockchain => blockchain.name === chain.name)?.id
+    for (const token of chain.tokens) {
+      const currencyUnit = await prisma.currencyUnit.findFirstOrThrow({
+        where: { name: token.symbol },
+      })
 
-    if (!blockchainId) throw new Error(`Blockchain ${chain.name} not found`)
-
-    const { id: currencyUnitId } = await prisma.currencyUnit.findFirstOrThrow({
-      where: { name: chain.symbol },
-    })
-
-    const program = await prisma.program.create({
-      data: {
-        deliveryMethod: 'ONE_TIME',
-        name: `ONE TIME PROGRAM - ${chain.symbol}`,
-        visibility: 'EXTERNAL',
-        programCurrency: {
-          create: [
-            {
-              currencyUnitId,
-              type: 'REQUEST',
-            },
-            {
-              currencyUnitId,
-              type: 'PAYMENT',
-            },
-          ],
+      const program = await prisma.program.create({
+        data: {
+          deliveryMethod: 'ONE_TIME',
+          name: `ONE TIME PROGRAM - ${chain.networkName} - ${token.symbol}`,
+          visibility: 'EXTERNAL',
+          programCurrency: {
+            create: [
+              {
+                currencyUnitId: currencyUnit.id,
+                type: 'REQUEST',
+              },
+              {
+                currencyUnitId: currencyUnit.id,
+                type: 'PAYMENT',
+              },
+            ],
+          },
+          currencyId: currencyUnit.currencyId,
         },
-        blockchainId,
-      },
-      include: {
-        programCurrency: true,
-      },
-    })
-    programs.push(program)
+        include: {
+          programCurrency: true,
+          currency: true,
+        },
+      })
+      programs.push(program)
+    }
   }
   return programs
 }
