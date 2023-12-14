@@ -65,7 +65,8 @@ export const UserWalletList = ({ data = [], totalItems }: UserWalletListProps) =
         <TableHead>
           <tr>
             <Header style={{ width: '50%' }}>User Email</Header>
-            <Header>Wallet Address</Header>
+            <Header style={{ minWidth: 350 }}>Wallet Address</Header>
+            <Header style={{ minWidth: 200 }}>Updated At</Header>
           </tr>
         </TableHead>
         <TableBody>
@@ -81,6 +82,7 @@ export const UserWalletList = ({ data = [], totalItems }: UserWalletListProps) =
                   className="hidden sm:flex"
                 />
               </Cell>
+              <Cell>{DateTime.fromISO(wallet.updatedAt).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS)}</Cell>
             </tr>
           ))}
         </TableBody>

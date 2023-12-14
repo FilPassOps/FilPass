@@ -31,6 +31,7 @@ export async function getAllWithWallets(params: FindAllWithWalletsParams) {
       verificationId: true,
       isDefault: true,
       createdAt: true,
+      updatedAt: true,
       verification: {
         select: {
           isVerified: true,
@@ -43,9 +44,7 @@ export async function getAllWithWallets(params: FindAllWithWalletsParams) {
       },
     },
     orderBy: {
-      user: {
-        createdAt: 'asc',
-      },
+      updatedAt: 'desc',
     },
     skip: size * currentPage,
     take: Number(size),
