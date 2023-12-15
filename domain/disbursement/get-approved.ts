@@ -1,7 +1,7 @@
 import { Currency, Program, ProgramCurrency, TransferRequest, UserWallet } from '@prisma/client'
 import { Transfer } from 'aws-sdk'
-import { PENDING_STATUS } from 'domain/transfer/constants'
 import { APPROVED } from 'domain/transfer-request-review/constants'
+import { PENDING_STATUS } from 'domain/transfer/constants'
 import prisma from 'lib/prisma'
 export interface GetApprovedParams {
   networks?: string[]
@@ -76,8 +76,10 @@ export const getApproved = async (params: GetApprovedParams): Promise<GetApprove
         },
       },
       program: {
-        blockchain: {
-          name: networks?.length ? { in: networks } : undefined,
+        currency: {
+          blockchain: {
+            name: networks?.length ? { in: networks } : undefined,
+          },
         },
       },
     },
@@ -106,8 +108,10 @@ export const getApproved = async (params: GetApprovedParams): Promise<GetApprove
         },
       },
       program: {
-        blockchain: {
-          name: networks?.length ? { in: networks } : undefined,
+        currency: {
+          blockchain: {
+            name: networks?.length ? { in: networks } : undefined,
+          },
         },
       },
     },
@@ -140,10 +144,15 @@ export const getApproved = async (params: GetApprovedParams): Promise<GetApprove
               },
             },
           },
-          blockchain: {
+          currency: {
             select: {
               name: true,
-              chainId: true,
+              blockchain: {
+                select: {
+                  name: true,
+                  chainId: true,
+                },
+              },
             },
           },
         },

@@ -33,8 +33,11 @@ interface Request {
         name: string
       }
     }[]
-    blockchain: {
+    currency: {
       name: string
+      blockchain: {
+        name: string
+      }
     }
   }
   team: string
@@ -183,7 +186,7 @@ const TransferList = ({
               const paymentUnit = request.program.programCurrency.find(({ type }) => type === 'PAYMENT') as Unit
               const requestUnit = request.program.programCurrency.find(({ type }) => type === 'REQUEST') as Unit
               const href = `/disbursement/${request.publicId}`
-              const { blockExplorer, chainId } = AppConfig.network.getChainByName(request.program.blockchain.name as ChainNames)
+              const { blockExplorer, chainId } = AppConfig.network.getChainByName(request.program.currency.blockchain.name as ChainNames)
 
               const paidTransfer = request?.transfers?.find(({ status }) => status === SUCCESS_STATUS)
               return (

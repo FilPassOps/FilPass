@@ -78,10 +78,16 @@ export async function getAllExternalPrograms() {
           type: true,
         },
       },
-      blockchain: {
+      currency: {
         select: {
           name: true,
-          chainId: true,
+          blockchain: {
+            select: {
+              id: true,
+              name: true,
+              chainId: true,
+            },
+          },
         },
       },
     },

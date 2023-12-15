@@ -4,10 +4,10 @@ import Big from 'big.js'
 import { useAlertDispatcher } from 'components/Layout/Alerts'
 import { Button } from 'components/Shared/Button'
 import { useMetaMask } from 'components/Web3/MetaMaskProvider'
-import { Forward } from 'hooks/useContract'
-import useCurrency from 'hooks/useCurrency'
 import { AppConfig, ChainNames } from 'config'
 import { USD } from 'domain/currency/constants'
+import { Forward } from 'hooks/useContract'
+import useCurrency from 'hooks/useCurrency'
 import { api } from 'lib/api'
 import { formatCrypto, formatCurrency } from 'lib/currency'
 import _ from 'lodash'
@@ -30,7 +30,13 @@ interface TransferRequest {
   publicId: string
   amount: string
   wallet: { address: string; blockchain: Blockchain }
-  program: { programCurrency: ProgramCurrency[]; blockchain: Blockchain }
+  program: {
+    programCurrency: ProgramCurrency[]
+    currency: {
+      name: string
+      blockchain: Blockchain
+    }
+  }
   transfers: { txHash: string; status: TransferStatus; amount: string; isActive: boolean; amountCurrencyUnit: { name: string } }[]
   isHexMatch?: boolean
 }
@@ -58,7 +64,8 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
   const [currentBatchIndex, setCurrentBatchIndex] = useState(0)
 
   const currentBatch = paymentBatchList[currentBatchIndex]
-  const chain = AppConfig.network.getChainByName(data[0].program.blockchain.name as ChainNames)
+  const chain = AppConfig.network.getChainByName(data[0].program.currency.blockchain.name as ChainNames)
+  const token = data[0].program.currency.name
   const { currency } = useCurrency(chain.chainId)
 
   useEffect(() => {
@@ -77,7 +84,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
     setTotalDollarAmount(totalDollarAmount)
 
     const finalList = _.chunk(data, PAYMENT_BATCH_SIZE).map(chunk => ({
-      blockchainName: chunk[0].program.blockchain.name,
+      blockchainName: chunk[0].program.currency.blockchain.name,
       isPaymentSent: false,
       data: chunk,
     }))
@@ -262,7 +269,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
         <div className="py-6 md:p-6 border-b border-gray-200">
           <h1 className="text-base md:text-lg text-gray-900 font-medium mb-2">
             Total payout amount:{' '}
-            {totalDollarAmount && currency ? formatCrypto(new Big(totalDollarAmount).div(Number(currency)).toFixed(2)) : '-'} {chain.symbol}
+            {totalDollarAmount && currency ? formatCrypto(new Big(totalDollarAmount).div(Number(currency)).toFixed(2)) : '-'} {token}
             <span className="text-sm text-gray-500"> ≈{formatCurrency(totalDollarAmount)}</span>
           </h1>
         </div>

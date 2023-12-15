@@ -10,17 +10,17 @@ import { Divider } from 'components/Shared/Divider'
 import { TextInput } from 'components/Shared/FormInput'
 
 import { ProgramVisibility } from '@prisma/client'
-import { WalletModal } from '../WalletModal'
+import { useFormSubmit } from '../../../hooks/useFormSubmit'
+import { useProgramCurrency } from '../../../hooks/useProgramCurrency'
 import { ProgramInfo } from '../Shared/ProgramInfo'
 import { RequestAmountInput } from '../Shared/RequestAmountInput'
 import { RequestorReceiver } from '../Shared/RequestorReceiver'
 import { SelectProgramInput } from '../Shared/SelectProgramInput'
-import { useProgramCurrency } from '../../../hooks/useProgramCurrency'
+import { WalletModal } from '../WalletModal'
 import { AttachmentInput } from './AttachmentInput'
 import { FooterButtons } from './FooterButtons'
 import { SelectWalletInput } from './SelectWalletInput'
 import { SubmittedModal } from './SubmittedModal'
-import { useFormSubmit } from '../../../hooks/useFormSubmit'
 
 interface TransferRequestFormProps {
   isEditable?: boolean
@@ -99,7 +99,7 @@ export const TransferRequestForm = ({ isEditable = false, data = null, programs 
   useEffect(() => {
     if (selectedProgram) {
       const defaultWallet =
-        user?.wallets?.find(wallet => wallet.isDefault && wallet.blockchain.id === selectedProgram?.blockchainId) || undefined
+        user?.wallets?.find(wallet => wallet.isDefault && wallet.blockchain.id === selectedProgram?.currency.blockchain.id) || undefined
 
       setValue('userWalletId', defaultWallet?.id as number)
     }
@@ -152,7 +152,7 @@ export const TransferRequestForm = ({ isEditable = false, data = null, programs 
               applyingForOthersDefaultWallet={data}
               control={control}
               onCreateWalletClick={() => setOpenWalletModal(true)}
-              blockchainIdFilter={selectedProgram?.blockchainId}
+              blockchainIdFilter={selectedProgram?.currency.blockchain.id}
               disabled={!programId}
             />
 
@@ -198,7 +198,7 @@ export const TransferRequestForm = ({ isEditable = false, data = null, programs 
         }}
         open={openWalletModal}
         onModalClosed={() => setOpenWalletModal(false)}
-        chainIdFilter={selectedProgram?.blockchain.chainId}
+        chainIdFilter={selectedProgram?.currency.blockchain.chainId}
       />
 
       <SubmittedModal openModal={openSubmittedModal && (!submitErrors || hasUnhandledError)} hasError={hasUnhandledError} />

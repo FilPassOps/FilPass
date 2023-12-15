@@ -31,7 +31,13 @@ interface TransferRequest {
   publicId: string
   amount: string
   wallet: { address: string; blockchain: Blockchain; verificationId?: string }
-  program: { programCurrency: ProgramCurrency[]; blockchain: Blockchain }
+  program: {
+    programCurrency: ProgramCurrency[]
+    currency: {
+      name: string
+      blockchain: Blockchain
+    }
+  }
   transfers: { txHash: string; status: TransferStatus; amount: string; isActive: boolean; amountCurrencyUnit: { name: string } }[]
   isHexMatch?: boolean
 }
@@ -170,8 +176,7 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
             </div>
             <div className="flex items-center gap-2">
               <CurrencyDollarIcon className="w-6 text-gray-400" />
-              {totalTokenAmount ? formatCrypto(totalTokenAmount.toFixed(2)) : '-'}{' '}
-              {AppConfig.network.getChainByName(blockchainName as ChainNames).symbol}
+              {totalTokenAmount ? formatCrypto(totalTokenAmount.toFixed(2)) : '-'} {data[0].program.currency.name}
               <span className="text-sm "> ≈{formatCurrency(totalDollarAmount)}</span>
             </div>
           </div>
