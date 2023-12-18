@@ -116,7 +116,8 @@ export async function getApproverTransferRequests(params: GetApproverTransferReq
           INNER JOIN currency_unit ON currency_unit.id = draft.currency_unit_id AND currency_unit.is_active = TRUE
           INNER JOIN program_currency ON program_currency.program_id = program.id AND program_currency.is_active = TRUE AND program_currency.type::text = 'PAYMENT'
           INNER JOIN currency_unit AS payment_unit ON payment_unit.id = program_currency.currency_unit_id AND program.is_active = TRUE
-          INNER JOIN blockchain AS program_blockchain ON program_blockchain.id = program.blockchain_id
+          INNER JOIN currency ON currency_unit.currency_id = currency.id AND currency.is_active = TRUE
+          INNER JOIN blockchain AS program_blockchain ON program_blockchain.id = currency.blockchain_id
     WHERE approver_role.is_active = TRUE
     AND approver_role.role::text = 'APPROVER'
     AND approver_role.user_id = ${approverId}
@@ -140,7 +141,8 @@ export async function getApproverTransferRequests(params: GetApproverTransferReq
         INNER JOIN currency_unit ON currency_unit.id = draft.currency_unit_id AND currency_unit.is_active = TRUE
         INNER JOIN program_currency ON program_currency.program_id = program.id AND program_currency.is_active = TRUE AND program_currency.type::text = 'PAYMENT'
         INNER JOIN currency_unit AS payment_unit ON payment_unit.id = program_currency.currency_unit_id AND program.is_active = TRUE
-        INNER JOIN blockchain AS program_blockchain ON program_blockchain.id = program.blockchain_id
+        INNER JOIN currency ON currency_unit.currency_id = currency.id AND currency.is_active = TRUE
+        INNER JOIN blockchain AS program_blockchain ON program_blockchain.id = currency.blockchain_id
       WHERE approver_role.is_active = TRUE
         AND approver_role.role::text = 'APPROVER'
         AND approver_role.user_id = ${approverId}
@@ -234,7 +236,8 @@ export async function getApproverTransferRequests(params: GetApproverTransferReq
             LEFT JOIN user_wallet ON request.user_wallet_id = user_wallet.id
             LEFT JOIN wallet_verification ON user_wallet.verification_id = wallet_verification.id
             LEFT JOIN blockchain AS user_wallet_blockchain ON user_wallet_blockchain.id = user_wallet.blockchain_id
-            INNER JOIN blockchain AS program_blockchain ON program_blockchain.id = program.blockchain_id
+            INNER JOIN currency ON currency_unit.currency_id = currency.id AND currency.is_active = TRUE
+            INNER JOIN blockchain AS program_blockchain ON program_blockchain.id = currency.blockchain_id
     WHERE approver_role.is_active = TRUE
     AND approver_role.role::text = 'APPROVER'
     AND approver_role.user_id = ${approverId}
@@ -264,7 +267,8 @@ export async function getApproverTransferRequests(params: GetApproverTransferReq
       INNER JOIN program_currency ON program_currency.program_id = program.id AND program_currency.is_active = TRUE AND program_currency.type::text = 'PAYMENT'
       INNER JOIN currency_unit AS payment_unit
         ON payment_unit.id = program_currency.currency_unit_id AND program.is_active = TRUE
-      INNER JOIN blockchain AS program_blockchain ON program_blockchain.id = program.blockchain_id
+      INNER JOIN currency ON currency_unit.currency_id = currency.id AND currency.is_active = TRUE
+      INNER JOIN blockchain AS program_blockchain ON program_blockchain.id = currency.blockchain_id
       WHERE approver_role.is_active = TRUE
         AND approver_role.role::text = 'APPROVER'
         AND approver_role.user_id = ${approverId}
