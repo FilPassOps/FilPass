@@ -31,7 +31,7 @@ export interface ERC20Token extends NativeToken {
 export type Chains = ReadonlyArray<Chain>
 
 export function isERC20Token(token: NativeToken | ERC20Token): token is ERC20Token {
-  return (token as ERC20Token).erc20TokenAddress === undefined
+  return (token as ERC20Token).erc20TokenAddress !== undefined
 }
 
 const ethereum = {
@@ -146,12 +146,12 @@ const calibration = {
   iconFileName: 'filecoin-icon.svg',
   tokens: [
     {
-      symbol: 'FIL',
+      symbol: 'tFIL',
       coinMarketApiCode: 2280, // from https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?symbol=FIL
       decimals: 18,
       units: {
         0: {
-          name: 'FIL',
+          name: 'tFIL',
           scale: 0,
         },
         '-9': {

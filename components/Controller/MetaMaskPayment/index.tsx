@@ -47,6 +47,7 @@ interface MetamaskPaymentModalProps {
 
 interface PaymentBatchData {
   blockchainName: string
+  tokenSymbol: string
   isPaymentSent: boolean
   isHexMatch?: boolean
   data: TransferRequest[]
@@ -85,6 +86,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
 
     const finalList = _.chunk(data, PAYMENT_BATCH_SIZE).map(chunk => ({
       blockchainName: chunk[0].program.currency.blockchain.name,
+      tokenSymbol: chunk[0].program.currency.name,
       isPaymentSent: false,
       data: chunk,
     }))

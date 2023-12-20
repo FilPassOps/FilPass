@@ -7,7 +7,7 @@ import { Button } from 'components/Shared/Button'
 import Currency, { CryptoAmount } from 'components/Shared/Table/Currency'
 import { WalletAddress } from 'components/Shared/WalletAddress'
 import { WithMetaMaskButton, useMetaMask } from 'components/Web3/MetaMaskProvider'
-import { AppConfig, ChainNames } from 'config'
+import { AppConfig, ChainNames, TokenOptions } from 'config'
 import { USD } from 'domain/currency/constants'
 import { Forward, contractInterface, useContract } from 'hooks/useContract'
 import useCurrency from 'hooks/useCurrency'
@@ -44,6 +44,7 @@ interface TransferRequest {
 
 interface PaymentBatchData {
   blockchainName: string
+  tokenSymbol: string
   isPaymentSent: boolean
   isHexMatch?: boolean
   data: TransferRequest[]
@@ -66,10 +67,11 @@ interface BatchProps {
 }
 
 const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsChunkHextMatch, setHextMatch }: BatchProps) => {
-  const { data, isPaymentSent, isHexMatch, blockchainName } = batchData
+  const { data, isPaymentSent, isHexMatch, blockchainName, tokenSymbol } = batchData
+  const token = AppConfig.network.getTokenBySymbolAndBlockchainName(tokenSymbol as TokenOptions, blockchainName as ChainNames)
   const [isOpen, setIsOpen] = useState(false)
   const { wallet } = useMetaMask()
-  const { forward } = useContract(blockchainName)
+  const { forward } = useContract(token)
   const { chainId } = AppConfig.network.getChainByName(blockchainName as ChainNames)
   const { dispatch, close } = useAlertDispatcher()
 
@@ -138,7 +140,8 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
   }
 
   async function hasSufficientBalance() {
-    const balance = await getBalance(wallet ?? '', AppConfig.network.getChainByName(blockchainName as ChainNames))
+    const balance = await getBalance(wallet ?? '', token)
+
     if (!totalTokenAmount) return false
     return new Big(balance).gte(totalTokenAmount)
   }

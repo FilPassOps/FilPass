@@ -1,4 +1,4 @@
-import chains, { Chain, Chains, NativeToken, isERC20Token } from './chains'
+import chains, { Chain, Chains, ERC20Token, NativeToken, isERC20Token } from './chains'
 
 export interface App {
   name: string
@@ -21,6 +21,8 @@ export interface AppConfig {
     chains: Chains
     getChain: (chainId: ChainIds) => Chain
     getChainByName: (blockchainName: ChainNames) => Chain
+    getChainByToken: (token: NativeToken | ERC20Token) => Chain | undefined
+    getTokenBySymbolAndBlockchainName: (symbol: TokenOptions, blockchainName: string) => NativeToken | ERC20Token
     getMetamaskParam: (chainId: ChainIds) => {
       chainId: string
       chainName: string
@@ -56,6 +58,8 @@ export const AppConfig = {
     getChain,
     getChainByName,
     getMetamaskParam,
+    getChainByToken,
+    getTokenBySymbolAndBlockchainName,
   },
 } as const satisfies AppConfig
 
@@ -87,4 +91,33 @@ function getMetamaskParam(chainId: ChainIds) {
     },
     rpcUrls: chains[index].rpcUrls,
   }
+}
+
+// export type TokenOptions = (typeof chains)[number]['tokens']
+//if token is an ERC20 token, find the chain that has the same erc20TokenAddress in the token array, otherwise uses symbol to find the chain
+function getChainByToken(token: NativeToken | ERC20Token) {
+  if (isERC20Token(token)) {
+    for (const chain of chains) {
+      for (const chainToken of chain.tokens) {
+        if (isERC20Token(chainToken) && chainToken.erc20TokenAddress === token.erc20TokenAddress) {
+          return chain
+        }
+      }
+    }
+  }
+  for (const chain of chains) {
+    for (const chainToken of chain.tokens) {
+      if (!isERC20Token(chainToken) && chainToken.symbol === token.symbol) {
+        return chain
+      }
+    }
+  }
+}
+
+export type TokenOptions = (typeof chains)[number]['tokens'][number]['symbol']
+function getTokenBySymbolAndBlockchainName(symbol: TokenOptions, blockchainName: string) {
+  const chain = getChainByName(blockchainName as ChainNames)
+  const tokens = chain.tokens
+  const index = tokens.findIndex(token => token.symbol === symbol)
+  return tokens[index]
 }

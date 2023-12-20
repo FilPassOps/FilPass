@@ -122,8 +122,6 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
     )
   }
 
-  console.log(requestList)
-
   useEffect(() => {
     if (!data) {
       return
