@@ -23,6 +23,8 @@ export interface AppConfig {
     getChainByName: (blockchainName: ChainNames) => Chain
     getChainByToken: (token: NativeToken | ERC20Token) => Chain | undefined
     getTokenBySymbolAndBlockchainName: (symbol: TokenOptions, blockchainName: string) => NativeToken | ERC20Token
+    getTokenByTokenAddress: (tokenAddress: string) => NativeToken | ERC20Token | undefined
+    getNativeToken: (chain: Chain) => NativeToken
     getMetamaskParam: (chainId: ChainIds) => {
       chainId: string
       chainName: string
@@ -60,6 +62,8 @@ export const AppConfig = {
     getMetamaskParam,
     getChainByToken,
     getTokenBySymbolAndBlockchainName,
+    getTokenByTokenAddress,
+    getNativeToken,
   },
 } as const satisfies AppConfig
 
@@ -119,5 +123,21 @@ function getTokenBySymbolAndBlockchainName(symbol: TokenOptions, blockchainName:
   const chain = getChainByName(blockchainName as ChainNames)
   const tokens = chain.tokens
   const index = tokens.findIndex(token => token.symbol === symbol)
+  return tokens[index]
+}
+
+function getTokenByTokenAddress(tokenAddress: string) {
+  for (const chain of chains) {
+    for (const chainToken of chain.tokens) {
+      if (isERC20Token(chainToken) && chainToken.erc20TokenAddress.toLowerCase() === tokenAddress.toLowerCase()) {
+        return chainToken
+      }
+    }
+  }
+}
+
+function getNativeToken(chain: Chain) {
+  const tokens = chain.tokens
+  const index = tokens.findIndex(token => !isERC20Token(token))
   return tokens[index]
 }
