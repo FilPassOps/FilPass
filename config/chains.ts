@@ -22,6 +22,7 @@ export interface NativeToken {
       scale: number
     }
   }
+  iconFileName: string
 }
 
 export interface ERC20Token extends NativeToken {
@@ -61,13 +62,14 @@ const ethereum = {
           scale: -18,
         },
       },
+      iconFileName: 'ethereum-icon.svg',
     },
     {
       symbol: 'USDC',
       erc20TokenAddress: '0x94a9d9ac8a22534e3faca9f4e7f2e2cf85d5e4c8',
       coinMarketApiCode: 3408, // from https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?symbol=MATIC
       decimals: 6,
-      units: {
+    units: {
         0: {
           name: 'USDC',
           scale: 0,
@@ -81,6 +83,7 @@ const ethereum = {
           scale: -18,
         },
       },
+      iconFileName: 'ethereum-usdc-icon.svg',
     },
     {
       symbol: 'LINK',
@@ -101,6 +104,7 @@ const ethereum = {
           scale: -18,
         },
       },
+      iconFileName: 'ethereum-link-icon.svg',
     },
   ],
 } as const satisfies Chain
@@ -132,6 +136,7 @@ const polygon = {
           scale: -18,
         },
       },
+      iconFileName: 'polygon-icon.svg',
     },
   ],
 } as const satisfies Chain
@@ -163,6 +168,7 @@ const calibration = {
           scale: -18,
         },
       },
+      iconFileName: 'filecoin-icon.svg',
     },
   ],
 } as const satisfies Chain

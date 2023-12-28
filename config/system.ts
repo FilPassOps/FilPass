@@ -24,6 +24,7 @@ export interface AppConfig {
     getChainByToken: (token: NativeToken | ERC20Token) => Chain | undefined
     getTokenBySymbolAndBlockchainName: (symbol: TokenOptions, blockchainName: string) => NativeToken | ERC20Token
     getTokenByTokenAddress: (tokenAddress: string) => NativeToken | ERC20Token | undefined
+    getTokenByIdentifier: (tokenIdentifier: string) => NativeToken | ERC20Token | undefined
     getNativeToken: (chain: Chain) => NativeToken
     getMetamaskParam: (chainId: ChainIds) => {
       chainId: string
@@ -64,6 +65,7 @@ export const AppConfig = {
     getTokenBySymbolAndBlockchainName,
     getTokenByTokenAddress,
     getNativeToken,
+    getTokenByIdentifier,
   },
 } as const satisfies AppConfig
 
@@ -133,6 +135,14 @@ function getTokenByTokenAddress(tokenAddress: string) {
         return chainToken
       }
     }
+  }
+}
+
+function getTokenByIdentifier(tokenIdentifier: string) {
+  if (tokenIdentifier.length === 42) {
+    return getTokenByTokenAddress(tokenIdentifier)
+  } else {
+    return getChain(tokenIdentifier as ChainIds).tokens[0]
   }
 }
 

@@ -1,4 +1,4 @@
-import { Blockchain, Prisma, Program } from '@prisma/client'
+import { Prisma, Program } from '@prisma/client'
 import { validateWalletAddress } from 'lib/blockchain-utils'
 import { TransactionError } from 'lib/errors'
 import prisma, { newPrismaTransaction } from 'lib/prisma'
@@ -47,14 +47,20 @@ interface CheckWalletParams {
 }
 
 interface ProgramWithBlockchain extends Program {
-  blockchain: Blockchain
+  currency: {
+    blockchainId: number
+  }
 }
 
 export const batchCreateWallet = async ({ requests, users, isBatchCsv }: BatchCreateWalletParams) => {
   const programs = (await prisma.program.findMany({
     select: {
       id: true,
-      blockchain: true,
+      currency: {
+        select: {
+          blockchainId: true,
+        },
+      },
     },
   })) as ProgramWithBlockchain[]
 
@@ -116,7 +122,9 @@ const checkWallet = async ({ prisma, user, request, isBatchCsv, index, programs 
     throw { message: errorsMessages.program_not_found.message }
   }
 
-  const defaultWallet = userWallets.find(wallet => wallet.isActive && wallet.isDefault && wallet.blockchainId === program.blockchain.id)
+  const defaultWallet = userWallets.find(
+    wallet => wallet.isActive && wallet.isDefault && wallet.blockchainId === program.currency.blockchainId,
+  )
 
   if (defaultWallet && !request.wallet) {
     return { ...request, wallet: defaultWallet, receiver: user }
@@ -131,7 +139,7 @@ const checkWallet = async ({ prisma, user, request, isBatchCsv, index, programs 
   }
 
   const storedWallet = userWallets.find(
-    ({ address, blockchainId, isActive }) => isActive && address === request.wallet && program.blockchain.id === blockchainId,
+    ({ address, blockchainId, isActive }) => isActive && address === request.wallet && program.currency.blockchainId === blockchainId,
   )
 
   if (storedWallet) {
@@ -148,7 +156,7 @@ const checkWallet = async ({ prisma, user, request, isBatchCsv, index, programs 
 
   const deactivatedWallet = userWallets.find(
     ({ address, blockchainId, isActive }) =>
-      !isActive && address.toLowerCase() === request.wallet?.toLowerCase() && program.blockchain.id === blockchainId,
+      !isActive && address.toLowerCase() === request.wallet?.toLowerCase() && program.currency.blockchainId === blockchainId,
   )
 
   if (deactivatedWallet) {
@@ -186,7 +194,7 @@ const createOrUpdateWallets = async (requests: Request[], programs: ProgramWithB
             userId: singleRequest.receiver.id,
             name: 'created by approver',
             address: singleRequest.wallet.address,
-            blockchainId: requestProgram?.blockchain.id as number,
+            blockchainId: requestProgram?.currency.blockchainId as number,
             isDefault: false,
           },
         })
@@ -241,7 +249,7 @@ const setDefaultWallets = async (requests: Request[], programs: ProgramWithBlock
 
       const requestProgram = programs.find(program => program.id === singleRequest.programId)
 
-      const defaultWallet = userWallets.find(wallet => wallet.isDefault && wallet.blockchainId === requestProgram?.blockchainId)
+      const defaultWallet = userWallets.find(wallet => wallet.isDefault && wallet.blockchainId === requestProgram?.currency.blockchainId)
 
       if (!defaultWallet) {
         await prisma.userWallet.update({

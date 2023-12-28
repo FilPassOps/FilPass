@@ -106,9 +106,12 @@ export async function updateTransferRequestById(params: UpdateTransferRequestPar
       throw new TransactionError('Wallet not found', { status: 400, errors: 'Wallet not found' })
     }
 
-    const program = await prisma.program.findUnique({ where: { id: programId, isActive: true, isArchived: false } })
+    const program = await prisma.program.findUnique({
+      where: { id: programId, isActive: true, isArchived: false },
+      include: { currency: { select: { blockchainId: true } } },
+    })
 
-    if (program && userWallet && userWallet.blockchainId !== program.blockchainId) {
+    if (program && userWallet && userWallet.blockchainId !== program.currency.blockchainId) {
       throw new TransactionError(errorsMessages.wallet_program_blockchain.message, {
         status: 400,
         errors: errorsMessages.wallet_program_blockchain.message,

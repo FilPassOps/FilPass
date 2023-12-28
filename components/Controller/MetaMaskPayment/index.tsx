@@ -4,7 +4,7 @@ import Big from 'big.js'
 import { useAlertDispatcher } from 'components/Layout/Alerts'
 import { Button } from 'components/Shared/Button'
 import { useMetaMask } from 'components/Web3/MetaMaskProvider'
-import { AppConfig, ChainNames } from 'config'
+import { AppConfig, ChainNames, TokenOptions, isERC20Token } from 'config'
 import { USD } from 'domain/currency/constants'
 import { Forward } from 'hooks/useContract'
 import useCurrency from 'hooks/useCurrency'
@@ -17,6 +17,7 @@ import errorsMessages from 'wordings-and-errors/errors-messages'
 import { ErrorAlert, SuccessAlert } from './Alerts'
 import PaymentBatch from './PaymentBatch'
 import { PaymentBatchStep } from './PaymentBatchStep'
+import { ContractTransaction } from 'ethers'
 
 interface ProgramCurrency {
   currency: {
@@ -64,10 +65,15 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
   const [paymentBatchList, setPaymentBatchList] = useState<PaymentBatchData[]>([])
   const [currentBatchIndex, setCurrentBatchIndex] = useState(0)
 
+  const paymentCurrency = data[0].program.programCurrency.find(({ type }) => type === 'PAYMENT')
+
   const currentBatch = paymentBatchList[currentBatchIndex]
   const chain = AppConfig.network.getChainByName(data[0].program.currency.blockchain.name as ChainNames)
-  const token = data[0].program.currency.name
-  const { currency } = useCurrency(chain.chainId)
+  const token = AppConfig.network.getTokenBySymbolAndBlockchainName(paymentCurrency?.currency.name as TokenOptions, chain.name)
+
+  const tokenIdentifier = isERC20Token(token) ? token.erc20TokenAddress : chain.chainId
+
+  const { currency } = useCurrency(tokenIdentifier)
 
   useEffect(() => {
     let totalDollarAmount = 0
@@ -163,7 +169,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
         amounts.push(transferAmount.toString())
       }
 
-      const { hash, from, to } = await forwardFunction(blockchainName, uuid, addresses, amounts)
+      const { hash, from, to } = (await forwardFunction(blockchainName, uuid, addresses, amounts)) as ContractTransaction
 
       await api.post('/transfers/payment-sent', {
         requests: requestIds,
@@ -271,7 +277,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
         <div className="py-6 md:p-6 border-b border-gray-200">
           <h1 className="text-base md:text-lg text-gray-900 font-medium mb-2">
             Total payout amount:{' '}
-            {totalDollarAmount && currency ? formatCrypto(new Big(totalDollarAmount).div(Number(currency)).toFixed(2)) : '-'} {token}
+            {totalDollarAmount && currency ? formatCrypto(new Big(totalDollarAmount).div(Number(currency)).toFixed(2)) : '-'} {token.symbol}
             <span className="text-sm text-gray-500"> ≈{formatCurrency(totalDollarAmount)}</span>
           </h1>
         </div>

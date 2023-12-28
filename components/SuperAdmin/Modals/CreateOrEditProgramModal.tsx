@@ -3,19 +3,19 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { Button } from 'components/Shared/Button'
 import { MultipleSelectInput, SelectInput, TextInput } from 'components/Shared/FormInput'
 import { Modal } from 'components/Shared/Modal'
-import { PROGRAM_TYPE_EXTERNAL, PROGRAM_TYPE_INTERNAL } from 'domain/programs/constants'
+import { PROGRAM_TYPE_EXTERNAL, PROGRAM_TYPE_INTERNAL, REQUEST_TOKEN } from 'domain/programs/constants'
 import { createProgramFormValidator } from 'domain/programs/validation'
 import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { useAssociatedRequests } from '../../../hooks/useAssociatedRequests'
 import { useCreateOrEditProgramSubmit } from '../../../hooks/useCreateOrEditProgramSubmit'
 import { useEditableProgram } from '../../../hooks/useEditableProgram'
-import { useSetProgramCurrency } from '../../../hooks/useSetProgramCurrency'
-import { deliveryMethodOptions, generateApproversRoleOptions, generateViewersRoleOptions, paymentMethodOptions } from '../Shared/utils'
+import { deliveryMethodOptions, generateApproversRoleOptions, generateViewersRoleOptions } from '../Shared/utils'
+import { SelectTokenInput } from 'components/Shared/SelectTokenInput'
+import { USD } from 'domain/currency/constants'
 
 interface Program {
   id: number
   name: string
-  paymentMethod: string
   deliveryMethod: string
   approversRole: {
     roleId: number
@@ -80,11 +80,11 @@ export const CreateOrEditProgramModal = ({
     shouldFocusError: false,
     defaultValues: {
       name: '',
-      paymentMethod: undefined,
+      requestType: undefined,
+      paymentToken: undefined,
       deliveryMethod: undefined,
       approversRole: [[]],
       viewersRole: [],
-      programCurrency: [],
       visibility: undefined,
     },
   })
@@ -98,11 +98,10 @@ export const CreateOrEditProgramModal = ({
     name: 'approversRole', // unique name for your Field Array
   })
 
-  const { paymentMethod, approversRole } = watch()
+  const { approversRole } = watch()
 
   useEditableProgram({ program, isEditable, setValue })
 
-  useSetProgramCurrency({ setValue, paymentMethodOptions, paymentMethod })
   const { handleFormSubmit, setSubmitErrors, submitErrors } = useCreateOrEditProgramSubmit({
     onModalClosed,
     reset,
@@ -162,19 +161,32 @@ export const CreateOrEditProgramModal = ({
 
           <Controller
             control={control}
-            name="paymentMethod"
+            name="requestType"
             render={({ field }) => (
               <SelectInput
                 {...field}
-                id="paymentMethod"
-                placeholder="Select the payment method"
-                name="paymentMethod"
-                options={paymentMethodOptions}
-                label="Payment Method"
-                error={errors?.paymentMethod || submitErrors?.paymentMethod}
+                id="requestType"
+                placeholder="Select the program type"
+                name="requestType"
+                options={[
+                  { value: USD, label: 'Request in USD(Dollar)' },
+                  { value: REQUEST_TOKEN, label: 'Request in payment token' },
+                ]}
+                label="Request Type"
+                error={errors?.requestType || submitErrors?.requestType}
                 disabled={program?.isArchived || hasAssociatedRequests}
               />
             )}
+          />
+
+          <SelectTokenInput
+            control={control}
+            name="paymentToken"
+            errors={errors?.paymentToken}
+            submitErrors={submitErrors?.paymentToken}
+            disabled={program?.isArchived || hasAssociatedRequests}
+            label="Payment Token"
+            placeholder="Select the payment token"
           />
 
           <Controller

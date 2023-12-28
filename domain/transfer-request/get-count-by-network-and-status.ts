@@ -25,8 +25,10 @@ export async function getCountByNetworkAndStatus({ networks, status }: Params) {
           isActive: true,
           status: status,
           program: {
-            blockchain: {
-              name: network,
+            currency: {
+              blockchain: {
+                name: network,
+              },
             },
           },
           transfers,

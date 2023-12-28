@@ -1,11 +1,11 @@
-import { AppConfig, ChainIds } from 'config'
+import { AppConfig } from 'config'
 import { coinmarketcapApi } from 'lib/coinmarketcap-api'
 import { validate } from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { getCurrencyRateFromCoinMarketCapValidator } from './validation'
 
 interface GetCurrencyMarketRateParams {
-  chainId: string
+  tokenIdentifier: string
 }
 
 export async function getCurrencyMarketRate(params: GetCurrencyMarketRateParams) {
@@ -20,11 +20,22 @@ export async function getCurrencyMarketRate(params: GetCurrencyMarketRateParams)
     }
   }
 
-  const { chainId } = fields
+  const { tokenIdentifier } = fields
 
-  const chain = AppConfig.network.getChain(chainId as ChainIds)
+  const token = AppConfig.network.getTokenByIdentifier(tokenIdentifier)
 
-  if (!chain.coinMarketApiCode) {
+  if (!token) {
+    return {
+      error: {
+        status: 400,
+        errors: {
+          tokenIdentifier: 'Token not found',
+        },
+      },
+    }
+  }
+
+  if (!token.coinMarketApiCode) {
     return {
       error: {
         status: 404,
@@ -42,7 +53,7 @@ export async function getCurrencyMarketRate(params: GetCurrencyMarketRateParams)
     }
   }
 
-  const { data, error: coinmarketcapError } = await coinmarketcapApi.get(`/v2/cryptocurrency/quotes/latest?id=${chain.coinMarketApiCode}`)
+  const { data, error: coinmarketcapError } = await coinmarketcapApi.get(`/v2/cryptocurrency/quotes/latest?id=${token.coinMarketApiCode}`)
 
   if (coinmarketcapError) {
     return {
@@ -53,7 +64,7 @@ export async function getCurrencyMarketRate(params: GetCurrencyMarketRateParams)
     }
   }
 
-  const rate = data.data[chain.coinMarketApiCode]?.quote?.USD?.price
+  const rate = data.data[token.coinMarketApiCode]?.quote?.USD?.price
 
   if (!rate) {
     return {

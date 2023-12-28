@@ -3,7 +3,6 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import { Button } from 'components/Shared/Button'
 import { NumberInput } from 'components/Shared/FormInput'
 import { LoadingIndicator } from 'components/Shared/LoadingIndicator'
-import { SelectNetworkInput } from 'components/Shared/SelectNetworkInput'
 import useCurrency from 'hooks/useCurrency'
 import { AppConfig } from 'config'
 import { updateCurrencyRateValidator } from 'domain/currency/validation'
@@ -11,6 +10,7 @@ import { api } from 'lib/api'
 import yup from 'lib/yup'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { SelectTokenInput } from 'components/Shared/SelectTokenInput'
 
 type FormValue = yup.InferType<typeof updateCurrencyRateValidator>
 
@@ -29,20 +29,20 @@ export const TokenPrice = () => {
     resolver: yupResolver(updateCurrencyRateValidator),
     defaultValues: {
       rate: undefined,
-      chainId: undefined,
+      tokenIdentifier: undefined,
     },
   })
 
-  const { rate, chainId } = watch()
+  const { rate, tokenIdentifier } = watch()
 
-  const { mutate } = useCurrency(chainId)
+  const { mutate } = useCurrency(tokenIdentifier)
 
   const handleFormSubmit = async (values: FormValue) => {
     if (Object.keys(errors).length > 0) {
       return
     }
 
-    const { error, data } = await api.patch(`/currency/${values.chainId}`, values)
+    const { error, data } = await api.patch(`/currency/${values.tokenIdentifier}`, values)
     if (error) {
       setSubmitErrors(error.errors)
       return
@@ -52,11 +52,11 @@ export const TokenPrice = () => {
   }
 
   const handleRefreshClick = async () => {
-    if (!chainId) {
+    if (!tokenIdentifier) {
       return
     }
     setLoadingRefresh(true)
-    const { data, error } = await api.get(`/currency/${chainId}/market-rate`)
+    const { data, error } = await api.get(`/currency/${tokenIdentifier}/market-rate`)
     if (error) {
       setSubmitErrors(error)
       setLoadingRefresh(false)
@@ -66,12 +66,12 @@ export const TokenPrice = () => {
     setValue('rate', data.rate.toString())
   }
 
-  const handleChangeNetwork = async (chainId: string) => {
-    if (!chainId) {
+  const handleChangeNetwork = async (tokenIdentifier: string) => {
+    if (!tokenIdentifier) {
       return
     }
     setLoadingRefresh(true)
-    const { data, error } = await api.get(`/currency/${chainId}`)
+    const { data, error } = await api.get(`/currency/${tokenIdentifier}`)
     if (error) {
       setSubmitErrors(error)
       setLoadingRefresh(false)
@@ -95,7 +95,7 @@ export const TokenPrice = () => {
       <h1 className="font-medium mb-2 text-lg">Token Price</h1>
       <form onSubmit={handleSubmit(handleFormSubmit)}>
         <div className="mb-3 relative">
-          <SelectNetworkInput control={control} errors={errors?.chainId} submitErrors={submitErrors} onChange={handleChangeNetwork} />
+          <SelectTokenInput control={control} errors={errors?.tokenIdentifier} submitErrors={submitErrors} onChange={handleChangeNetwork} />
         </div>
         <div className="mb-3 relative">
           <NumberInput

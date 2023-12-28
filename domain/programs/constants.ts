@@ -9,3 +9,5 @@ export const PROGRAM_TYPE_EXTERNAL = 'EXTERNAL'
 
 export const ACTIVE_STATUS = 'ACTIVE'
 export const ARCHIVED_STATUS = 'ARCHIVED'
+
+export const REQUEST_TOKEN = 'TOKEN'

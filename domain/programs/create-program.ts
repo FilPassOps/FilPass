@@ -5,6 +5,10 @@ import { newPrismaTransaction } from 'lib/prisma'
 import { validate } from 'lib/yup'
 import { createProgramValidator } from './validation'
 import prisma from 'lib/prisma'
+import { AppConfig } from 'config/system'
+import { ERC20Token, NativeToken } from 'config/chains'
+import { USD } from 'domain/currency/constants'
+import { REQUEST_TOKEN } from './constants'
 
 interface CreateProgramParams {
   name: string
@@ -31,7 +35,7 @@ export async function createProgram(params: CreateProgramParams) {
     }
   }
 
-  const { name, deliveryMethod, approversRole, programCurrency, visibility, viewersRole } = fields
+  const { name, deliveryMethod, approversRole, visibility, viewersRole, paymentToken, requestType } = fields
 
   const trimmedName = name.trim()
 
@@ -51,31 +55,38 @@ export async function createProgram(params: CreateProgramParams) {
     }
   }
 
-  return await newPrismaTransaction(async fnPrisma => {
-    const [request, payment, blockchain] = await Promise.all([
-      fnPrisma.currencyUnit.findFirstOrThrow({
-        where: { name: programCurrency.find(currency => currency.type === 'REQUEST')?.name },
-      }),
-      fnPrisma.currencyUnit.findFirstOrThrow({
-        where: { name: programCurrency.find(currency => currency.type === 'PAYMENT')?.name },
-      }),
-      fnPrisma.blockchain.findFirstOrThrow({ where: { name: programCurrency[0].blockchain } }),
-    ])
+  const paymentTokenObject = AppConfig.network.getTokenByIdentifier(paymentToken) as NativeToken | ERC20Token
+  const paymentTokenBlockchain = AppConfig.network.getChainByToken(paymentTokenObject)
+  const paymentBlockchain = await prisma.blockchain.findFirst({
+    where: { name: paymentTokenBlockchain?.name },
+  })
+  const paymentCurrency = await prisma.currencyUnit.findFirstOrThrow({
+    where: { name: paymentTokenObject?.symbol, currency: { blockchainId: paymentBlockchain?.id } },
+    select: { currency: true, id: true },
+  })
 
+  const requestCurrencyUnit =
+    requestType === REQUEST_TOKEN
+      ? paymentCurrency
+      : await prisma.currencyUnit.findFirstOrThrow({
+          where: { name: USD, currency: { blockchainId: null } },
+        })
+
+  return await newPrismaTransaction(async fnPrisma => {
     const createdProgram = await fnPrisma.program.create({
       data: {
         deliveryMethod,
         name: trimmedName,
         visibility,
-        blockchainId: blockchain.id,
+        currencyId: paymentCurrency.currency.id,
         programCurrency: {
           create: [
             {
-              currencyUnitId: request.id,
+              currencyUnitId: requestCurrencyUnit.id,
               type: 'REQUEST',
             },
             {
-              currencyUnitId: payment.id,
+              currencyUnitId: paymentCurrency.id,
               type: 'PAYMENT',
             },
           ],

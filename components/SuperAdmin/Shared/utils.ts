@@ -1,4 +1,4 @@
-import { AppConfig } from 'config'
+import { AppConfig, TokenOptions, isERC20Token } from 'config'
 import { deliveryMethod as deliveryMethodConst, ONE_TIME } from 'domain/programs/constants'
 
 interface ApproverRole {
@@ -71,57 +71,17 @@ export const formatProgramCurrency = (program: Program) => {
   ]
 }
 
-export const findProgramPaymentMethod = (program: Program) =>
-  paymentMethodOptions.find(option => option.label === formatPaymentMethod(program?.request_unit_name, program?.payment_unit_name))
-
-const createPaymentMethodOptions = () => {
-  let index = 1
-  const options = []
-  for (const chain of AppConfig.network.chains) {
-    options.push({
-      value: index++,
-      label: formatPaymentMethod(chain.symbol, chain.symbol),
-      programCurrency: [
-        {
-          name: chain.symbol,
-          type: 'REQUEST',
-          blockchain: chain.name,
-        },
-        {
-          name: chain.symbol,
-          type: 'PAYMENT',
-          blockchain: chain.name,
-        },
-      ],
-    })
-    options.push({
-      value: index++,
-      label: formatPaymentMethod(AppConfig.network.fiatPaymentUnit, chain.symbol),
-      programCurrency: [
-        {
-          name: AppConfig.network.fiatPaymentUnit,
-          type: 'REQUEST',
-          blockchain: chain.name,
-        },
-        {
-          name: chain.symbol,
-          type: 'PAYMENT',
-          blockchain: chain.name,
-        },
-      ],
-    })
+export const formatProgramViewersRole = (program: Program) => {
+  if (!program?.viewersRole) {
+    return []
   }
-  return options
-}
 
-export const paymentMethodOptions = createPaymentMethodOptions()
-
-export const formatProgramViewersRole = (program: Program) =>
-  program?.viewersRole?.map(r => ({
+  return program?.viewersRole?.map(r => ({
     label: r.email,
     value: r.email,
     roleId: r.roleId,
   }))
+}
 
 export const formatProgramApproversRole = (program: Program) => {
   //creates one entry to each group id value
@@ -174,4 +134,23 @@ export const groupProgramApproversRole = (approversRole: { roleId: number }[][],
   }
 
   return Array.from(groupedApproversRole.values())
+}
+
+export const formatRequestPaymentToken = ({
+  isUSD,
+  blockchainName,
+  tokenSymbol,
+}: {
+  isUSD: boolean
+  blockchainName: string
+  tokenSymbol: string
+}) => {
+  if (isUSD || !tokenSymbol || !blockchainName) {
+    return undefined
+  }
+
+  const token = AppConfig.network.getTokenBySymbolAndBlockchainName(tokenSymbol as TokenOptions, blockchainName)
+  const blockchain = AppConfig.network.getChainByToken(token)
+
+  return isERC20Token(token) ? token.erc20TokenAddress : blockchain?.chainId
 }

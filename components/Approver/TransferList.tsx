@@ -7,7 +7,7 @@ import { Cell, Header, LinkedCell, Table, TableBody, TableHead } from 'component
 import Currency, { CryptoAmount } from 'components/Shared/Table/Currency'
 import Timestamp from 'components/Shared/Timestamp'
 import { WalletAddress } from 'components/Shared/WalletAddress'
-import { AppConfig } from 'config'
+import { AppConfig, isERC20Token } from 'config'
 import { USD } from 'domain/currency/constants'
 import { PAID_STATUS } from 'domain/transfer-request/constants'
 import useCurrency from 'hooks/useCurrency'
@@ -35,7 +35,7 @@ interface Request {
 }
 
 interface CryptoAmountInfoProps {
-  chainId: string
+  tokenIdentifier: string
   request: Request
 }
 
@@ -98,6 +98,9 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
         <TableBody>
           {data.map((request, requestIndex) => {
             const chain = AppConfig.network.getChainByName(request.program_blockchain)
+            const token = AppConfig.network.getTokenBySymbolAndBlockchainName(request.payment_unit, request.program_blockchain)
+            const tokenIdentifier = isERC20Token(token) ? token.erc20TokenAddress : chain.chainId
+
             const href = `/approvals/${request.id}`
 
             return (
@@ -145,7 +148,7 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
                 <LinkedCell href={href}>
                   {request.amount ? (
                     <CryptoAmount>
-                      <CryptoAmountInfo chainId={chain?.chainId} request={request} />
+                      <CryptoAmountInfo tokenIdentifier={tokenIdentifier} request={request} />
                     </CryptoAmount>
                   ) : (
                     '-'
@@ -182,8 +185,8 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
 
 export default TransferList
 
-const CryptoAmountInfo = ({ chainId, request }: CryptoAmountInfoProps) => {
-  const { currency, isLoading } = useCurrency(chainId)
+const CryptoAmountInfo = ({ tokenIdentifier, request }: CryptoAmountInfoProps) => {
+  const { currency, isLoading } = useCurrency(tokenIdentifier)
 
   if (isLoading) {
     return (

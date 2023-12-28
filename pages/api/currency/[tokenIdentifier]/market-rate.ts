@@ -3,9 +3,9 @@ import { NextApiRequestWithSession, newHandler, withMethods, withRoles } from 'l
 import { NextApiResponse } from 'next'
 
 async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
-  const chainId = req.query.chainId as string
+  const tokenIdentifier = req.query.tokenIdentifier as string
 
-  const { data, error } = await getCurrencyMarketRate({ chainId })
+  const { data, error } = await getCurrencyMarketRate({ tokenIdentifier })
   if (error) {
     return res.status(error.status).json(error)
   }
