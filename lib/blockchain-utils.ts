@@ -7,7 +7,7 @@ export const validateWalletAddress = (address: string) => {
   return utils.isAddress(address)
 }
 
-export const amountConverter = (amount: ethers.BigNumber) => ethers.utils.formatEther(ethers.BigNumber.from(amount))
+export const amountConverter = (amount: ethers.BigNumber, decimals: number) => ethers.utils.formatUnits(String(amount), decimals)
 
 export async function getBalance(walletAddress: string, token: ERC20Token | NativeToken) {
   const chain = AppConfig.network.getChainByToken(token)

@@ -216,7 +216,7 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
       </div>
       <div className={`${isOpen ? 'block' : 'hidden'} py-6 md:p-6`}>
         {isHexMatch !== undefined && <ParseResultMessage isSucess={isHexMatch} />}
-        <TransactionParser onParseData={handleParseData} />
+        <TransactionParser onParseData={handleParseData} token={token} />
         <div className="overflow-x-scroll">
           <Table cols="grid-cols-5" className="bg-white">
             <TableHeader>No</TableHeader>

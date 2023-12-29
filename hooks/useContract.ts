@@ -63,9 +63,8 @@ export const useContract = (token: ERC20Token | NativeToken) => {
 
     try {
       setBusy(true)
-      //TODO Get token unit from props
       const weiValues = amounts.map(amount => ethers.utils.parseEther(amount))
-      const unitValues = amounts.map(amount => ethers.utils.parseUnits(amount, 6))
+      const unitValues = amounts.map(amount => ethers.utils.parseUnits(amount, token.decimals))
       const weiTotal = weiValues.reduce((a, b) => a.add(b), ethers.BigNumber.from(0))
       const unitTotal = unitValues.reduce((a, b) => a.add(b), ethers.BigNumber.from(0))
 
