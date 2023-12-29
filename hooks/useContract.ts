@@ -69,7 +69,11 @@ export const useContract = (token: ERC20Token | NativeToken) => {
       const unitTotal = unitValues.reduce((a, b) => a.add(b), ethers.BigNumber.from(0))
 
       if (isERC20Token(token) && erc20) {
-        await erc20.approve(multiForwarder.address, unitTotal)
+        const approveResult = await erc20.approve(multiForwarder.address, unitTotal)
+
+        // TODO: Need to wait the approval to be confirmed on the chain so we can forward the transaction
+        // Fixed by using the waitForTransaction method, now we just need to show a loading indicator to the user that the approve is being confirmed
+        await provider.waitForTransaction(approveResult.hash)
 
         return await multiForwarder.forwardERC20(id, destinations, unitValues, erc20.address)
       }
