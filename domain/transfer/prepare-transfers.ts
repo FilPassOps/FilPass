@@ -1,19 +1,29 @@
 import crypto from 'crypto'
 import prisma from 'lib/prisma'
 import { SUCCESS_STATUS } from './constants'
+import { encrypt } from 'lib/emissary-crypto'
+
+interface RequestsData {
+  [key: string]: {
+    id: number
+    amount: string
+  }
+}
 
 interface PrepareTransferProps {
-  requests: number[]
+  requests: RequestsData
   from: string
   to: string
   controllerUserRoleId: number
 }
 
 export const prepareTransfers = async ({ requests, from, to, controllerUserRoleId }: PrepareTransferProps) => {
+  const requestsIds = Object.keys(requests).map(Number)
+
   const transferRequest = await prisma.transferRequest.findMany({
     where: {
       id: {
-        in: requests,
+        in: requestsIds,
       },
     },
     select: {
@@ -32,7 +42,7 @@ export const prepareTransfers = async ({ requests, from, to, controllerUserRoleI
     },
   })
 
-  if (transferRequest.length !== requests.length) {
+  if (transferRequest.length !== requestsIds.length) {
     throw new Error('Invalid request ids')
   }
   if (transferRequest.some(req => req.transfers.find(transfer => transfer.status === SUCCESS_STATUS))) {
@@ -52,14 +62,19 @@ export const prepareTransfers = async ({ requests, from, to, controllerUserRoleI
 
   const uuid = crypto.randomUUID()
 
-  await prisma.transfer.createMany({
-    data: transferRequest.map(request => ({
-      controllerId: controllerUserRoleId,
-      transferRequestId: request.id,
-      transferRef: uuid,
-      from: from.toLowerCase(),
-      to: to.toLowerCase(),
-    })),
+  const newTransferData = transferRequest.map(async request => ({
+    controllerId: controllerUserRoleId,
+    transferRequestId: request.id,
+    transferRef: uuid,
+    from: from.toLowerCase(),
+    to: to.toLowerCase(),
+    amount: (await encrypt(requests[request.id]?.amount)) as string,
+  }))
+
+  await Promise.all(newTransferData).then(async newTransferData => {
+    await prisma.transfer.createMany({
+      data: newTransferData,
+    })
   })
 
   return { uuid, pendingTransferRequests }

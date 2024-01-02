@@ -51,13 +51,13 @@ interface UpdateTransferParams {
   id: number
   transferRequest: TransferResult['transferRequest']
   hash: string
-  amount: number
+  amount?: number
   sendEmail?: boolean
 }
 
 export async function updateTransfer({ id, transferRequest, hash, amount, sendEmail = false }: UpdateTransferParams) {
   const { id: transferRequestId, status, publicId, receiver, program } = transferRequest
-  const encryptedAmount = await encrypt(amount.toString())
+  const encryptedAmount = amount ? (await encrypt(amount as any)) : undefined
   const receiverEmail = await decryptPII(receiver.email)
   const currencyUnitId = program.programCurrency.pop()?.currencyUnitId
   try {

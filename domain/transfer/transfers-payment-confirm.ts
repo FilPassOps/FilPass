@@ -13,7 +13,7 @@ interface TransferPaymentConfirmParams {
   tokenDecimal: number
 }
 
-export const transferPaymentConfirm = async ({ id, to, from, value, transactionHash, tokenDecimal }: TransferPaymentConfirmParams) => {
+export const transferPaymentConfirm = async ({ id, to, from, value, transactionHash }: TransferPaymentConfirmParams) => {
   const pendingTransfers = await prisma.transfer.findMany({
     select: select,
     where: {
@@ -24,8 +24,6 @@ export const transferPaymentConfirm = async ({ id, to, from, value, transactionH
       from: from.toLowerCase(),
     },
   })
-
-  processPayment(pendingTransfers, to, value, transactionHash, tokenDecimal)
 
   if (pendingTransfers.length > 0) {
     return
@@ -58,7 +56,7 @@ export const transferPaymentConfirm = async ({ id, to, from, value, transactionH
     },
   })
 
-  processPayment(pendingTransfersWithNoTxHash, to, value, transactionHash, tokenDecimal)
+  processPayment(pendingTransfersWithNoTxHash, to, value, transactionHash)
 
   if (pendingTransfersWithNoTxHash.length > 0) {
     logger.warning('Transfer request with no transaction hash set as Paid', {
@@ -74,11 +72,9 @@ const processPayment = async (
   to: string[],
   value: ethers.BigNumber[],
   transactionHash: string,
-  tokenDecimal: number,
 ) => {
   for (let i = 0; i < to.length; i++) {
     const receiver = to[i].toLowerCase()
-    const paidAmount = ethers.utils.formatUnits(value[i], tokenDecimal)
     const transfers = []
     for await (const transfer of pendingTransfers) {
       try {
@@ -109,7 +105,6 @@ const processPayment = async (
           await updateTransfer({
             id: transfer.id,
             transferRequest: transfer.transferRequest,
-            amount: Number(paidAmount),
             hash: transactionHash,
             sendEmail,
           })

@@ -119,41 +119,16 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
       })
     }
 
-    const requestIds = batch.map(({ id }) => id)
+    const addresses = []
+    const amounts = []
+    const requestsData = {} as any
 
-    const { data, error } = await api.post('/transfers/prepare', {
-      requests: requestIds,
-      from: wallet,
-      to: chain.contractAddress,
-    })
-
-    if (error) {
-      dispatch({
-        type: 'error',
-        title: 'Payment failed',
-        config: {
-          closeable: true,
-        },
-        body: () => <ErrorAlert handleClose={() => close()} message={error.message} />,
-      })
-      return false
-    }
-
-    const { uuid, pendingTransferRequests } = data
-
-    if (pendingTransferRequests.length > 0) {
-      const isContinue = confirm(`It seems that some requests were already paid. Would you like to continue?`)
-      if (!isContinue) {
-        return false
-      }
-    }
+    let preparedTransferRequests
 
     try {
-      const addresses = []
-      const amounts = []
-
-      for (const { amount, wallet, program } of batch) {
+      for (const { amount, wallet, program, id } of batch) {
         addresses.push(wallet.address)
+
         const programCurrency = program.programCurrency.find(({ type }) => type === 'REQUEST')
 
         if (!currency) {
@@ -167,8 +142,43 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
         }
 
         amounts.push(transferAmount.toString())
+        requestsData[id] = { id: id, amount: transferAmount.toString() }
+      }
+      const { data, error } = await api.post('/transfers/prepare', {
+        requests: requestsData,
+        from: wallet,
+        to: chain.contractAddress,
+      })
+
+      if (error) {
+        throw error
       }
 
+      preparedTransferRequests = data
+    } catch (error: any) {
+      dispatch({
+        type: 'error',
+        title: 'Payment failed',
+        config: {
+          closeable: true,
+        },
+        body: () => <ErrorAlert handleClose={() => close()} message={error.message || errorsMessages.something_went_wrong.message} />,
+      })
+      return false
+    }
+
+    const requestIds = batch.map(({ id }) => id)
+
+    const { uuid, pendingTransferRequests } = preparedTransferRequests
+
+    if (pendingTransferRequests.length > 0) {
+      const isContinue = confirm(`It seems that some requests were already paid. Would you like to continue?`)
+      if (!isContinue) {
+        return false
+      }
+    }
+
+    try {
       const { hash, from, to } = (await forwardFunction(blockchainName, uuid, addresses, amounts)) as ContractTransaction
 
       await api.post('/transfers/payment-sent', {
