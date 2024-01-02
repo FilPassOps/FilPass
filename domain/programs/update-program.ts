@@ -56,18 +56,31 @@ export async function updateProgram(params: UpdateProgramParams) {
 
   const trimmedName = name.trim()
 
-  const existingProgram = await prisma.program.findFirst({
+  const existingProgramName = await prisma.program.findFirst({
     where: { name: trimmedName },
   })
 
-  if (existingProgram) {
+  const existingProgram = await prisma.program.findFirst({
+    select: {
+      name: true,
+    },
+    where: { id },
+  })
+
+  if (!existingProgram) {
     return {
       error: {
         status: 400,
-        errors: {
-          name: 'Program name already exists',
-          type: 'internal',
-        },
+        errors: { ['name']: { message: 'Program not found' } },
+      },
+    }
+  }
+
+  if (existingProgram?.name !== trimmedName && existingProgramName) {
+    return {
+      error: {
+        status: 400,
+        errors: { ['name']: { message: 'Program name already exists' } },
       },
     }
   }

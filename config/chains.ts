@@ -151,7 +151,7 @@ const calibration = {
   iconFileName: 'filecoin-icon.svg',
   tokens: [
     {
-      symbol: 'FIL',
+      symbol: 'tFIL',
       coinMarketApiCode: 2280, // from https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?symbol=FIL
       decimals: 18,
       units: {

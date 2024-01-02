@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 export default function Login() {
   const [redirect, setRedirect] = useState<any>(null)
   useEffect(() => {
-    const fromCookie = Cookie.get('@PL:fromDraftEmail')
+    const fromCookie = Cookie.get('@Emissary:fromDraftEmail')
     if (!fromCookie) return
 
     const parsedFrom = JSON.parse(fromCookie)

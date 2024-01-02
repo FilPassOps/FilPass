@@ -47,10 +47,7 @@ export async function createProgram(params: CreateProgramParams) {
     return {
       error: {
         status: 400,
-        errors: {
-          name: 'Program name already exists',
-          type: 'internal',
-        },
+        errors: { ['name']: { message: 'Program name already exists' } },
       },
     }
   }
