@@ -2,10 +2,9 @@ import { ArrowLeftIcon } from '@heroicons/react/24/outline'
 import { Blockchain, TransferStatus } from '@prisma/client'
 import { Button } from 'components/Shared/Button'
 import { AppConfig, ChainNames, TokenOptions } from 'config'
-import { formatCurrency } from 'lib/currency'
 import _ from 'lodash'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import PaymentBatch, { PaymentBatchData } from './PaymentBatch'
 import { PaymentBatchStep } from './PaymentBatchStep'
 
@@ -36,41 +35,15 @@ interface MetamaskPaymentModalProps {
   data: TransferRequest[]
 }
 
-interface TotalAmount {
-  [key: string]: {
-    dollar: number
-    token: Big
-  }
-}
-
 const PAYMENT_BATCH_SIZE = 100
 
 const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
   const router = useRouter()
 
-  const [totalDollarAmount, setTotalDollarAmount] = useState<TotalAmount>({})
   const [paymentBatchList, setPaymentBatchList] = useState<PaymentBatchData[]>([])
   const [currentBatchIndex, setCurrentBatchIndex] = useState(0)
 
-  console.log('Total amount', totalDollarAmount)
-
   const currentBatch = paymentBatchList[currentBatchIndex]
-
-  const handleTotalAmountChange = useCallback((tokenAmount: Big, dollarAmount: number, tokenSymbol: string) => {
-    setTotalDollarAmount(prevAmount => {
-      if (!prevAmount[tokenSymbol]) {
-        return {
-          ...prevAmount,
-          [tokenSymbol]: { dollar: dollarAmount, token: tokenAmount },
-        }
-      }
-
-      return {
-        ...prevAmount,
-        [tokenSymbol]: { dollar: prevAmount[tokenSymbol].dollar + dollarAmount, token: prevAmount[tokenSymbol].token.add(tokenAmount) },
-      }
-    })
-  }, [])
 
   useEffect(() => {
     const groupedData = _.groupBy(data, item => item.program.currency.name)
@@ -146,13 +119,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
             ))}
           </div>
         )}
-        <div className="py-6 md:p-6 border-b border-gray-200">
-          <h1 className="text-base md:text-lg text-gray-900 font-medium mb-2">
-            Total payout amount:{' '}
-            {/* {totalDollarAmount && currency ? formatCrypto(new Big(totalDollarAmount).div(Number(currency)).toFixed(2)) : '-'} {token.symbol} */}
-            <span className="text-sm text-gray-500"> ≈{formatCurrency(totalDollarAmount)}</span>
-          </h1>
-        </div>
+
         {currentBatch && (
           <PaymentBatch
             index={currentBatchIndex}
@@ -160,23 +127,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
             setIsBatchSent={setIsBatchSent}
             setHexMatch={setHexMatch}
             setIsChunkHexMatch={setIsChunkHexMatch}
-            setBatchTotalDollarAmount={handleTotalAmountChange}
           />
-        )}
-        {paymentBatchList.map((paymentBatch, index) => {
-
-          return (
-            <PaymentBatch
-              key={index}
-              index={index}
-              batchData={paymentBatch}
-              setIsBatchSent={setIsBatchSent}
-              setHexMatch={setHexMatch}
-              setIsChunkHexMatch={setIsChunkHexMatch}
-              setBatchTotalDollarAmount={handleTotalAmountChange}
-            />
-          )
-        }
         )}
       </div>
     </>

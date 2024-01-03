@@ -57,20 +57,12 @@ interface ParsedData {
 interface PaymentBatchProps {
   index: number
   batchData: PaymentBatchData
-  setBatchTotalDollarAmount: (tokenAmount: Big, dollarAmount: number, tokenSymbol: string) => void
   setIsBatchSent: (isBatchSent: boolean) => void
   setIsChunkHexMatch: (isChunkHexMatch: boolean) => void
   setHexMatch: (transferRequests: TransferRequest[]) => void
 }
 
-const PaymentBatch = ({
-  index,
-  batchData,
-  setIsBatchSent,
-  setIsChunkHexMatch,
-  setHexMatch,
-  setBatchTotalDollarAmount,
-}: PaymentBatchProps) => {
+const PaymentBatch = ({ index, batchData, setIsBatchSent, setIsChunkHexMatch, setHexMatch }: PaymentBatchProps) => {
   const { data, isPaymentSent, isHexMatch, blockchain, token } = batchData
   const [isOpen, setIsOpen] = useState(false)
   const [totalDollarAmount, setTotalDollarAmount] = useState(0)
@@ -101,11 +93,8 @@ const PaymentBatch = ({
 
       setTotalTokenAmount(totalTokenAmount)
       setTotalDollarAmount(totalDollarAmount)
-      setBatchTotalDollarAmount(totalTokenAmount, totalDollarAmount, token.symbol)
     }
-
-    console.log('Total amount', totalDollarAmount)
-  }, [])
+  }, [currency, data])
 
   const validateParseData = (parsedData: ParsedData) => {
     const isValidFunctionCall = contractInterface.getFunction('forward').name
