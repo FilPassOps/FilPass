@@ -8,7 +8,7 @@ interface AlertConfig {
   closeable?: boolean
 }
 
-interface DispatchedAlert {
+export interface DispatchedAlert {
   type?: AlertType
   title: string
   config?: AlertConfig
