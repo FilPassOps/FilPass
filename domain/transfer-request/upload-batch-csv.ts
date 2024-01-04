@@ -54,10 +54,14 @@ export async function uploadBatchCsv(params: UploadBatchCsvParams) {
   const program = await prisma.program.findUnique({
     where: { id: programId },
     select: {
-      blockchain: {
+      currency: {
         select: {
-          name: true,
-          chainId: true,
+          blockchain: {
+            select: {
+              name: true,
+              chainId: true,
+            },
+          },
         },
       },
     },
@@ -67,8 +71,8 @@ export async function uploadBatchCsv(params: UploadBatchCsvParams) {
     file,
     prisma,
     approverId,
-    blockchainName: program?.blockchain.name as string,
-    chainId: program?.blockchain.chainId as string,
+    blockchainName: program?.currency?.blockchain?.name as string,
+    chainId: program?.currency?.blockchain?.chainId as string,
   })
 
   if (verifyResult.errors.length > 0) {

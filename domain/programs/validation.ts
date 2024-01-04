@@ -1,9 +1,10 @@
-import { DeliveryMethod, ProgramCurrencyType, ProgramVisibility } from '@prisma/client'
+import { DeliveryMethod, ProgramVisibility } from '@prisma/client'
 import yup from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
 import { MAX_INTEGER_VALUE } from '../constants'
-import { ONE_TIME, PROGRAM_TYPE_EXTERNAL, PROGRAM_TYPE_INTERNAL } from './constants'
+import { ONE_TIME, PROGRAM_TYPE_EXTERNAL, PROGRAM_TYPE_INTERNAL, REQUEST_TOKEN } from './constants'
+import { USD } from 'domain/currency/constants'
 
 export const createProgramValidator = yup
   .object({
@@ -27,26 +28,14 @@ export const createProgramValidator = yup
       )
       .required(),
     viewersRole: yup.array().of(yup.object({ roleId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required() }).required()),
-    programCurrency: yup
-      .array()
-      .min(1, errorsMessages.required_field.message)
-      .of(
-        yup
-          .object({
-            name: yup.string().required(),
-            type: yup.mixed<ProgramCurrencyType>().oneOf(['REQUEST', 'PAYMENT']).required(),
-            blockchain: yup.string().required(),
-          })
-          .required(),
-      )
-      .required(),
     visibility: yup.mixed<ProgramVisibility>().oneOf([PROGRAM_TYPE_EXTERNAL, PROGRAM_TYPE_INTERNAL]).required(),
+    requestType: yup.string().oneOf(['USD', 'TOKEN']).required(),
+    paymentToken: yup.string().required(),
   })
   .required()
 
 export const createProgramFormValidator = yup
   .object({
-    paymentMethod: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
     name: yup.string().required(),
     deliveryMethod: yup.mixed<DeliveryMethod>().oneOf([ONE_TIME]).required(),
     visibility: yup.string().oneOf([PROGRAM_TYPE_EXTERNAL, PROGRAM_TYPE_INTERNAL]).required(),
@@ -68,18 +57,8 @@ export const createProgramFormValidator = yup
       )
       .required(),
     viewersRole: yup.array().of(yup.object({ roleId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required() }).required()),
-    programCurrency: yup
-      .array()
-      .min(1, errorsMessages.required_field.message)
-      .of(
-        yup
-          .object({
-            name: yup.string().required(),
-            type: yup.mixed<ProgramCurrencyType>().oneOf(['REQUEST', 'PAYMENT']).required(),
-          })
-          .required(),
-      )
-      .required(),
+    requestType: yup.string().oneOf([USD, REQUEST_TOKEN]).required(),
+    paymentToken: yup.string().required(),
   })
   .required()
 
@@ -111,24 +90,14 @@ export const updateProgramValidator = yup
       .required(),
     viewersRole: yup.array().of(yup.object({ roleId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required() }).required()),
     id: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
-    programCurrency: yup
-      .array()
-      .min(1, errorsMessages.required_field.message)
-      .of(
-        yup
-          .object({
-            name: yup.string().required(),
-            type: yup.mixed<ProgramCurrencyType>().oneOf(['REQUEST', 'PAYMENT']).required(),
-          })
-          .required(),
-      )
-      .required(),
     name: yup.string().required(),
     deliveryMethod: yup.mixed<DeliveryMethod>().oneOf([ONE_TIME]).required(),
     visibility: yup.mixed<ProgramVisibility>().oneOf([PROGRAM_TYPE_EXTERNAL, PROGRAM_TYPE_INTERNAL]).required(),
     updateApprovers: yup.bool().optional().default(false),
     updateViewers: yup.bool().optional().default(false),
     isArchived: yup.bool().optional().default(false),
+    requestType: yup.string().oneOf(['USD', 'TOKEN']).required(),
+    paymentToken: yup.string().required(),
   })
   .required()
 

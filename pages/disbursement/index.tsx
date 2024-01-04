@@ -62,7 +62,10 @@ interface DisbursementRequest {
   }
   program: {
     programCurrency: ProgramCurrency[]
-    blockchain: Blockchain
+    currency: {
+      name: string
+      blockchain: Blockchain
+    }
     name: string
   }
   transfers: {
@@ -154,7 +157,7 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
 
   const onBeforeMetamaskBatchPayClick = () => {
     const hasDifferentChains = selectedRequests.some(
-      request => request.program.blockchain.name !== selectedRequests[0].program.blockchain.name,
+      request => request.program.currency.blockchain.name !== selectedRequests[0].program.currency.blockchain.name,
     )
     if (hasDifferentChains) {
       dispatch({
@@ -224,7 +227,7 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
         [
           headerFile,
           ...data.requests.map(({ program, wallet, transfers, currency, receiver, ...request }) => {
-            const chain = AppConfig.network.getChain(program.blockchain.chainId as ChainIds)
+            const chain = AppConfig.network.getChain(program.currency.blockchain.chainId as ChainIds)
 
             const row = []
             columns.number && row.push(request.publicId)
@@ -315,7 +318,9 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
                     onBeforeClick={onBeforeMetamaskBatchPayClick}
                     onClick={onMetamaskBatchPayClick}
                     defaultLabel="Pay"
-                    targetChainId={AppConfig.network.getChainByName(selectedRequests[0].program.blockchain.name as ChainNames).chainId}
+                    targetChainId={
+                      AppConfig.network.getChainByName(selectedRequests[0].program.currency.blockchain.name as ChainNames).chainId
+                    }
                     switchChainLabel="Switch network to pay"
                   >
                     Pay

@@ -1,10 +1,22 @@
 import { prepareTransfers } from 'domain/transfer/prepare-transfers'
 import { newHandler, NextApiRequestWithSession, withController, withMethods, withValidation } from 'lib/middleware'
 import yup from 'lib/yup'
+import { mapValues } from 'lodash'
 import { NextApiResponse } from 'next'
 
 const requestSchema = yup.object({
-  requests: yup.array(yup.number().required()).min(1).required(),
+  requests: yup.lazy(obj =>
+    yup
+      .object(
+        mapValues(obj, () =>
+          yup.object({
+            id: yup.number().required(),
+            amount: yup.string().required(),
+          }),
+        ),
+      )
+      .required(),
+  ),
   from: yup.string().required(),
   to: yup.string().required(),
 })

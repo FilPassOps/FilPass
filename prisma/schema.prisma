@@ -249,8 +249,8 @@ model Program {
   createdAt             DateTime               @default(now()) @map("created_at")
   updatedAt             DateTime               @updatedAt @map("updated_at")
   visibility            ProgramVisibility?     @default(EXTERNAL) @map("visibility")
-  blockchain            Blockchain             @relation(fields: [blockchainId], references: [id])
-  blockchainId          Int                    @map("blockchain_id")
+  currency              Currency               @relation(fields: [currencyId], references: [id])
+  currencyId            Int                    @map("currency_id")
   userRolePrograms      UserRoleProgram[]
   transferRequests      TransferRequest[]
   programCurrency       ProgramCurrency[]
@@ -401,14 +401,16 @@ model Transfer {
 }
 
 model Currency {
-  id         Int            @id @default(autoincrement())
-  name       String         @unique
-  rate       Decimal        @db.Decimal(65, 2)
-  isActive   Boolean        @default(true) @map("is_active")
-  createdAt  DateTime       @default(now()) @map("created_at")
-  updatedAt  DateTime       @updatedAt @map("updated_at")
-  units      CurrencyUnit[]
-  Blockchain Blockchain[]
+  id           Int            @id @default(autoincrement())
+  name         String         @unique
+  rate         Decimal        @db.Decimal(65, 2)
+  blockchain   Blockchain?    @relation(fields: [blockchainId], references: [id])
+  blockchainId Int?           @map("blockchain_id")
+  isActive     Boolean        @default(true) @map("is_active")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+  units        CurrencyUnit[]
+  Program      Program[]
 
   @@map("currency")
 }
@@ -498,13 +500,11 @@ model Blockchain {
   id                 Int                  @id @default(autoincrement())
   name               String               @unique
   chainId            String               @unique @map("chain_id")
-  Currency           Currency             @relation(fields: [currencyId], references: [id])
-  currencyId         Int                  @map("currency_id")
   createdAt          DateTime             @default(now()) @map("created_at")
   updatedAt          DateTime             @updatedAt @map("updated_at")
   UserWallet         UserWallet[]
   WalletVerification WalletVerification[]
-  Program            Program[]
+  Currency           Currency[]
 
   @@map("blockchain")
 }

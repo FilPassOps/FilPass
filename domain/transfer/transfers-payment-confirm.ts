@@ -1,5 +1,4 @@
 import { ethers } from 'ethers'
-import { amountConverter } from 'lib/blockchain-utils'
 import { logger } from 'lib/logger'
 import prisma from 'lib/prisma'
 import { PENDING_STATUS } from './constants'
@@ -11,9 +10,10 @@ interface TransferPaymentConfirmParams {
   from: string
   value: ethers.BigNumber[]
   transactionHash: string
+  tokenDecimal: number
 }
 
-export const transferPaymentConfirm = async ({ id, to, from, value, transactionHash }: TransferPaymentConfirmParams) => {
+export const transferPaymentConfirm = async ({ id, to, from, transactionHash }: TransferPaymentConfirmParams) => {
   const pendingTransfers = await prisma.transfer.findMany({
     select: select,
     where: {
@@ -25,7 +25,7 @@ export const transferPaymentConfirm = async ({ id, to, from, value, transactionH
     },
   })
 
-  processPayment(pendingTransfers, to, value, transactionHash)
+  processPayment(pendingTransfers, to, transactionHash)
 
   if (pendingTransfers.length > 0) {
     return
@@ -58,7 +58,7 @@ export const transferPaymentConfirm = async ({ id, to, from, value, transactionH
     },
   })
 
-  processPayment(pendingTransfersWithNoTxHash, to, value, transactionHash)
+  processPayment(pendingTransfersWithNoTxHash, to, transactionHash)
 
   if (pendingTransfersWithNoTxHash.length > 0) {
     logger.warning('Transfer request with no transaction hash set as Paid', {
@@ -69,10 +69,9 @@ export const transferPaymentConfirm = async ({ id, to, from, value, transactionH
   }
 }
 
-const processPayment = async (pendingTransfers: TransferResult[], to: string[], value: ethers.BigNumber[], transactionHash: string) => {
+const processPayment = async (pendingTransfers: TransferResult[], to: string[], transactionHash: string) => {
   for (let i = 0; i < to.length; i++) {
     const receiver = to[i].toLowerCase()
-    const paidAmount = amountConverter(value[i])
     const transfers = []
     for await (const transfer of pendingTransfers) {
       try {
@@ -103,7 +102,6 @@ const processPayment = async (pendingTransfers: TransferResult[], to: string[], 
           await updateTransfer({
             id: transfer.id,
             transferRequest: transfer.transferRequest,
-            amount: Number(paidAmount),
             hash: transactionHash,
             sendEmail,
           })

@@ -78,10 +78,16 @@ export async function getAllExternalPrograms() {
           type: true,
         },
       },
-      blockchain: {
+      currency: {
         select: {
           name: true,
-          chainId: true,
+          blockchain: {
+            select: {
+              id: true,
+              name: true,
+              chainId: true,
+            },
+          },
         },
       },
     },
@@ -162,6 +168,18 @@ export async function getAllProgramsComplete(params: any) {
           type: true,
         },
       },
+      currency: {
+        select: {
+          name: true,
+          blockchain: {
+            select: {
+              id: true,
+              name: true,
+              chainId: true,
+            },
+          },
+        },
+      },
       userRolePrograms: {
         select: {
           id: true,
@@ -226,6 +244,7 @@ export async function getAllProgramsComplete(params: any) {
         delivery_method: program.deliveryMethod,
         created_at: program.createdAt,
         payment_unit_name: program.programCurrency.find(c => c.type === 'PAYMENT')?.currency.name,
+        payment_blockchain: program.currency.blockchain?.name || undefined,
         request_unit_name: program.programCurrency.find(c => c.type === 'REQUEST')?.currency.name,
         approversRole,
         viewersRole,

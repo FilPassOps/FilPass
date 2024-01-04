@@ -183,7 +183,7 @@ CREATE TABLE "program" (
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "visibility" "ProgramVisibility" DEFAULT 'EXTERNAL',
-    "blockchain_id" INTEGER NOT NULL,
+    "currency_id" INTEGER NOT NULL,
 
     CONSTRAINT "program_pkey" PRIMARY KEY ("id")
 );
@@ -301,6 +301,7 @@ CREATE TABLE "currency" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "rate" DECIMAL(65,2) NOT NULL,
+    "blockchain_id" INTEGER,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
@@ -384,7 +385,6 @@ CREATE TABLE "blockchain" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "chain_id" TEXT NOT NULL,
-    "currency_id" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -551,7 +551,7 @@ ALTER TABLE "wallet_verification" ADD CONSTRAINT "wallet_verification_blockchain
 ALTER TABLE "wallet_verification" ADD CONSTRAINT "wallet_verification_transaction_currency_unit_id_fkey" FOREIGN KEY ("transaction_currency_unit_id") REFERENCES "currency_unit"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "program" ADD CONSTRAINT "program_blockchain_id_fkey" FOREIGN KEY ("blockchain_id") REFERENCES "blockchain"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "program" ADD CONSTRAINT "program_currency_id_fkey" FOREIGN KEY ("currency_id") REFERENCES "currency"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "transfer_request" ADD CONSTRAINT "transfer_request_requester_id_fkey" FOREIGN KEY ("requester_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -617,6 +617,9 @@ ALTER TABLE "transfer" ADD CONSTRAINT "transfer_user_role_id_fkey" FOREIGN KEY (
 ALTER TABLE "transfer" ADD CONSTRAINT "transfer_amount_currency_unit_id_fkey" FOREIGN KEY ("amount_currency_unit_id") REFERENCES "currency_unit"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "currency" ADD CONSTRAINT "currency_blockchain_id_fkey" FOREIGN KEY ("blockchain_id") REFERENCES "blockchain"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "currency_unit" ADD CONSTRAINT "currency_unit_currency_id_fkey" FOREIGN KEY ("currency_id") REFERENCES "currency"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -630,6 +633,3 @@ ALTER TABLE "auth_verification" ADD CONSTRAINT "auth_verification_user_id_fkey" 
 
 -- AddForeignKey
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "blockchain" ADD CONSTRAINT "blockchain_currency_id_fkey" FOREIGN KEY ("currency_id") REFERENCES "currency"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

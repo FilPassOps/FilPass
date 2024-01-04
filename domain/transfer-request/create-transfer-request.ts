@@ -63,7 +63,7 @@ export async function createTransferRequest(params: CreateTransferRequestParams)
     }
   }
 
-  if (userWallet.blockchainId !== program.blockchainId) {
+  if (userWallet.blockchainId !== program.currency.blockchain?.id) {
     return {
       error: {
         status: 400,

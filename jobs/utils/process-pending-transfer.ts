@@ -1,4 +1,4 @@
-import { Chain } from 'config'
+import { AppConfig, Chain, ChainNames, TokenOptions } from 'config'
 import { baseEmail } from 'domain/notifications/constants'
 import { transferPaymentConfirm } from 'domain/transfer/transfers-payment-confirm'
 import { decryptPII } from 'lib/emissary-crypto'
@@ -12,6 +12,7 @@ interface EmailReminderRecipient {
 
 const contractInterface = MultiForwarderFactory.createInterface()
 const forwardEvent = contractInterface.getEvent('Forward')
+const forwardERC20 = contractInterface.getEvent('ForwardERC20')
 
 export async function processPendingTransfer(chain: Chain, contract: MultiForwarder) {
   const pendingTransfers = await prisma.transfer.findMany({
@@ -24,14 +25,29 @@ export async function processPendingTransfer(chain: Chain, contract: MultiForwar
       },
       transferRequest: {
         program: {
-          blockchain: {
-            name: chain.name,
+          currency: {
+            blockchain: {
+              name: chain.name,
+            },
           },
         },
       },
     },
     select: {
       txHash: true,
+      transferRequest: {
+        select: {
+          program: {
+            select: {
+              currency: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
     distinct: ['txHash'],
   })
@@ -43,20 +59,25 @@ export async function processPendingTransfer(chain: Chain, contract: MultiForwar
   const failedTransactions = []
   const failedTransferRequestPublicIds = []
 
-  for (const { txHash } of pendingTransfers) {
+  for (const { txHash, transferRequest } of pendingTransfers) {
     if (!txHash || !txHash.startsWith('0x')) continue
 
     const receipt = await contract.provider.getTransactionReceipt(txHash)
 
     if (!receipt) continue
 
+    const token = AppConfig.network.getTokenBySymbolAndBlockchainName(
+      transferRequest.program.currency.name as TokenOptions,
+      chain.name as ChainNames,
+    )
+
     if (receipt.status === 1) {
       receipt.logs.forEach(log => {
         if (log.address !== chain.contractAddress) return
         const parsed = contractInterface.parseLog(log)
-        if (parsed.name !== forwardEvent.name) return
+        if (parsed.name !== forwardEvent.name && parsed.name !== forwardERC20.name) return
         const { id, from, to, value } = parsed.args
-        transferPaymentConfirm({ id, from, to, value, transactionHash: txHash })
+        transferPaymentConfirm({ id, from, to, value, transactionHash: txHash, tokenDecimal: token.decimals })
       })
     } else {
       await prisma.transfer.updateMany({

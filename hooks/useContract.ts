@@ -1,24 +1,27 @@
 import { CustomWindow, useMetaMask } from '../components/Web3/MetaMaskProvider'
 
 import { ExternalProvider } from '@ethersproject/providers'
-import { AppConfig, ChainNames } from 'config'
+import { AppConfig, ERC20Token, NativeToken, isERC20Token } from 'config'
 import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
-import { MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
+import { ERC20, ERC20__factory as ERC20Factory, MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
 
 declare const window: CustomWindow
 
 export const contractInterface = MultiForwarderFactory.createInterface()
 
-export const useContract = (blockchainName: string) => {
+export const useContract = (token: ERC20Token | NativeToken) => {
+  const chain = AppConfig.network.getChainByToken(token)
+
+  if (!chain) {
+    throw new Error('Chain not found')
+  }
+
   const { chainId, wallet, setBusy } = useMetaMask()
   const [provider, setProvider] = useState<ethers.providers.Web3Provider>()
   const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner>()
   const [multiForwarder, setMultiForwarder] = useState<MultiForwarder>()
-
-  const { getChainByName } = AppConfig.network
-
-  const chain = getChainByName(blockchainName as ChainNames)
+  const [erc20, setErc20] = useState<ERC20>()
 
   const connectedToTargetChain = wallet && chainId === chain.chainId
 
@@ -31,15 +34,20 @@ export const useContract = (blockchainName: string) => {
     setProvider(provider)
     setMultiForwarder(multiForwarder)
 
+    if (isERC20Token(token)) {
+      const erc20 = ERC20Factory.connect(token.erc20TokenAddress, signer)
+      setErc20(erc20)
+    }
+
     return () => {
       multiForwarder.removeAllListeners()
     }
-  }, [chain.contractAddress])
+  }, [chain.contractAddress, token])
 
   /**
-   * Forward FIL to up to 100 addresses
-   * @param destinations array of addresses (f1/2/4 0x) - DO NOT USE f3 ADDRESSES
-   * @param amounts array of amounts in FIL
+   * Forward to up to 100 addresses
+   * @param destinations array of addresses
+   * @param amounts array of amounts
    * @throws if dependencies are not set / if the transaction fails
    * @returns
    */
@@ -56,9 +64,23 @@ export const useContract = (blockchainName: string) => {
     try {
       setBusy(true)
       const weiValues = amounts.map(amount => ethers.utils.parseEther(amount))
+      const unitValues = amounts.map(amount => ethers.utils.parseUnits(amount, token.decimals))
       const weiTotal = weiValues.reduce((a, b) => a.add(b), ethers.BigNumber.from(0))
+      const unitTotal = unitValues.reduce((a, b) => a.add(b), ethers.BigNumber.from(0))
+
+      if (isERC20Token(token) && erc20) {
+        const approveResult = await erc20.approve(multiForwarder.address, unitTotal)
+
+        // TODO: Need to wait the approval to be confirmed on the chain so we can forward the transaction
+        // Fixed by using the waitForTransaction method, now we just need to show a loading indicator to the user that the approve is being confirmed
+        await provider.waitForTransaction(approveResult.hash)
+
+        return await multiForwarder.forwardERC20(id, destinations, unitValues, erc20.address)
+      }
 
       return await multiForwarder.forward(id, destinations, weiValues, { value: weiTotal })
+    } catch (error) {
+      console.error(error)
     } finally {
       setBusy(false)
     }

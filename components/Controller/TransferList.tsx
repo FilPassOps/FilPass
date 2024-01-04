@@ -11,7 +11,7 @@ import Currency, { CryptoAmount } from 'components/Shared/Table/Currency'
 import Timestamp from 'components/Shared/Timestamp'
 import { WalletAddress } from 'components/Shared/WalletAddress'
 import { WithMetaMaskButton } from 'components/Web3/MetaMaskProvider'
-import { AppConfig, ChainNames } from 'config'
+import { AppConfig, ChainNames, TokenOptions, isERC20Token } from 'config'
 import { USD } from 'domain/currency/constants'
 import { APPROVED_STATUS, PAID_STATUS } from 'domain/transfer-request/constants'
 import { SUCCESS_STATUS } from 'domain/transfer/constants'
@@ -33,8 +33,11 @@ interface Request {
         name: string
       }
     }[]
-    blockchain: {
+    currency: {
       name: string
+      blockchain: {
+        name: string
+      }
     }
   }
   team: string
@@ -83,6 +86,7 @@ interface CryptoAmountInfoProps {
       name: string
     }
   }
+  chainName: string
   requestUnit: Unit
   paymentUnit: Unit
 }
@@ -183,7 +187,10 @@ const TransferList = ({
               const paymentUnit = request.program.programCurrency.find(({ type }) => type === 'PAYMENT') as Unit
               const requestUnit = request.program.programCurrency.find(({ type }) => type === 'REQUEST') as Unit
               const href = `/disbursement/${request.publicId}`
-              const { blockExplorer, chainId } = AppConfig.network.getChainByName(request.program.blockchain.name as ChainNames)
+
+              const { blockExplorer, chainId, name } = AppConfig.network.getChainByName(
+                request.program.currency.blockchain.name as ChainNames,
+              )
 
               const paidTransfer = request?.transfers?.find(({ status }) => status === SUCCESS_STATUS)
               return (
@@ -247,6 +254,7 @@ const TransferList = ({
                     <CryptoAmount>
                       <CryptoAmountInfo
                         chainId={chainId}
+                        chainName={name}
                         request={request}
                         requestUnit={requestUnit}
                         paymentUnit={paymentUnit}
@@ -304,8 +312,12 @@ const TransferList = ({
 
 export default TransferList
 
-const CryptoAmountInfo = ({ chainId, request, requestUnit, paymentUnit, paidTransfer }: CryptoAmountInfoProps) => {
-  const { currency } = useCurrency(chainId)
+const CryptoAmountInfo = ({ chainId, chainName, request, requestUnit, paymentUnit, paidTransfer }: CryptoAmountInfoProps) => {
+  const token = AppConfig.network.getTokenBySymbolAndBlockchainName(paymentUnit.currency.name as TokenOptions, chainName)
+
+  const tokenIdentifier = isERC20Token(token) ? token.erc20TokenAddress : chainId
+
+  const { currency } = useCurrency(tokenIdentifier)
 
   if (!currency) {
     return (

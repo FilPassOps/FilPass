@@ -81,10 +81,15 @@ export const getRejected = async (params: GetRejectedParams) => {
               },
             },
           },
-          blockchain: {
+          currency: {
             select: {
               name: true,
-              chainId: true,
+              blockchain: {
+                select: {
+                  name: true,
+                  chainId: true,
+                },
+              },
             },
           },
         },

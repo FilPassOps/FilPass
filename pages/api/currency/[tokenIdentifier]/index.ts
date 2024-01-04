@@ -14,9 +14,9 @@ async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
 export default newHandler(withLimiter(withMethods(['PATCH', 'GET'], handler)))
 
 const handlePatchRequest = withRoles(['SUPERADMIN', 'CONTROLLER'], async (req, res) => {
-  const chainId = req.query.chainId as string
+  const tokenIdentifier = req.query.tokenIdentifier as string
 
-  const { data, error } = await updateCurrencyRate({ ...req.body, chainId })
+  const { data, error } = await updateCurrencyRate({ ...req.body, tokenIdentifier })
   if (error) {
     return res.status(error.status).json(error)
   }
@@ -25,9 +25,9 @@ const handlePatchRequest = withRoles(['SUPERADMIN', 'CONTROLLER'], async (req, r
 })
 
 const handleGetRequest = async (req: NextApiRequestWithSession, res: NextApiResponse) => {
-  const chainId = req.query.chainId as string
+  const tokenIdentifier = req.query.tokenIdentifier as string
 
-  const { data, error } = await getCurrency({ chainId })
+  const { data, error } = await getCurrency({ tokenIdentifier })
   if (error) {
     return res.status(error.status).json(error)
   }

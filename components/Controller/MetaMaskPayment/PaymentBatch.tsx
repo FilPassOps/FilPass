@@ -2,22 +2,19 @@ import { Bars4Icon } from '@heroicons/react/24/outline'
 import { CheckCircleIcon, ChevronDownIcon, ChevronUpIcon, CurrencyDollarIcon, XCircleIcon } from '@heroicons/react/24/solid'
 import { Blockchain, TransferStatus } from '@prisma/client'
 import Big from 'big.js'
-import { useAlertDispatcher } from 'components/Layout/Alerts'
 import { Button } from 'components/Shared/Button'
 import Currency, { CryptoAmount } from 'components/Shared/Table/Currency'
 import { WalletAddress } from 'components/Shared/WalletAddress'
-import { WithMetaMaskButton, useMetaMask } from 'components/Web3/MetaMaskProvider'
-import { AppConfig, ChainNames } from 'config'
+import { useMetaMask } from 'components/Web3/MetaMaskProvider'
+import { AppConfig, Chain, ERC20Token, NativeToken, isERC20Token } from 'config'
 import { USD } from 'domain/currency/constants'
-import { Forward, contractInterface, useContract } from 'hooks/useContract'
+import { contractInterface, useContract } from 'hooks/useContract'
 import useCurrency from 'hooks/useCurrency'
-import { getBalance } from 'lib/blockchain-utils'
 import { formatCrypto, formatCurrency } from 'lib/currency'
-import { useState } from 'react'
-import errorsMessages from 'wordings-and-errors/errors-messages'
-import { ErrorAlert } from './Alerts'
+import { useEffect, useState } from 'react'
 import { Table, TableDiv, TableHeader } from './Table'
 import { TransactionParser } from './TransactionParser'
+import { SendPayment } from './SendPaymentBatchButton'
 
 interface ProgramCurrency {
   currency: {
@@ -26,18 +23,25 @@ interface ProgramCurrency {
   type: string
 }
 
-interface TransferRequest {
+export interface TransferRequest {
   id: number
   publicId: string
   amount: string
   wallet: { address: string; blockchain: Blockchain; verificationId?: string }
-  program: { programCurrency: ProgramCurrency[]; blockchain: Blockchain }
+  program: {
+    programCurrency: ProgramCurrency[]
+    currency: {
+      name: string
+      blockchain: Blockchain
+    }
+  }
   transfers: { txHash: string; status: TransferStatus; amount: string; isActive: boolean; amountCurrencyUnit: { name: string } }[]
   isHexMatch?: boolean
 }
 
-interface PaymentBatchData {
-  blockchainName: string
+export interface PaymentBatchData {
+  blockchain: Chain
+  token: ERC20Token | NativeToken
   isPaymentSent: boolean
   isHexMatch?: boolean
   data: TransferRequest[]
@@ -50,38 +54,47 @@ interface ParsedData {
   amount: string[]
 }
 
-interface BatchProps {
+interface PaymentBatchProps {
   index: number
   batchData: PaymentBatchData
-  forwardHandler: (batch: TransferRequest[], forwardFunction: Forward, blockchainName: string) => Promise<boolean>
   setIsBatchSent: (isBatchSent: boolean) => void
-  setIsChunkHextMatch: (isChunkHextMatch: boolean) => void
-  setHextMatch: (transferRequests: TransferRequest[]) => void
+  setIsChunkHexMatch: (isChunkHexMatch: boolean) => void
+  setHexMatch: (transferRequests: TransferRequest[]) => void
 }
 
-const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsChunkHextMatch, setHextMatch }: BatchProps) => {
-  const { data, isPaymentSent, isHexMatch, blockchainName } = batchData
+const PaymentBatch = ({ index, batchData, setIsBatchSent, setIsChunkHexMatch, setHexMatch }: PaymentBatchProps) => {
+  const { data, isPaymentSent, isHexMatch, blockchain, token } = batchData
   const [isOpen, setIsOpen] = useState(false)
+  const [totalDollarAmount, setTotalDollarAmount] = useState(0)
+  const [totalTokenAmount, setTotalTokenAmount] = useState<Big>()
+
   const { wallet } = useMetaMask()
-  const { forward } = useContract(blockchainName)
-  const { chainId } = AppConfig.network.getChainByName(blockchainName as ChainNames)
-  const { dispatch, close } = useAlertDispatcher()
+  const { forward } = useContract(token)
 
-  const { currency } = useCurrency(chainId)
+  const tokenIdentifier = isERC20Token(token) ? token.erc20TokenAddress : blockchain.chainId
 
-  let totalDollarAmount = 0
+  const { currency } = useCurrency(tokenIdentifier)
 
-  for (const item of data) {
-    const programCurrency = item.program.programCurrency.find(({ type }) => type === 'REQUEST')
+  useEffect(() => {
+    let totalDollarAmount = 0
 
-    if (programCurrency?.currency.name === USD) {
-      totalDollarAmount += Number(item.amount)
-    } else {
-      totalDollarAmount += Number(item.amount) * Number(currency)
+    for (const item of data) {
+      const programCurrency = item.program.programCurrency.find(({ type }) => type === 'REQUEST')
+
+      if (programCurrency?.currency.name === USD) {
+        totalDollarAmount += Number(item.amount)
+      } else {
+        totalDollarAmount += Number(item.amount) * Number(currency)
+      }
     }
-  }
 
-  const totalTokenAmount = currency && totalDollarAmount && new Big(totalDollarAmount).div(currency)
+    if (currency) {
+      const totalTokenAmount = new Big(totalDollarAmount).div(currency)
+
+      setTotalTokenAmount(totalTokenAmount)
+      setTotalDollarAmount(totalDollarAmount)
+    }
+  }, [currency, data])
 
   const validateParseData = (parsedData: ParsedData) => {
     const isValidFunctionCall = contractInterface.getFunction('forward').name
@@ -116,7 +129,7 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
       return tranferRequest
     })
 
-    setHextMatch(newData)
+    setHexMatch(newData)
 
     if (parsedDataArray.length > 0) {
       return false
@@ -128,35 +141,7 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
   }
   const handleParseData = async (parsedData: ParsedData) => {
     const isValid = validateParseData(parsedData)
-    setIsChunkHextMatch(isValid)
-  }
-
-  async function hasSufficientBalance() {
-    const balance = await getBalance(wallet ?? '', AppConfig.network.getChainByName(blockchainName as ChainNames))
-    if (!totalTokenAmount) return false
-    return new Big(balance).gte(totalTokenAmount)
-  }
-
-  async function checkBalance() {
-    const hasBalance = await hasSufficientBalance()
-
-    if (!hasBalance) {
-      dispatch({
-        type: 'error',
-        title: 'Payment failed',
-        config: {
-          closeable: true,
-        },
-        body: () => (
-          <ErrorAlert handleClose={() => close()}>
-            <span className="text-sm text-gray-600 text-center first-letter:uppercase pt-2">
-              {errorsMessages.check_account_balance.message}
-            </span>
-          </ErrorAlert>
-        ),
-      })
-      throw new Error('No balance')
-    }
+    setIsChunkHexMatch(isValid)
   }
 
   return (
@@ -170,25 +155,23 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
             </div>
             <div className="flex items-center gap-2">
               <CurrencyDollarIcon className="w-6 text-gray-400" />
-              {totalTokenAmount ? formatCrypto(totalTokenAmount.toFixed(2)) : '-'}{' '}
-              {AppConfig.network.getChainByName(blockchainName as ChainNames).symbol}
+              {totalTokenAmount ? formatCrypto(totalTokenAmount.toFixed(2)) : '-'} {data[0].program.currency.name}
               <span className="text-sm "> ≈{formatCurrency(totalDollarAmount)}</span>
             </div>
           </div>
         </div>
         <div className="w-full md:w-auto flex items-center justify-between md:justify-start gap-4">
           {!isPaymentSent && (
-            <WithMetaMaskButton
-              className="w-full md:w-auto"
-              targetChainId={AppConfig.network.getChainByName(blockchainName as ChainNames).chainId}
-              onBeforeClick={checkBalance}
-              onClick={async () => {
-                const sent = await forwardHandler(data, forward, blockchainName)
-                setIsBatchSent(sent)
-              }}
-            >
-              Send payment
-            </WithMetaMaskButton>
+            <SendPayment
+              forward={forward}
+              wallet={wallet}
+              token={token}
+              transferRequests={data}
+              setIsBatchSent={setIsBatchSent}
+              totalTokenAmount={totalTokenAmount}
+              chain={blockchain}
+              currency={currency}
+            />
           )}
           {isPaymentSent && (
             <Button className="py-2" variant="primary-lighter" disabled>
@@ -206,7 +189,7 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
       </div>
       <div className={`${isOpen ? 'block' : 'hidden'} py-6 md:p-6`}>
         {isHexMatch !== undefined && <ParseResultMessage isSucess={isHexMatch} />}
-        <TransactionParser onParseData={handleParseData} />
+        <TransactionParser onParseData={handleParseData} token={token} />
         <div className="overflow-x-scroll">
           <Table cols="grid-cols-5" className="bg-white">
             <TableHeader>No</TableHeader>
@@ -216,7 +199,6 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
             <TableHeader>Hex Match</TableHeader>
             {data.map(({ id, amount, wallet, program, publicId, transfers, isHexMatch }) => {
               const requestUnit = program.programCurrency.find(({ type }) => type === 'REQUEST') as ProgramCurrency
-              const paymentUnit = program.programCurrency.find(({ type }) => type === 'PAYMENT') as ProgramCurrency
               return (
                 <div key={id} className="contents">
                   <TableDiv>
@@ -238,7 +220,7 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
                     />
                   </TableDiv>
                   <TableDiv>
-                    <Currency amount={amount} requestCurrency={requestUnit.currency.name} paymentUnit={paymentUnit.currency.name} />
+                    <Currency amount={amount} requestCurrency={requestUnit.currency.name} paymentUnit={token.symbol} />
                   </TableDiv>
                   <TableDiv>
                     <div className="w-40">
@@ -246,7 +228,7 @@ const PaymentBatch = ({ index, batchData, forwardHandler, setIsBatchSent, setIsC
                         {requestUnit.currency.name === USD && currency
                           ? formatCrypto(new Big(Number(amount) / Number(currency)).toFixed(2))
                           : amount}{' '}
-                        {paymentUnit.currency.name}
+                        {token.symbol}
                       </CryptoAmount>
                     </div>
                   </TableDiv>

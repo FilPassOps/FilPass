@@ -41,7 +41,7 @@ export async function submitDraftTransferRequestById(params: SubmitDraftTransfer
 
   const [userWallet, program] = await Promise.all([
     prisma.userWallet.findUnique({ where: { id: userWalletId, userId: user.id } }),
-    prisma.program.findUnique({ where: { id: programId } }),
+    prisma.program.findUnique({ where: { id: programId }, include: { currency: { select: { blockchainId: true } } } }),
   ])
 
   if (!userWallet) {
@@ -62,7 +62,7 @@ export async function submitDraftTransferRequestById(params: SubmitDraftTransfer
     }
   }
 
-  if (userWallet.blockchainId !== program.blockchainId) {
+  if (userWallet.blockchainId !== program.currency.blockchainId) {
     return {
       error: {
         status: 400,

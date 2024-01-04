@@ -103,7 +103,8 @@ export async function getViewerTransferRequests(params: GetViewerTransferRequets
             LEFT JOIN user_wallet ON request.user_wallet_id = user_wallet.id
             LEFT JOIN wallet_verification ON user_wallet.verification_id = wallet_verification.id
             LEFT JOIN blockchain ON user_wallet.blockchain_id = blockchain.id
-            INNER JOIN blockchain AS program_blockchain ON program_blockchain.id = program.blockchain_id
+            INNER JOIN currency ON currency.id = program.currency_id
+            INNER JOIN blockchain AS program_blockchain ON program_blockchain.id = currency.blockchain_id
     WHERE user_role.is_active = TRUE
     AND user_role.role::text = 'VIEWER'
     AND user_role.user_id = ${viewerId}
@@ -135,7 +136,8 @@ export async function getViewerTransferRequests(params: GetViewerTransferRequets
         ON payment_unit.id = program_currency.currency_unit_id AND program.is_active = TRUE
       LEFT JOIN wallet_verification ON user_wallet.verification_id = wallet_verification.id
       LEFT JOIN blockchain ON user_wallet.blockchain_id = blockchain.id
-      INNER JOIN blockchain AS program_blockchain ON program_blockchain.id = program.blockchain_id
+      INNER JOIN currency ON currency.id = program.currency_id
+      INNER JOIN blockchain AS program_blockchain ON program_blockchain.id = currency.blockchain_id
       WHERE user_role.is_active = TRUE
         AND user_role.role::text = 'VIEWER'
         AND user_role.user_id = ${viewerId}

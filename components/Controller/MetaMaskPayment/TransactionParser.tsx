@@ -5,6 +5,8 @@ import { contractInterface } from 'hooks/useContract'
 import { amountConverter } from 'lib/blockchain-utils'
 import { useState } from 'react'
 import Image from 'next/image'
+import { ERC20Token, NativeToken } from 'config/chains'
+import { ethers } from 'ethers'
 
 interface ParsedData {
   functionName: string
@@ -15,9 +17,10 @@ interface ParsedData {
 
 interface TransactionParserProps {
   onParseData: (data: ParsedData) => void
+  token: NativeToken | ERC20Token
 }
 
-export const TransactionParser = ({ onParseData }: TransactionParserProps) => {
+export const TransactionParser = ({ onParseData, token }: TransactionParserProps) => {
   const [hexDataInput, setHexDataInput] = useState('')
   const [error, setError] = useState('')
   const { dispatch, close } = useAlertDispatcher()
@@ -55,7 +58,7 @@ export const TransactionParser = ({ onParseData }: TransactionParserProps) => {
     })
   }
 
-  const handleParse = () => {
+  const handleParse = (token: NativeToken | ERC20Token) => {
     try {
       const transactionDescription = contractInterface.parseTransaction({
         data: hexDataInput,
@@ -68,7 +71,7 @@ export const TransactionParser = ({ onParseData }: TransactionParserProps) => {
         functionName,
         id,
         addresses: addresses,
-        amount: amount.map(amountConverter),
+        amount: amount.map((item: ethers.BigNumber) => amountConverter(item, token.decimals)),
       })
     } catch (error) {
       setError('Invalid hex data')
@@ -93,7 +96,7 @@ export const TransactionParser = ({ onParseData }: TransactionParserProps) => {
           value={hexDataInput}
           placeholder="0x1cd5a66500000000000000000..."
         />
-        <Button className="" onClick={handleParse}>
+        <Button className="" onClick={() => handleParse(token)}>
           Parse
         </Button>
       </div>
