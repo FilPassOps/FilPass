@@ -3,7 +3,7 @@ import { SYSTEM_USER_ROLE_ID } from 'domain/auth/constants'
 import { sendPaidVerification } from 'domain/notifications/send-paid-notification'
 import { PROGRAM_TYPE_INTERNAL } from 'domain/programs/constants'
 import { APPROVED_STATUS, PAID_STATUS } from 'domain/transfer-request/constants'
-import { decryptPII, encrypt } from 'lib/emissary-crypto'
+import { decryptPII } from 'lib/emissary-crypto'
 import prisma from 'lib/prisma'
 import { SUCCESS_STATUS } from './constants'
 
@@ -55,9 +55,8 @@ interface UpdateTransferParams {
   sendEmail?: boolean
 }
 
-export async function updateTransfer({ id, transferRequest, hash, amount, sendEmail = false }: UpdateTransferParams) {
+export async function updateTransfer({ id, transferRequest, hash, sendEmail = false }: UpdateTransferParams) {
   const { id: transferRequestId, status, publicId, receiver, program } = transferRequest
-  const encryptedAmount = amount ? (await encrypt(amount as any)) : undefined
   const receiverEmail = await decryptPII(receiver.email)
   const currencyUnitId = program.programCurrency.pop()?.currencyUnitId
   try {
@@ -73,7 +72,6 @@ export async function updateTransfer({ id, transferRequest, hash, amount, sendEm
         data: {
           status: SUCCESS_STATUS,
           txHash: hash,
-          amount: encryptedAmount,
           amountCurrencyUnitId: currencyUnitId,
         },
       }),

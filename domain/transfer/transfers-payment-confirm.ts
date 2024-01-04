@@ -13,7 +13,7 @@ interface TransferPaymentConfirmParams {
   tokenDecimal: number
 }
 
-export const transferPaymentConfirm = async ({ id, to, from, value, transactionHash }: TransferPaymentConfirmParams) => {
+export const transferPaymentConfirm = async ({ id, to, from, transactionHash }: TransferPaymentConfirmParams) => {
   const pendingTransfers = await prisma.transfer.findMany({
     select: select,
     where: {
@@ -24,6 +24,8 @@ export const transferPaymentConfirm = async ({ id, to, from, value, transactionH
       from: from.toLowerCase(),
     },
   })
+
+  processPayment(pendingTransfers, to, transactionHash)
 
   if (pendingTransfers.length > 0) {
     return
@@ -56,7 +58,7 @@ export const transferPaymentConfirm = async ({ id, to, from, value, transactionH
     },
   })
 
-  processPayment(pendingTransfersWithNoTxHash, to, value, transactionHash)
+  processPayment(pendingTransfersWithNoTxHash, to, transactionHash)
 
   if (pendingTransfersWithNoTxHash.length > 0) {
     logger.warning('Transfer request with no transaction hash set as Paid', {
@@ -67,12 +69,7 @@ export const transferPaymentConfirm = async ({ id, to, from, value, transactionH
   }
 }
 
-const processPayment = async (
-  pendingTransfers: TransferResult[],
-  to: string[],
-  value: ethers.BigNumber[],
-  transactionHash: string,
-) => {
+const processPayment = async (pendingTransfers: TransferResult[], to: string[], transactionHash: string) => {
   for (let i = 0; i < to.length; i++) {
     const receiver = to[i].toLowerCase()
     const transfers = []

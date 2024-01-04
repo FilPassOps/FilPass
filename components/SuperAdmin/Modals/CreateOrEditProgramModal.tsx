@@ -169,7 +169,7 @@ export const CreateOrEditProgramModal = ({
                 placeholder="Select the program type"
                 name="requestType"
                 options={[
-                  { value: USD, label: 'Request in USD(Dollar)' },
+                  { value: USD, label: 'Request in USD' },
                   { value: REQUEST_TOKEN, label: 'Request in payment token' },
                 ]}
                 label="Request Type"
