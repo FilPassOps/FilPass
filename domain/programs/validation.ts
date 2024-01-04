@@ -1,4 +1,4 @@
-import { DeliveryMethod, ProgramCurrencyType, ProgramVisibility } from '@prisma/client'
+import { DeliveryMethod, ProgramVisibility } from '@prisma/client'
 import yup from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
@@ -90,24 +90,14 @@ export const updateProgramValidator = yup
       .required(),
     viewersRole: yup.array().of(yup.object({ roleId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required() }).required()),
     id: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
-    programCurrency: yup
-      .array()
-      .min(1, errorsMessages.required_field.message)
-      .of(
-        yup
-          .object({
-            name: yup.string().required(),
-            type: yup.mixed<ProgramCurrencyType>().oneOf(['REQUEST', 'PAYMENT']).required(),
-          })
-          .required(),
-      )
-      .required(),
     name: yup.string().required(),
     deliveryMethod: yup.mixed<DeliveryMethod>().oneOf([ONE_TIME]).required(),
     visibility: yup.mixed<ProgramVisibility>().oneOf([PROGRAM_TYPE_EXTERNAL, PROGRAM_TYPE_INTERNAL]).required(),
     updateApprovers: yup.bool().optional().default(false),
     updateViewers: yup.bool().optional().default(false),
     isArchived: yup.bool().optional().default(false),
+    requestType: yup.string().oneOf(['USD', 'TOKEN']).required(),
+    paymentToken: yup.string().required(),
   })
   .required()
 

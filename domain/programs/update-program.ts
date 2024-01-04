@@ -6,16 +6,16 @@ import prisma, { newPrismaTransaction } from 'lib/prisma'
 import { validate } from 'lib/yup'
 import { programAssociatedRequests } from './program-associated-requests'
 import { updateProgramValidator } from './validation'
+import { ERC20Token, NativeToken } from 'config/chains'
+import { AppConfig } from 'config/index'
+import { REQUEST_TOKEN } from './constants'
+import { USD } from 'domain/currency/constants'
 
 export interface UpdateProgramParams {
   superId: number
   approversRole: { roleId: number }[][]
   viewersRole: { roleId: number }[]
   id: number
-  programCurrency: {
-    name: string
-    type: string
-  }[]
   name: string
   visibility: ProgramVisibility
   updateApprovers: boolean
@@ -42,7 +42,6 @@ export async function updateProgram(params: UpdateProgramParams) {
 
   const {
     id,
-    programCurrency,
     name,
     approversRole: approversRoleMatrix,
     viewersRole,
@@ -50,6 +49,8 @@ export async function updateProgram(params: UpdateProgramParams) {
     updateApprovers = false,
     updateViewers = false,
     isArchived = false,
+    paymentToken,
+    requestType,
   } = fields
 
   const approversRole: ProgramRole[] = groupProgramApproversRole(approversRoleMatrix, id)
@@ -168,8 +169,7 @@ export async function updateProgram(params: UpdateProgramParams) {
     if (data.length > 0) {
       return count
     } else {
-      await updateProgramCurrency({ fnPrisma, programId: id, programCurrency })
-
+      await updateProgramCurrency({ fnPrisma, programId: id, paymentToken, requestType })
       return count
     }
   })
@@ -332,24 +332,27 @@ const setNewProgramRoles = async ({ fnPrisma, programId, programRoles, prevProgr
 interface UpdateProgramCurrencyParams {
   fnPrisma: Prisma.TransactionClient
   programId: number
-  programCurrency: {
-    name: string
-    type: string
-  }[]
+  paymentToken: string
+  requestType: string
 }
 
-const updateProgramCurrency = async ({ fnPrisma, programId, programCurrency }: UpdateProgramCurrencyParams) => {
-  const [requestCurrencyUnit] = await fnPrisma.currencyUnit.findMany({
-    where: {
-      isActive: true,
-      name: {
-        equals: programCurrency.find(pc => pc.type === 'REQUEST')?.name,
-      },
-    },
-    select: {
-      id: true,
-    },
+const updateProgramCurrency = async ({ fnPrisma, programId, paymentToken, requestType }: UpdateProgramCurrencyParams) => {
+  const paymentTokenObject = AppConfig.network.getTokenByIdentifier(paymentToken) as NativeToken | ERC20Token
+  const paymentTokenBlockchain = AppConfig.network.getChainByToken(paymentTokenObject)
+  const paymentBlockchain = await prisma.blockchain.findFirst({
+    where: { name: paymentTokenBlockchain?.name },
   })
+  const paymentCurrency = await prisma.currencyUnit.findFirstOrThrow({
+    where: { name: paymentTokenObject?.symbol, currency: { blockchainId: paymentBlockchain?.id } },
+    select: { currency: true, id: true },
+  })
+
+  const requestCurrencyUnit =
+    requestType === REQUEST_TOKEN
+      ? paymentCurrency
+      : await prisma.currencyUnit.findFirstOrThrow({
+          where: { name: USD, currency: { blockchainId: null } },
+        })
 
   await fnPrisma.programCurrency.updateMany({
     where: {
@@ -362,18 +365,6 @@ const updateProgramCurrency = async ({ fnPrisma, programId, programCurrency }: U
     },
   })
 
-  const [paymentCurrencyUnit] = await fnPrisma.currencyUnit.findMany({
-    where: {
-      isActive: true,
-      name: {
-        equals: programCurrency.find(pc => pc.type === 'PAYMENT')?.name,
-      },
-    },
-    select: {
-      id: true,
-    },
-  })
-
   await fnPrisma.programCurrency.updateMany({
     where: {
       programId,
@@ -381,7 +372,7 @@ const updateProgramCurrency = async ({ fnPrisma, programId, programCurrency }: U
       isActive: true,
     },
     data: {
-      currencyUnitId: paymentCurrencyUnit.id,
+      currencyUnitId: paymentCurrency.id,
     },
   })
 }

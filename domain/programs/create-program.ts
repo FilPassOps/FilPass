@@ -15,12 +15,9 @@ interface CreateProgramParams {
   deliveryMethod: DeliveryMethod
   approversRole: { roleId: number }[][]
   viewersRole: { roleId: number }[]
-  programCurrency: {
-    name: string
-    type: string
-    blockchain: string
-  }[]
   visibility: ProgramVisibility
+  requestType: string
+  paymentToken: string
 }
 
 export async function createProgram(params: CreateProgramParams) {
