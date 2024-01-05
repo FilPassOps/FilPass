@@ -19,7 +19,7 @@
     "test:coverage": "npm run docker:up && dotenv -e .env.test -- npm run migrate:test && dotenv -e .env.test -- jest -i --coverage --forceExit && npm run docker:down",
     "deploy": "npx hardhat run scripts/deploy.ts --network",
     "test-contract": "npx hardhat test",
-    "pre-dev": "docker compose up -d && npm run migrate && npm run seed && npm run seed:dev",
+    "pre-dev": "docker compose up -d db && npm run migrate && npm run seed && npm run seed:dev",
     "start:migrate": "npm run migrate && npm run seed && node dist/server/index.js"
   },
   "prisma": {

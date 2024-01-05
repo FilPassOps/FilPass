@@ -25,7 +25,7 @@
     - [Seeding the database with essential data](#seeding-the-database-with-essential-data)
   - [Application Start Up](#application-start-up)
   - [Running the application](#running-the-application)
-- [Developer](#developer)
+- [Developer and System Administrator](#developer-and-system-administrator)
 - [License](#license)
 - [Security](#security)
 
@@ -82,9 +82,9 @@ Before starting the application, make sure you have the following files set up:
 
 - Environment: Create a file named `.env` in the root folder containing all environment variables defined at [env-vars](env-vars.md), also found in the root folder.
 
-- Chains: If needed, change the `chains.ts` file to match your desired chains. The default chains are `filecoin` and `ethereum`.
+- Chains: If needed, change the `chains.ts` file to match your desired chains. The default chains are `filecoin` and `ethereum`. You can find more information about the chains configuration file at [chains](chains.md).
 
-- System: Change the app information on the `system.ts` file to match your company information.
+- System: Change the app information on the `system.ts` file to match your company information. You can find more information about the system configuration file at [system-config](system-config.md).
 
 ### Running the application
 
@@ -95,9 +95,9 @@ npm run dev:server
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 
-## Developer
+## Developer and System Administrator
 
-If you are a developer and want some useful commands to contribute to Emissary, check the [Developer Helpers](developer-helpers.md) page for more information.
+If you are a developer or a system administrator and want some useful commands to contribute to Emissary or maybe add a new token, check the [Developer Helpers](developer-helpers.md) page for more information.
 
 <!-- temporary license -->
 
