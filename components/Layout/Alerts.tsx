@@ -1,7 +1,7 @@
 import { CheckIcon, ExclamationTriangleIcon, InformationCircleIcon, XMarkIcon } from '@heroicons/react/24/solid'
 import React, { Dispatch, FC, HTMLAttributes, SetStateAction, createContext, useContext, useRef, useState } from 'react'
 
-type AlertType = 'success' | 'error' | 'warning'
+type AlertType = 'success' | 'error' | 'warning' | 'info'
 
 interface AlertConfig {
   timeout?: number
@@ -13,6 +13,7 @@ export interface DispatchedAlert {
   title: string
   config?: AlertConfig
   body?: React.FC<React.PropsWithChildren<unknown>>
+  customIcon?: React.FC<React.PropsWithChildren<unknown>>
 }
 
 const AlertDispatcherContext = createContext<{
@@ -78,13 +79,11 @@ interface AlertProps {
 const Alert: React.FC<React.PropsWithChildren<AlertProps>> = ({ alert }) => {
   if (!alert) return null
 
-  const { type, title, body: BodyRender } = alert
+  const { type, title, body: BodyRender, customIcon: CustomIcon } = alert
 
   return (
     <>
-      <div className="flex justify-center items-center pb-2">
-        <AlertIcon type={type} />
-      </div>
+      <div className="flex justify-center items-center pb-2">{CustomIcon ? <CustomIcon /> : <AlertIcon type={type} />}</div>
       <div className="flex items-center justify-center"></div>
       <h1 className="my-2 font-medium text-lg leading-6 text-center">{title}</h1>
       <div className="text-sm leading-5 text-gray-500">{BodyRender && <BodyRender />}</div>
@@ -110,6 +109,12 @@ export const AlertIcon = ({ type }: { type?: AlertType }) => {
       return (
         <span className="rounded-full w-14 h-14 flex justify-center items-center bg-red-100">
           <XMarkIcon className="h-7 w-7 text-red-500" />
+        </span>
+      )
+    case 'info':
+      return (
+        <span className="rounded-full w-14 h-14 flex justify-center items-center bg-blue-100">
+          <InformationCircleIcon className="h-7 w-7 text-blue-500" />
         </span>
       )
     default:
