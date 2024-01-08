@@ -2,7 +2,9 @@ import { Bars4Icon } from '@heroicons/react/24/outline'
 import { CheckCircleIcon, ChevronDownIcon, ChevronUpIcon, CurrencyDollarIcon, XCircleIcon } from '@heroicons/react/24/solid'
 import { Blockchain, TransferStatus } from '@prisma/client'
 import Big from 'big.js'
+import { useAlertDispatcher } from 'components/Layout/Alerts'
 import { Button } from 'components/Shared/Button'
+import { LoadingIndicator } from 'components/Shared/LoadingIndicator'
 import Currency, { CryptoAmount } from 'components/Shared/Table/Currency'
 import { WalletAddress } from 'components/Shared/WalletAddress'
 import { useMetaMask } from 'components/Web3/MetaMaskProvider'
@@ -12,11 +14,9 @@ import { contractInterface, useContract } from 'hooks/useContract'
 import useCurrency from 'hooks/useCurrency'
 import { formatCrypto, formatCurrency } from 'lib/currency'
 import { useEffect, useState } from 'react'
+import { SendPayment } from './SendPaymentBatchButton'
 import { Table, TableDiv, TableHeader } from './Table'
 import { TransactionParser } from './TransactionParser'
-import { SendPayment } from './SendPaymentBatchButton'
-import { useAlertDispatcher } from 'components/Layout/Alerts'
-import { LoadingIndicator } from 'components/Shared/LoadingIndicator'
 
 interface ProgramCurrency {
   currency: {
@@ -82,13 +82,13 @@ const PaymentBatch = ({ index, batchData, setIsBatchSent, setIsChunkHexMatch, se
     if (loadingAllowance) {
       dispatch({
         title: 'Please wait for the allowance to be confirmed',
+        icon: () => <LoadingIndicator className="text-indigo-500 h-12 w-12 mb-6" />,
         config: {
-          closeable: true,
+          closeable: false,
         },
-        customIcon: () => <LoadingIndicator className="text-indigo-500 h-8 w-8 mb-6" />,
       })
     }
-  }, [loadingAllowance])
+  }, [dispatch, loadingAllowance])
 
   useEffect(() => {
     let totalDollarAmount = 0

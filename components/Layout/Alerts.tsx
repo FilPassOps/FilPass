@@ -10,10 +10,10 @@ interface AlertConfig {
 
 export interface DispatchedAlert {
   type?: AlertType
+  icon?: React.FC
   title: string
   config?: AlertConfig
   body?: React.FC<React.PropsWithChildren<unknown>>
-  customIcon?: React.FC<React.PropsWithChildren<unknown>>
 }
 
 const AlertDispatcherContext = createContext<{
@@ -79,11 +79,13 @@ interface AlertProps {
 const Alert: React.FC<React.PropsWithChildren<AlertProps>> = ({ alert }) => {
   if (!alert) return null
 
-  const { type, title, body: BodyRender, customIcon: CustomIcon } = alert
+  const { type, title, body: BodyRender, icon: Icon = () => <AlertIcon type={type} /> } = alert
 
   return (
     <>
-      <div className="flex justify-center items-center pb-2">{CustomIcon ? <CustomIcon /> : <AlertIcon type={type} />}</div>
+      <div className="flex justify-center items-center pb-2">
+        <Icon />
+      </div>
       <div className="flex items-center justify-center"></div>
       <h1 className="my-2 font-medium text-lg leading-6 text-center">{title}</h1>
       <div className="text-sm leading-5 text-gray-500">{BodyRender && <BodyRender />}</div>
@@ -91,7 +93,7 @@ const Alert: React.FC<React.PropsWithChildren<AlertProps>> = ({ alert }) => {
   )
 }
 
-export const AlertIcon = ({ type }: { type?: AlertType }) => {
+export const AlertIcon: React.FC<{ type?: AlertType }> = ({ type }) => {
   switch (type) {
     case 'success':
       return (

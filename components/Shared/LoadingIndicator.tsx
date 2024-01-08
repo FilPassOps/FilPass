@@ -4,7 +4,7 @@ interface LoadingIndicatorProps {
   className?: string
 }
 
-export const LoadingIndicator = ({ className= '' }: LoadingIndicatorProps) => {
+export const LoadingIndicator = ({ className = '' }: LoadingIndicatorProps) => {
   return (
     <svg
       className={twMerge('animate-spin h-5 w-5 text-white shrink-0', className)}
