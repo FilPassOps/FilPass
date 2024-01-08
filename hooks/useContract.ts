@@ -22,6 +22,7 @@ export const useContract = (token: ERC20Token | NativeToken) => {
   const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner>()
   const [multiForwarder, setMultiForwarder] = useState<MultiForwarder>()
   const [erc20, setErc20] = useState<ERC20>()
+  const [loadingAllowance, setLoadingAllowance] = useState<boolean>(false)
 
   const connectedToTargetChain = wallet && chainId === chain.chainId
 
@@ -71,9 +72,9 @@ export const useContract = (token: ERC20Token | NativeToken) => {
       if (isERC20Token(token) && erc20) {
         const approveResult = await erc20.approve(multiForwarder.address, unitTotal)
 
-        // TODO: Need to wait the approval to be confirmed on the chain so we can forward the transaction
-        // Fixed by using the waitForTransaction method, now we just need to show a loading indicator to the user that the approve is being confirmed
+        setLoadingAllowance(true)
         await provider.waitForTransaction(approveResult.hash)
+        setLoadingAllowance(false)
 
         return await multiForwarder.forwardERC20(id, destinations, unitValues, erc20.address)
       }
@@ -86,7 +87,7 @@ export const useContract = (token: ERC20Token | NativeToken) => {
     }
   }
 
-  return { forward }
+  return { forward, loadingAllowance }
 }
 
 export type Forward = ReturnType<typeof useContract>['forward']

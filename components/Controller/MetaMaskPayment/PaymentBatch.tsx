@@ -2,7 +2,9 @@ import { Bars4Icon } from '@heroicons/react/24/outline'
 import { CheckCircleIcon, ChevronDownIcon, ChevronUpIcon, CurrencyDollarIcon, XCircleIcon } from '@heroicons/react/24/solid'
 import { Blockchain, TransferStatus } from '@prisma/client'
 import Big from 'big.js'
+import { useAlertDispatcher } from 'components/Layout/Alerts'
 import { Button } from 'components/Shared/Button'
+import { LoadingIndicator } from 'components/Shared/LoadingIndicator'
 import Currency, { CryptoAmount } from 'components/Shared/Table/Currency'
 import { WalletAddress } from 'components/Shared/WalletAddress'
 import { useMetaMask } from 'components/Web3/MetaMaskProvider'
@@ -12,9 +14,9 @@ import { contractInterface, useContract } from 'hooks/useContract'
 import useCurrency from 'hooks/useCurrency'
 import { formatCrypto, formatCurrency } from 'lib/currency'
 import { useEffect, useState } from 'react'
+import { SendPayment } from './SendPaymentBatchButton'
 import { Table, TableDiv, TableHeader } from './Table'
 import { TransactionParser } from './TransactionParser'
-import { SendPayment } from './SendPaymentBatchButton'
 
 interface ProgramCurrency {
   currency: {
@@ -67,13 +69,26 @@ const PaymentBatch = ({ index, batchData, setIsBatchSent, setIsChunkHexMatch, se
   const [isOpen, setIsOpen] = useState(false)
   const [totalDollarAmount, setTotalDollarAmount] = useState(0)
   const [totalTokenAmount, setTotalTokenAmount] = useState<Big>()
+  const { dispatch } = useAlertDispatcher()
 
   const { wallet } = useMetaMask()
-  const { forward } = useContract(token)
+  const { forward, loadingAllowance } = useContract(token)
 
   const tokenIdentifier = isERC20Token(token) ? token.erc20TokenAddress : blockchain.chainId
 
   const { currency } = useCurrency(tokenIdentifier)
+
+  useEffect(() => {
+    if (loadingAllowance) {
+      dispatch({
+        title: 'Please wait for the allowance to be confirmed',
+        icon: () => <LoadingIndicator className="text-indigo-500 h-12 w-12 mb-6" />,
+        config: {
+          closeable: false,
+        },
+      })
+    }
+  }, [dispatch, loadingAllowance])
 
   useEffect(() => {
     let totalDollarAmount = 0
