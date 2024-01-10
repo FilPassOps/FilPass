@@ -94,8 +94,8 @@ export const CreateOrEditProgramModal = ({
     remove: approversRoleRemove,
     append: approversRoleAppend,
   } = useFieldArray({
-    control: control, // control props comes from useForm (optional: if you are using FormContext)
-    name: 'approversRole', // unique name for your Field Array
+    control: control,
+    name: 'approversRole',
   })
 
   const { approversRole } = watch()

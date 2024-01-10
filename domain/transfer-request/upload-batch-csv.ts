@@ -306,7 +306,7 @@ const verifyWallet = async (data: Row[], prisma: Prisma.TransactionClient, block
       }
 
       if (wallet && !validateWalletAddress(wallet)) {
-        errors.push({ message: `Invalid wallet address on row ${row}. The wallet is not a valid ${blockchainName} address.` })
+        errors.push({ message: `Invalid wallet address on row ${row}. The wallet is not a valid address.` })
       }
     }),
   )

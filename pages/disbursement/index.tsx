@@ -226,8 +226,10 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
       const csvTemplate = stringify(
         [
           headerFile,
-          ...data.requests.map(({ program, wallet, transfers, currency, receiver, ...request }) => {
+          ...data.requests.map(({ program, wallet, transfers, receiver, ...request }) => {
             const chain = AppConfig.network.getChain(program.currency.blockchain.chainId as ChainIds)
+
+            const requestUnit = program.programCurrency.find(({ type }) => type === 'REQUEST')
 
             const row = []
             columns.number && row.push(request.publicId)
@@ -237,7 +239,7 @@ export default function Disbursement({ initialData = [], programs = [], pageSize
             columns.createDate && row.push(status === PAID_STATUS ? request.updatedAt : request.createdAt)
             columns.address && row.push(wallet.address)
             columns.amount && row.push(request.amount)
-            columns.amount && row.push(currency.name)
+            columns.amount && row.push(requestUnit?.currency?.name ?? 'FIL')
             columns.paidAmount && row.push(transfers[0].amount)
             columns.paidAmount && row.push(transfers[0].amountCurrencyUnit?.name ?? 'FIL')
             columns.status && row.push(status)
