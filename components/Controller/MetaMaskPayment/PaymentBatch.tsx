@@ -88,7 +88,8 @@ const PaymentBatch = ({ index, batchData, setIsBatchSent, setIsChunkHexMatch, se
         },
       })
     }
-  }, [dispatch, loadingAllowance])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadingAllowance])
 
   useEffect(() => {
     let totalDollarAmount = 0

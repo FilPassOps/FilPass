@@ -1,8 +1,7 @@
 /* eslint-disable react/display-name */
 import { Listbox } from '@headlessui/react'
 import { ChevronDownIcon, ChevronUpIcon, EyeIcon, EyeSlashIcon, XMarkIcon } from '@heroicons/react/24/solid'
-import { classNames } from 'lib/class-names'
-import { forwardRef, useEffect, useRef, useState } from 'react'
+import { forwardRef, useRef, useState } from 'react'
 
 import { NumericFormat } from 'react-number-format'
 import { twMerge } from 'tailwind-merge'
@@ -28,7 +27,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
       <InputController id={id} label={label} error={error} name={props.name}>
         <div className="relative w-full">
           {leftIcon && <div className="absolute flex justify-center items-center text-gray-500 left-3 inset-y-0">{leftIcon}</div>}
-          <NumericFormat id={id} getInputRef={ref} className={classNames(classes, className)} disabled={disabled} {...props} />
+          <NumericFormat id={id} getInputRef={ref} className={twMerge(classes, className)} disabled={disabled} {...props} />
           {rightIcon && <div className="absolute flex justify-center items-center text-gray-500 right-3 inset-y-0">{rightIcon}</div>}
         </div>
       </InputController>
@@ -97,9 +96,9 @@ export const SelectInput = forwardRef<HTMLButtonElement, SelectInputProps>(
           {...props}
         >
           {({ open }) => (
-            <div className={classNames('mt-1 relative', className)}>
-              <Listbox.Button className={classNames(classes, buttonClasses)} ref={ref}>
-                <span className={classNames('block truncate', selected?.label ? 'text-black' : error ? 'text-red-300' : 'text-gray-500')}>
+            <div className={twMerge('mt-1 relative', className)}>
+              <Listbox.Button className={twMerge(classes, buttonClasses)} ref={ref}>
+                <span className={twMerge('block truncate', selected?.label ? 'text-black' : error ? 'text-red-300' : 'text-gray-500')}>
                   {selected?.decorator || ''}
                   {selected?.label || placeholder}
                 </span>
@@ -133,7 +132,7 @@ export const SelectInput = forwardRef<HTMLButtonElement, SelectInputProps>(
                 {emptyState && !options.length && (
                   <Listbox.Option disabled value={undefined}>
                     <div className="flex flex-1 items-center pl-4 pt-3 pb-3">
-                      <span className={classNames('block truncate font-normal')}>{emptyState}</span>
+                      <span className="block truncate font-normal">{emptyState}</span>
                     </div>
                   </Listbox.Option>
                 )}
@@ -141,13 +140,13 @@ export const SelectInput = forwardRef<HTMLButtonElement, SelectInputProps>(
                   <Listbox.Option
                     key={option.value}
                     className={({ active }) =>
-                      classNames(active ? 'text-white bg-indigo-600' : 'text-gray-900', 'cursor-default select-none relative p-3')
+                      twMerge(active ? 'text-white bg-indigo-600' : 'text-gray-900', 'cursor-default select-none relative p-3')
                     }
                     value={option}
                   >
                     {({ selected }) => (
                       <div className="flex flex-1 items-center gap-0.5">
-                        <span className={classNames(selected ? 'font-semibold' : 'font-normal', 'block truncate')}>{option.label}</span>
+                        <span className={twMerge(selected ? 'font-semibold' : 'font-normal', 'block truncate')}>{option.label}</span>
 
                         {option?.rightElement}
                       </div>
@@ -210,7 +209,7 @@ export const MultipleSelectInput = forwardRef(
               <div className="mt-1 relative">
                 <Listbox.Button className={classes} title={selecteds.map(item => item.label).join(', ')}>
                   <span
-                    className={classNames(
+                    className={twMerge(
                       selecteds.length > 0
                         ? `text-black ${truncate ? 'truncate inline-block w-[calc(80%)]' : ''}`
                         : error
@@ -237,7 +236,7 @@ export const MultipleSelectInput = forwardRef(
                     <Listbox.Option disabled value={undefined}>
                       {() => (
                         <div className="flex flex-1 items-center pl-4 pt-3 pb-3">
-                          <span className={classNames('block truncate font-normal')}>{emptyState}</span>
+                          <span className="block truncate font-normal">{emptyState}</span>
                         </div>
                       )}
                     </Listbox.Option>
@@ -261,7 +260,7 @@ export const MultipleSelectInput = forwardRef(
                             </div>
                           )}
                           <div
-                            className={classNames(
+                            className={twMerge(
                               'cursor-default select-none relative p-3 text-gray-900 ',
                               !disabled && 'hover:bg-indigo-600 hover:text-white',
                               (disabled || option.disabled) && 'opacity-50 hover:bg-white pointer-events-none',
@@ -294,168 +293,6 @@ export const MultipleSelectInput = forwardRef(
   },
 )
 
-interface MultipleSelectInputV2Props {
-  error?: any
-  id: string
-  label?: string
-  placeholder: string
-  disabled?: boolean
-  emptyState?: string
-  value?: SelectInputOption[]
-  onChange?: (value: SelectInputOption[]) => void
-  options?: SelectInputOption[]
-  variant?: string
-  name: string
-  actionComponent?: React.ReactNode
-  [key: string]: any
-}
-
-export const MultipleSelectInputV2 = ({
-  id,
-  label,
-  error,
-  placeholder,
-  disabled,
-  emptyState,
-  value = [],
-  onChange,
-  options,
-  variant,
-  name,
-  actionComponent = null,
-  ...rest
-}: MultipleSelectInputV2Props) => {
-  const [selecteds, setSelecteds] = useState(value)
-  useEffect(() => {
-    if (value.length !== selecteds.length) {
-      setSelecteds(value)
-    }
-  }, [value, selecteds])
-  const classes = getSelectClasses({ error, disabled, variant })
-  return (
-    <InputController id={id} label={label} error={error} name={name}>
-      <Listbox defaultValue={selecteds} disabled={disabled} name={name} {...rest}>
-        {() => (
-          <>
-            <div className="mt-1 relative">
-              <Listbox.Button className={classes}>
-                <span className="text-gray-500">{placeholder}</span>
-                <span className="absolute inset-y-0 right-0 flex items-center pr-2 cursor-default">
-                  <ChevronDownIcon className="h-7 w-7 text-gray-400" aria-hidden="true" />
-                </span>
-              </Listbox.Button>
-              {!disabled && actionComponent}
-              <Listbox.Options className="absolute z-20 mt-1 w-min bg-white shadow-lg max-h-60 rounded-md text-base ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm right-0 overflow-hidden">
-                {emptyState && !options?.length && (
-                  <Listbox.Option disabled value={undefined}>
-                    {() => (
-                      <div className="flex flex-1 items-center pl-4 pt-3 pb-3">
-                        <span className={classNames('block truncate font-normal')}>{emptyState}</span>
-                      </div>
-                    )}
-                  </Listbox.Option>
-                )}
-                <div className="overflow-auto max-h-36">
-                  {options?.map(option => {
-                    const handleChange = () => {
-                      if (selecteds.find(item => item.value === option.value)) {
-                        onChange && onChange(selecteds.filter(item => item.value !== option.value))
-                        setSelecteds(selecteds.filter(item => item.value !== option.value))
-                      } else {
-                        onChange && onChange([...selecteds, option])
-                        setSelecteds([...selecteds, option])
-                      }
-                    }
-                    return (
-                      <div
-                        key={option.value}
-                        className={classNames(
-                          'cursor-default select-none relative p-3 text-gray-900 ',
-                          !disabled && 'hover:bg-indigo-600 hover:text-white',
-                          disabled && 'opacity-50 hover:bg-white pointer-events-none',
-                        )}
-                      >
-                        <div className="flex flex-1 w-full items-center">
-                          <CheckboxInput
-                            id={option.value}
-                            value={Boolean(selecteds.find(item => item.value === option.value))}
-                            onChange={handleChange}
-                            className="w-full"
-                            disabled={option.disabled}
-                          >
-                            <span className="flex items-center truncate">{option.label}</span>
-                          </CheckboxInput>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </Listbox.Options>
-            </div>
-          </>
-        )}
-      </Listbox>
-    </InputController>
-  )
-}
-
-interface RadioInputProps {
-  formId?: string
-  error?: any
-  label: string
-  options: string[]
-  value: string
-  disabled?: boolean
-  checkboxPosition?: string
-  [key: string]: any
-}
-
-export const CheckRadioInput = forwardRef<HTMLInputElement, RadioInputProps>(
-  ({ formId = 'profile', error, label, options = [], value, disabled, checkboxPosition = 'justify-start', ...props }, ref) => {
-    const { checkboxClasses, iconClasses } = getRadioClasses({ error, disabled })
-
-    return (
-      <>
-        <div className="text-center text-sm leading-5 font-medium text-gray-700">{label}</div>
-        <div role="radiogroup" className={`flex ${checkboxPosition} items-center gap-4 mt-3`}>
-          {options.map((option, index) => (
-            <div key={`${formId}-${option}-${index}-container`} className="flex relative items-center">
-              <input
-                {...props}
-                id={`${formId}-${option}-${index}`}
-                ref={ref}
-                type="radio"
-                value={option}
-                className={checkboxClasses}
-                disabled={disabled}
-                tabIndex={0}
-              />
-              <label htmlFor={`${formId}-${option}-${index}`} className="flex items-center font-medium text-gray-700 text-sm">
-                <div
-                  role="radio"
-                  aria-checked={value === option}
-                  style={{ minWidth: '1rem', minHeight: '1rem' }}
-                  className={iconClasses(value === option)}
-                >
-                  {value === option && (
-                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                      <path
-                        d="M9.20643 0.792787C9.3939 0.980314 9.49922 1.23462 9.49922 1.49979C9.49922 1.76495 9.3939 2.01926 9.20643 2.20679L4.20643 7.20679C4.0189 7.39426 3.76459 7.49957 3.49943 7.49957C3.23427 7.49957 2.97996 7.39426 2.79243 7.20679L0.792431 5.20679C0.610272 5.01818 0.509478 4.76558 0.511757 4.50339C0.514035 4.24119 0.619204 3.99038 0.804612 3.80497C0.99002 3.61956 1.24083 3.51439 1.50303 3.51211C1.76523 3.50983 2.01783 3.61063 2.20643 3.79279L3.49943 5.08579L7.79243 0.792787C7.97996 0.605316 8.23427 0.5 8.49943 0.5C8.7646 0.5 9.0189 0.605316 9.20643 0.792787Z"
-                        fill="white"
-                      />
-                    </svg>
-                  )}
-                </div>
-                {option}
-              </label>
-            </div>
-          ))}
-        </div>
-      </>
-    )
-  },
-)
-
 interface CheckboxInputProps {
   error?: any
   id: string
@@ -474,7 +311,7 @@ export const CheckboxInput = forwardRef<HTMLInputElement, CheckboxInputProps>(
     const checkboxClasses = getCheckboxClasses({ error, disabled })
     return (
       <div className="relative flex items-start w-full">
-        <div className={classNames('flex', className)}>
+        <div className={twMerge('flex', className)}>
           <input
             id={id}
             name={name}
@@ -509,7 +346,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(({ error, 
   const classes = getInputClasses({ error, disabled })
   return (
     <InputController id={id} label={label} error={error} name={props.name}>
-      <input ref={ref} id={id} className={classNames(classes, className)} disabled={disabled} {...props} />
+      <input ref={ref} id={id} className={twMerge(classes, className)} disabled={disabled} {...props} />
     </InputController>
   )
 })
@@ -528,7 +365,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(({ error,
   const classes = getInputClasses({ error, disabled })
   return (
     <InputController id={id} label={label} error={error} name={props.name}>
-      <textarea ref={ref} id={id} className={classNames(classes, className)} disabled={disabled} {...props} />
+      <textarea ref={ref} id={id} className={twMerge(classes, className)} disabled={disabled} {...props} />
     </InputController>
   )
 })
@@ -554,7 +391,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
           <input
             id={id}
             ref={ref}
-            className={classNames(classes, 'pr-10')}
+            className={twMerge(classes, 'pr-10')}
             type={!show ? 'password' : 'text'}
             autoComplete="current-password"
             disabled={disabled}
@@ -669,7 +506,7 @@ interface GetInputClassesParams {
 }
 
 export const getInputClasses = ({ error, disabled }: GetInputClassesParams) =>
-  classNames(
+  twMerge(
     error && 'border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500 focus:ring-1',
     !error && 'focus:ring-indigo-500 focus:border-indigo-500 border-gray-300',
     'border leading-5 shadow-sm block w-full rounded-md px-3 py-2 text-sm bg-white',
@@ -683,7 +520,7 @@ interface GetSelectClassesParams {
 }
 
 const getSelectClasses = ({ error, disabled, variant }: GetSelectClassesParams) =>
-  classNames(
+  twMerge(
     error && 'border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500',
     !error && 'focus:ring-indigo-500 focus:border-indigo-500 border-gray-300',
     'leading-5 block w-full',
@@ -699,33 +536,10 @@ interface GetCheckboxClassesParams {
 }
 
 const getCheckboxClasses = ({ error, disabled }: GetCheckboxClassesParams) => {
-  return classNames(
+  return twMerge(
     error && 'bg-red-100 border border-red-300',
     disabled && 'cursor-default opacity-50',
     !error && 'border border-gray-300',
     'focus:ring-indigo-500 h-4 w-4 text-indigo-600 rounded mr-3',
   )
-}
-
-interface GetRadioClassesParams {
-  error: any
-  disabled?: boolean
-}
-
-const getRadioClasses = ({ error, disabled }: GetRadioClassesParams) => {
-  const checkboxClasses = classNames(
-    error && 'bg-red-100',
-    disabled && 'cursor-default opacity-50 bg-gray-300',
-    'h-4 w-4 text-white rounded mr-3',
-  )
-  const iconClasses = (checked: boolean) =>
-    classNames(
-      error && 'border border-red-300',
-      disabled && 'cursor-default opacity-70',
-      checked && 'bg-indigo-600 border border-indigo-600',
-      !checked && !error && 'bg-white border border-gray-300',
-      'focus:ring-indigo-500 h-4 w-4 rounded absolute top-0.5 left-0 flex items-center justify-center',
-    )
-
-  return { checkboxClasses, iconClasses }
 }
