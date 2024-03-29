@@ -40,18 +40,20 @@ export default function ProgramSettings({
         <title>{`Program Settings - ${AppConfig.app.name}`}</title>
       </Head>
       <div className="w-full">
-        <Button
-          className="w-56 my-4 ml-auto"
-          onClick={() => {
-            setCurrentProgram(undefined)
-            setOpenCreateOrEditModal(true)
-          }}
-        >
-          <div className="flex items-center gap-2 text-white text-sm font-medium whitespace-nowrap">
-            <PlusCircleIcon className="h-5 w-5" />
-            <span>Create New Program</span>
-          </div>
-        </Button>
+        {status !== ARCHIVED_STATUS && (
+          <Button
+            className="w-56 my-4 ml-auto"
+            onClick={() => {
+              setCurrentProgram(undefined)
+              setOpenCreateOrEditModal(true)
+            }}
+          >
+            <div className="flex items-center gap-2 text-white text-sm font-medium whitespace-nowrap">
+              <PlusCircleIcon className="h-5 w-5" />
+              <span>Create New Program</span>
+            </div>
+          </Button>
+        )}
         <PaginationWrapper totalItems={total} pageSize={pageSize}>
           <ProgramList
             data={data}
