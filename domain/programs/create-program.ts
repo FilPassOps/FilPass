@@ -1,4 +1,4 @@
-import { DeliveryMethod, Prisma, ProgramVisibility } from '@prisma/client'
+import { Prisma, ProgramVisibility } from '@prisma/client'
 import { APPROVER_ROLE } from 'domain/auth/constants'
 import { TransactionError } from 'lib/errors'
 import { newPrismaTransaction } from 'lib/prisma'
@@ -12,7 +12,6 @@ import { REQUEST_TOKEN } from './constants'
 
 interface CreateProgramParams {
   name: string
-  deliveryMethod: DeliveryMethod
   approversRole: { roleId: number }[][]
   viewersRole: { roleId: number }[]
   visibility: ProgramVisibility
@@ -32,7 +31,7 @@ export async function createProgram(params: CreateProgramParams) {
     }
   }
 
-  const { name, deliveryMethod, approversRole, visibility, viewersRole, paymentToken, requestType } = fields
+  const { name, approversRole, visibility, viewersRole, paymentToken, requestType } = fields
 
   const trimmedName = name.trim()
 
@@ -69,7 +68,6 @@ export async function createProgram(params: CreateProgramParams) {
   return await newPrismaTransaction(async fnPrisma => {
     const createdProgram = await fnPrisma.program.create({
       data: {
-        deliveryMethod,
         name: trimmedName,
         visibility,
         currencyId: paymentCurrency.currency.id,

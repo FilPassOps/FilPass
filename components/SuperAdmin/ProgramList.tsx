@@ -5,7 +5,7 @@ import { Button } from 'components/Shared/Button'
 import { Cell, Header, Table, TableBody, TableHead } from 'components/Shared/Table'
 import Timestamp from 'components/Shared/Timestamp'
 import { formatPaymentMethod } from 'components/SuperAdmin/Shared/utils'
-import { ACTIVE_STATUS, deliveryMethod } from 'domain/programs/constants'
+import { ACTIVE_STATUS } from 'domain/programs/constants'
 import { DateTime } from 'luxon'
 import dynamic from 'next/dynamic'
 import { Fragment, useState } from 'react'
@@ -19,7 +19,6 @@ interface ProgramListProps {
     program_name: string
     request_unit_name: string
     payment_unit_name: string
-    delivery_method: string
     isArchived: boolean
     approversRole: {
       id: number
@@ -94,7 +93,6 @@ export const ProgramList = ({
             <tr>
               <Header style={{ minWidth: 200 }}>Program Name</Header>
               <Header style={{ minWidth: 245 }}>Payment Method</Header>
-              <Header style={{ minWidth: 200 }}>Delivery Method</Header>
               <Header style={{ minWidth: 200 }}>Approver</Header>
               <Header style={{ minWidth: 200 }}>Viewer</Header>
               <Header style={{ minWidth: 200 }}>Create Date</Header>
@@ -107,7 +105,6 @@ export const ProgramList = ({
               <tr key={program.id}>
                 <Cell className="break-all">{program.program_name}</Cell>
                 <Cell className="break-all">{formatPaymentMethod(program.request_unit_name, program.payment_unit_name)}</Cell>
-                <Cell className="break-all">{deliveryMethod[program.delivery_method]}</Cell>
                 <Cell className="break-all">
                   {program.approversRole.length > 0 ? <GroupColumnValue groupList={program.approversRole} /> : '-'}
                 </Cell>

@@ -1,15 +1,14 @@
-import { DeliveryMethod, ProgramVisibility } from '@prisma/client'
+import { ProgramVisibility } from '@prisma/client'
 import yup from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
 import { MAX_INTEGER_VALUE } from '../constants'
-import { ONE_TIME, PROGRAM_TYPE_EXTERNAL, PROGRAM_TYPE_INTERNAL, REQUEST_TOKEN } from './constants'
+import { PROGRAM_TYPE_EXTERNAL, PROGRAM_TYPE_INTERNAL, REQUEST_TOKEN } from './constants'
 import { USD } from 'domain/currency/constants'
 
 export const createProgramValidator = yup
   .object({
     name: yup.string().required(),
-    deliveryMethod: yup.mixed<DeliveryMethod>().oneOf([ONE_TIME]).required(),
     approversRole: yup
       .array()
       .min(1, errorsMessages.required_field.message)
@@ -37,7 +36,6 @@ export const createProgramValidator = yup
 export const createProgramFormValidator = yup
   .object({
     name: yup.string().required(),
-    deliveryMethod: yup.mixed<DeliveryMethod>().oneOf([ONE_TIME]).required(),
     visibility: yup.string().oneOf([PROGRAM_TYPE_EXTERNAL, PROGRAM_TYPE_INTERNAL]).required(),
     approversRole: yup
       .array()
@@ -91,7 +89,6 @@ export const updateProgramValidator = yup
     viewersRole: yup.array().of(yup.object({ roleId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required() }).required()),
     id: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
     name: yup.string().required(),
-    deliveryMethod: yup.mixed<DeliveryMethod>().oneOf([ONE_TIME]).required(),
     visibility: yup.mixed<ProgramVisibility>().oneOf([PROGRAM_TYPE_EXTERNAL, PROGRAM_TYPE_INTERNAL]).required(),
     updateApprovers: yup.bool().optional().default(false),
     updateViewers: yup.bool().optional().default(false),

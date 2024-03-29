@@ -214,7 +214,7 @@ const FormComponent = ({
   remove,
   receiverShouldReview,
 }: FormComponentProps) => {
-  const { selectedProgram, paymentCurrency, requestCurrency } = useProgramCurrency({
+  const { paymentCurrency, requestCurrency } = useProgramCurrency({
     programs: approverPrograms,
     programId: requests?.[index].programId,
   })
@@ -317,7 +317,7 @@ const FormComponent = ({
           }}
         />
 
-        <ProgramInfo paymentCurrency={paymentCurrency} requestCurrency={requestCurrency} selectedProgram={selectedProgram} />
+        <ProgramInfo paymentCurrency={paymentCurrency} requestCurrency={requestCurrency} />
       </div>
     </div>
   )

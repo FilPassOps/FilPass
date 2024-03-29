@@ -70,7 +70,6 @@ export const getRejected = async (params: GetRejectedParams) => {
       program: {
         select: {
           name: true,
-          deliveryMethod: true,
           programCurrency: {
             select: {
               type: true,

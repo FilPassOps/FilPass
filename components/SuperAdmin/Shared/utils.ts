@@ -1,5 +1,4 @@
 import { AppConfig, TokenOptions, isERC20Token } from 'config'
-import { deliveryMethod as deliveryMethodConst, ONE_TIME } from 'domain/programs/constants'
 
 interface ApproverRole {
   roleId: number
@@ -19,13 +18,6 @@ interface Program {
   approversRole?: ApproverRole[][]
   userRoleProgramGroupIds?: number[]
 }
-
-export const deliveryMethodOptions = [
-  {
-    value: ONE_TIME,
-    label: deliveryMethodConst[ONE_TIME],
-  },
-]
 
 export const formatPaymentMethod = (request_unit_name?: string, payment_unit_name?: string) => {
   if (!request_unit_name && !payment_unit_name) {

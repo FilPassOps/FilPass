@@ -133,7 +133,6 @@ export const getApproved = async (params: GetApprovedParams): Promise<GetApprove
       program: {
         select: {
           name: true,
-          deliveryMethod: true,
           programCurrency: {
             select: {
               type: true,

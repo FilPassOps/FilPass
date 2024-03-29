@@ -30,10 +30,6 @@ enum TransferRequestReviewStatus {
   BLOCKED
 }
 
-enum DeliveryMethod {
-  ONE_TIME
-}
-
 enum TransferRequestStatus {
   SUBMITTED
   VOIDED
@@ -243,7 +239,6 @@ model WalletVerification {
 model Program {
   id                    Int                    @id @default(autoincrement())
   name                  String                 @unique
-  deliveryMethod        DeliveryMethod         @map("delivery_method")
   isActive              Boolean                @default(true) @map("is_active")
   isArchived            Boolean                @default(false) @map("is_archived")
   createdAt             DateTime               @default(now()) @map("created_at")

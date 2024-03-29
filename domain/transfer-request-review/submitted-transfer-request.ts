@@ -74,7 +74,6 @@ export async function submittedTransferRequest(params: SubmittedTransferRequestP
         program: {
           select: {
             id: true,
-            deliveryMethod: true,
           },
         },
       },

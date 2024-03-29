@@ -26,9 +26,6 @@ CREATE TYPE "TransferStatus" AS ENUM ('PENDING', 'SUCCESS', 'FAILED', 'REJECTED'
 CREATE TYPE "TransferRequestReviewStatus" AS ENUM ('APPROVED', 'REJECTED', 'REQUIRES_CHANGES', 'BLOCKED');
 
 -- CreateEnum
-CREATE TYPE "DeliveryMethod" AS ENUM ('ONE_TIME');
-
--- CreateEnum
 CREATE TYPE "TransferRequestStatus" AS ENUM ('SUBMITTED', 'VOIDED', 'APPROVED', 'PROCESSING', 'REJECTED_BY_APPROVER', 'REQUIRES_CHANGES', 'PAID', 'REJECTED_BY_CONTROLLER', 'SUBMITTED_BY_APPROVER', 'BLOCKED');
 
 -- CreateEnum
@@ -177,7 +174,6 @@ CREATE TABLE "wallet_verification" (
 CREATE TABLE "program" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "delivery_method" "DeliveryMethod" NOT NULL,
     "is_active" BOOLEAN NOT NULL DEFAULT true,
     "is_archived" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

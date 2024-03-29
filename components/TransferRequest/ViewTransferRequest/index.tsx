@@ -43,7 +43,6 @@ export interface ViewTransferRequestProps {
     wallet_name: string
     request_unit: string
     payment_unit: string
-    program_delivery_method: string
     expected_transfer_date: string
     amount: number
     created_at: string
@@ -172,7 +171,6 @@ export const ViewTransferRequest = ({ data, role }: ViewTransferRequestProps) =>
           <ProgramInfo
             paymentCurrency={{ name: data?.payment_unit }}
             requestCurrency={{ name: data?.request_unit }}
-            selectedProgram={{ deliveryMethod: data?.program_delivery_method }}
             expectedTransferDate={data?.expected_transfer_date || (DateTime.now().plus({ days: 30 }).toISO() as string)}
           />
           {isApprover && (
