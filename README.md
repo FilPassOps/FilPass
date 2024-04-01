@@ -5,7 +5,7 @@
     <img src="https://img.shields.io/badge/MADE%20BY%20Protocol%20Labs-000000?style=for-the-badge">
   </a>
   <a aria-label="License" href="#license">
-    <img alt="" src="https://img.shields.io/badge/MIT-%234F46E5?style=for-the-badge&label=LICENSE&labelColor=000000">
+    <img alt="" src="https://img.shields.io/badge/MIT--Apache_2.0-%234F46E5?style=for-the-badge&label=LICENSE&labelColor=000000">
   </a>
   <a aria-label="Join the community" href="https://filecoinproject.slack.com/">
     <img alt="" src="https://img.shields.io/badge/Join%20the%20community-emissary?style=for-the-badge&logo=slack&color=%234F46E5">
@@ -25,6 +25,7 @@
     - [Seeding the database with essential data](#seeding-the-database-with-essential-data)
   - [Application Start Up](#application-start-up)
   - [Running the application](#running-the-application)
+  - [Documentation](#documentation)
 - [Developer and System Administrator](#developer-and-system-administrator)
 - [License](#license)
 - [Security](#security)
@@ -94,16 +95,17 @@ npm run dev:server
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+### Documentation
+
+For more information about getting started and business rules, check the [documentation](./documentation/en/documentation.md) page.
 
 ## Developer and System Administrator
 
 If you are a developer or a system administrator and want some useful commands to contribute to Emissary or maybe add a new token, check the [Developer Helpers](developer-helpers.md) page for more information.
 
-<!-- temporary license -->
-
 ## License
 
-This project is open-source under the [MIT License](LICENSE).
+This project is open-source under the [MIT](LICENSE-MIT) and [Apache 2.0](APACHE-LICENSE) licenses.
 
 ## Security
 
