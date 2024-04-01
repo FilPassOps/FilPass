@@ -28,7 +28,6 @@ export const useEditableProgram = ({ program, isEditable, setValue }: UseEditabl
       setValue('name', program?.program_name)
       setValue('requestType', _requestType)
       setValue('paymentToken', _paymentToken)
-      setValue('deliveryMethod', program?.delivery_method)
       setValue('approversRole', _approversRole)
       setValue('viewersRole', _viewersRole)
       setValue('visibility', program?.visibility)

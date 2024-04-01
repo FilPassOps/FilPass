@@ -73,7 +73,6 @@ export const getPaid = async (params: GetPaidParams) => {
       program: {
         select: {
           name: true,
-          deliveryMethod: true,
           programCurrency: {
             select: {
               type: true,

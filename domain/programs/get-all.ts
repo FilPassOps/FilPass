@@ -134,7 +134,6 @@ export async function getAllProgramsComplete(params: any) {
     select: {
       id: true,
       name: true,
-      deliveryMethod: true,
       createdAt: true,
       visibility: true,
       isArchived: true,
@@ -241,7 +240,6 @@ export async function getAllProgramsComplete(params: any) {
       return {
         id: program.id,
         program_name: program.name,
-        delivery_method: program.deliveryMethod,
         created_at: program.createdAt,
         payment_unit_name: program.programCurrency.find(c => c.type === 'PAYMENT')?.currency.name,
         payment_blockchain: program.currency.blockchain?.name || undefined,

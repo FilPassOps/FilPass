@@ -1,19 +1,15 @@
 import Timestamp from 'components/Shared/Timestamp'
-import { deliveryMethod } from 'domain/programs/constants'
 import { DateTime } from 'luxon'
 
 interface ProgramInfoProps {
   paymentCurrency: {
     name: string
   }
-  selectedProgram: {
-    deliveryMethod: string
-  }
   expectedTransferDate?: string
   requestCurrency: any
 }
 
-export const ProgramInfo = ({ paymentCurrency, selectedProgram, expectedTransferDate, requestCurrency }: ProgramInfoProps) => {
+export const ProgramInfo = ({ paymentCurrency, expectedTransferDate, requestCurrency }: ProgramInfoProps) => {
   const _expectedTransferDate = expectedTransferDate || (DateTime.now().plus({ days: 30 }).toISO() as string)
   return (
     <div className="bg-light-gray w-full p-4 rounded-md mb-7">
@@ -22,9 +18,6 @@ export const ProgramInfo = ({ paymentCurrency, selectedProgram, expectedTransfer
         <strong className="text-black font-semibold">
           {requestCurrency?.name ? `Request in ${requestCurrency.name} and` : ''} Pay in {paymentCurrency?.name || ''}
         </strong>
-      </p>
-      <p className="text-sm text-gray-500 mb-4">
-        Delivery Method : <strong className="text-black font-semibold">{deliveryMethod[selectedProgram?.deliveryMethod]}</strong>
       </p>
       <p className="text-sm text-gray-500">
         Expected payment date:{' '}

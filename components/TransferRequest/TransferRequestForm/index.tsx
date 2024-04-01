@@ -171,7 +171,6 @@ export const TransferRequestForm = ({ isEditable = false, data = null, programs 
             <ProgramInfo
               paymentCurrency={paymentCurrency}
               requestCurrency={requestCurrency}
-              selectedProgram={selectedProgram}
               expectedTransferDate={expectedTransferDate}
             />
 

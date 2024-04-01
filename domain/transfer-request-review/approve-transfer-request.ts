@@ -62,7 +62,6 @@ export async function batchApproveTransferRequest(params: BatchApproveTransferRe
       expectedTransferDate: true,
       program: {
         select: {
-          deliveryMethod: true,
           visibility: true,
           userRoleProgramGroups: {
             select: {

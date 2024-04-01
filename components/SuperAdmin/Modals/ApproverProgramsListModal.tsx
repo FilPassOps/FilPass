@@ -8,7 +8,6 @@ interface ApproverProgramsListModalProps {
     name: string
     request_unit: string
     payment_unit: string
-    delivery_method: string
   }[]
   open: boolean
   onModalClosed: () => void
@@ -25,7 +24,6 @@ export const ApproverProgramsListModal = ({ data = [], open, onModalClosed }: Ap
             <tr>
               <Header className="w-10/12">Program Name</Header>
               <Header className="w-9/12">Payment Method</Header>
-              <Header className="w-10/12 ">Delivery Method</Header>
             </tr>
           </TableHead>
           <TableBody>
@@ -38,7 +36,6 @@ export const ApproverProgramsListModal = ({ data = [], open, onModalClosed }: Ap
                 <tr key={program.id}>
                   <Cell className="break-all">{program.name}</Cell>
                   <Cell className="break-all">{formatPaymentMethod(program.request_unit, program.payment_unit)}</Cell>
-                  <Cell className="break-all">{program.delivery_method}</Cell>
                 </tr>
               )
             })}

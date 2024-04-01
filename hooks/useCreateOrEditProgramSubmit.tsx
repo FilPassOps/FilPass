@@ -1,4 +1,4 @@
-import { DeliveryMethod, ProgramVisibility } from '@prisma/client'
+import { ProgramVisibility } from '@prisma/client'
 import { useAlertDispatcher } from 'components/Layout/Alerts'
 import { Button } from 'components/Shared/Button'
 import { api } from 'lib/api'
@@ -29,7 +29,6 @@ export interface ProgramValues {
   updateApprovers: boolean
   updateViewers: boolean
   isArchived?: boolean
-  deliveryMethod?: DeliveryMethod
 }
 
 export const useCreateOrEditProgramSubmit = ({

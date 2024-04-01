@@ -45,7 +45,6 @@ export async function getTransferRequestById(params: GetTransferRequestByIdParam
          wallet_verification.is_verified        wallet_is_verified,
          program.name                           program_name,
          program.id                             program_id,
-         program.delivery_method                program_delivery_method,
          program.visibility                     program_visibility,
          filter.receiver_email                  receiver,
          filter.receiver_id                     receiver_id,

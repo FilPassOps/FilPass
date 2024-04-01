@@ -9,14 +9,13 @@ import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-fo
 import { useAssociatedRequests } from '../../../hooks/useAssociatedRequests'
 import { useCreateOrEditProgramSubmit } from '../../../hooks/useCreateOrEditProgramSubmit'
 import { useEditableProgram } from '../../../hooks/useEditableProgram'
-import { deliveryMethodOptions, generateApproversRoleOptions, generateViewersRoleOptions } from '../Shared/utils'
+import { generateApproversRoleOptions, generateViewersRoleOptions } from '../Shared/utils'
 import { SelectTokenInput } from 'components/Shared/SelectTokenInput'
 import { USD } from 'domain/currency/constants'
 
 interface Program {
   id: number
   name: string
-  deliveryMethod: string
   approversRole: {
     roleId: number
     roleName: string
@@ -82,7 +81,6 @@ export const CreateOrEditProgramModal = ({
       name: '',
       requestType: undefined,
       paymentToken: undefined,
-      deliveryMethod: undefined,
       approversRole: [[]],
       viewersRole: [],
       visibility: undefined,
@@ -187,23 +185,6 @@ export const CreateOrEditProgramModal = ({
             disabled={program?.isArchived || hasAssociatedRequests}
             label="Payment Token"
             placeholder="Select the payment token"
-          />
-
-          <Controller
-            control={control}
-            name="deliveryMethod"
-            render={({ field }) => (
-              <SelectInput
-                {...field}
-                id="deliveryMethod"
-                name="deliveryMethod"
-                placeholder="Select the delivery method"
-                options={deliveryMethodOptions}
-                label="Delivery Method"
-                error={errors.deliveryMethod || submitErrors?.deliveryMethod}
-                disabled={program?.isArchived || hasAssociatedRequests}
-              />
-            )}
           />
 
           <fieldset>

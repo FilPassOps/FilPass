@@ -44,7 +44,6 @@ export async function getDraftTransferRequestById(params: GetDraftTransferReques
         select: {
           id: true,
           name: true,
-          deliveryMethod: true,
           programCurrency: {
             select: {
               type: true,
@@ -89,7 +88,6 @@ export async function getDraftTransferRequestById(params: GetDraftTransferReques
       created_at: transferRequestDraft.createdAt,
       program_id: transferRequestDraft.programId,
       program_name: transferRequestDraft.program.name,
-      program_delivery_method: transferRequestDraft.program.deliveryMethod,
       request_unit: transferRequestDraft.currency.name,
       payment_unit: transferRequestDraft.program.programCurrency.find(curr => curr.type === 'PAYMENT')?.currency.name,
       receiver: await decryptPII(transferRequestDraft.receiver.email),

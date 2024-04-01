@@ -390,7 +390,6 @@ async function createOneTimeProgramIds() {
 
       const program = await prisma.program.create({
         data: {
-          deliveryMethod: 'ONE_TIME',
           name: `ONE TIME PROGRAM - ${chain.networkName} - ${token.symbol}`,
           visibility: 'EXTERNAL',
           programCurrency: {
