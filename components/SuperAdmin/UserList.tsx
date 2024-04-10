@@ -100,7 +100,7 @@ export const UserList = ({ data = [] }: UserListProps) => {
                 {user.is_banned ? (
                   <button className="flex items-center justify-center gap-1" onClick={() => handleOnViewClick(user.ban_reason)}>
                     View
-                    <InformationCircleIcon width={16} height={16} className="text-indigo-800" />
+                    <InformationCircleIcon width={16} height={16} className="text-green-500" />
                   </button>
                 ) : (
                   '-'

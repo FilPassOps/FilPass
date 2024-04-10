@@ -196,7 +196,7 @@ const GroupColumnValue = ({ groupList, groupName = 'Multistage', membersName = '
       <Popover.Button className="relative after:absolute after:-inset-2" ref={refs.reference as any}>
         <p className={`flex items-center gap-1 ${columnValue.showIcon ? 'font-medium' : 'font-normal'}`}>
           {columnValue.approverColumnValue}
-          <InformationCircleIcon width={16} height={16} className="text-indigo-800" />
+          <InformationCircleIcon width={16} height={16} className="text-green-800" />
         </p>
       </Popover.Button>
 

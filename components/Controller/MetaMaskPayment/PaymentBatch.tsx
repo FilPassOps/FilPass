@@ -82,7 +82,7 @@ const PaymentBatch = ({ index, batchData, setIsBatchSent, setIsChunkHexMatch, se
     if (loadingAllowance) {
       dispatch({
         title: 'Please wait for the allowance to be confirmed',
-        icon: () => <LoadingIndicator className="text-indigo-500 h-12 w-12 mb-6" />,
+        icon: () => <LoadingIndicator className="text-green-500 h-12 w-12 mb-6" />,
         config: {
           closeable: false,
         },

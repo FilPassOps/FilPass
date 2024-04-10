@@ -21,7 +21,7 @@ export const ErrorAlert: React.FC<React.PropsWithChildren<ErrorAlertProps>> = ({
         <>
           <p className="text-sm text-gray-600 text-center first-letter:uppercase">{message}</p>
           {reason && (
-            <button className="text-sm text-indigo-600 font-medium" onClick={() => setToggleReason(!toggleReason)}>
+            <button className="text-sm text-green-700 font-medium" onClick={() => setToggleReason(!toggleReason)}>
               {toggleReason ? 'Hide Reason' : 'Show Reason'}
             </button>
           )}
@@ -49,7 +49,7 @@ export const SuccessAlert: React.FC<React.PropsWithChildren<{ hash: string; hand
         onClick={() => handleClose()}
         rel="noreferrer"
         target="_blank"
-        className="underline text-indigo-600"
+        className="underline text-green-700"
       >
         Check the message
       </a>

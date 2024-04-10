@@ -6,7 +6,7 @@ interface PaymentBatchStepProps {
 
 export const PaymentBatchStep = ({ index, status, handleOnClick }: PaymentBatchStepProps) => {
   const config = {
-    Reviewing: { backgroud: 'bg-indigo-600', text: 'text-indigo-600' },
+    Reviewing: { backgroud: 'bg-blue-600', text: 'text-blue-600' },
     Pending: { backgroud: 'bg-gray-300', text: 'text-gray-500' },
     Sent: { backgroud: 'bg-green-600', text: 'text-gray-500' },
   }

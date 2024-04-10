@@ -102,7 +102,7 @@ export const AttachmentInput = ({
         </UploadFileButton>
       )}
       {attachmentData && (
-        <div className="flex items-center gap-6 text-purple-500 text-sm font-bold">
+        <div className="flex items-center gap-6 text-green-500 text-sm font-bold">
           <div className="flex items-center gap-1">
             <div>
               <DocumentTextIcon className="w-6 h-6" />
@@ -112,7 +112,7 @@ export const AttachmentInput = ({
           <div className="flex items-center gap-1">
             <Button
               variant="primary-lighter"
-              buttonStyle="rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 py-1 px-1"
+              buttonStyle="rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 py-1 px-1"
               defaultStyle={false}
               onClick={handleDownloadFile}
               disabled={loadingFile}
@@ -121,7 +121,7 @@ export const AttachmentInput = ({
             </Button>
             <Button
               variant="opacity-red"
-              buttonStyle="rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 py-1 px-1"
+              buttonStyle="rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 py-1 px-1"
               defaultStyle={false}
               onClick={() => {
                 setOpenDeleteFormModal(true)

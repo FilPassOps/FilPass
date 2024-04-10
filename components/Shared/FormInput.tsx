@@ -140,7 +140,7 @@ export const SelectInput = forwardRef<HTMLButtonElement, SelectInputProps>(
                   <Listbox.Option
                     key={option.value}
                     className={({ active }) =>
-                      twMerge(active ? 'text-white bg-indigo-600' : 'text-gray-900', 'cursor-default select-none relative p-3')
+                      twMerge(active ? 'text-white bg-green-600' : 'text-gray-900', 'cursor-default select-none relative p-3')
                     }
                     value={option}
                   >
@@ -262,7 +262,7 @@ export const MultipleSelectInput = forwardRef(
                           <div
                             className={twMerge(
                               'cursor-default select-none relative p-3 text-gray-900 ',
-                              !disabled && 'hover:bg-indigo-600 hover:text-white',
+                              !disabled && 'hover:bg-green-600 hover:text-white',
                               (disabled || option.disabled) && 'opacity-50 hover:bg-white pointer-events-none',
                             )}
                           >
@@ -508,7 +508,7 @@ interface GetInputClassesParams {
 export const getInputClasses = ({ error, disabled }: GetInputClassesParams) =>
   twMerge(
     error && 'border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500 focus:ring-1',
-    !error && 'focus:ring-indigo-500 focus:border-indigo-500 border-gray-300',
+    !error && 'focus:ring-green-500 focus:border-green-500 border-gray-300',
     'border leading-5 shadow-sm block w-full rounded-md px-3 py-2 text-sm bg-white',
     disabled && 'cursor-default opacity-50 bg-gray-100',
   )
@@ -522,7 +522,7 @@ interface GetSelectClassesParams {
 const getSelectClasses = ({ error, disabled, variant }: GetSelectClassesParams) =>
   twMerge(
     error && 'border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500',
-    !error && 'focus:ring-indigo-500 focus:border-indigo-500 border-gray-300',
+    !error && 'focus:ring-green-500 focus:border-green-500 border-gray-300',
     'leading-5 block w-full',
     'bg-white relative w-full py-2 text-left cursor-default focus:outline-none text-sm',
     variant !== 'invisible' && 'pl-3 pr-10 border shadow-sm rounded-md focus:ring-1',
@@ -540,6 +540,6 @@ const getCheckboxClasses = ({ error, disabled }: GetCheckboxClassesParams) => {
     error && 'bg-red-100 border border-red-300',
     disabled && 'cursor-default opacity-50',
     !error && 'border border-gray-300',
-    'focus:ring-indigo-500 h-4 w-4 text-indigo-600 rounded mr-3',
+    'focus:ring-green-500 h-4 w-4 text-green-600 rounded mr-3',
   )
 }

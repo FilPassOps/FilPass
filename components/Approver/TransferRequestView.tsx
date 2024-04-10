@@ -62,7 +62,7 @@ export const TransferRequestView = ({ data }: TransferRequestViewProps) => {
         )}
 
         {(showApprovalOptions || showRequiresChangeActions) && (
-          <Button className="flex-1" variant="primary-lighter" onClick={() => setRejectModalOpen(true)}>
+          <Button className="flex-1" variant="red" onClick={() => setRejectModalOpen(true)}>
             Reject
           </Button>
         )}

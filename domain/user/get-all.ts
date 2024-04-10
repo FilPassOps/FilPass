@@ -55,7 +55,7 @@ export async function getAllUsers(params: FindAllUsersParams) {
             'id',              p.id,
             'name',            p.name,
             'request_unit',    request_unit."name",
-            'payment_unit',    payment_unit."name",
+            'payment_unit',    payment_unit."name"
            )
         )
       ) as approver_programs

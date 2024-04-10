@@ -278,7 +278,7 @@ const DownloadFile = ({ file }: OpenFileProps) => {
   return (
     <div className="flex items-center">
       <DocumentTextIcon className="w-6 h-6 mr-2" />
-      <button type="button" className="text-sm text-indigo-500 font-bold hover:underline cursor-pointer" onClick={handleDownloadFile}>
+      <button type="button" className="text-sm text-green-700 font-bold hover:underline cursor-pointer" onClick={handleDownloadFile}>
         {file?.originalname}
       </button>
     </div>

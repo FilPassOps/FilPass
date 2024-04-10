@@ -46,7 +46,7 @@ const getBody = ({ expectedTransferDate, transferRequestId }: GetBodyParams) => 
   return `
   <tr>
     <td style="padding-left:32px; padding-right: 32px;padding-top: 48px;">
-      <h1 style="margin-top:0;margin-bottom:35px;font-size:48px;line-height:48px;font-weight:800;letter-spacing:-0.02em; color:#4F46E5">
+      <h1 style="margin-top:0;margin-bottom:35px;font-size:48px;line-height:48px;font-weight:800;letter-spacing:-0.02em; color:#034130">
         Transfer request created
       </h1>
       <p style="margin:0; color: #6B7280;line-height: 24px;">
@@ -62,7 +62,7 @@ const getBody = ({ expectedTransferDate, transferRequestId }: GetBodyParams) => 
     <td align="center" style="padding: 48px 32px 0px 32px;">
       <div style="display:inline-block;width:100%;max-width:400px;vertical-align:top;font-family:Inter,sans-serif;font-size:16px;line-height:24px;font-weight: 500;">
         <a href="${process.env.NEXT_PUBLIC_APP_URL}/transfer-requests/${transferRequestId}"
-          style="background:#4F46E5;text-decoration: none; padding: 13px 33px; color: #ffffff; border-radius: 6px; display:inline-block;">
+          style="background:#034130;text-decoration: none; padding: 13px 33px; color: #ffffff; border-radius: 6px; display:inline-block;">
           View details
         </a>
       </div>

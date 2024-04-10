@@ -27,7 +27,7 @@ export default Currency
 
 export const CryptoAmount: React.FC<React.PropsWithChildren<unknown>> = ({ children }) => {
   return (
-    <div className="bg-indigo-100 rounded-md shadow-sm px-4 py-2 text-indigo-700 text-sm leading-5 font-medium text-center break-all whitespace-normal 2xl:truncate">
+    <div className="bg-blue-100 rounded-md shadow-sm px-4 py-2 text-blue-700 text-sm leading-5 font-medium text-center break-all whitespace-normal 2xl:truncate">
       {children}
     </div>
   )

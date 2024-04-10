@@ -24,12 +24,12 @@ export default function BannedUserPage() {
         <p className="text-base font-normal text-gray-500 mb-9 text-center">
           Your account is prohibited to use the {AppConfig.app.name} platform because of a violation of our terms and conditions. <br />
           If you believe this is a mistake contact{' '}
-          <a className="text-purple-500" href={`mailto:${AppConfig.app.emailConfig.supportAddress}`}>
+          <a className="text-green-700" href={`mailto:${AppConfig.app.emailConfig.supportAddress}`}>
             {AppConfig.app.emailConfig.supportAddress}
           </a>
         </p>
         <div className="w-44">
-          <Button variant="primary" onClick={handleGoBack}>
+          <Button variant="outline" onClick={handleGoBack}>
             Go Back
           </Button>
         </div>

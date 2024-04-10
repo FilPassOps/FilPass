@@ -27,7 +27,7 @@ export const TransferDetails = ({ data }: TransferRequestDetailsProps) => {
 
           {data?.isVoidable && data?.status !== SUBMITTED_BY_APPROVER_STATUS && (
             <div>
-              <Button variant="primary-lighter" onClick={() => setVoidModalOpen(true)}>
+              <Button variant="outline-red" onClick={() => setVoidModalOpen(true)}>
                 Void
               </Button>
             </div>

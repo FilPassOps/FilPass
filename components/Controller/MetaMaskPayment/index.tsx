@@ -92,7 +92,7 @@ const MetamaskPayment = ({ data = [] }: MetamaskPaymentModalProps) => {
   return (
     <>
       <Button
-        variant="primary-lighter"
+        variant="outline"
         onClick={() => {
           if (paymentBatchList.find(paymentBatch => paymentBatch.isPaymentSent)) {
             router.reload()
