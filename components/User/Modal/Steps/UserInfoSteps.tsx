@@ -87,7 +87,7 @@ export const UserInfoSteps = ({ toBeginning, toEnd, totalSteps }: UserInfoStepsP
       <StepWrapper active={activeStep === totalSteps}>
         <div className="flex flex-col justify-center items-center gap-6">
           <div className="flex flex-col gap-4 items-center py-28">
-            <LoadingIndicator className="text-indigo-600 h-8 w-8" />
+            <LoadingIndicator className="text-green-600 h-8 w-8" />
             <p className="text-gray-800 font-normal">Saving</p>
           </div>
         </div>
@@ -99,19 +99,19 @@ export const UserInfoSteps = ({ toBeginning, toEnd, totalSteps }: UserInfoStepsP
 const StepWrapper = ({ active, children }: { active: boolean; children: ReactNode }) => (
   <div className={active ? 'block' : 'hidden'}>{children}</div>
 )
-const Separator = ({ done }: { done: boolean }) => <div className={`${done ? 'bg-indigo-600' : 'bg-gray-200'} h-0.5  w-20`}></div>
+const Separator = ({ done }: { done: boolean }) => <div className={`${done ? 'bg-green-600' : 'bg-gray-200'} h-0.5  w-20`}></div>
 
 const Stepper = ({ done, active }: { done: boolean; active: boolean }) => {
   if (active) {
     return (
-      <div className="h-8 w-8 rounded-full border-2 border-indigo-600 flex items-center justify-center">
-        <div className="h-2.5 w-2.5 rounded-full border-2 border-indigo-600 bg-indigo-600"></div>
+      <div className="h-8 w-8 rounded-full border-2 border-green-600 flex items-center justify-center">
+        <div className="h-2.5 w-2.5 rounded-full border-2 border-green-600 bg-green-600"></div>
       </div>
     )
   }
   if (done) {
     return (
-      <div className="h-8 w-8 rounded-full bg-indigo-600 flex items-center justify-center text-white px-1">
+      <div className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center text-white px-1">
         <CheckIcon />
       </div>
     )

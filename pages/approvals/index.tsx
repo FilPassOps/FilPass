@@ -299,7 +299,7 @@ export const BatchActionsButton = () => {
       <div
         className={`${
           toggle ? 'absolute' : 'hidden'
-        } z-30 left-0 md:left-auto w-screen md:w-64 h-screen md:h-auto flex flex-col gap-2 mt-4 md:mt-2 py-4 bg-indigo-700 rounded-md md:shadow-lg`}
+        } z-30 left-0 md:left-auto w-screen md:w-64 h-screen md:h-auto flex flex-col gap-2 mt-4 md:mt-2 py-4 bg-green-700 rounded-md md:shadow-lg`}
       >
         <div className="absolute top-0 right-0">
           <Button variant="none" onClick={() => setToggle(false)}>

@@ -88,10 +88,10 @@ export const ViewTransferRequest = ({ data, role }: ViewTransferRequestProps) =>
                 <div
                   key={group.groupId}
                   className={`border-l-4 pl-2 sm:pl-0 sm:border-l-0 sm:border-t-4 w-60 first:mt-5 sm:first:mt-0 py-2 sm:py-0 ${
-                    group.approved ? 'border-indigo-600' : 'border-gray-200'
+                    group.approved ? 'border-green-700' : 'border-gray-200'
                   }`}
                 >
-                  <p className="text-indigo-600 sm:pt-4 ">{group.approved ? 'Approved by' : 'Waiting for approval'}</p>
+                  <p className="text-green-700 sm:pt-4 ">{group.approved ? 'Approved by' : 'Waiting for approval'}</p>
                   {group.members.map(member => (
                     <p className="break-all" key={member.email}>
                       {member.email}
@@ -195,7 +195,7 @@ const ShowAttachment = ({ data }: ShowAttachmentProps) => {
       <p className="text-sm mb-1">Attachment</p>
       <div className="flex items-center justify-between">
         <div className="w-max">
-          <div className="flex flex-row text-purple-500 text-sm font-bold hover:underline cursor-pointer" onClick={handleDownloadFile}>
+          <div className="flex flex-row text-green-500 text-sm font-bold hover:underline cursor-pointer" onClick={handleDownloadFile}>
             <PhotoIcon width={20} height={20} className="mr-2 text-gray-900" />
             {data?.attachment_filename}
           </div>

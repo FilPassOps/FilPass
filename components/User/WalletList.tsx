@@ -98,11 +98,11 @@ const ListItems = ({ items, isLoading, setLoading, refresh }: ListItemsProps) =>
                 />
               </>
               <div className="flex items-center">
-                <div>{isLoading && wallet.id === currentWallet?.id && <LoadingIndicator className="mr-3 text-indigo-600" />}</div>
+                <div>{isLoading && wallet.id === currentWallet?.id && <LoadingIndicator className="mr-3 text-green-600" />}</div>
                 <div className="text-sm pr-4 border-r border-gray-200">
                   <Tooltip content={hoverMessage}>
                     <button
-                      className={classNames(wallet.isDefault ? 'text-gray-400 pointer-events-auto' : 'text-indigo-600 hover:underline')}
+                      className={classNames(wallet.isDefault ? 'text-gray-400 pointer-events-auto' : 'text-green-700 hover:underline')}
                       onClick={() => handeSetDefault(wallet)}
                       disabled={wallet.isDefault || isLoading}
                     >

@@ -46,7 +46,7 @@ export const PreviewTable = ({ data, program }: PreviewTableProps) => {
             {data?.map((item, index) => {
               const shouldReceiverReviewStr = item?.['Should Receiver Review']
               return (
-                <tr key={String(index + 1).padStart(3, '0')} className="hover:bg-indigo-50">
+                <tr key={String(index + 1).padStart(3, '0')} className="hover:bg-green-50">
                   <Cell className="break-all xl:whitespace-nowrap">#{String(index + 1).padStart(3, '0')}</Cell>
                   <Cell>{item.Email}</Cell>
                   <Cell>{item?.Custodian ?? program?.name}</Cell>

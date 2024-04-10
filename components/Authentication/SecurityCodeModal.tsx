@@ -72,7 +72,7 @@ export const SecurityCodeModal = ({
     <Modal open={open} onModalClosed={handleClose}>
       <h2 className="text-lg font-medium text-gray-900 mb-6 text-center">Enter 4-digit security code</h2>
       <p className="mb-8 text-sm text-gray-500 text-center">
-        Please enter a 4-digit security code that was sent to you email address <span className="text-indigo-600">{email}.</span> The code
+        Please enter a 4-digit security code that was sent to you email address <span className="text-green-700">{email}.</span> The code
         is valid for 10 minutes
       </p>
       <OtpInput

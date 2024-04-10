@@ -43,7 +43,7 @@ export const ResendVerificationModal = ({
         <h1 className="my-2 font-medium text-lg leading-6 text-center">Please check your email</h1>
         <div className="text-sm leading-5 text-gray-500">
           <p className="text-gray-500 text-sm text-center mb-8">
-            We just sent an activation email to <span className="text-indigo-500 block">{email},</span>
+            We just sent an activation email to <span className="text-green-700 block">{email},</span>
             please check your inbox.
           </p>
           {errorMessage && <p className="text-red-600 text-center text-sm mt-4">{errorMessage}</p>}

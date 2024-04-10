@@ -106,7 +106,7 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
             return (
               <tr
                 key={request.id}
-                className="cursor-pointer hover:bg-indigo-50"
+                className="cursor-pointer hover:bg-green-50"
                 onClick={e => {
                   if ((e.target as HTMLTableCellElement).cellIndex > 0) {
                     !e.metaKey && push(href)

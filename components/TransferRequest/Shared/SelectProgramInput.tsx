@@ -61,7 +61,7 @@ export const SelectProgramInput = ({
           label={
             <>
               {label}
-              {required && <span className="text-indigo-500">*</span>}
+              {required && <span className="text-gray-500">*</span>}
             </>
           }
           error={errors?.[name] || submitErrors?.[name] || error}

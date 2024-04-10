@@ -77,7 +77,7 @@ const TransferList = ({ data = [] }: TransferListProps) => {
             return (
               <tr
                 key={request.id}
-                className="cursor-pointer hover:bg-indigo-50"
+                className="cursor-pointer hover:bg-green-50"
                 onClick={e => (!e.metaKey && router.push(href)) || (e.metaKey && window.open(href, '_blank'))}
               >
                 <LinkedCell href={href} className="break-all xl:whitespace-nowrap">

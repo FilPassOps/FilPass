@@ -139,7 +139,7 @@ export function Login({ redirectAfterLogin }: LoginProps) {
             <button
               type="button"
               onClick={() => setOpenForgotPassModal(true)}
-              className="absolute right-0 text-sm text-indigo-600 font-bold"
+              className="absolute right-0 text-sm text-green-700 font-bold"
             >
               Forgot password?
             </button>

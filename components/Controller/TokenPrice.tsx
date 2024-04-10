@@ -84,9 +84,9 @@ export const TokenPrice = () => {
 
   const rightIcon = AppConfig.app.enableCoinMarketApi ? (
     loadingRefresh ? (
-      <LoadingIndicator className="text-indigo-500" />
+      <LoadingIndicator className="text-green-500" />
     ) : (
-      <ArrowPathIcon className="h-5 w-5 text-indigo-500 cursor-pointer" onClick={handleRefreshClick} />
+      <ArrowPathIcon className="h-5 w-5 text-green-500 cursor-pointer" onClick={handleRefreshClick} />
     )
   ) : null
 

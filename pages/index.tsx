@@ -24,7 +24,7 @@ export default function Home({ data: { features, socialLinks } }: PageProps) {
     <>
       <Head>
         <title key="company">{AppConfig.app.companyName}</title>
-        <meta name="theme-color" content="#4F46E5" />
+        <meta name="theme-color" content="#034130" />
         <meta
           name="description"
           content={`${AppConfig.app.name} is a tool that streamlines your invoicing workflow, making cryptocurrency transfer management effortless.`}
@@ -39,14 +39,14 @@ export default function Home({ data: { features, socialLinks } }: PageProps) {
           <nav className="ml-auto">
             <ul className="flex gap-4">
               <li>
-                <Link href="/login" className="rounded-md text-gray-500 px-4 py-2 font-medium block hover:text-indigo-600 duration-200">
+                <Link href="/login" className="rounded-md text-gray-500 px-4 py-2 font-medium block hover:text-green-600 duration-200">
                   Log In
                 </Link>
               </li>
               <li>
                 <Link
                   href="/signup"
-                  className="rounded-md bg-indigo-600 hover:bg-indigo-500 duration-200 text-white px-4 py-2 font-medium block"
+                  className="rounded-md bg-green-700 hover:bg-green-500 duration-200 text-white px-4 py-2 font-medium block"
                 >
                   Sign Up
                 </Link>
@@ -60,7 +60,7 @@ export default function Home({ data: { features, socialLinks } }: PageProps) {
           <span className={twMerge('flex gap-2 justify-center px-4 pt-16 pb-20 lg:justify-between lg:py-48', container)}>
             <div className="max-w-xl text-center lg:text-left animate-fadeInUp motion-reduce:animate-none lg:pr-10">
               <h1 className="text-gray-900 text-3xl lg:text-5xl font-extrabold tracking-tight">
-                <strong className="text-indigo-600 font-extrabold">Introducing {AppConfig.app.name}</strong>:
+                <strong className="text-green-700 font-extrabold">Introducing {AppConfig.app.name}</strong>:
                 <br />
                 Streamline Your Cryptocurrency Transfer Requests
               </h1>
@@ -70,7 +70,7 @@ export default function Home({ data: { features, socialLinks } }: PageProps) {
               </p>
               <Link
                 href="/signup"
-                className="block rounded-md bg-indigo-600 hover:bg-indigo-500 duration-200 text-white py-3 px-10 font-medium w-full lg:w-fit lg:py-4 lg:text-lg"
+                className="block rounded-md bg-green-700 hover:bg-green-500 duration-200 text-white py-3 px-10 font-medium w-full lg:w-fit lg:py-4 lg:text-lg"
               >
                 Sign Up
               </Link>
@@ -88,7 +88,7 @@ export default function Home({ data: { features, socialLinks } }: PageProps) {
               const Icon = featureIcons[item.icon]
               return (
                 <div key={item.title} className="lg:max-w-sm">
-                  <div className="bg-indigo-500 rounded-md w-12 h-12 flex justify-center items-center">
+                  <div className="bg-green-500 rounded-md w-12 h-12 flex justify-center items-center">
                     <Icon width={24} color="white" />
                   </div>
                   <h2 className="text-lg font-medium leading-6 text-gray-900 mt-5 mb-2">{item.title}</h2>
@@ -110,7 +110,7 @@ export default function Home({ data: { features, socialLinks } }: PageProps) {
                   target="_blank"
                   rel="noreferrer"
                   title={item.label}
-                  className="p-1 block rounded text-gray-400 hover:text-indigo-600 duration-200"
+                  className="p-1 block rounded text-gray-400 hover:text-green-600 duration-200"
                 >
                   <Icon />
                   <span className="sr-only">{item.label}</span>

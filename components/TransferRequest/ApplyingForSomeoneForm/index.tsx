@@ -323,4 +323,4 @@ const FormComponent = ({
   )
 }
 
-const Asterisk = () => <span className="text-indigo-500">*</span>
+const Asterisk = () => <span className="text-gray-500">*</span>

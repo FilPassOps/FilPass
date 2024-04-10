@@ -29,7 +29,7 @@ export const Header = ({ title, setSidebarToggle }: HeaderProps) => {
     <div className="sticky top-0 z-40 shrink-0 flex h-16 bg-white shadow">
       <button
         type="button"
-        className="px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+        className="px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500"
         onClick={() => setSidebarToggle(toggle => !toggle)}
       >
         <span className="sr-only">Open sidebar</span>
@@ -40,9 +40,9 @@ export const Header = ({ title, setSidebarToggle }: HeaderProps) => {
         <div className="ml-4 flex justify-end items-center">
           <Menu as="div" className="relative">
             <div>
-              <Menu.Button className="max-w-xs bg-white flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              <Menu.Button className="max-w-xs bg-white flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
                 <span className="sr-only">Open user menu</span>
-                <div className="h-8 w-8 rounded-full bg-indigo-700 flex items-center justify-center">
+                <div className="h-8 w-8 rounded-full bg-green-800 flex items-center justify-center">
                   <UserIcon className="w-5 h-5" />
                 </div>
                 <span className="hidden md:block ml-2 text-sm text-deep-koamaru">{user?.email}</span>

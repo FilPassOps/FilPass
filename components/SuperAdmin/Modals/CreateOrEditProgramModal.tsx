@@ -192,7 +192,7 @@ export const CreateOrEditProgramModal = ({
               <legend className="text-gray-700">Approver(s)</legend>
               <div className="max-w-xs">
                 <Button
-                  className="text-indigo-700"
+                  className="text-green-800"
                   type="button"
                   variant="none"
                   toolTipText={program?.isArchived ? '' : 'Add up to three groups'}

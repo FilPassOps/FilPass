@@ -92,7 +92,7 @@ export const PaginationWrapper = ({
           </div>
           <p> Total {totalItems} Items</p>
         </div>
-        <div className="flex justify-center mt-4">{isLoading && <LoadingIndicator className="text-indigo-500" />}</div>
+        <div className="flex justify-center mt-4">{isLoading && <LoadingIndicator className="text-green-500" />}</div>
         <div className="flex flex-row items-center">
           <div className="flex flex-row items-center mr-2">
             <p>Page </p>
@@ -107,7 +107,7 @@ export const PaginationWrapper = ({
               defaultStyle={false}
               className="mr-1"
               disabled={currentPage === 1}
-              buttonStyle="p-1 rounded-md shadow-sm border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              buttonStyle="p-1 rounded-md shadow-sm border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
               onClick={() => changePage({ page: 1 })}
             >
               <ChevronDoubleLeftIcon width={12} />
@@ -117,7 +117,7 @@ export const PaginationWrapper = ({
               className="mr-1"
               disabled={currentPage === 1}
               onClick={() => changePage({ page: currentPage - 1 })}
-              buttonStyle="p-1 rounded-md shadow-sm border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              buttonStyle="p-1 rounded-md shadow-sm border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
             >
               <ChevronLeftIcon width={12} />
             </Button>
@@ -126,7 +126,7 @@ export const PaginationWrapper = ({
               className="mr-1"
               disabled={currentPage >= totalPages}
               onClick={() => changePage({ page: currentPage + 1 })}
-              buttonStyle="p-1 rounded-md shadow-sm border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              buttonStyle="p-1 rounded-md shadow-sm border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
             >
               <ChevronRightIcon width={12} />
             </Button>
@@ -134,7 +134,7 @@ export const PaginationWrapper = ({
               defaultStyle={false}
               disabled={currentPage >= totalPages}
               onClick={() => changePage({ page: totalPages })}
-              buttonStyle="p-1 rounded-md shadow-sm border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              buttonStyle="p-1 rounded-md shadow-sm border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
             >
               <ChevronDoubleRightIcon width={12} />
             </Button>

@@ -5,10 +5,10 @@
     <img src="https://img.shields.io/badge/MADE%20BY%20Protocol%20Labs-000000?style=for-the-badge">
   </a>
   <a aria-label="License" href="#license">
-    <img alt="" src="https://img.shields.io/badge/MIT--Apache_2.0-%234F46E5?style=for-the-badge&label=LICENSE&labelColor=000000">
+    <img alt="" src="https://img.shields.io/badge/MIT--Apache_2.0-%23034130?style=for-the-badge&label=LICENSE&labelColor=000000">034130
   </a>
   <a aria-label="Join the community" href="https://filecoinproject.slack.com/">
-    <img alt="" src="https://img.shields.io/badge/Join%20the%20community-emissary?style=for-the-badge&logo=slack&color=%234F46E5">
+    <img alt="" src="https://img.shields.io/badge/Join%20the%20community-emissary?style=for-the-badge&logo=slack&color=%23034130">
   </a>
 </p>
 

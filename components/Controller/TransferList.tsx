@@ -195,7 +195,7 @@ const TransferList = ({
               const paidTransfer = request?.transfers?.find(({ status }) => status === SUCCESS_STATUS)
               return (
                 <tr
-                  className={classNames(request.selected && 'bg-indigo-50', 'cursor-pointer hover:bg-indigo-50')}
+                  className={classNames(request.selected && 'bg-green-50', 'cursor-pointer hover:bg-green-50')}
                   key={request.id}
                   onClick={e => {
                     if ((e.target as HTMLTableCellElement).cellIndex > 0) {
