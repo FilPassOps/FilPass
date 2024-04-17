@@ -24,7 +24,7 @@ async function getAccessTokenFromCode({ code }: GetAccessTokenFromCodeParams) {
       data: {
         client_id: NEXT_PUBLIC_GOOGLE_CLIENT_ID,
         client_secret: GOOGLE_CLIENT_SECRET,
-        redirect_uri: `${APP_URL}/login`,
+        redirect_uri: `${APP_URL}/`,
         grant_type: 'authorization_code',
         code,
       },

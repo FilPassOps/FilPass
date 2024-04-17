@@ -27,7 +27,7 @@ export default function Activate({ error }: { error: any }) {
           <CheckCircleIcon className="text-green-500 w-20 h-20 mb-6" />
           <h1 className="text-2xl font-bold mb-8">Account activated!</h1>
           <div>
-            <NextLink href="/login" legacyBehavior>
+            <NextLink href="/" legacyBehavior>
               <Button>Go to Login</Button>
             </NextLink>
           </div>
