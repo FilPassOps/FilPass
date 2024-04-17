@@ -14,7 +14,6 @@ interface GetUserByIdAndEmailParams {
 const select = {
   id: true,
   email: true,
-  isOnboarded: true,
   terms: true,
   isBanned: true,
   roles: {

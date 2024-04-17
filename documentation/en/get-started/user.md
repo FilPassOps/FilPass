@@ -54,14 +54,8 @@ When creating a request for yourself, you’ll be required to complete the follo
 
            TODO: AFTER DELIVERY METHOD REMOVAL ADD A SCREENSHOT
 
-
-8. Hit the “Submit” button;
-9. If it's your first time submitting a transfer request, a popup will be shown asking you to accept the Terms and Conditions:
-
-TODO: AFTER LEGAL REVIEW, UPDATE THE TERMS AND CONDITIONS SCREENSHOT
-
-10.  Read and check all the terms and conditions so you can go to the next step;
-11.  A confirmation must be shown saying that it is all set;
+8.   Read and check all the terms and conditions so you can go to the next step;
+9.   A confirmation must be shown saying that it is all set;
 
 
 <img src="../../images/acknowledgments-submitted-modal.png" alt="Acknowledgments submitted modal" style="height: 310px; width:649px;"/>

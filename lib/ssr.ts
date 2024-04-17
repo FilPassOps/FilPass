@@ -13,7 +13,6 @@ import { SessionUser } from './middleware'
 interface User {
   id: number
   email: string
-  isOnboarded: boolean
   roles: { id: number; role: Role }[]
 }
 
@@ -60,7 +59,6 @@ export function withUserSSR(
     const freshUser = {
       id: data?.id,
       email: data?.email,
-      isOnboarded: data?.isOnboarded,
       roles: data?.roles?.map(role => ({ id: role.id, role: role.role })),
     }
 

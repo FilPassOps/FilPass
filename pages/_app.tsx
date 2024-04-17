@@ -1,6 +1,5 @@
 import { AuthProvider } from 'components/Authentication/Provider'
 import { AlertContainer, AlertDispatcherProvider } from 'components/Layout/Alerts'
-import { OnboardContextProvider, OnboardWrapper } from 'components/OnboardingWrapper'
 import { MetaMaskProvider } from 'components/Web3/MetaMaskProvider'
 import { NextPage } from 'next'
 import type { AppProps } from 'next/app'
@@ -35,15 +34,12 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <AuthProvider>
       <SWRConfig value={{ provider: () => new Map() }}>
-        <OnboardContextProvider>
-          <MetaMaskProvider>
-            <AlertDispatcherProvider>
-              <AlertContainer />
-              {getLayout(<Component {...pageProps} />)}
-            </AlertDispatcherProvider>
-          </MetaMaskProvider>
-          <OnboardWrapper />
-        </OnboardContextProvider>
+        <MetaMaskProvider>
+          <AlertDispatcherProvider>
+            <AlertContainer />
+            {getLayout(<Component {...pageProps} />)}
+          </AlertDispatcherProvider>
+        </MetaMaskProvider>
       </SWRConfig>
     </AuthProvider>
   )

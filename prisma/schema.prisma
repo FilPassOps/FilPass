@@ -79,8 +79,7 @@ model User {
   isDraft                       Boolean                @default(false) @map("is_draft")
   createdAt                     DateTime               @default(now()) @map("created_at")
   updatedAt                     DateTime               @updatedAt @map("updated_at")
-  // Set this column value to NULL to prompt the user to accept new Terms and Conditions
-  terms                         Json?
+  terms                         Boolean?
   ownedTransferRequests         TransferRequest[]      @relation("requester")
   receivedTransferRequests      TransferRequest[]      @relation("receiver")
   files                         UserFile[]             @relation("file_owner")
@@ -93,7 +92,6 @@ model User {
   authVerifications             AuthVerification[]
   temporaryFiles                TemporaryFile[]
   sessions                      Session[]
-  isOnboarded                   Boolean                @default(false) @map("is_onboarded")
   isBanned                      Boolean                @default(false) @map("is_banned")
   banReason                     String?                @map("ban_reason")
   banActionedBy                 UserRole?              @relation("BannedUsers", fields: [banActionedById], references: [id])
@@ -273,7 +271,7 @@ model TransferRequest {
   amount               String
   currency             CurrencyUnit               @relation(fields: [currencyUnitId], references: [id])
   currencyUnitId       Int                        @map("currency_unit_id")
-  terms                Json?
+  terms                Boolean?
   userFileId           Int?                       @map("user_file_id")
   isActive             Boolean                    @default(true) @map("is_active")
   createdAt            DateTime                   @default(now()) @map("created_at")

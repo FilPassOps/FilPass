@@ -1,5 +1,3 @@
-import { useAuth } from 'components/Authentication/Provider'
-import { useOnboard } from 'components/OnboardingWrapper'
 import { api } from 'lib/api'
 import { DateTime } from 'luxon'
 import { useState } from 'react'
@@ -37,17 +35,10 @@ interface SubmitDraftTransferRequestProps {
 export const useFormSubmit = ({ errors, data, isEditable = false }: UseFormSubmitProps) => {
   const [submitErrors, setSubmitErrors] = useState<any>()
   const [openSubmittedModal, setOpenSubmittedModal] = useState(false)
-  const { user } = useAuth()
-  const { setOpenOnboardingModal } = useOnboard()
 
   const handleFormSubmit = async (values: any) => {
     if (Object.keys(errors).length > 0) {
       console.error('errors', errors)
-      return
-    }
-
-    if (!user?.terms) {
-      setOpenOnboardingModal(true)
       return
     }
 

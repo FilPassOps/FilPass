@@ -1,11 +1,10 @@
 import { TransferRequestStatus } from '@prisma/client'
 import { sendCreatedNotification } from 'domain/notifications/send-created-notification'
 import { getAllExternalPrograms } from 'domain/programs/get-all'
-import { termsValidator } from 'domain/user/validation'
 import { encrypt, encryptPII } from 'lib/emissary-crypto'
 import { generateTeamHash } from 'lib/password'
 import prisma from 'lib/prisma'
-import yup, { validate } from 'lib/yup'
+import { validate } from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { sendSubmittedNotification } from '../notifications/send-submitted-notification'
 import { SUBMITTED_STATUS } from './constants'
@@ -21,7 +20,7 @@ interface CreateTransferRequestParams {
   userAttachmentId?: string
   user: {
     id: number
-    terms: yup.Asserts<typeof termsValidator>
+    terms: boolean
     email: string
   }
 }

@@ -2,11 +2,10 @@ import { TransferRequest } from '@prisma/client'
 import { APPROVER_ROLE, USER_ROLE } from 'domain/auth/constants'
 import { getAllExternalPrograms } from 'domain/programs/get-all'
 import { createRequestChangeHistory } from 'domain/transfer-request-history/create-request-change-history'
-import { termsValidator } from 'domain/user/validation'
 import { encrypt, encryptPII } from 'lib/emissary-crypto'
 import { TransactionError } from 'lib/errors'
 import prisma, { newPrismaTransaction } from 'lib/prisma'
-import yup, { validate } from 'lib/yup'
+import { validate } from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import { sendSubmittedNotification } from '../notifications/send-submitted-notification'
 import { REQUIRES_CHANGES_STATUS, SUBMITTED_STATUS } from './constants'
@@ -26,7 +25,7 @@ interface UpdateTransferRequestParams {
   user: {
     id: number
     email: string
-    terms: yup.Asserts<typeof termsValidator>
+    terms: boolean
   }
 }
 
