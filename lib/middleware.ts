@@ -143,7 +143,6 @@ export function withUser<T>(handler: NextApiHandlerWithUser<T>): NextApiHandlerW
     const freshUser = {
       id: data.id,
       email: data.email,
-      isOnboarded: data.isOnboarded,
       roles: data.roles?.map(role => ({ id: role.id, role: role.role })),
       terms: data.terms,
     }

@@ -86,7 +86,6 @@ export async function submitDraftTransferRequestById(params: SubmitDraftTransfer
         userWalletId,
         team: await encryptPII(team),
         teamHash: await generateTeamHash(team),
-
         terms: terms ? terms : undefined,
         expectedTransferDate,
         receiverId: userId,

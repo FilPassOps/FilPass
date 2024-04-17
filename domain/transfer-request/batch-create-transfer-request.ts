@@ -39,7 +39,7 @@ interface CompletedRequest extends BatchCreateTransferRequestParams {
   skipWalletCreation?: boolean
   receiver: {
     id: string
-    terms: string
+    terms: boolean
   }
   wallet: {
     id: number

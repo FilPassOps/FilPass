@@ -31,8 +31,6 @@ const handleGetRequest = async (req: NextApiRequestWithSession, res: NextApiResp
 }
 
 const handlePostRequest = async (req: NextApiRequestWithSession, res: NextApiResponse) => {
-  if (!req.user?.isOnboarded) return res.status(403).send({ message: 'Forbidden' })
-
   const { data, error } = await createTransferRequest({ ...req.body, user: req.user })
   if (error) {
     return res.status(error.status).json(error)

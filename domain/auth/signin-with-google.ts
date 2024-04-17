@@ -17,6 +17,7 @@ export async function signinWithGoogle({ email }: SigninWithGoogleParams) {
       data: {
         email: (await encryptPII(email)) || undefined,
         emailHash: await generateEmailHash(email),
+        terms: true,
       },
       include: {
         roles: {
@@ -33,6 +34,7 @@ export async function signinWithGoogle({ email }: SigninWithGoogleParams) {
         email: await encryptPII(email),
         emailHash: await generateEmailHash(email),
         isVerified: true,
+        terms: true,
         roles: {
           createMany: {
             data: [{ role: Role.USER }],

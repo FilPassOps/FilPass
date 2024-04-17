@@ -68,6 +68,7 @@ export async function signup(params: SignupParams) {
         email: await encryptPII(email),
         emailHash: await generateEmailHash(email),
         password: pwdHash,
+        terms: true,
         roles: {
           createMany: {
             data: [

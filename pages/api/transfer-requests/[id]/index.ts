@@ -9,8 +9,6 @@ async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
 }
 
 const handlePatchRequest = async (req: NextApiRequestWithSession, res: NextApiResponse) => {
-  if (!req.user?.isOnboarded) return res.status(403).send({ message: 'Forbidden' })
-
   const transferRequestId = req.query.id
 
   const { data, error } = await updateTransferRequestById({

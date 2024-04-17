@@ -7,7 +7,6 @@ declare module 'iron-session' {
     user?: {
       id: number
       email: string
-      isOnboarded: boolean
       roles: {
         id: number
         role: Role

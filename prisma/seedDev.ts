@@ -34,16 +34,6 @@ interface Teams {
 
 const teams: Teams = {}
 
-const defaultTerms = {
-  tax: true,
-  release: true,
-  soleControl: true,
-  walletAddress: true,
-  informedDecision: true,
-  transferAuthorization: true,
-  satisfactionOfObligations: true,
-}
-
 let blockchainList: Blockchain[] = []
 
 async function main() {
@@ -297,7 +287,7 @@ async function createTransferRequest({
       teamHash: teams[team].hash,
       amount: await encrypt(amount.toString()),
       expectedTransferDate: new Date(),
-      terms: defaultTerms,
+      terms: true,
       currency: {
         connect: {
           id: program.programCurrency.find(curr => curr.type === 'REQUEST')?.currencyUnitId,

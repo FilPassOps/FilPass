@@ -1,6 +1,5 @@
 import { TransferRequestStatus } from '@prisma/client'
 import { statusFilterOptions } from 'components/Filters/constants'
-import { termsValidator } from 'domain/user/validation'
 import yup from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
@@ -37,7 +36,7 @@ export const createTransferRequestValidatorBackend = yup.object({
   user: yup.object({
     id: yup.number().integer().positive().max(MAX_INTEGER_VALUE).required(),
     email: yup.string().required(),
-    terms: termsValidator,
+    terms: yup.boolean().optional(),
   }),
 })
 
