@@ -1,8 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
-import { PageAlert } from 'components/Layout/Alerts'
 import { Button, LinkButton } from 'components/Shared/Button'
 import { PasswordInput, TextInput } from 'components/Shared/FormInput'
-import { AppConfig } from 'config'
 import { signupValidator } from 'domain/auth/validation'
 import { api } from 'lib/api'
 import { useState } from 'react'
@@ -53,10 +51,6 @@ export function SignUp() {
   return (
     <Layout>
       <div className="h-full w-full flex flex-col justify-center space-y-6 px-8 md:px-0">
-        <PageAlert type="info">
-          <p>If you have participated in a {AppConfig.app.name} event, make sure to use the same registered email address</p>
-        </PageAlert>
-
         {NEXT_PUBLIC_GOOGLE_CLIENT_ID && (
           <>
             <GoogleLogin buttonText="Sign up with Google" />
@@ -80,13 +74,41 @@ export function SignUp() {
             error={errors.confirmPassword || submitErrors?.confirmPassword}
             {...register('confirmPassword')}
           />
+          <p className="text-sm">
+            By pressing <strong>Sign Up</strong>
+            {NEXT_PUBLIC_GOOGLE_CLIENT_ID && (
+              <>
+                {' '}
+                or <strong>Sign up with Google </strong>
+              </>
+            )}{' '}
+            you agree to our{' '}
+            <a
+              href="https://github.com/protocol/coinemissary/blob/main/docs/terms-and-conditions.md"
+              className="text-blue-600 hover:text-blue-800"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              terms and conditions
+            </a>{' '}
+            and acknowledge you have read our{' '}
+            <a
+              href="https://github.com/protocol/coinemissary/blob/main/docs/private-policy.md"
+              className="text-blue-600 hover:text-blue-800"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              privacy policy
+            </a>
+            .
+          </p>
           <div>
             <div className="h-full w-full flex flex-col justify-center space-y-6 mt-6">
               <Button type="submit" loading={isSubmitting} disabled={isSubmitting}>
                 Sign up
               </Button>
               <p className="text-center">or</p>
-              <LinkButton variant="outline" href="/login">
+              <LinkButton variant="outline" href="/">
                 Login
               </LinkButton>
             </div>

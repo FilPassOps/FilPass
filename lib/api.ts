@@ -45,7 +45,7 @@ api.interceptors.response.use(
         status: error.response.status,
       }
       if (error.response.status === 401 && error.response.config.url !== '/auth/me') {
-        nextRouter.push('/login')
+        nextRouter.push('/')
       }
     } else if (error.request) {
       err = {

@@ -156,7 +156,7 @@ async function destroySession(
 
   return {
     redirect: {
-      destination: '/login',
+      destination: '/',
       permanent: false,
     },
   } as GetServerSidePropsResult<{ [key: string]: unknown }>

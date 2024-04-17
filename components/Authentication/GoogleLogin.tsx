@@ -28,7 +28,7 @@ export const GoogleLogin = ({ buttonText }: GoogleLoginProps) => {
       code: router.query.code,
     })
     if (error) {
-      router.push('/login')
+      router.push('/')
       NProgress.done()
     } else {
       await refresh()
