@@ -1,17 +1,17 @@
 /* eslint-disable @next/next/no-img-element */
 
+import Image from 'next/image'
+
 interface LayoutProps {
   children: React.ReactNode
 }
 
 export function Layout({ children }: LayoutProps) {
   return (
-    <div className="m-auto min-h-screen flex flex-col justify-center py-12 max-w-md items-center space-y-12">
-      <div className="flex gap-4 justify-center items-center">
-        <img src="/logo-small.svg" alt="Logo" className="block sm:hidden" />
-        <img src="/written-logo.svg" alt="Logo" className="block sm:hidden" />
+    <div className="flex min-h-screen flex-col items-center justify-center py-12 space-y-12 mx-auto max-w-md">
+      <div className="relative w-full flex-1 max-h-[20rem] min-h-[5rem] flex justify-center items-center">
+        <Image src="/logo-written-dark.svg" alt="Logo" fill className="object-contain" priority />
       </div>
-      <img src="/logo.svg" alt="Logo" width="80%" className="hidden sm:block" />
       {children}
     </div>
   )

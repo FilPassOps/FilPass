@@ -80,7 +80,7 @@ export const BanUserModal = ({ open, user, onModalClosed }: BanUserModalProps) =
               Cancel
             </Button>
             {/* @ts-ignore */}
-            <Button type="submit" disabled={isSubmitting} loading={isSubmitting}>
+            <Button variant='dark-red' type="submit" disabled={isSubmitting} loading={isSubmitting}>
               Submit
             </Button>
           </div>

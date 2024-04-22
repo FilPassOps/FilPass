@@ -107,7 +107,7 @@ export const PaginationWrapper = ({
               defaultStyle={false}
               className="mr-1"
               disabled={currentPage === 1}
-              buttonStyle="p-1 rounded-md shadow-sm border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              buttonStyle="p-1 rounded-md shadow-sm border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-700"
               onClick={() => changePage({ page: 1 })}
             >
               <ChevronDoubleLeftIcon width={12} />
@@ -117,7 +117,7 @@ export const PaginationWrapper = ({
               className="mr-1"
               disabled={currentPage === 1}
               onClick={() => changePage({ page: currentPage - 1 })}
-              buttonStyle="p-1 rounded-md shadow-sm border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              buttonStyle="p-1 rounded-md shadow-sm border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-700"
             >
               <ChevronLeftIcon width={12} />
             </Button>
@@ -126,7 +126,7 @@ export const PaginationWrapper = ({
               className="mr-1"
               disabled={currentPage >= totalPages}
               onClick={() => changePage({ page: currentPage + 1 })}
-              buttonStyle="p-1 rounded-md shadow-sm border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              buttonStyle="p-1 rounded-md shadow-sm border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-700"
             >
               <ChevronRightIcon width={12} />
             </Button>
@@ -134,7 +134,7 @@ export const PaginationWrapper = ({
               defaultStyle={false}
               disabled={currentPage >= totalPages}
               onClick={() => changePage({ page: totalPages })}
-              buttonStyle="p-1 rounded-md shadow-sm border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              buttonStyle="p-1 rounded-md shadow-sm border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-700"
             >
               <ChevronDoubleRightIcon width={12} />
             </Button>

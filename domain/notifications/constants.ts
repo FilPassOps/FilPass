@@ -80,21 +80,21 @@ export const baseEmail = (content: string) => {
               ">
                         <tr>
                             <td
-                                style="padding: 20px 32px 20px 32px; text-align: left; font-size: 24px; font-weight: bold; background-color: #034130">
-                                <a href="https://pl.coinemissary.com/" style="text-decoration: none">
-                                    <img src="https://s3.us-east-2.amazonaws.com/coinemissary.com/logo.png" width="223"
+                                style="padding: 20px 32px 20px 32px; text-align: left; font-size: 24px; font-weight: bold; background-color: #065F59">
+                                    <img src=${AppConfig.app.emailConfig.logoUrl} width="223"
                                         alt="Logo"
-                                        style="width:223px;max-width:80%;height:auto;border:none;text-decoration:none;">
-                                </a>
+                                        style="width:223px;max-width:60%;height:auto;border:none;text-decoration:none;">
                             </td>
                         </tr>
-
                             ${content}
-
                         <tr>
-                            <td style="padding-left: 32px; padding-right: 32px; padding-top:48px; color: #6b7280; line-height: 24px">
-                              <p style="margin: 0">${AppConfig.app.name} is a system ${AppConfig.app.companyName} uses for disbursements.</p>
-                              <p style="margin: 0; padding-top: 20px">Please reach out to <a style="color: #6b7280;" href="mailto:${AppConfig.app.emailConfig.supportAddress}">${AppConfig.app.emailConfig.supportAddress}</a> with any questions.</p>
+                            <td style="padding-left: 32px; padding-right: 32px; padding-top:48px; color: #6B7280; line-height: 24px">
+                              <p style="margin: 0">${AppConfig.app.name} is a system ${
+                                AppConfig.app.companyName
+                              } uses for disbursements.</p>
+                              <p style="margin: 0; padding-top: 20px">Please reach out to <a style="color: #6B7280;" href="mailto:${
+                                AppConfig.app.emailConfig.supportAddress
+                              }">${AppConfig.app.emailConfig.supportAddress}</a> with any questions.</p>
                             </td>
                         </tr>
 
@@ -111,25 +111,25 @@ export const baseEmail = (content: string) => {
                                 <table>
                                     <tr style="margin:0;padding:0;">
                                         <td align="center" style="width: 40px;">
-                                            <a href="https://twitter.com/protocollabs/" style="text-decoration:none;">
-                                                <img src="https://s3.us-east-2.amazonaws.com/coinemissary.com/twitter-icon.png"
+                                            <a href=${AppConfig.app.twitterUrl} style="text-decoration:none;">
+                                                <img src=${AppConfig.app.emailConfig.twitterIconUrl}
                                                     width="20" height="20" alt="Twitter"
                                                     style="display:inline-block;color:#cccccc;">
                                             </a>
                                         </td>
                                         <td align="center" style="width: 40px;">
-                                            <a href="https://www.linkedin.com/company/protocollabs/"
+                                            <a href=${AppConfig.app.linkedinUrl}
                                                 style="text-decoration:none;">
-                                                <img src="https://s3.us-east-2.amazonaws.com/coinemissary.com/linkedin-icon.png"
-                                                    width="20" height="20" alt="Twitter"
+                                                <img src=${AppConfig.app.emailConfig.linkedinIconUrl}
+                                                    width="20" height="20" alt="Linkedin"
                                                     style="display:inline-block;color:#cccccc;">
                                             </a>
                                         </td>
                                         <td align="center" style="width: 40px;">
-                                            <a href="https://www.youtube.com/ProtocolLabs"
+                                            <a href=${AppConfig.app.youtubeChannelUrl}
                                                 style="text-decoration:none;">
-                                                <img src="https://s3.us-east-2.amazonaws.com/coinemissary.com/youtube-icon.png"
-                                                    width="20" height="20" alt="Github"
+                                                <img src=${AppConfig.app.emailConfig.youtubeIconUrl}
+                                                    width="20" height="20" alt="Youtube"
                                                     style="display:inline-block;color:#cccccc;">
                                             </a>
                                         </td>
@@ -139,7 +139,7 @@ export const baseEmail = (content: string) => {
                         </tr>
                         <tr>
                             <td style="text-align:center;font-size:16px;color:#9CA3AF;padding-bottom: 32px;">
-                                <p style="margin:0;font-size:16px;line-height:24px;font-weight:400;">© 2023
+                                <p style="margin:0;font-size:16px;line-height:24px;font-weight:400;">© ${new Date().getFullYear()}
                                     ${AppConfig.app.companyName}, Inc. <br /> All rights reserved.</p>
                             </td>
                         </tr>

@@ -17,11 +17,10 @@ This guide is your go-to resource for getting started with our system. As an adm
 
 After the system is all set, you can start using it with the system account. To do it, follow the steps:
 
-1. Navigate to the login page by clicking "Log In" at the top right of the landing page.
-2. On the login page, click "Forgot Password."
-3. Enter the system email defined during application setup in the modal that appears.
-4. Check your system email for a message with instructions to define a new password.
-5. Click the link in the email to set your new password.
+1. On the login page, click "Forgot Password."
+2. Enter the system email defined during application setup in the modal that appears.
+3. Check your system email for a message with instructions to define a new password.
+4. Click the link in the email to set your new password.
 
 TODO: AFTER LOGO/DESIGN UPDATE ADD A SCREENSHOT
 

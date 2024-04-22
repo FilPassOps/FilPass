@@ -268,15 +268,15 @@ const ParseResultMessage = ({ isSucess }: { isSucess: boolean }) => {
     : `There are unmatched requests. Since this a security concern, we recommend stopping and reach out to ${AppConfig.app.emailConfig.supportAddress}.`
   return (
     <div className={`w-full p-4 flex items-center gap-3 mb-5 ${isSucess ? 'bg-green-50' : 'bg-red-50'}`}>
-      <Icon className={`w-5 h-5 flex-shrink-0 ${isSucess ? 'text-green-400' : 'text-red-400'}`} />
-      <p className={`text-sm ${isSucess ? 'text-green-800' : 'text-red-800'}`}>{message}</p>
+      <Icon className={`w-5 h-5 flex-shrink-0 ${isSucess ? 'text-green-500' : 'text-red-400'}`} />
+      <p className={`text-sm ${isSucess ? 'text-green-700' : 'text-red-800'}`}>{message}</p>
     </div>
   )
 }
 
 const HexMatchTag = ({ isMatch }: { isMatch: boolean }) => {
   return (
-    <p className={`text-xs font-medium px-2.5 py-0.5 rounded-md ${isMatch ? 'text-green-800 bg-green-100' : 'text-red-700 bg-red-100'}`}>
+    <p className={`text-xs font-medium px-2.5 py-0.5 rounded-md ${isMatch ? 'text-green-700 bg-green-100' : 'text-red-700 bg-red-100'}`}>
       {isMatch ? 'Matched' : 'Unmatched'}
     </p>
   )

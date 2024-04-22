@@ -16,8 +16,7 @@ This guide is your go-to resource for getting started with our system. As a user
 
 To start using all the cool features of Emissary, you will first need to create an account. To do it you’ll be required to complete the following steps:
 
-1. Navigate to the Sign In page by clicking "Sign up" at the top right of the landing page.
-2. You can choose one of the two options to create your account: </br>
+1. You can choose one of the two options to create your account: </br>
     a. You can easily sign up using your Google account, eliminating the need for any additional steps. (If the system was configured enabling this option) </br>
     b. Simply fill out the required fields and activate your account through the email sent by Emissary.
 

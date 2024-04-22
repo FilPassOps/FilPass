@@ -102,7 +102,7 @@ export const TransactionParser = ({ onParseData, token }: TransactionParserProps
       </div>
       <p className="text-gray-500 text-sm font-normal mt-2 mb-6">
         As an additional security measure, we recommend verifying requests using the Hex Data Parser -{' '}
-        <button className="underline text-green-700 font-semibold" onClick={() => showMetamaskHexData()}>
+        <button className="underline text-teal-700 font-semibold" onClick={() => showMetamaskHexData()}>
           more info here
         </button>
         .

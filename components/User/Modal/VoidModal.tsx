@@ -40,7 +40,7 @@ export const VoidModal = ({ onModalClosed, open, data }: VoidModalProps) => {
           <Button variant="outline" onClick={onModalClosed}>
             Cancel
           </Button>
-          <Button onClick={handleVoid} disabled={isLoading} loading={isLoading}>
+          <Button variant='dark-red' onClick={handleVoid} disabled={isLoading} loading={isLoading}>
             Yes
           </Button>
         </div>

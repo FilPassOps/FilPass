@@ -56,7 +56,7 @@ export const WithdrawModal = ({ data, open, text: withdrawTypeText = '', onModal
           <Button variant="outline" onClick={onModalClosed}>
             Cancel
           </Button>
-          <Button onClick={handleApprove} disabled={isLoading} loading={isLoading}>
+          <Button variant='tertiary' onClick={handleApprove} disabled={isLoading} loading={isLoading}>
             Withdraw
           </Button>
         </div>

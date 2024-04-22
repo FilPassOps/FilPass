@@ -51,7 +51,7 @@ export const ArchiveProgramModal = ({ onModalClosed, open, program, isActive }: 
           <Button variant="outline" onClick={onModalClosed}>
             Cancel
           </Button>
-          <Button onClick={handleArchiveProgram} disabled={isLoading} loading={isLoading}>
+          <Button variant={isActive ? 'tertiary' : 'green'} onClick={handleArchiveProgram} disabled={isLoading} loading={isLoading}>
             Yes
           </Button>
         </div>

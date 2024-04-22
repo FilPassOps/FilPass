@@ -115,7 +115,7 @@ export const ApproveModal = ({ data, open, onModalClosed, isBatch = false }: App
               <Button variant="outline" onClick={closeModal} disabled={isLoading}>
                 Cancel
               </Button>
-              <Button onClick={handleApprove} disabled={isLoading} loading={isLoading}>
+              <Button variant='green' onClick={handleApprove} disabled={isLoading} loading={isLoading}>
                 Approve
               </Button>
             </>

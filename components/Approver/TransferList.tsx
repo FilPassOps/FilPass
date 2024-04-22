@@ -11,6 +11,7 @@ import { AppConfig, isERC20Token } from 'config'
 import { USD } from 'domain/currency/constants'
 import { PAID_STATUS } from 'domain/transfer-request/constants'
 import useCurrency from 'hooks/useCurrency'
+import { classNames } from 'lib/class-names'
 import { formatCrypto } from 'lib/currency'
 import { DateTime } from 'luxon'
 import { useRouter } from 'next/router'
@@ -75,7 +76,7 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
           <tr>
             {shouldShowHeaderCheckbox && (
               <Header style={{ minWidth: 60, width: 60 }}>
-                <input type="checkbox" className="cursor-pointer p-1" checked={selectAll} onChange={onHeaderToggle} ref={selectAllRef} />
+                <input type="checkbox" className="cursor-pointer p-1 focus:ring-green-700 text-teal-700" checked={selectAll} onChange={onHeaderToggle} ref={selectAllRef} />
               </Header>
             )}
             <Header style={{ width: 100 }}>
@@ -106,7 +107,7 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
             return (
               <tr
                 key={request.id}
-                className="cursor-pointer hover:bg-green-50"
+                className={classNames(request.selected && 'bg-teal-50', 'cursor-pointer hover:bg-teal-50')}
                 onClick={e => {
                   if ((e.target as HTMLTableCellElement).cellIndex > 0) {
                     !e.metaKey && push(href)
@@ -116,7 +117,12 @@ const TransferList = ({ data = [], shouldShowHeaderCheckbox = true, onHeaderTogg
               >
                 {shouldShowHeaderCheckbox && (
                   <Cell style={{ minWidth: 60 }}>
-                    <input className="p-1" type="checkbox" checked={request.selected} onChange={() => onRequestChecked(requestIndex)} />
+                    <input
+                      className="p-1 focus:ring-green-700 text-teal-700 cursor-pointer"
+                      type="checkbox"
+                      checked={request.selected}
+                      onChange={() => onRequestChecked(requestIndex)}
+                    />
                   </Cell>
                 )}
                 <LinkedCell href={href} className="break-all xl:whitespace-nowrap">
