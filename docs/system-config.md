@@ -12,14 +12,18 @@ Here's a breakdown of its properties:
   - `domain`: This string represents the domain of the company's email addresses. It will be used when checking if it was the system that have made changes on a transfer request and the seed dev creating new users.
   - `fromName`: This string represents the name that will appear in the 'From' field of the emails sent by the application.
   - `supportAddress`: This string represents the email address for the application's support. It will be used on some parts of the system and emails.
+  - `logoUrl`: This string represents the URL of the company's logo. It will be used on the emails. You can use the Emissary logo if you don't have one.
+  - `twitterIconUrl`: This string represents the URL of the Twitter icon. It will be used on the emails.
+  - `linkedinIconUrl`: This string represents the URL of the LinkedIn icon. It will be used on the emails.
+  - `youtubeIconUrl`: This string represents the URL of the YouTube icon. It will be used on the emails.
 
 - `enableCoinMarketApi`: This boolean indicates whether the Coin Market API is enabled. The coin market API is used to get the actual value of the token as a Super Admin.
 
-- `twitterUrl`: This string represents the company's Twitter page URL. It will be used on the landing page and in emails. If it is not set, it will not appear.
+- `twitterUrl`: This string represents the company's Twitter page URL. It will be used on the emails. If it is not set, it will not appear.
 
-- `linkedinUrl`: This string represents the company's LinkedIn page URL. It will be used on the landing page and in emails. If it is not set, it will not appear.
+- `linkedinUrl`: This string represents the company's LinkedIn page URL. It will be used on the emails. If it is not set, it will not appear.
 
-- `youtubeChannelUrl`: This string represents the URL of the company's YouTube channel. It will be used on the landing page and in emails. If it is not set, it will not appear.
+- `youtubeChannelUrl`: This string represents the URL of the company's YouTube channel. It will be used on the emails. If it is not set, it will not appear.
 
 
 Here's an example of the system configuration file:
@@ -28,15 +32,19 @@ Here's an example of the system configuration file:
 ```typescript
 export const app = {
   name: 'Emissary',
-  companyName: 'Protocol Labs',
+  companyName: 'Your Company',
   emailConfig: {
-    domain: '@protocol.ai',
+    domain: '@your-domain.com',
     fromName: 'Emissary Support',
-    supportAddress: 'emissary@test.com',
+    supportAddress: 'emissary@your-company.com',
+    logoUrl: 'https://your-company.com/logo.png',
+    twitterIconUrl: 'https://your-company.com/twitter.png',
+    linkedinIconUrl: 'https://your-company.com/linkedin.png',
+    youtubeIconUrl: 'https://your-company.com/youtube.png',
     },
   enableCoinMarketApi: true,
-  twitterUrl: 'https://twitter.com/protocollabs/',
-  linkedinUrl: 'https://www.linkedin.com/company/protocollabs/',
-  youtubeChannelUrl: 'https://www.youtube.com/ProtocolLabs/',
+  twitterUrl: 'https://twitter.com/your-company/',
+  linkedinUrl: 'https://www.linkedin.com/company/your-company/',
+  youtubeChannelUrl: 'https://www.youtube.com/your-company/',
 };
 ```
