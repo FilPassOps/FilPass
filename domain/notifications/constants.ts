@@ -83,14 +83,18 @@ export const baseEmail = (content: string) => {
                                 style="padding: 20px 32px 20px 32px; text-align: left; font-size: 24px; font-weight: bold; background-color: #065F59">
                                     <img src=${AppConfig.app.emailConfig.logoUrl} width="223"
                                         alt="Logo"
-                                        style="width:223px;max-width:80%;height:auto;border:none;text-decoration:none;">
+                                        style="width:223px;max-width:60%;height:auto;border:none;text-decoration:none;">
                             </td>
                         </tr>
                             ${content}
                         <tr>
                             <td style="padding-left: 32px; padding-right: 32px; padding-top:48px; color: #6B7280; line-height: 24px">
-                              <p style="margin: 0">${AppConfig.app.name} is a system ${AppConfig.app.companyName} uses for disbursements.</p>
-                              <p style="margin: 0; padding-top: 20px">Please reach out to <a style="color: #6B7280;" href="mailto:${AppConfig.app.emailConfig.supportAddress}">${AppConfig.app.emailConfig.supportAddress}</a> with any questions.</p>
+                              <p style="margin: 0">${AppConfig.app.name} is a system ${
+                                AppConfig.app.companyName
+                              } uses for disbursements.</p>
+                              <p style="margin: 0; padding-top: 20px">Please reach out to <a style="color: #6B7280;" href="mailto:${
+                                AppConfig.app.emailConfig.supportAddress
+                              }">${AppConfig.app.emailConfig.supportAddress}</a> with any questions.</p>
                             </td>
                         </tr>
 
@@ -135,7 +139,7 @@ export const baseEmail = (content: string) => {
                         </tr>
                         <tr>
                             <td style="text-align:center;font-size:16px;color:#9CA3AF;padding-bottom: 32px;">
-                                <p style="margin:0;font-size:16px;line-height:24px;font-weight:400;">© 2023
+                                <p style="margin:0;font-size:16px;line-height:24px;font-weight:400;">© ${new Date().getFullYear()}
                                     ${AppConfig.app.companyName}, Inc. <br /> All rights reserved.</p>
                             </td>
                         </tr>
