@@ -172,10 +172,10 @@ export const Sidebar = ({ toggle = false, setSidebarToggle }: SidebarProps) => {
   return (
     <div className={`${toggle ? 'flex md:w-64' : 'hidden md:flex'} h-full min-h-screen md:min-h-0 flex-col md:fixed md:inset-y-0 z-50`}>
       {/* Sidebar component, swap this element with another sidebar if you like */}
-      <div className="flex flex-col flex-grow bg-green-800 overflow-y-auto md:pt-5">
+      <div className="flex flex-col flex-grow bg-teal-800 overflow-y-auto md:pt-5">
         <div className="hidden md:flex items-center shrink-0 px-4">
-          <Link href="/my-transfer-requests" passHref className="h-7 w-full relative outline-offset-8">
-            <img className={`object-fill h-full ${toggleClasses(toggle, 'block')}`} src="/logo-white.svg" alt="Logo" />
+          <Link href="/my-transfer-requests" passHref className="h-10 w-full relative outline-offset-8">
+            <img className={`object-fill h-full ${toggleClasses(toggle, 'block')}`} src="/logo-written.svg" alt="Logo" />
           </Link>
         </div>
         <div className="md:mt-5 flex-1 flex flex-col">
@@ -211,13 +211,13 @@ export const Sidebar = ({ toggle = false, setSidebarToggle }: SidebarProps) => {
           <RoleComponent roles={[USER_ROLE]}>
             <a
               href={`mailto:${AppConfig.app.emailConfig.supportAddress}`}
-              className="flex items-center gap-4 mt-2 py-5 px-4 border-y border-green-700 font-medium text-green-100"
+              className="flex items-center gap-4 mt-2 py-5 px-4 border-y border-teal-700 font-medium text-teal-200"
             >
-              <LifebuoyIcon className="h-6 w-6 text-green-300" />
+              <LifebuoyIcon className="h-6 w-6 text-teal-200" />
               <span className={toggleClasses(toggle, 'inline')}>Contact Support</span>
             </a>
           </RoleComponent>
-          <p className={`${toggleClasses(toggle, 'block')} font-medium text-sm text-green-300 p-4`}>Version {projectVersion}</p>
+          <p className={`${toggleClasses(toggle, 'block')} font-medium text-sm text-white p-4`}>Version {projectVersion}</p>
         </div>
       </div>
     </div>
@@ -257,8 +257,8 @@ const NavItem = ({
         href={navItem.target}
         passHref
         className={classNames(
-          isItemSelected ? 'bg-green-900 text-green-50' : 'text-green-100',
-          'flex items-center gap-2 leading-5 text-sm font-medium p-2 rounded-md focus-within:bg-green-900 focus-within:text-white hover:bg-green-900 hover:text-green-50',
+          isItemSelected ? 'bg-teal-900 text-white' : 'text-teal-100',
+          'flex items-center gap-2 leading-5 text-sm font-medium p-2 rounded-md focus-within:bg-teal-900 focus-within:text-white hover:bg-teal-900 hover:text-white hover:font-extrabold',
         )}
       >
         <navItem.icon className="h-6 w-6" aria-hidden="true" />
@@ -270,8 +270,8 @@ const NavItem = ({
   return (
     <div
       className={classNames(
-        isItemSelected ? 'bg-green-900 text-white' : 'text-green-100',
-        'leading-5 text-sm font-medium p-2 rounded-md focus-within:bg-green-900 focus-within:text-white hover:bg-green-900 hover:text-white',
+        isItemSelected ? 'bg-teal-900 text-white' : 'text-teal-100',
+        'leading-5 text-sm font-medium p-2 rounded-md focus-within:bg-teal-900 focus-within:text-white hover:bg-teal-900 hover:text-white',
       )}
     >
       <button className="w-full flex items-center justify-between outline-offset-8 leading-5 " onClick={onNavItemClick}>

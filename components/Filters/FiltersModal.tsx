@@ -203,7 +203,7 @@ function FiltersModal({
             <FilterLabel htmlFor="request-number">Request number:</FilterLabel>
             <div className="relative">
               <input
-                className="appearance-none w-full focus:ring-green-500 focus:border-green-700 border-gray-300 border shadow-sm rounded-md px-3 py-2 text-sm bg-white"
+                className="appearance-none w-full focus:ring-green-700 focus:border-green-700 border-gray-300 border shadow-sm rounded-md px-3 py-2 text-sm bg-white"
                 type="number"
                 name="request-number"
                 id="request-number"
@@ -228,8 +228,8 @@ function FiltersModal({
                     <Listbox.Button
                       className={({ open }) =>
                         `${
-                          open ? 'ring-1 ring-green-500 border border-green-600' : ''
-                        } relative w-full appearance-none border border-gray-300 focus:outline-none focus-visible:border-green-600 focus-visible:ring-1 focus-visible:ring-green-500 shadow-sm rounded-md px-3 py-2 text-left text-sm bg-white`
+                          open ? 'ring-1 ring-green-700 border border-green-700' : ''
+                        } relative w-full appearance-none border border-gray-300 focus:outline-none focus-visible:border-green-700 focus-visible:ring-1 focus-visible:ring-green-700 shadow-sm rounded-md px-3 py-2 text-left text-sm bg-white`
                       }
                     >
                       {({ open }) => (
@@ -266,7 +266,7 @@ function FiltersModal({
                           <Listbox.Option
                             key={status}
                             className={({ active }) =>
-                              `text-sm cursor-pointer select-none px-4 py-1 ${active ? 'bg-green-700 text-white' : 'text-gray-900'}`
+                              `text-sm cursor-pointer select-none px-4 py-1 ${active ? 'bg-teal-700 text-white' : 'text-gray-900'}`
                             }
                             value={status}
                           >
@@ -335,7 +335,7 @@ function FiltersModal({
             <FilterLabel htmlFor="wallet-address">Wallet address:</FilterLabel>
             <div className="relative">
               <input
-                className="appearance-none w-full focus:ring-green-500 focus:border-green-600 border-gray-300 border shadow-sm rounded-md px-3 py-2 text-sm bg-white"
+                className="appearance-none w-full focus:ring-green-700 focus:border-green-700 border-gray-300 border shadow-sm rounded-md px-3 py-2 text-sm bg-white"
                 type="text"
                 name="wallet-address"
                 id="wallet-address"
@@ -381,7 +381,7 @@ const CustomDatepickInput = forwardRef<any, any>(({ value, onClick, onClear }, r
     <button
       id="create-date"
       name="create-date"
-      className="appearance-none w-full focus:ring-1 focus:ring-green-500 focus:border-green-600 border-gray-300 border shadow-sm rounded-md px-3 py-2 text-left text-sm bg-white pr-10"
+      className="appearance-none w-full focus:ring-1 focus:ring-green-700 focus:border-green-700 border-gray-300 border shadow-sm rounded-md px-3 py-2 text-left text-sm bg-white pr-10"
       onClick={onClick}
       ref={ref}
       type="button"
@@ -452,14 +452,14 @@ function Select({ name, placeholder, options, onChange, selectedOptions, setSele
   return (
     <div ref={containerRef} className="w-full relative">
       <div
-        className={`${optionsToggle ? 'ring-1 ring-green-500 border-green-600' : ''} flex border-gray-300 border shadow-sm rounded-md py-2`}
+        className={`${optionsToggle ? 'ring-1 ring-green-700 border-green-700' : ''} flex border-gray-300 border shadow-sm rounded-md py-2`}
       >
         <div className="flex-1">
           <div className="flex flex-wrap items-center gap-2 px-2">
             {selectedOptions
               .sort((a, b) => a.label.localeCompare(b.label))
               .map(option => (
-                <div key={option.value} className="flex items-center gap-2 p-2 bg-green-700 text-white rounded-md">
+                <div key={option.value} className="flex items-center gap-2 p-2 bg-teal-700 text-white rounded-md">
                   <div className="border-r border-white pr-2 text-sm">{option.label}</div>
                   <button
                     type="button"
@@ -512,7 +512,7 @@ function Select({ name, placeholder, options, onChange, selectedOptions, setSele
           .sort((a, b) => a.label.localeCompare(b.label))
           .map(option => (
             <button
-              className="text-left text-sm px-4 py-1 hover:bg-green-700 hover:text-white"
+              className="text-left text-sm px-4 py-1 hover:bg-teal-700 hover:text-white"
               type="button"
               key={option.value}
               onClick={() => {

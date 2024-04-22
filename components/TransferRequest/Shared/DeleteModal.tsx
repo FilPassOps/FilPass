@@ -97,7 +97,7 @@ export const DeleteModal = ({ onModalClosed, open, data, redirectTo }: DeleteMod
           <Button variant="outline" onClick={onModalClosed}>
             Cancel
           </Button>
-          <Button onClick={handleDelete} disabled={isLoading} loading={isLoading}>
+          <Button variant='dark-red' onClick={handleDelete} disabled={isLoading} loading={isLoading}>
             Yes
           </Button>
         </div>

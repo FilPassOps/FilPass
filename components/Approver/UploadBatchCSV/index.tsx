@@ -199,7 +199,7 @@ export const BatchCSV = () => {
           {fileData && (
             <div className="w-full space-y-5">
               <DownloadFile file={fileData?.file} />
-              <div className="text-green-600 text-sm font-medium flex items-center ml-7">
+              <div className="text-green-500 text-sm font-medium flex items-center ml-7">
                 <CheckCircleIcon className="w-4 h-4 mr-1" />
                 Upload successful
               </div>

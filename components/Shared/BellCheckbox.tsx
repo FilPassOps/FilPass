@@ -23,7 +23,7 @@ export const BellCheckbox = ({ checked, onClick = () => {} }: BellCheckboxProps)
 
   return (
     <button onClick={handleClick}>
-      {isChecked && <BellIcon className="w-6 text-green-500" fill="rgba(79, 70, 229, 0.5)" />}
+      {isChecked && <BellIcon className="w-6 text-teal-800" fill="rgba(5, 150, 140, 1)" />}
       {!isChecked && <BellIcon className="w-6 text-gray-400" />}
     </button>
   )

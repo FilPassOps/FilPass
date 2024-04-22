@@ -60,7 +60,7 @@ export const DeleteFileModal = ({
           <Button variant="outline" onClick={onModalClosed}>
             Cancel
           </Button>
-          <Button onClick={handleDelete} loading={loading} disabled={loading}>
+          <Button variant='dark-red' onClick={handleDelete} loading={loading} disabled={loading}>
             Delete
           </Button>
         </div>

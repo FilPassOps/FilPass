@@ -7,6 +7,10 @@ export interface App {
     domain: string
     fromName: string
     supportAddress: string
+    logoUrl: string
+    twitterIconUrl: string
+    linkedinIconUrl: string
+    youtubeIconUrl: string
   }
   enableCoinMarketApi: boolean
   youtubeChannelUrl?: string
@@ -41,16 +45,20 @@ export interface AppConfig {
 
 const app: App = {
   name: 'Emissary',
-  companyName: 'Protocol Labs',
+  companyName: 'Company Name',
   emailConfig: {
     domain: '@protocol.ai',
-    fromName: 'Emissary Support',
-    supportAddress: 'emissary@protocol.ai',
+    fromName: 'Company Name',
+    supportAddress: 'platform-name@company.com',
+    logoUrl: 'https://s3.us-east-2.amazonaws.com/coinemissary.com/open-source-logo.png',
+    twitterIconUrl: 'https://s3.us-east-2.amazonaws.com/coinemissary.com/twitter-icon.png',
+    linkedinIconUrl: 'https://s3.us-east-2.amazonaws.com/coinemissary.com/linkedin-icon.png',
+    youtubeIconUrl: 'https://s3.us-east-2.amazonaws.com/coinemissary.com/youtube-icon.png',
   },
   enableCoinMarketApi: true,
-  twitterUrl: 'https://twitter.com/protocollabs/',
-  linkedinUrl: 'https://www.linkedin.com/company/protocollabs/',
-  youtubeChannelUrl: 'https://www.youtube.com/ProtocolLabs/',
+  twitterUrl: 'https://twitter.com',
+  linkedinUrl: 'https://www.linkedin.com',
+  youtubeChannelUrl: 'https://www.youtube.com',
 }
 
 export const AppConfig = {

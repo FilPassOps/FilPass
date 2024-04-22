@@ -195,7 +195,7 @@ const ShowAttachment = ({ data }: ShowAttachmentProps) => {
       <p className="text-sm mb-1">Attachment</p>
       <div className="flex items-center justify-between">
         <div className="w-max">
-          <div className="flex flex-row text-green-500 text-sm font-bold hover:underline cursor-pointer" onClick={handleDownloadFile}>
+          <div className="flex flex-row text-green-700 text-sm font-bold hover:underline cursor-pointer" onClick={handleDownloadFile}>
             <PhotoIcon width={20} height={20} className="mr-2 text-gray-900" />
             {data?.attachment_filename}
           </div>

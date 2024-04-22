@@ -149,7 +149,7 @@ const TransferList = ({
           <tr>
             {shouldShowHeaderCheckbox && (
               <Header style={{ minWidth: 60, width: 60 }}>
-                <input type="checkbox" className="cursor-pointer p-1" checked={selectAll} onChange={onHeaderToggle} ref={selectAllRef} />
+                <input type="checkbox" className="cursor-pointer p-1 focus:ring-green-700 text-teal-700" checked={selectAll} onChange={onHeaderToggle} ref={selectAllRef} />
               </Header>
             )}
 
@@ -195,7 +195,7 @@ const TransferList = ({
               const paidTransfer = request?.transfers?.find(({ status }) => status === SUCCESS_STATUS)
               return (
                 <tr
-                  className={classNames(request.selected && 'bg-green-50', 'cursor-pointer hover:bg-green-50')}
+                  className={classNames(request.selected && 'bg-teal-50', 'cursor-pointer hover:bg-teal-50')}
                   key={request.id}
                   onClick={e => {
                     if ((e.target as HTMLTableCellElement).cellIndex > 0) {
@@ -208,7 +208,7 @@ const TransferList = ({
                     <Cell style={{ minWidth: 60 }}>
                       <input
                         type="checkbox"
-                        className={classNames('p-1 cursor-pointer')}
+                        className="p-1 focus:ring-green-700 text-teal-700 cursor-pointer"
                         checked={request.selected}
                         onChange={() => onRequestChecked(requestIndex)}
                       />

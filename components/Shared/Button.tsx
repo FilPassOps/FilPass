@@ -86,7 +86,7 @@ interface getButtonClassesParams {
 
 function getButtonClasses({ variant, disabled, defaultStyle }: getButtonClassesParams) {
   return classNames(
-    variant === 'primary' && 'bg-green-800 hover:bg-green-900 border-transparent text-white',
+    variant === 'primary' && 'bg-teal-700 hover:bg-teal-800 border-transparent text-white',
     disabled && 'opacity-50 pointer-events-none',
     variant === 'primary-lighter' && 'bg-green-100 hover:bg-green-200 border-transparent text-green-600',
     variant === 'secondary' && 'border-black hover:shadow-inner',
@@ -97,7 +97,7 @@ function getButtonClasses({ variant, disabled, defaultStyle }: getButtonClassesP
     variant === 'outline-blue' && 'border border-sky-600 bg-white text-sky-600 hover:text-sky-700 hover:border-sky-700',
     variant === 'outline-blue' && disabled && 'border-gray-500 text-gray-500',
     defaultStyle &&
-      'text-sm w-full leading-5 font-medium flex justify-center py-2 px-4 rounded-md shadow-sm border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500',
+      'text-sm w-full leading-5 font-medium flex justify-center py-2 px-4 rounded-md shadow-sm border focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-700',
     variant === 'red' && 'bg-red-600 hover:bg-red-700 text-white',
     variant === 'green' && 'bg-green-600 hover:bg-green-700 text-white',
     variant === 'opacity-red' && 'bg-red-100 hover:bg-red-200 text-red-400 shadow-none border-none font-light',

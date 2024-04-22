@@ -57,7 +57,7 @@ export const DeleteWalletAddressModal = ({ openModal, onModalClosed, wallet }: D
           <Button variant="outline" onClick={handleModalClose}>
             Cancel
           </Button>
-          <Button onClick={handleDelete} loading={loading} disabled={loading}>
+          <Button variant='dark-red' onClick={handleDelete} loading={loading} disabled={loading}>
             Delete
           </Button>
         </div>
