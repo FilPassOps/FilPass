@@ -1,11 +1,8 @@
 <h1 align="center">Emissary</h1>
 
 <p align="center">
-  <a aria-label="Protocol Labs badge" href="https://protocol.ai/">
-    <img src="https://img.shields.io/badge/MADE%20BY%20Protocol%20Labs-000000?style=for-the-badge">
-  </a>
   <a aria-label="License" href="#license">
-    <img alt="" src="https://img.shields.io/badge/MIT--Apache_2.0-%23034130?style=for-the-badge&label=LICENSE&labelColor=000000">034130
+    <img alt="" src="https://img.shields.io/badge/MIT--Apache_2.0-%23034130?style=for-the-badge&label=LICENSE&labelColor=000000">
   </a>
   <a aria-label="Join the community" href="https://filecoinproject.slack.com/">
     <img alt="" src="https://img.shields.io/badge/Join%20the%20community-emissary?style=for-the-badge&logo=slack&color=%23034130">
@@ -28,6 +25,7 @@
   - [Documentation](#documentation)
 - [Developer and System Administrator](#developer-and-system-administrator)
 - [License](#license)
+- [Acceptable Use Policy](#acceptable-use-policy)
 - [Security](#security)
 
 ## Introduction
@@ -105,7 +103,11 @@ If you are a developer or a system administrator and want some useful commands t
 
 ## License
 
-This project is open-source under the [MIT](LICENSE-MIT) and [Apache 2.0](APACHE-LICENSE) licenses.
+This project is open-source under the [MIT](LICENSE-MIT) and [Apache 2.0](LICENSE-APACHE) licenses.
+
+## Acceptable Use Policy
+
+Before you proceed to use Emissary, please make sure you read and understand the entire [Acceptable Use Policy](./docs/acceptable-use-policy.md). By accessing or using Emissary, you agree to all terms in this Policy without modification of any of its terms.
 
 ## Security
 
