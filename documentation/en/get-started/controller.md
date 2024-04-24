@@ -32,7 +32,7 @@ To initiate the payment process, follow these steps:
 - Details of the selected batch, including the batch number, number of Transfer Requests, total token amount, and total dollar amount.
 - By clicking the dropdown button next to the “Send payment” button, you can access additional information about the selected batch. This includes a table listing the Transfer Requests being paid within that batch, along with their `public IDs, destinations, amounts, token amount, and the hex match` (a security functionality discussed in the next section).
 
-<img src="../../images/payment-list.png" alt="Transfer request payment list" style="height: 700px; width:960px;"/>
+<img src="../../images/payment-list.png" alt="Transfer request payment list" style="height: 750px; width:2114px;"/>
 
 6. Click on the "Send Payment" button.
   -  6.1. If you are paying requests that are using custom tokens (ERC20) such as USDC, a extra step will be displayed to approve the amount to be paid.<br/>
@@ -56,6 +56,6 @@ If the at least one hex data **do not match**, do not continue with the payment.
 8. Confirm the payment in MetaMask.
 9. If the payment is successful, a modal will appear, confirming the payment for the batch. The modal will contain a link to the blockchain explorer, allowing you to view transaction details. If multiple steps are involved (when you are paying more the 100 requests), the selected step will be highlighted in green and you can you go to the next one.
 
-<img src="../../images/confirm-payment-modal.png" alt="Confirm payment modal" style="height: 345px; width:630px;"/>
+<img src="../../images/confirm-payment-modal.png" alt="Confirm payment modal" style="height: 318px; width:563px;"/>
 
 Please note that payments may take several minutes to be processed depending on the blockchain.

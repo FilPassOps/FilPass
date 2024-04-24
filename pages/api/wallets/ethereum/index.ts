@@ -6,7 +6,7 @@ import { NextApiResponse } from 'next'
 const requestSchema = yup.object({
   walletAddress: yup.string().trim().required('Wallet address is required'),
   label: yup.string().trim(),
-  blockchain: yup.string().required(), // TODO OPEN-SOURCE: should be the id of the blockchain
+  blockchain: yup.string().required(),
 })
 
 interface EthereumWalletCreationReq extends NextApiRequestWithSession {

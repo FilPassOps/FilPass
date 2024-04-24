@@ -415,6 +415,7 @@ async function createUser(index: number) {
       isActive: true,
       isVerified: true,
       password: password,
+      terms: true,
     },
   })
 

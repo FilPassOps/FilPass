@@ -39,30 +39,22 @@ When creating a request for yourself, you’ll be required to complete the follo
 3. Hit the “Create New Request button”; </br>
     a. On a desktop, the button is below the My Transfer Requests page title or in the page center if it is your first request.
 
-    TODO: AFTER LOGO/DESIGN UPDATE ADD A SCREENSHOT
+<img src="../../images/desktop-create-transfer-request.png" alt="Desktop create transfer request" style="height: 315px; width:631px;"/>
 
     b. On mobile, the button can be found at the center of the page if it is your first request or at the top of the side menu bar after clicking on the Hamburger icon on the top left;
 
-<img src="../../images/mobile-transfer-list.png" alt="Mobile transfer request list" style="height: 724px; width:378px;"/>
+<img src="../../images/mobile-create-transfer-request.png" alt="Mobile create transfer request" style="height: 663px; width:370px;"/>
 
 4. Choose the program for which you are requesting tokens;
 5. Add a project or **team name as was submitted in the event;**
 6. Select a previously added wallet address or add a new one using the same blockchain/network as the program that you are requesting;
 7. Add the requested amount;
-    1. Notice that programs have different payment methods. Consider it when requesting the amount.
+    1. Notice that programs have different payment methods(USD or TOKEN). Consider it when requesting the amount.
 
-           TODO: AFTER DELIVERY METHOD REMOVAL ADD A SCREENSHOT
+8.   Hit "Submit” at the of the page again to create your transfer request.
 
-8.   Read and check all the terms and conditions so you can go to the next step;
-9.   A confirmation must be shown saying that it is all set;
+<img src="../../images/transfer-request-submit-button.png" alt="Transfer request submitting button" style="height: 235px; width:892px;"/>
 
+9.  Congratulations, you have just created your first Transfer Request!
 
-<img src="../../images/acknowledgments-submitted-modal.png" alt="Acknowledgments submitted modal" style="height: 310px; width:649px;"/>
-
-12.  Hit “Continue” to close the popup window, and click "Submit” at the bottom again to create your transfer request.
-
-<img src="../../images/transfer-request-submit-button.png" alt="Transfer request submitting button" style="height: 236px; width:843px;"/>
-
-13.  Congratulations, you have just created your first Transfer Request!
-
-<img src="../../images/transfer-request-submitted.png" alt="Transfer request submitted modal" style="height: 499px; width:638px;"/>
+<img src="../../images/transfer-request-submitted.png" alt="Transfer request submitted modal" style="height: 418px; width:536px;"/>

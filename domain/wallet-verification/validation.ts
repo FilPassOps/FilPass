@@ -7,14 +7,14 @@ export const sendVerificationTransactionValidator = yup
   .object({
     address: yup.string().required(),
     userId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).typeError(errorsMessages.required_field.message).required(),
-    blockchain: yup.string().required(), // TODO OPEN-SOURCE: should the id of the blockchain table
+    blockchain: yup.string().required(),
   })
   .required()
 
 export const connectWalletStepValidator = yup
   .object({
     address: yup.string().required().max(100),
-    blockchain: yup.string().required(), // TODO OPEN-SOURCE: should the id of the blockchain table
+    blockchain: yup.string().required(),
     name: yup.string().trim().max(100),
   })
   .required()

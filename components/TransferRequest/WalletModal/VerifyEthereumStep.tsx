@@ -57,12 +57,12 @@ export const VerifyEthereumStep = ({ onNextStepClick, onBackClick, formData, net
     <div className="w-full h-full flex flex-col justify-center items-center sm:py-2 sm:px-11">
       <p className="font-medium text-lg text-gray-900 text-center">Verify Wallet Address</p>
       <p className="font-normal text-sm text-gray-500 text-center mt-2">Confirm your MetaMask wallet address to continue</p>
-      <div className="flex flex-col p-4 space-y-2 text-blue-900 font-medium text-sm bg-blue-50 border border-blue-200 rounded-md w-full my-6">
+      <div className="flex flex-col p-4 space-y-2 text-teal-900 font-medium text-sm bg-teal-50 border border-teal-200 rounded-md w-full my-6">
         <div className="flex items-center gap-2 ">
           <BlockchainIcon blockchainName={formData.blockchain} className="h-5 w-5" />
           <span>{`${formData.blockchain} ${networkName}`} MetaMask Address</span>
         </div>
-        <span className="text-blue-700 break-all">{formData?.address}</span>
+        <span className="text-teal-700 break-all">{formData?.address}</span>
       </div>
       <div className="w-full flex flex-col justify-center items-center space-y-4">
         <p className="text-red-500 text-sm">{error}</p>

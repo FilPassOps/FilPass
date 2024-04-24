@@ -28,6 +28,4 @@ The wallet on the system is required to any common user that needs to create tra
 14. To confirm your wallet, an email will be sent to your registered email address;
 15. Check your email inbox, locate the email from Emissary, and click on the confirmation link provided. Follow any additional instructions to confirm your wallet;
 
-TODO: AFTER LOGO/DESIGN UPDATE ADD A SCREENSHOT
-
 Congratulations! Your wallet is now successfully connected to the application, and you can now create your transfer requests!

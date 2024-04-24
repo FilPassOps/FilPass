@@ -8,7 +8,7 @@ When accessing a page with a transfer request list, users are provided with the 
 
 You can filter the transfer requests by clicking the “Filter” button on the right side of the table.
 
-<img src="../../images/empty-transfer-list.png" alt="Empty transfer request list" style="height: 289px; width:1385px;"/>
+<img src="../../images/empty-transfer-list.png" alt="Empty transfer request list" style="height: 430px; width:2111px;"/>
 
 A modal will be displayed, presenting the available fields for filtering. You can utilize one or more of these fields to obtain more refined and precise results.
 
