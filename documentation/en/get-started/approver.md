@@ -28,7 +28,7 @@ If you want to create multiple requests at once or assign a request vesting info
 2. Navigate to the "My Approvals" section;
 3. Click on the “Batch Actions” button and then click on “Upload CSV”;
 
-<img src="../../images/batch-actions.png" alt="Batch actions buttons" style="height: 358px; width:370px;"/>
+<img src="../../images/batch-actions.png" alt="Batch actions buttons" style="height: 351px; width:740px;"/>
 
 4. Click on the “Download CSV template” button to receive the format for bulk upload requests;
 5. Fill the CSV with the following information:
@@ -74,7 +74,7 @@ Ralph Roe,ralphroe@test.com,0.2,ONE TIME PROGRAM - FIL,0xe1d4a6d35d980ef93cc3be0
 
 After uploading the CSV file, the app disables the Select Program field and shows the following warning text explaining the reason.
 
-<img src="../../images/create-transfer-request-csv.png" alt="Create transfer request CSV" style="height: 680px; width:1064px;"/>
+<img src="../../images/create-transfer-request-csv.png" alt="Create transfer request CSV" style="height: 1092px; width:2112px;"/>
 
 From the screenshot above, we can notice that Request numbers 1 and 2 have different Programs.
 
@@ -103,7 +103,7 @@ You can perform four actions for each request: Requires Change, Reject, Approve,
 5. Click on the action that you want to perform;
 6. Confirm the action.
 
-<img src="../../images/approve-transfer-request.png" alt="Approve transfer request confirmation modal" style="height: 356px; width:650px;"/>
+<img src="../../images/approve-transfer-request.png" alt="Approve transfer request confirmation modal" style="height: 814px; width:2105px;"/>
 
 </br><code>
 🚨 It’s extremely important to review all the transfer requests carefully, and make sure that the right person is being paid.

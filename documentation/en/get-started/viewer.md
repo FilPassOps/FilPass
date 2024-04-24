@@ -30,7 +30,7 @@ To create a report, follow these steps:
 3. You can filter the transfer requests that you want to have in the report by clicking on the "Filter" button and applying the filter;
 4. On the top right of the page, click on "Create Report";
 
-<img src="../../images/create-report.png" alt="Create report modal" style="height: 510px; width:420px;"/>
+<img src="../../images/create-report.png" alt="Create report modal" style="height: 652px; width:600px;"/>
 
 5. You will see a modal with the information that you want to include on the report, select what you want and click on "Download as CSV"
 6. Finally, a CSV file will be downloaded with all your selected information!

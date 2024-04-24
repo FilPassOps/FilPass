@@ -7,7 +7,7 @@ interface CreateEthereumWalletRequestParams {
   address: string
   label?: string
   email: string
-  blockchain: string // TODO OPEN-SOURCE: should the id of the blockchain table
+  blockchain: string
 }
 
 export async function createEthereumWallet(params: CreateEthereumWalletRequestParams) {

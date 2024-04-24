@@ -22,7 +22,7 @@ After the system is all set, you can start using it with the system account. To 
 3. Check your system email for a message with instructions to define a new password.
 4. Click the link in the email to set your new password.
 
-TODO: AFTER LOGO/DESIGN UPDATE ADD A SCREENSHOT
+<img src="../../images/forgot-password.png" alt="Forgot password" style="height: 712px; width:630px;"/>
 
 <code>ℹ️ The domain of the system user is configured by the person who has set up the application. The email always starts with "system”. If you want to change it, ask the person who has set up the application</code>
 
@@ -38,7 +38,7 @@ Users can start using the platform in different ways. One of them is being invit
 3. You will see the list of registered users on the User Settings page. Click "Add New User" at the top right.
 4. Enter the user's email and submit.
 
-TODO: AFTER LOGO/DESIGN UPDATE ADD A SCREENSHOT
+<img src="../../images/inviting-user.png" alt="Invite users" style="height: 307px; width:630px;"/>
 
 After adding the user, they'll appear in the "All Users" table. An invitation email will be sent to them, containing a link to complete their account setup.
 
@@ -54,7 +54,7 @@ To assign roles to the users, follow the steps:
 2. On the sidebar, go to “User Settings”;
 3. On the All Users table, you can click on the Role column for the user you want to add or remove a role.
 
-TODO: AFTER LOGO/DESIGN UPDATE ADD A SCREENSHOT
+<img src="../../images/change-user-role.png" alt="Change user role" style="height: 511px; width:1961px;"/>
 
 Assigning roles grants users access to role-specific features.
 
@@ -76,8 +76,10 @@ To create a new program, follow the steps:
 4. Fill in the requested information.
 5. Click "Submit” to create the program.
 
-TODO: AFTER LOGO/DESIGN UPDATE ADD A SCREENSHOT
+<img src="../../images/create-program.png" alt="Create program" style="height: 1123px; width:2243px;"/>
 
 Once created, your program will appear in the list, ready for use in new transfer requests.
+
+You can also edit or archive a program on the program name in the list.
 
 <code>ℹ️ [Click here to see more information about Programs.](../guide/programs.md)</code>

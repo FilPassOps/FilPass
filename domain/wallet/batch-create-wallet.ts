@@ -144,7 +144,6 @@ const checkWallet = async ({ prisma, user, request, isBatchCsv, index, programs 
     ({ address, blockchainId, isActive }) =>
       isActive && address.toLowerCase() === request.wallet?.toLowerCase() && program.currency.blockchainId === blockchainId,
   )
-  // TODO it should check for inactive wallets too if so, should update isActive to true
 
   if (storedWallet) {
     return {

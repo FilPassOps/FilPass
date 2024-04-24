@@ -53,7 +53,6 @@ export const useContract = (token: ERC20Token | NativeToken) => {
    * @returns
    */
   const forward = async (blockchainName: string, id: string, destinations: string[], amounts: string[]) => {
-    //TODO OPEN-SOURCE: use the blockchainName from the props
     if (!multiForwarder || !signer || !provider || !destinations || !amounts) {
       throw new Error('Missing dependencies')
     }
