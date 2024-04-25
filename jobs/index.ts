@@ -21,6 +21,6 @@ const job = (limiter: Bottleneck, job: () => Promise<void>) => {
 }
 
 schedule.scheduleJob('0 6 * * *', requiresChangeNotification)
-schedule.scheduleJob('*/2 * * * *', job(checkPendingTransferLimiter, checkPendingTransfer))
+schedule.scheduleJob('* * * * *', job(checkPendingTransferLimiter, checkPendingTransfer))
 
 logger.info(`> Jobs scheduled...`)

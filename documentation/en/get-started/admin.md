@@ -54,7 +54,7 @@ To assign roles to the users, follow the steps:
 2. On the sidebar, go to “User Settings”;
 3. On the All Users table, you can click on the Role column for the user you want to add or remove a role.
 
-<img src="../../images/change-user-role.png" alt="Change user role" style="height: 511px; width:1961px;"/>
+<img src="../../images/change-user-role.png" alt="Change user role" style="height: 306px; width:1176px;"/>
 
 Assigning roles grants users access to role-specific features.
 
@@ -76,7 +76,7 @@ To create a new program, follow the steps:
 4. Fill in the requested information.
 5. Click "Submit” to create the program.
 
-<img src="../../images/create-program.png" alt="Create program" style="height: 1123px; width:2243px;"/>
+<img src="../../images/create-program.png" alt="Create program" style="height: 674px; width:1345px;"/>
 
 Once created, your program will appear in the list, ready for use in new transfer requests.
 

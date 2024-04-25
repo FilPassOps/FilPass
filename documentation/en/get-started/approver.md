@@ -74,7 +74,7 @@ Ralph Roe,ralphroe@test.com,0.2,ONE TIME PROGRAM - FIL,0xe1d4a6d35d980ef93cc3be0
 
 After uploading the CSV file, the app disables the Select Program field and shows the following warning text explaining the reason.
 
-<img src="../../images/create-transfer-request-csv.png" alt="Create transfer request CSV" style="height: 1092px; width:2112px;"/>
+<img src="../../images/create-transfer-request-csv.png" alt="Create transfer request CSV" style="height: 655px; width:1267px;"/>
 
 From the screenshot above, we can notice that Request numbers 1 and 2 have different Programs.
 
@@ -103,7 +103,7 @@ You can perform four actions for each request: Requires Change, Reject, Approve,
 5. Click on the action that you want to perform;
 6. Confirm the action.
 
-<img src="../../images/approve-transfer-request.png" alt="Approve transfer request confirmation modal" style="height: 814px; width:2105px;"/>
+<img src="../../images/approve-transfer-request.png" alt="Approve transfer request confirmation modal" style="height: 488px; width:1263px;"/>
 
 </br><code>
 🚨 It’s extremely important to review all the transfer requests carefully, and make sure that the right person is being paid.
