@@ -52,8 +52,6 @@ export async function processPendingTransfer(chain: Chain, contract: MultiForwar
     distinct: ['txHash'],
   })
 
-
-  console.log(pendingTransfers)
   if (pendingTransfers.length <= 0) {
     return
   }
