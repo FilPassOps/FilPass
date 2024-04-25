@@ -32,7 +32,7 @@ To initiate the payment process, follow these steps:
 - Details of the selected batch, including the batch number, number of Transfer Requests, total token amount, and total dollar amount.
 - By clicking the dropdown button next to the “Send payment” button, you can access additional information about the selected batch. This includes a table listing the Transfer Requests being paid within that batch, along with their `public IDs, destinations, amounts, token amount, and the hex match` (a security functionality discussed in the next section).
 
-<img src="../../images/payment-list.png" alt="Transfer request payment list" style="height: 750px; width:2114px;"/>
+<img src="../../images/payment-list.png" alt="Transfer request payment list" style="height: 450px; width:1258px;"/>
 
 6. Click on the "Send Payment" button.
   -  6.1. If you are paying requests that are using custom tokens (ERC20) such as USDC, a extra step will be displayed to approve the amount to be paid.<br/>

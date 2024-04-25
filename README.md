@@ -81,9 +81,9 @@ Before starting the application, make sure you have the following files set up:
 
 - Environment: Create a file named `.env` in the root folder containing all environment variables defined at [env-vars](env-vars.md), also found in the root folder.
 
-- Chains: If needed, change the `chains.ts` file to match your desired chains. The default chains are `filecoin` and `ethereum`. You can find more information about the chains configuration file at [chains](chains.md).
+- Chains: If needed, change the `chains.ts` file to match your desired chains. The default chains are `filecoin` and `ethereum`. You can find more information about the chains configuration file at [chains](./docs/chains-config.md).
 
-- System: Change the app information on the `system.ts` file to match your company information. You can find more information about the system configuration file at [system-config](system-config.md).
+- System: Change the app information on the `system.ts` file to match your company information. You can find more information about the system configuration file at [system-config](./docs/system-config.md).
 
 ### Running the application
 
