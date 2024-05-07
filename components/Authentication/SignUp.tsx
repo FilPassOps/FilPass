@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form'
 import { GoogleLogin } from './GoogleLogin'
 import { ResendVerificationModal } from './ResendVerificationModal'
 import { Layout } from './Shared'
+import { AppConfig } from 'config/system'
 
 export function SignUp() {
   const [openModal, setOpenModal] = useState(false)
@@ -50,7 +51,9 @@ export function SignUp() {
 
   return (
     <Layout>
-      <div className="h-full w-full flex flex-col justify-center space-y-6 px-8 md:px-0">
+      <p className='font-medium'>Operated by {AppConfig.app.companyName}</p>
+
+      <div className="h-full w-full flex flex-col justify-center space-y-4 px-8 md:px-0">
         {NEXT_PUBLIC_GOOGLE_CLIENT_ID && (
           <>
             <GoogleLogin buttonText="Sign up with Google" />
@@ -103,7 +106,7 @@ export function SignUp() {
             .
           </p>
           <div>
-            <div className="h-full w-full flex flex-col justify-center space-y-6 mt-6">
+            <div className="h-full w-full flex flex-col justify-center space-y-4 mt-6">
               <Button type="submit" loading={isSubmitting} disabled={isSubmitting}>
                 Sign up
               </Button>

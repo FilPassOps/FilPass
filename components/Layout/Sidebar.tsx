@@ -217,7 +217,10 @@ export const Sidebar = ({ toggle = false, setSidebarToggle }: SidebarProps) => {
               <span className={toggleClasses(toggle, 'inline')}>Contact Support</span>
             </a>
           </RoleComponent>
+          <span>
+          <p className={`${toggleClasses(toggle, 'block')} font-medium text-base pb-1 text-white p-4`}>Operated by {AppConfig.app.companyName}</p>
           <p className={`${toggleClasses(toggle, 'block')} font-medium text-sm text-white p-4`}>Version {projectVersion}</p>
+          </span>
         </div>
       </div>
     </div>
