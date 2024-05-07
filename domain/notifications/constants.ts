@@ -110,14 +110,23 @@ export const baseEmail = (content: string) => {
                             <td align="center" style="padding: 0px 20px 34px 20px;">
                                 <table>
                                     <tr style="margin:0;padding:0;">
-                                        <td align="center" style="width: 40px;">
+                                        ${
+                                          AppConfig.app.twitterUrl && AppConfig.app.emailConfig.twitterIconUrl
+                                            ? `
+                                            <td align="center" style="width: 40px;">
                                             <a href=${AppConfig.app.twitterUrl} style="text-decoration:none;">
                                                 <img src=${AppConfig.app.emailConfig.twitterIconUrl}
                                                     width="20" height="20" alt="Twitter"
                                                     style="display:inline-block;color:#cccccc;">
                                             </a>
                                         </td>
-                                        <td align="center" style="width: 40px;">
+                                            `
+                                            : ''
+                                        }
+                                        ${
+                                          AppConfig.app.linkedinUrl && AppConfig.app.emailConfig.linkedinIconUrl
+                                            ? `
+                                            <td align="center" style="width: 40px;">
                                             <a href=${AppConfig.app.linkedinUrl}
                                                 style="text-decoration:none;">
                                                 <img src=${AppConfig.app.emailConfig.linkedinIconUrl}
@@ -125,7 +134,13 @@ export const baseEmail = (content: string) => {
                                                     style="display:inline-block;color:#cccccc;">
                                             </a>
                                         </td>
-                                        <td align="center" style="width: 40px;">
+                                            `
+                                            : ''
+                                        }
+                                        ${
+                                          AppConfig.app.youtubeChannelUrl && AppConfig.app.emailConfig.youtubeIconUrl
+                                            ? `
+                                            <td align="center" style="width: 40px;">
                                             <a href=${AppConfig.app.youtubeChannelUrl}
                                                 style="text-decoration:none;">
                                                 <img src=${AppConfig.app.emailConfig.youtubeIconUrl}
@@ -133,14 +148,11 @@ export const baseEmail = (content: string) => {
                                                     style="display:inline-block;color:#cccccc;">
                                             </a>
                                         </td>
+                                            `
+                                            : ''
+                                        }
                                     </tr>
                                 </table>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="text-align:center;font-size:16px;color:#9CA3AF;padding-bottom: 32px;">
-                                <p style="margin:0;font-size:16px;line-height:24px;font-weight:400;">© ${new Date().getFullYear()}
-                                    ${AppConfig.app.companyName}, Inc. <br /> All rights reserved.</p>
                             </td>
                         </tr>
                     </table>

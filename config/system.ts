@@ -8,9 +8,9 @@ export interface App {
     fromName: string
     supportAddress: string
     logoUrl: string
-    twitterIconUrl: string
-    linkedinIconUrl: string
-    youtubeIconUrl: string
+    twitterIconUrl?: string
+    linkedinIconUrl?: string
+    youtubeIconUrl?: string
   }
   enableCoinMarketApi: boolean
   youtubeChannelUrl?: string
@@ -51,9 +51,6 @@ const app: App = {
     fromName: 'Company Name',
     supportAddress: 'platform-name@company.com',
     logoUrl: 'https://s3.us-east-2.amazonaws.com/coinemissary.com/open-source-logo.png',
-    twitterIconUrl: 'https://s3.us-east-2.amazonaws.com/coinemissary.com/twitter-icon.png',
-    linkedinIconUrl: 'https://s3.us-east-2.amazonaws.com/coinemissary.com/linkedin-icon.png',
-    youtubeIconUrl: 'https://s3.us-east-2.amazonaws.com/coinemissary.com/youtube-icon.png',
   },
   enableCoinMarketApi: true,
   twitterUrl: 'https://twitter.com',
