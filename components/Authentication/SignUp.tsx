@@ -87,7 +87,7 @@ export function SignUp() {
             )}{' '}
             you agree to our{' '}
             <a
-              href="https://github.com/protocol/coinemissary/blob/main/docs/terms-and-conditions.md"
+              href="https://github.com/emissaryops/emissary/blob/main/docs/terms-and-conditions.md"
               className="text-blue-600 hover:text-blue-800"
               rel="noopener noreferrer"
               target="_blank"
@@ -96,7 +96,7 @@ export function SignUp() {
             </a>{' '}
             and acknowledge you have read our{' '}
             <a
-              href="https://github.com/protocol/coinemissary/blob/main/docs/private-policy.md"
+              href="https://github.com/emissaryops/emissary/blob/main/docs/private-policy.md"
               className="text-blue-600 hover:text-blue-800"
               rel="noopener noreferrer"
               target="_blank"

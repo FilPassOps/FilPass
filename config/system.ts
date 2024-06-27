@@ -47,10 +47,10 @@ const app: App = {
   name: 'Emissary',
   companyName: 'Company Name',
   emailConfig: {
-    domain: '@protocol.ai',
+    domain: '@company-host.ai',
     fromName: 'Company Name',
     supportAddress: 'platform-name@company.com',
-    logoUrl: 'https://s3.us-east-2.amazonaws.com/coinemissary.com/open-source-logo.png',
+    logoUrl: 'logo-url',
   },
   enableCoinMarketApi: true,
   twitterUrl: 'https://twitter.com',
