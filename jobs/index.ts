@@ -3,8 +3,13 @@ import { logger } from 'lib/logger'
 import schedule from 'node-schedule'
 import checkPendingTransfer from './check-pending-transfer'
 import requiresChangeNotification from './requires-change-notification'
+import checkCreditTransactionPayment from './check-credit-transaction-payment'
 
 const checkPendingTransferLimiter = new Bottleneck({
+  maxConcurrent: 1,
+})
+
+const checkCreditTransactionPaymentLimiter = new Bottleneck({
   maxConcurrent: 1,
 })
 
@@ -22,5 +27,6 @@ const job = (limiter: Bottleneck, job: () => Promise<void>) => {
 
 schedule.scheduleJob('0 6 * * *', requiresChangeNotification)
 schedule.scheduleJob('*/2 * * * *', job(checkPendingTransferLimiter, checkPendingTransfer))
+schedule.scheduleJob('* * * * *', job(checkCreditTransactionPaymentLimiter, checkCreditTransactionPayment))
 
 logger.info(`> Jobs scheduled...`)

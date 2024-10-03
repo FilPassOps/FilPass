@@ -86,7 +86,24 @@ export const useContract = (token: ERC20Token | NativeToken) => {
     }
   }
 
-  return { forward, loadingAllowance }
+  const transferERC20 = async (recipient: string, amount: string) => {
+    if (!erc20 || !signer || !provider || !recipient || !amount) {
+      throw new Error('Missing dependencies')
+    }
+
+    if (!connectedToTargetChain) {
+      throw new Error('Not connected to target chain')
+    }
+
+    try {
+      setBusy(true)
+      return await erc20.transfer(recipient, ethers.utils.parseUnits(amount, token.decimals))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return { forward, loadingAllowance, transferERC20 }
 }
 
 export type Forward = ReturnType<typeof useContract>['forward']

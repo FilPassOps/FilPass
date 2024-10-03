@@ -1,0 +1,71 @@
+import { Layout } from 'components/Layout'
+import { withUserSSR } from 'lib/ssr'
+import Head from 'next/head'
+import { getUserTransactionCreditsByUserId } from 'domain/transfer-credits/get-user-transaction-credits-by-user-id'
+import { AppConfig } from 'config/system'
+import { ReactElement } from 'react'
+import { TransactionList } from 'components/User/TransactionList'
+import { CreditTransaction } from '@prisma/client'
+
+export interface CreditTransactionObject extends Omit<CreditTransaction, 'createdAt'> {
+  createdAt: string
+  storageProvider: {
+    walletAddress: string
+  }
+  userCredit: {
+    expiresAt: string
+    amount: string
+    unit: string
+  }
+}
+
+interface TransactionHistoryData {
+  transactions: CreditTransactionObject[]
+}
+
+interface TransactionHistoryProps {
+  data: TransactionHistoryData
+  totalItems: number
+  pageSize: number
+}
+
+const TransactionHistory = ({ data }: TransactionHistoryProps) => {
+  if (!data) {
+    return <div>Loading...</div>
+  }
+
+  return (
+    <>
+      <Head>
+        <title>{`Transaction History - ${AppConfig.app.name}`}</title>
+      </Head>
+      <div className="w-full">
+        <TransactionList transactions={data.transactions} />
+      </div>
+    </>
+  )
+}
+
+export default TransactionHistory
+
+TransactionHistory.getLayout = function getLayout(page: ReactElement) {
+  return (
+    <Layout title="Transaction History" containerClass="">
+      {page}
+    </Layout>
+  )
+}
+
+export const getServerSideProps = withUserSSR(async ({ user }: any) => {
+  const { data } = await getUserTransactionCreditsByUserId({ userId: user.id })
+
+  const transactions = data?.length ? JSON.parse(JSON.stringify(data)) : []
+
+  return {
+    props: {
+      data: {
+        transactions,
+      },
+    },
+  }
+})

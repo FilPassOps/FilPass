@@ -44,8 +44,8 @@ export interface AppConfig {
 }
 
 const app: App = {
-  name: 'Emissary',
-  companyName: 'Company Name',
+  name: 'FilPass',
+  companyName: 'FilPass',
   emailConfig: {
     domain: '@company-host.ai',
     fromName: 'Company Name',

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { ButtonHTMLAttributes, DetailedHTMLProps, forwardRef } from 'react'
 import { LoadingIndicator } from './LoadingIndicator'
 import styles from './button.module.css'
+import { twMerge } from 'tailwind-merge'
 
 type Variant =
   | 'primary'
@@ -72,7 +73,7 @@ export function LinkButton({
   className = '',
 }: LinkButtonProps) {
   return (
-    <Link href={href} passHref={true} className={classNames(getButtonClasses({ disabled, variant, defaultStyle }), className)}>
+    <Link href={href} passHref={true} className={twMerge(getButtonClasses({ disabled, variant, defaultStyle }), className)}>
       {children}
     </Link>
   )

@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import {
   BanknotesIcon,
+  CircleStackIcon,
   DocumentTextIcon,
   HomeIcon,
   IdentificationIcon,
@@ -38,12 +39,50 @@ import { BatchActionsButton } from 'pages/approvals'
 import projectVersion from 'project-version'
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
 
-const navigation = [
+interface NavigationItem {
+  target: string
+  text: string
+  icon: React.ForwardRefExoticComponent<
+    React.PropsWithoutRef<React.SVGProps<SVGSVGElement>> & { title?: string; titleId?: string } & React.RefAttributes<SVGSVGElement>
+  >
+  roles: string[]
+  items?: {
+    text: string
+    roles: string[]
+    filter?: string
+    subPath?: string
+    params?: string
+  }[]
+}
+
+const navigation: NavigationItem[] = [
   {
     target: '/my-transfer-requests',
     text: 'My Requests',
     icon: HomeIcon,
     roles: [],
+  },
+  {
+    target: '/transfer-credits',
+    text: 'Transfer Credits',
+    icon: CircleStackIcon,
+    roles: [USER_ROLE],
+    items: [
+      {
+        text: 'Overview',
+        roles: [USER_ROLE],
+      },
+      {
+        text: 'Buy Credits',
+        roles: [USER_ROLE],
+        subPath: '/buy',
+      },
+      {
+        text: 'Transaction History',
+        roles: [USER_ROLE],
+        subPath: '/transaction-history',
+      },
+    ],
   },
   {
     target: '/approvals',
@@ -218,8 +257,10 @@ export const Sidebar = ({ toggle = false, setSidebarToggle }: SidebarProps) => {
             </a>
           </RoleComponent>
           <span>
-          <p className={`${toggleClasses(toggle, 'block')} font-medium text-base pb-1 text-white p-4`}>Operated by {AppConfig.app.companyName}</p>
-          <p className={`${toggleClasses(toggle, 'block')} font-medium text-sm text-white p-4`}>Version {projectVersion}</p>
+            <p className={`${toggleClasses(toggle, 'block')} font-medium text-base pb-1 text-white p-4`}>
+              Operated by {AppConfig.app.companyName}
+            </p>
+            <p className={`${toggleClasses(toggle, 'block')} font-medium text-sm text-white p-4`}>Version {projectVersion}</p>
           </span>
         </div>
       </div>
@@ -289,12 +330,12 @@ const NavItem = ({
         {navItem.items.map(subItem => {
           if (!user.roles.some(role => subItem.roles.includes(role.role))) return null
 
-          const target = `${navItem.target}?${subItem.filter}`
+          const target = `${navItem.target}${subItem.subPath ?? ''}${subItem.filter ? `?${subItem.filter}` : ''}`
           return (
             <li key={target} className="py-2 hover:font-extrabold">
               <Link href={target} passHref className="flex items-center outline-offset-4">
                 <div className="w-8">
-                  {router.asPath.startsWith(target) && (
+                  {(router.asPath === target || (subItem.filter && router.asPath.includes(subItem.filter))) && (
                     <svg className="ml-2" height="8" width="8">
                       <circle cx="4" cy="4" r="4" fill="white" />
                     </svg>

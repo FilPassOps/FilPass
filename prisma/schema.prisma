@@ -69,6 +69,12 @@ enum NotificationName {
   TR_REQUIRES_CHANGE
 }
 
+enum CreditTransactionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
 model User {
   id                            Int                    @id @default(autoincrement())
   email                         String                 @unique
@@ -96,6 +102,7 @@ model User {
   banReason                     String?                @map("ban_reason")
   banActionedBy                 UserRole?              @relation("BannedUsers", fields: [banActionedById], references: [id])
   banActionedById               Int?                   @map("ban_actioned_by_id")
+  userCredit                    UserCredit[]
 
   @@index([emailHash])
   @@map("user")
@@ -500,4 +507,103 @@ model Blockchain {
   Currency           Currency[]
 
   @@map("blockchain")
+}
+
+model StorageProvider {
+  id                        Int                         @id @default(autoincrement())
+  walletAddress             String                      @unique @map("wallet_address")
+  createdAt                 DateTime                    @default(now()) @map("created_at")
+  updatedAt                 DateTime                    @updatedAt @map("updated_at")
+  creditTransactions        CreditTransaction[]
+  redeemRequest             RedeemRequest[]
+  storageProviderWithdrawal StorageProviderWithdrawal[]
+  userCredit                UserCredit[]
+
+  @@index([walletAddress])
+  @@map("storage_provider")
+}
+
+model CreditTransaction {
+  id                Int                     @id @default(autoincrement())
+  transactionHash   String                  @unique @map("transaction_hash")
+  status            CreditTransactionStatus @default(PENDING)
+  from              String                  @map("from")
+  storageProvider   StorageProvider         @relation(fields: [storageProviderId], references: [id])
+  storageProviderId Int                     @map("storage_provider_id")
+  createdAt         DateTime                @default(now()) @map("created_at")
+  updatedAt         DateTime                @updatedAt @map("updated_at")
+  userCredit        UserCredit              @relation(fields: [userCreditId], references: [id])
+  amount            String                  @map("amount")
+  userCreditId      Int                     @map("user_credit_id")
+
+  @@index([transactionHash])
+  @@map("credit_transaction")
+}
+
+model UserCredit {
+  id                 Int                 @id @default(autoincrement())
+  userId             Int                 @map("user_id")
+  user               User                @relation(fields: [userId], references: [id])
+  storageProviderId  Int                 @map("storage_provider_id")
+  storageProvider    StorageProvider     @relation(fields: [storageProviderId], references: [id])
+  amount             String              @map("amount")
+  totalHeight        String?             @default("0") @map("total_height")
+  totalWithdrawals   String              @default("0") @map("total_withdrawals")
+  totalRefunds       String              @default("0") @map("total_refunds")
+  creditTransactions CreditTransaction[]
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
+  refundStartsAt     DateTime?           @map("refund_starts_at")
+  withdrawStartsAt   DateTime?           @map("withdraw_starts_at")
+  withdrawExpiresAt  DateTime?           @map("withdraw_expires_at")
+  creditTokens       CreditToken[]
+  currentToken       CreditToken?        @relation("current_token", fields: [currentTokenId], references: [id])
+  currentTokenId     Int?                @unique @map("current_token_id")
+
+  @@index([userId])
+  @@map("user_credit")
+}
+
+model CreditToken {
+  id                        Int                         @id @default(autoincrement())
+  publicId                  String                      @unique @map("public_id")
+  userCreditId              Int                         @map("user_credit_id")
+  height                    String                      @map("height")
+  amount                    String                      @map("amount")
+  token                     String                      @map("token")
+  redeemable                Boolean                     @default(true) @map("redeemable")
+  createdAt                 DateTime                    @default(now()) @map("created_at")
+  updatedAt                 DateTime                    @updatedAt @map("updated_at")
+  splitGroup                String?                     @map("split_group")
+  redeemRequest             RedeemRequest[]
+  storageProviderWithdrawal StorageProviderWithdrawal[]
+  userCredit                UserCredit                  @relation(fields: [userCreditId], references: [id])
+  currentUserCredit         UserCredit?                 @relation("current_token")
+
+  @@index([userCreditId])
+  @@map("credit_token")
+}
+
+model RedeemRequest {
+  id                Int             @id @default(autoincrement())
+  storageProvider   StorageProvider @relation(fields: [storageProviderId], references: [id])
+  storageProviderId Int             @map("storage_provider_id")
+  creditToken       CreditToken     @relation(fields: [creditTokenId], references: [id])
+  creditTokenId     Int             @map("credit_token_id")
+  createdAt         DateTime        @default(now()) @map("created_at")
+
+  @@index([creditTokenId])
+  @@map("redeem_request")
+}
+
+model StorageProviderWithdrawal {
+  id                Int             @id @default(autoincrement())
+  storageProvider   StorageProvider @relation(fields: [storageProviderId], references: [id])
+  storageProviderId Int             @map("storage_provider_id")
+  creditToken       CreditToken     @relation(fields: [creditTokenId], references: [id])
+  creditTokenId     Int             @map("credit_token_id")
+  createdAt         DateTime        @default(now()) @map("created_at")
+
+  @@index([creditTokenId])
+  @@map("storage_provider_withdrawal")
 }
