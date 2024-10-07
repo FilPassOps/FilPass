@@ -56,7 +56,7 @@ CREATE TABLE "credit_token" (
     "redeemable" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
-    "split_group" TEXT,
+    "split_group" TEXT DEFAULT '1',
 
     CONSTRAINT "credit_token_pkey" PRIMARY KEY ("id")
 );
@@ -72,13 +72,13 @@ CREATE TABLE "redeem_request" (
 );
 
 -- CreateTable
-CREATE TABLE "storage_provider_withdrawal" (
+CREATE TABLE "refund_request" (
     "id" SERIAL NOT NULL,
-    "storage_provider_id" INTEGER NOT NULL,
-    "credit_token_id" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "amount" TEXT NOT NULL,
+    "user_credit_id" INTEGER NOT NULL,
 
-    CONSTRAINT "storage_provider_withdrawal_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "refund_request_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -106,10 +106,10 @@ CREATE UNIQUE INDEX "credit_token_public_id_key" ON "credit_token"("public_id");
 CREATE INDEX "credit_token_user_credit_id_idx" ON "credit_token"("user_credit_id");
 
 -- CreateIndex
-CREATE INDEX "redeem_request_credit_token_id_idx" ON "redeem_request"("credit_token_id");
+CREATE INDEX "credit_token_split_group_idx" ON "credit_token"("split_group");
 
 -- CreateIndex
-CREATE INDEX "storage_provider_withdrawal_credit_token_id_idx" ON "storage_provider_withdrawal"("credit_token_id");
+CREATE INDEX "redeem_request_credit_token_id_idx" ON "redeem_request"("credit_token_id");
 
 -- AddForeignKey
 ALTER TABLE "credit_transaction" ADD CONSTRAINT "credit_transaction_storage_provider_id_fkey" FOREIGN KEY ("storage_provider_id") REFERENCES "storage_provider"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -136,7 +136,4 @@ ALTER TABLE "redeem_request" ADD CONSTRAINT "redeem_request_storage_provider_id_
 ALTER TABLE "redeem_request" ADD CONSTRAINT "redeem_request_credit_token_id_fkey" FOREIGN KEY ("credit_token_id") REFERENCES "credit_token"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "storage_provider_withdrawal" ADD CONSTRAINT "storage_provider_withdrawal_storage_provider_id_fkey" FOREIGN KEY ("storage_provider_id") REFERENCES "storage_provider"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "storage_provider_withdrawal" ADD CONSTRAINT "storage_provider_withdrawal_credit_token_id_fkey" FOREIGN KEY ("credit_token_id") REFERENCES "credit_token"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "refund_request" ADD CONSTRAINT "refund_request_user_credit_id_fkey" FOREIGN KEY ("user_credit_id") REFERENCES "user_credit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

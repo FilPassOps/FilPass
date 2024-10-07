@@ -43,17 +43,6 @@ export const getUserCreditById = async (props: GetUserCreditByIdParams) => {
             transactionHash: true,
           },
         },
-        creditTokens: {
-          select: {
-            id: true,
-            height: true,
-            token: true,
-            redeemable: true,
-          },
-          orderBy: {
-            id: 'asc',
-          },
-        },
       },
     })
     return { data: userCredit }

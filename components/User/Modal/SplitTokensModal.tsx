@@ -16,6 +16,7 @@ interface SplitTokensModalProps {
 export const SplitTokensModal = ({ onModalClosed, open, userCreditId }: SplitTokensModalProps) => {
   const [error, setError] = useState<any>()
   const [success, setSuccess] = useState<boolean>(false)
+
   const {
     register,
     handleSubmit,

@@ -11,7 +11,7 @@ interface TransactionListProps {
 }
 
 export const TransactionList = ({ transactions }: TransactionListProps) => {
-  const ethereum = AppConfig.network.getChainByName('Ethereum')
+  const filecoin = AppConfig.network.getChainByName('Filecoin')
 
   return (
     <div className="flex flex-col relative py-4">
@@ -42,7 +42,7 @@ export const TransactionList = ({ transactions }: TransactionListProps) => {
                   <Cell className="break-all">
                     <div className="flex items-center gap-2">
                       <p>{transaction.userCredit.amount}</p>
-                      <TokenIcon blockchainName={'Ethereum'} tokenSymbol={'USDC'} width={20} height={20} />
+                      <TokenIcon blockchainName={'Filecoin'} tokenSymbol={'tFIL'} width={20} height={20} />
                     </div>
                   </Cell>
                   {/* @ts-ignore */}
@@ -58,8 +58,8 @@ export const TransactionList = ({ transactions }: TransactionListProps) => {
                   {/* @ts-ignore */}
                   <Cell className="break-all">
                     <BlockExplorerLink
-                      blockExplorerName={ethereum.blockExplorer.name}
-                      blockExplorerUrl={ethereum.blockExplorer.url}
+                      blockExplorerName={filecoin.blockExplorer.name}
+                      blockExplorerUrl={filecoin.blockExplorer.url}
                       transactionHash={transaction.transactionHash}
                     />
                   </Cell>

@@ -105,7 +105,7 @@ const BuyCredits = () => {
   return (
     <div className="h-full min-h-screen">
       <Head>
-        <title>Buy Credits - Protocol Labs Transfer</title>
+        <title>Buy Credits</title>
       </Head>
       <div className="h-full max-w-3xl mx-auto">
         <form className="flex flex-col gap-4 mt-5 h-full flex-grow">

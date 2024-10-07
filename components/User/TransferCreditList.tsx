@@ -7,11 +7,9 @@ import { UserCreditItem } from 'pages/transfer-credits'
 
 interface TransferCreditListProps {
   userCreditItems: UserCreditItem[]
-  setSelectedUserCreditId: (id: number) => void
-  setSplitTokensModalOpen: (open: boolean) => void
 }
 
-export const TransferCreditList = ({ userCreditItems, setSelectedUserCreditId, setSplitTokensModalOpen }: TransferCreditListProps) => {
+export const TransferCreditList = ({ userCreditItems }: TransferCreditListProps) => {
   const usdc = AppConfig.network.getTokenBySymbolAndBlockchainName('USDC', 'Ethereum')
 
   return (
@@ -28,14 +26,25 @@ export const TransferCreditList = ({ userCreditItems, setSelectedUserCreditId, s
 
         const currentCredit = totalHeight.sub(parsedCurrentHeight)
 
+        const hasCredits = currentCredit.gt(0)
+
         return (
           <div key={item.id} className="bg-white rounded-lg shadow-md">
-            {item.isWithdrawExpired && (
+            {item.isRefundStarted && hasCredits && (
               <div className="text-gamboge-orange bg-papaya-whip p-4 rounded-t-lg" role="alert">
                 <p className="font-bold">Attention</p>
                 <p>
                   This credit has expired on {new Date(item.withdrawExpiresAt).toLocaleString()}. <br />
                   You can only refund your credits.
+                </p>
+              </div>
+            )}
+            {!hasCredits && (
+              <div className="text-gamboge-orange bg-papaya-whip p-4 rounded-t-lg" role="alert">
+                <p className="font-bold">Attention</p>
+                <p>
+                  You currently have <strong>0</strong> credits. Please buy credits to continue using the service with this Storage
+                  Provider.
                 </p>
               </div>
             )}
@@ -57,58 +66,36 @@ export const TransferCreditList = ({ userCreditItems, setSelectedUserCreditId, s
               </div>
               <div className="flex flex-col gap-2">
                 <div>
-                  <p className="text-gray-600">Current Balance:</p>
+                  <p className="text-gray-600">Current Credits:</p>
                   <p className="text-xl font-bold text-deep-koamaru">{formatUnits(currentCredit, usdc.decimals)} Credits</p>
                 </div>
                 <div>
-                  <p className="text-gray-600">Current Balance Token:</p>
-                  <div className="flex gap-2 items-center">
-                    <p title={item.currentToken?.token} className="text-xl font-bold text-deep-koamaru">{`${item.currentToken?.token.slice(
-                      0,
-                      5,
-                    )}...${item.currentToken?.token.slice(-5)}`}</p>
-                    <Button
-                      variant="none"
-                      className="p-0"
-                      onClick={() => {
-                        navigator.clipboard.writeText(item.currentToken?.token ?? '')
-                        // TODO: Add toast notification or copied message
-                      }}
-                    >
-                      <ClipboardIcon className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <p className="text-gray-600">Current Credits Token:</p>
+                  {hasCredits ? (
+                    <div className="flex gap-2 items-center">
+                      <p
+                        title={item.currentToken?.token}
+                        className="text-xl font-bold text-deep-koamaru"
+                      >{`${item.currentToken?.token.slice(0, 5)}...${item.currentToken?.token.slice(-5)}`}</p>
+                      <Button
+                        variant="none"
+                        className="p-0"
+                        onClick={() => {
+                          navigator.clipboard.writeText(item.currentToken?.token ?? '')
+                          // TODO: Add toast notification or copied message
+                        }}
+                      >
+                        <ClipboardIcon className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    '-'
+                  )}
                 </div>
                 <div className="flex gap-2 justify-end">
                   <LinkButton href={`/transfer-credits/${item.id}`} variant="secondary" className="w-fit">
                     <p>View Details</p>
                   </LinkButton>
-                  <Button
-                    onClick={() => {
-                      setSelectedUserCreditId(item.id)
-                      setSplitTokensModalOpen(true)
-                    }}
-                    variant="primary"
-                    className="w-fit"
-                    disabled={item.isWithdrawExpired}
-                    toolTipText={item.isWithdrawExpired ? 'This credit has expired' : ''}
-                  >
-                    <p>Split Tokens</p>
-                  </Button>
-                  <Button
-                    variant="primary"
-                    className="w-fit"
-                    disabled={!item.isWithdrawExpired || !item.isRefundStarted}
-                    toolTipText={
-                      !item.isWithdrawExpired
-                        ? ' This credit has not expired yet'
-                        : !item.isRefundStarted
-                        ? 'This credit cannot be refunded yet'
-                        : ''
-                    }
-                  >
-                    Refund Credits
-                  </Button>
                 </div>
               </div>
             </div>

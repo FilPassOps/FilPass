@@ -510,14 +510,13 @@ model Blockchain {
 }
 
 model StorageProvider {
-  id                        Int                         @id @default(autoincrement())
-  walletAddress             String                      @unique @map("wallet_address")
-  createdAt                 DateTime                    @default(now()) @map("created_at")
-  updatedAt                 DateTime                    @updatedAt @map("updated_at")
-  creditTransactions        CreditTransaction[]
-  redeemRequest             RedeemRequest[]
-  storageProviderWithdrawal StorageProviderWithdrawal[]
-  userCredit                UserCredit[]
+  id                 Int                 @id @default(autoincrement())
+  walletAddress      String              @unique @map("wallet_address")
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
+  creditTransactions CreditTransaction[]
+  redeemTokenRequest      RedeemTokenRequest[]
+  userCredit         UserCredit[]
 
   @@index([walletAddress])
   @@map("storage_provider")
@@ -559,32 +558,33 @@ model UserCredit {
   creditTokens       CreditToken[]
   currentToken       CreditToken?        @relation("current_token", fields: [currentTokenId], references: [id])
   currentTokenId     Int?                @unique @map("current_token_id")
+  refundCreditsRequest      RefundCreditsRequest[]
 
   @@index([userId])
   @@map("user_credit")
 }
 
 model CreditToken {
-  id                        Int                         @id @default(autoincrement())
-  publicId                  String                      @unique @map("public_id")
-  userCreditId              Int                         @map("user_credit_id")
-  height                    String                      @map("height")
-  amount                    String                      @map("amount")
-  token                     String                      @map("token")
-  redeemable                Boolean                     @default(true) @map("redeemable")
-  createdAt                 DateTime                    @default(now()) @map("created_at")
-  updatedAt                 DateTime                    @updatedAt @map("updated_at")
-  splitGroup                String?                     @map("split_group")
-  redeemRequest             RedeemRequest[]
-  storageProviderWithdrawal StorageProviderWithdrawal[]
-  userCredit                UserCredit                  @relation(fields: [userCreditId], references: [id])
-  currentUserCredit         UserCredit?                 @relation("current_token")
+  id                Int             @id @default(autoincrement())
+  publicId          String          @unique @map("public_id")
+  userCreditId      Int             @map("user_credit_id")
+  height            String          @map("height")
+  amount            String          @map("amount")
+  token             String          @map("token")
+  redeemable        Boolean         @default(true) @map("redeemable")
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+  splitGroup        String?         @default("1") @map("split_group")
+  redeemTokenRequest     RedeemTokenRequest[]
+  userCredit        UserCredit      @relation(fields: [userCreditId], references: [id])
+  currentUserCredit UserCredit?     @relation("current_token")
 
   @@index([userCreditId])
+  @@index([splitGroup])
   @@map("credit_token")
 }
 
-model RedeemRequest {
+model RedeemTokenRequest {
   id                Int             @id @default(autoincrement())
   storageProvider   StorageProvider @relation(fields: [storageProviderId], references: [id])
   storageProviderId Int             @map("storage_provider_id")
@@ -596,14 +596,12 @@ model RedeemRequest {
   @@map("redeem_request")
 }
 
-model StorageProviderWithdrawal {
-  id                Int             @id @default(autoincrement())
-  storageProvider   StorageProvider @relation(fields: [storageProviderId], references: [id])
-  storageProviderId Int             @map("storage_provider_id")
-  creditToken       CreditToken     @relation(fields: [creditTokenId], references: [id])
-  creditTokenId     Int             @map("credit_token_id")
-  createdAt         DateTime        @default(now()) @map("created_at")
+model RefundCreditsRequest {
+  id           Int        @id @default(autoincrement())
+  createdAt    DateTime   @default(now()) @map("created_at")
+  amount       String     @map("amount")
+  userCreditId Int        @map("user_credit_id")
+  userCredit   UserCredit @relation(fields: [userCreditId], references: [id])
 
-  @@index([creditTokenId])
-  @@map("storage_provider_withdrawal")
+  @@map("refund_request")
 }

@@ -40,7 +40,7 @@ const WITHDRAW_DAYS_TIME = 30 * 24 * 60 * 60 * 1000
 // 1 day
 const LOCK_DAYS_TIME = 1 * 24 * 60 * 60 * 1000
 
-const ONE_DAY_TIME = 24 * 60 * 60 * 1000
+const ONE_DAY_TIME = 1 * 24 * 60 * 60 * 1000
 
 export default async function run() {
   try {

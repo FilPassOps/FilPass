@@ -15,10 +15,10 @@ export const buyCredits = async (props: BuyCreditsParams) => {
   try {
     const fields = await saveTransferCreditsValidator.validate(props)
 
-    const usdc = AppConfig.network.getTokenBySymbolAndBlockchainName('USDC', 'Ethereum')
+    const fil = AppConfig.network.getTokenBySymbolAndBlockchainName('tFIL', 'Filecoin')
 
-    if (!usdc) {
-      throw new Error('USDC token not found')
+    if (!fil) {
+      throw new Error('FIL token not found')
     }
 
     // TODO: check minimum offer price

@@ -28,11 +28,12 @@ export const redeemToken = async (props: RedeemTokenParams) => {
       throw new Error('Invalid token')
     }
 
-    const { exp, iat, sub, height } = decodedToken
+    const { exp, sub, height } = decodedToken
 
-    if (new Date(exp * 1000) < new Date()) {
-      throw new Error('Token expired')
-    }
+    // TODO: Even if token is expired we need to check in the database because the date could have changed
+    // if (new Date(exp * 1000) < new Date()) {
+    //   throw new Error('Token expired')
+    // }
 
     if (height <= 0) {
       throw new Error('Invalid token')
@@ -92,7 +93,7 @@ export const redeemToken = async (props: RedeemTokenParams) => {
         })
       }
 
-      await tx.redeemRequest.create({
+      await tx.redeemTokenRequest.create({
         data: {
           creditTokenId: creditToken.id,
           storageProviderId: storageProvider.id,

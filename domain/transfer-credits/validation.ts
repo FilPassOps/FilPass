@@ -1,6 +1,7 @@
 import { MAX_INTEGER_VALUE } from 'domain/constants'
 import yup from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
+import * as Yup from 'yup'
 
 export const getUserTransactionCreditsByUserIdValidator = yup.object({
   userId: yup.number().required(),
@@ -38,4 +39,21 @@ export const splitCreditsValidator = yup.object({
 
 export const splitTokensValidator = yup.object({
   splitNumber: yup.number().positive().typeError(errorsMessages.required_field.message).required(),
+})
+
+export const refundCreditsValidator = yup.object({
+  id: yup.number().required(),
+  userId: yup.number().required(),
+})
+
+export const getSplitTokensGroupValidator = Yup.object().shape({
+  userCreditId: Yup.number().required('User credit ID is required'),
+})
+
+export const getSplitTokensBySplitGroupValidator = Yup.object().shape({
+  splitGroup: Yup.string().required(),
+  userId: Yup.number().required(),
+  userCreditId: Yup.number().required(),
+  pageSize: Yup.number().required(),
+  page: Yup.number().required(),
 })

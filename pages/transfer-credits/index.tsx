@@ -3,10 +3,9 @@ import { withUserSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { LinkButton } from 'components/Shared/Button'
 import { ShoppingCartIcon } from '@heroicons/react/24/outline'
-import { ReactElement, useState } from 'react'
+import { ReactElement } from 'react'
 import { AppConfig } from 'config/system'
 import { getUserCredits } from 'domain/transfer-credits/get-user-credits'
-import { SplitTokensModal } from 'components/User/Modal/SplitTokensModal'
 import { getItemsPerPage, PaginationWrapper } from 'components/Shared/PaginationWrapper'
 import { TransferCreditList } from 'components/User/TransferCreditList'
 
@@ -44,8 +43,6 @@ interface TransferCreditsProps {
 
 const TransferCredits = ({ data, totalItems, pageSize }: TransferCreditsProps) => {
   const { userCreditItems } = data
-  const [splitTokensModalOpen, setSplitTokensModalOpen] = useState(false)
-  const [selectedUserCreditId, setSelectedUserCreditId] = useState<number | null>(null)
 
   return (
     <>
@@ -69,18 +66,9 @@ const TransferCredits = ({ data, totalItems, pageSize }: TransferCreditsProps) =
           </div>
         </div>
         <PaginationWrapper totalItems={totalItems} pageSize={pageSize}>
-          <TransferCreditList
-            userCreditItems={userCreditItems}
-            setSelectedUserCreditId={setSelectedUserCreditId}
-            setSplitTokensModalOpen={setSplitTokensModalOpen}
-          />
+          <TransferCreditList userCreditItems={userCreditItems} />
         </PaginationWrapper>
       </div>
-      <SplitTokensModal
-        onModalClosed={() => setSplitTokensModalOpen(false)}
-        open={splitTokensModalOpen}
-        userCreditId={selectedUserCreditId?.toString() ?? ''}
-      />
     </>
   )
 }
