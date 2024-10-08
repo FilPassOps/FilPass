@@ -81,7 +81,6 @@
     "react-hook-form": "^7.45.4",
     "react-number-format": "^5.2.2",
     "react-otp-input": "^3.0.4",
-    "secp256k1": "^5.0.0",
     "swr": "^2.2.0",
     "tailwind-merge": "^1.13.0",
     "winston": "^3.10.0",

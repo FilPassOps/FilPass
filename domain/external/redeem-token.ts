@@ -1,5 +1,5 @@
 import prisma from 'lib/prisma'
-import { verify } from 'lib/jwt'
+import { verifyJwt } from 'lib/jwt'
 import { redeemTokenValidator } from './validation'
 import Big from 'big.js'
 
@@ -8,27 +8,17 @@ interface RedeemTokenParams {
   token: string
 }
 
-export const PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu1SU1LfVLPHCozMxH2Mo
-4lgOEePzNm0tRgeLezV6ffAt0gunVTLw7onLRnrq0/IzW7yWR7QkrmBL7jTKEn5u
-+qKhbwKfBstIs+bMY2Zkp18gnTxKLxoS2tFczGkPLPgizskuemMghRniWaoLcyeh
-kd3qqGElvW/VDL5AaWTg0nLVkjRo9z+40RQzuVaE8AkAFmxZzow3x+VJYKdjykkJ
-0iT9wCS0DRTXu269V264Vf/3jvredZiKRkgwlL9xNAwxXFg0x/XFw005UWVRIkdg
-cKWTjpBP2dPwVZ4WWC+9aGVd+Gyn1o0CLelf4rEjGoXbAAEgAqeGUxrcIlbjXfbc
-mwIDAQAB
------END PUBLIC KEY-----`
-
 export const redeemToken = async (props: RedeemTokenParams) => {
   try {
     const fields = await redeemTokenValidator.validate(props)
 
-    const { data: decodedToken, error } = verify(fields.token, PUBLIC_KEY)
+    const result = await verifyJwt(fields.token, process.env.SYSTEM_WALLET_ADDRESS as string)
 
-    if (error) {
-      throw new Error('Invalid token')
+    if (result.error) {
+      throw new Error('Invalid token ')
     }
 
-    const { exp, sub, height } = decodedToken
+    const { exp, sub, height } = result.data
 
     // TODO: Even if token is expired we need to check in the database because the date could have changed
     // if (new Date(exp * 1000) < new Date()) {

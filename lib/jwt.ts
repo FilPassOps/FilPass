@@ -1,6 +1,9 @@
 import { ethers } from 'ethers'
-import jwt, { SignOptions } from 'jsonwebtoken'
+import jwt, { JwtPayload, SignOptions } from 'jsonwebtoken'
 import errorsMessages from 'wordings-and-errors/errors-messages'
+import * as crypto from 'crypto'
+
+const wallet = new ethers.Wallet(process.env.SYSTEM_WALLET_PRIVATE_KEY as string)
 
 export const verify = (value: string, secretOrPublicKey?: string) => {
   try {
@@ -14,49 +17,56 @@ export const sign = (value: any, secretOrPrivateKey?: string, options?: SignOpti
   return jwt.sign(value, secretOrPrivateKey || (process.env.APP_SECRET as string), options)
 }
 
-// export const secp256k1KeyFromLotusWallet = (exp: string) => {
-//   const decoded = Buffer.from(exp, 'hex')
-
-//   const keyData = JSON.parse(decoded.toString())
-
-//   if (keyData.Type !== 'secp256k1') {
-//     throw new Error(`Key must be of type secp256k1, got: ${keyData.Type}`)
-//   }
-
-//   const privateKeyUint = new Uint8Array(Buffer.from(keyData.PrivateKey, 'base64'))
-
-//   if (privateKeyUint.length !== 32) {
-//     throw new Error('Private key must be 32 bytes long.')
-//   }
-
-//   if (!secp256k1.privateKeyVerify(privateKeyUint)) {
-//     throw new Error('Invalid private key')
-//   }
-
-//   const publicKeyUint = secp256k1.publicKeyCreate(privateKeyUint, true)
-
-//   const privateKey = Buffer.from(privateKeyUint).toString('hex')
-//   const publicKey = Buffer.from(publicKeyUint).toString('hex')
-
-//   return { privateKey, publicKey }
-// }
-
-export const signEthereumJWT = async (payload: any) => {
-  // Create a signer instance from ethers.js
-  const signer = new ethers.Wallet(process.env.SYSTEM_WALLET_PRIVATE_KEY as string)
-
+// Function to sign a JWT using the ES256K-R algorithm
+export async function signJwt(payload: any) {
   const header = {
-    alg: 'ES256',
+    alg: 'ES256K-R',
     typ: 'JWT',
   }
 
-  const base64Header = Buffer.from(JSON.stringify(header)).toString('base64')
-  const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64')
-  const unsignedToken = `${base64Header}.${base64Payload}`
+  const encodedHeader = Buffer.from(JSON.stringify(header)).toString('base64url')
+  const encodedPayload = Buffer.from(JSON.stringify(payload)).toString('base64url')
 
-  const signature = await signer.signMessage(unsignedToken)
+  const signingInput = `${encodedHeader}.${encodedPayload}`
 
-  const signedJWT = `${unsignedToken}.${signature}`
+  const hash = crypto.createHash('sha256').update(signingInput).digest()
 
-  return signedJWT
+  const signature = wallet._signingKey().signDigest(hash)
+
+  const flatSignature = ethers.utils.joinSignature(signature)
+
+  const signatureBuffer = Buffer.from(flatSignature.slice(2), 'hex') // 65 bytes
+
+  const encodedSignature = signatureBuffer.toString('base64url')
+
+  const jwt = `${signingInput}.${encodedSignature}`
+
+  return jwt
+}
+
+export async function verifyJwt(jwtToken: string, expectedAddress: string) {
+  try {
+    const [encodedHeader, encodedPayload, encodedSignature] = jwtToken.split('.')
+
+    const signingInput = `${encodedHeader}.${encodedPayload}`
+
+    const hash = crypto.createHash('sha256').update(signingInput).digest()
+
+    const signatureBuffer = Buffer.from(encodedSignature, 'base64url')
+
+    const signatureHex = '0x' + signatureBuffer.toString('hex')
+
+    const recoveredAddress = ethers.utils.recoverAddress(hash, signatureHex)
+
+    if (recoveredAddress.toLowerCase() !== expectedAddress.toLowerCase()) {
+      throw new Error('Invalid signature: address mismatch')
+    }
+
+    const payloadJson = Buffer.from(encodedPayload, 'base64url').toString('utf8')
+    const payload = JSON.parse(payloadJson)
+
+    return { data: payload as JwtPayload }
+  } catch (error: any) {
+    return { error: errorsMessages.invalid_token }
+  }
 }

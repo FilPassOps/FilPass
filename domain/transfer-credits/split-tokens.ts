@@ -1,7 +1,7 @@
 import prisma from 'lib/prisma'
 import { getUserCreditById } from './get-user-credit-by-id'
 import { splitCreditsValidator } from './validation'
-import { signEthereumJWT } from 'lib/jwt'
+import { signJwt } from 'lib/jwt'
 import { randomUUID } from 'node:crypto'
 import { formatUnits, parseUnits } from 'ethers/lib/utils'
 import { AppConfig } from 'config/system'
@@ -62,14 +62,12 @@ export const splitTokens = async (props: SplitTokensParams) => {
             amount,
             publicId: tokenUuid,
             splitGroup,
-            token: await signEthereumJWT({
+            token: await signJwt({
               iss: process.env.SYSTEM_WALLET_ADDRESS,
               exp: data.withdrawExpiresAt?.getTime(),
               iat: Math.floor(Date.now() / 1000),
               sub: tokenUuid,
               height: height,
-              splitGroup,
-              systemWallet: process.env.SYSTEM_WALLET_ADDRESS,
             }),
           }
         }),
