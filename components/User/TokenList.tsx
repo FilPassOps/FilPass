@@ -1,10 +1,8 @@
-import { ClipboardIcon, XCircleIcon } from '@heroicons/react/24/outline'
-import { ProgramCurrency } from '@prisma/client'
+import { ClipboardIcon } from '@heroicons/react/24/outline'
 import Big from 'big.js'
 import { TableDiv, TableHeader, Table } from 'components/Controller/MetaMaskPayment/Table'
 import { Button } from 'components/Shared/Button'
 import { CreditToken } from 'pages/transfer-credits/[id]'
-import { useState } from 'react'
 
 interface TokenListProps {
   creditTokens: CreditToken[]
@@ -13,8 +11,8 @@ interface TokenListProps {
   isOpen: boolean
 }
 
-export const TokenList = ({ creditTokens, maxHeight, currentHeight, isOpen }: TokenListProps) => {
-  const copyToClipboard = (text: string, field: string) => {
+export const TokenList = ({ creditTokens, currentHeight, isOpen }: TokenListProps) => {
+  const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
   }
 
@@ -40,7 +38,7 @@ export const TokenList = ({ creditTokens, maxHeight, currentHeight, isOpen }: To
                 <TableDiv>
                   <div className="flex items-center justify-end gap-2">
                     <p className="text-deep-koamaru">{`${tokenItem.token.slice(0, 6)}...${tokenItem.token.slice(-6)}`}</p>
-                    <Button variant="none" className="p-0" onClick={() => copyToClipboard(tokenItem.token, tokenItem.id.toString())}>
+                    <Button variant="none" className="p-0" onClick={() => copyToClipboard(tokenItem.token)}>
                       <ClipboardIcon className="h-4 w-4" />
                     </Button>
                   </div>

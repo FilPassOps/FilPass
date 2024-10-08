@@ -30,14 +30,14 @@ export const buyCredits = async (props: BuyCreditsParams) => {
       throw new Error('Invalid storage provider address')
     }
 
-    let storageProvider = await prisma.storageProvider.findUnique({
+    let creditStorageProvider = await prisma.storageProvider.findUnique({
       where: {
         walletAddress: fields.to,
       },
     })
 
-    if (!storageProvider) {
-      storageProvider = await prisma.storageProvider.create({
+    if (!creditStorageProvider) {
+      creditStorageProvider = await prisma.storageProvider.create({
         data: {
           walletAddress: fields.to,
         },
@@ -47,26 +47,32 @@ export const buyCredits = async (props: BuyCreditsParams) => {
     const existingUserCredit = await prisma.userCredit.findFirst({
       where: {
         userId: fields.userId,
-        storageProviderId: storageProvider.id,
+        storageProviderId: creditStorageProvider.id,
       },
     })
 
     // TODO: encrypt amount and other important info
     await prisma.$transaction(async tx => {
-      const userCredit = existingUserCredit
-        ? existingUserCredit
-        : await tx.userCredit.create({
-            data: {
-              userId: fields.userId,
-              storageProviderId: storageProvider.id,
-              amount: fields.amount,
-            },
-          })
+      if (!creditStorageProvider || !creditStorageProvider.id) {
+        throw new Error('Failed to create or find storage provider')
+      }
+
+      let userCredit = existingUserCredit
+
+      if (!userCredit) {
+        userCredit = await tx.userCredit.create({
+          data: {
+            userId: fields.userId,
+            storageProviderId: creditStorageProvider.id,
+            amount: fields.amount,
+          },
+        })
+      }
 
       await tx.creditTransaction.create({
         data: {
           from: fields.from,
-          storageProviderId: storageProvider.id,
+          storageProviderId: creditStorageProvider.id,
           transactionHash: fields.hash,
           status: 'PENDING',
           amount: fields.amount,
