@@ -1,6 +1,6 @@
 import { Role } from '@prisma/client'
 import { MultipleSelectInput } from 'components/Shared/FormInput'
-import { ADDRESS_MANAGER_ROLE, APPROVER_ROLE, CONTROLLER_ROLE, SUPERADMIN_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
+import { ADDRESS_MANAGER_ROLE, SUPERADMIN_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
 import { BaseApiResult, api } from 'lib/api'
 import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
@@ -24,12 +24,9 @@ export const SelectRoles = ({ user, scrolled }: SelectRolesProps) => {
   const [submitErrors, setSubmitErrors] = useState<any>()
   const [isLoading, setLoading] = useState(false)
 
-  const approverOption: RoleOption = { value: APPROVER_ROLE, label: 'Approver', disabled: false, tooltip: undefined }
   const viewerOption: RoleOption = { value: VIEWER_ROLE, label: 'Viewer', disabled: false, tooltip: undefined }
 
   const rolesOptions = [
-    approverOption,
-    { value: CONTROLLER_ROLE, label: 'Controller', disabled: false, tooltip: undefined },
     { value: ADDRESS_MANAGER_ROLE, label: 'Address Manager', disabled: false, tooltip: undefined },
     { value: SUPERADMIN_ROLE, label: 'Superadmin', disabled: false, tooltip: undefined },
     viewerOption,
@@ -41,7 +38,6 @@ export const SelectRoles = ({ user, scrolled }: SelectRolesProps) => {
     control,
     formState: { errors },
     setValue,
-    watch,
   } = useForm({
     shouldFocusError: false,
     defaultValues: {
@@ -57,18 +53,6 @@ export const SelectRoles = ({ user, scrolled }: SelectRolesProps) => {
       setSubmitErrors(error.errors)
     }
     setLoading(false)
-  }
-
-  const rolesValue = watch('roles')
-
-  if (rolesValue.some(({ value }) => value === VIEWER_ROLE)) {
-    approverOption.disabled = true
-    approverOption.tooltip = 'To make this user an approver, remove their viewer role.'
-  }
-
-  if (rolesValue.some(({ value }) => value === APPROVER_ROLE)) {
-    viewerOption.disabled = true
-    viewerOption.tooltip = 'To make this user a viewer, remove their approver role.'
   }
 
   return (

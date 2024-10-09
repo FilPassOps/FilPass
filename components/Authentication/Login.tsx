@@ -98,7 +98,7 @@ export function Login({ redirectAfterLogin }: LoginProps) {
       router.push(redirectAfterLogin)
       return { error: undefined }
     } else {
-      router.push('/my-transfer-requests')
+      router.push('/transfer-credits')
       return { error: undefined }
     }
   }

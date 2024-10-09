@@ -1,3 +1,0 @@
-export const APPROVED = 'APPROVED'
-export const REJECTED = 'REJECTED'
-export const REQUIRES_CHANGES = 'REQUIRES_CHANGES'

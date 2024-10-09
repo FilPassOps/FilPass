@@ -1,16 +1,11 @@
-import { PlusCircleIcon } from '@heroicons/react/24/solid'
 import { Layout } from 'components/Layout'
-import { Button } from 'components/Shared/Button'
 import { getItemsPerPage, PaginationWrapper } from 'components/Shared/PaginationWrapper'
 import { UserList } from 'components/SuperAdmin/UserList'
 import { AppConfig } from 'config'
 import { getAllUsers } from 'domain/user/get-all'
 import { withSuperAdminSSR } from 'lib/ssr'
-import dynamic from 'next/dynamic'
 import Head from 'next/head'
-import { ReactElement, useState } from 'react'
-
-const InviteUserModal = dynamic(() => import('components/SuperAdmin/Modals/InviteUserModal').then(mod => mod.InviteUserModal))
+import { ReactElement } from 'react'
 
 interface UserSettingsProps {
   data: any[]
@@ -19,8 +14,6 @@ interface UserSettingsProps {
 }
 
 export default function UserSettings({ data = [], pageSize, totalItems }: UserSettingsProps) {
-  const [openInviteModal, setOpenInviteModal] = useState(false)
-
   return (
     <>
       <Head>
@@ -28,21 +21,10 @@ export default function UserSettings({ data = [], pageSize, totalItems }: UserSe
       </Head>
       <div className="flex justify-between items-center pb-3">
         <p className="text-base font-bold text-gray-900">All users</p>
-        <div>
-          <Button
-            variant="primary"
-            className="flex justify-center items-center space-x-2 text-white text-sm font-medium"
-            onClick={() => setOpenInviteModal(true)}
-          >
-            <PlusCircleIcon className="h-5 w-5 mr-2" />
-            Add New User
-          </Button>
-        </div>
       </div>
       <PaginationWrapper totalItems={totalItems} pageSize={pageSize}>
         <UserList data={data} />
       </PaginationWrapper>
-      {openInviteModal && <InviteUserModal open={openInviteModal} onModalClosed={() => setOpenInviteModal(false)} />}
     </>
   )
 }

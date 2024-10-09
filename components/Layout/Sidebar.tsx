@@ -1,41 +1,17 @@
 /* eslint-disable @next/next/no-img-element */
-import {
-  BanknotesIcon,
-  CircleStackIcon,
-  DocumentTextIcon,
-  HomeIcon,
-  IdentificationIcon,
-  LifebuoyIcon,
-  ServerIcon,
-  UserIcon,
-  UsersIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline'
+import { CircleStackIcon, IdentificationIcon, LifebuoyIcon, UserIcon, UsersIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/solid'
 
 import { useAuth } from 'components/Authentication/Provider'
-import { TokenPrice } from 'components/Controller/TokenPrice'
 import { LinkButton } from 'components/Shared/Button'
 import { RoleComponent } from 'components/Shared/RoleComponent'
 import { AppConfig } from 'config'
-import { ADDRESS_MANAGER_ROLE, APPROVER_ROLE, CONTROLLER_ROLE, SUPERADMIN_ROLE, USER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
-import { ACTIVE_STATUS, ARCHIVED_STATUS } from 'domain/programs/constants'
-import {
-  APPROVED_STATUS,
-  DRAFT_STATUS,
-  PAID_STATUS,
-  PROCESSING_STATUS,
-  REJECTED_BY_CONTROLLER_STATUS,
-  REJECTED_STATUS,
-  REQUIRES_CHANGES_STATUS,
-  SUBMITTED_STATUS,
-  VOIDED_STATUS,
-} from 'domain/transfer-request/constants'
+import { ADDRESS_MANAGER_ROLE, SUPERADMIN_ROLE, USER_ROLE } from 'domain/auth/constants'
+
 import { UserResult } from 'domain/user'
 import { classNames } from 'lib/class-names'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { BatchActionsButton } from 'pages/approvals'
 import projectVersion from 'project-version'
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
 
@@ -56,12 +32,6 @@ interface NavigationItem {
 }
 
 const navigation: NavigationItem[] = [
-  {
-    target: '/my-transfer-requests',
-    text: 'My Requests',
-    icon: HomeIcon,
-    roles: [],
-  },
   {
     target: '/transfer-credits',
     text: 'Transfer Credits',
@@ -85,99 +55,10 @@ const navigation: NavigationItem[] = [
     ],
   },
   {
-    target: '/approvals',
-    text: 'My Approvals',
-    icon: DocumentTextIcon,
-    roles: [APPROVER_ROLE, VIEWER_ROLE],
-    items: [
-      {
-        filter: `status=${SUBMITTED_STATUS}`,
-        text: 'Pending You',
-        roles: [APPROVER_ROLE],
-      },
-      {
-        filter: `status=${PROCESSING_STATUS}`,
-        text: 'Pending Others',
-        roles: [APPROVER_ROLE],
-      },
-      {
-        filter: `status=${APPROVED_STATUS}`,
-        text: 'Approved',
-        roles: [APPROVER_ROLE],
-      },
-      {
-        filter: `status=${PAID_STATUS}`,
-        text: 'Paid',
-        roles: [APPROVER_ROLE, VIEWER_ROLE],
-      },
-      {
-        filter: `status=${REQUIRES_CHANGES_STATUS}`,
-        text: 'Requires Changes',
-        roles: [APPROVER_ROLE],
-      },
-      {
-        filter: `status=${REJECTED_STATUS}`,
-        text: 'Rejected',
-        roles: [APPROVER_ROLE],
-      },
-      {
-        filter: `status=${VOIDED_STATUS}`,
-        text: 'Voided',
-        roles: [APPROVER_ROLE],
-      },
-      {
-        filter: `status=${DRAFT_STATUS}`,
-        text: 'Draft',
-        roles: [APPROVER_ROLE],
-      },
-    ],
-  },
-  {
-    target: '/disbursement',
-    text: 'Disbursement',
-    icon: BanknotesIcon,
-    roles: [CONTROLLER_ROLE],
-    items: [
-      {
-        filter: `status=${APPROVED_STATUS}&sort=createdAt&order=asc`,
-        text: 'Approved',
-        roles: [CONTROLLER_ROLE],
-      },
-      {
-        filter: `status=${PAID_STATUS}&sort=updatedAt&order=desc`,
-        text: 'Paid',
-        roles: [CONTROLLER_ROLE],
-      },
-      {
-        filter: `status=${REJECTED_BY_CONTROLLER_STATUS}&sort=createdAt&order=asc`,
-        text: 'Rejected',
-        roles: [CONTROLLER_ROLE],
-      },
-    ],
-  },
-  {
     target: '/user-settings',
     text: 'User Settings',
     icon: UsersIcon,
     roles: [SUPERADMIN_ROLE],
-  },
-  {
-    target: '/program-settings',
-    text: 'Program Settings',
-    icon: ServerIcon,
-    roles: [SUPERADMIN_ROLE],
-    items: [
-      {
-        filter: `status=${ACTIVE_STATUS}`,
-        text: 'Active',
-        roles: [SUPERADMIN_ROLE],
-      },
-      {
-        filter: `status=${ARCHIVED_STATUS}`,
-        text: 'Archived',
-        roles: [SUPERADMIN_ROLE],
-      },
-    ],
   },
   {
     target: '/user-address',
@@ -213,7 +94,7 @@ export const Sidebar = ({ toggle = false, setSidebarToggle }: SidebarProps) => {
       {/* Sidebar component, swap this element with another sidebar if you like */}
       <div className="flex flex-col flex-grow bg-teal-800 overflow-y-auto md:pt-5">
         <div className="hidden md:flex items-center shrink-0 px-4">
-          <Link href="/my-transfer-requests" passHref className="h-10 w-full relative outline-offset-8">
+          <Link href="/transfer-credits" passHref className="h-10 w-full relative outline-offset-8">
             <img className={`object-fill h-full ${toggleClasses(toggle, 'block')}`} src="/logo-written.svg" alt="Logo" />
           </Link>
         </div>
@@ -224,11 +105,6 @@ export const Sidebar = ({ toggle = false, setSidebarToggle }: SidebarProps) => {
                 <XMarkIcon width={20} />
               </button>
               <div className="flex gap-2">
-                <RoleComponent roles={[APPROVER_ROLE]}>
-                  <div>
-                    <BatchActionsButton />
-                  </div>
-                </RoleComponent>
                 <div>
                   <LinkButton variant="primary" href="/transfer-requests/create">
                     <div className="flex items-center text-sm font-semibold whitespace-nowrap">Create New Request</div>
@@ -242,11 +118,7 @@ export const Sidebar = ({ toggle = false, setSidebarToggle }: SidebarProps) => {
               ))}
             </div>
           </nav>
-          <RoleComponent roles={[SUPERADMIN_ROLE, CONTROLLER_ROLE]}>
-            <div className={`${toggle ? 'block p-3' : 'md:hidden'}`}>
-              <TokenPrice />
-            </div>
-          </RoleComponent>
+
           <RoleComponent roles={[USER_ROLE]}>
             <a
               href={`mailto:${AppConfig.app.emailConfig.supportAddress}`}

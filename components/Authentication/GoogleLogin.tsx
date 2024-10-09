@@ -32,7 +32,7 @@ export const GoogleLogin = ({ buttonText }: GoogleLoginProps) => {
       NProgress.done()
     } else {
       await refresh()
-      return router.push('/my-transfer-requests')
+      return router.push('/transfer-credits')
     }
   }
 

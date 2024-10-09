@@ -1,12 +1,9 @@
 import { TransferRequestStatus } from '@prisma/client'
-import { sendCreatedNotification } from 'domain/notifications/send-created-notification'
-import { getAllExternalPrograms } from 'domain/programs/get-all'
 import { encrypt, encryptPII } from 'lib/emissary-crypto'
 import { generateTeamHash } from 'lib/password'
 import prisma from 'lib/prisma'
 import { validate } from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
-import { sendSubmittedNotification } from '../notifications/send-submitted-notification'
 import { SUBMITTED_STATUS } from './constants'
 import { createTransferRequestValidatorBackend } from './validation'
 
@@ -50,27 +47,6 @@ export async function createTransferRequest(params: CreateTransferRequestParams)
     }
   }
 
-  const { data: programs } = await getAllExternalPrograms()
-  const program = programs?.find(program => program.id === programId)
-
-  if (!program) {
-    return {
-      error: {
-        status: 400,
-        errors: { programId: errorsMessages.program_not_found.message },
-      },
-    }
-  }
-
-  if (userWallet.blockchainId !== program.currency.blockchain?.id) {
-    return {
-      error: {
-        status: 400,
-        errors: { userWalletId: errorsMessages.wallet_program_blockchain.message },
-      },
-    }
-  }
-
   const status: TransferRequestStatus = SUBMITTED_STATUS
 
   const [attachmentFile] = await prisma.userFile.findMany({
@@ -95,17 +71,6 @@ export async function createTransferRequest(params: CreateTransferRequestParams)
     include: {
       wallet: true,
     },
-  })
-
-  await sendSubmittedNotification({
-    programId,
-    transferRequestId: transferRequest.publicId,
-  })
-
-  await sendCreatedNotification({
-    email: user.email,
-    transferRequestId: transferRequest.publicId,
-    expectedTransferDate,
   })
 
   return { data: transferRequest }

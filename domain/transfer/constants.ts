@@ -1,3 +1,0 @@
-export const PENDING_STATUS = 'PENDING'
-export const SUCCESS_STATUS = 'SUCCESS'
-export const FILECOIN_CURRENCY_NAME = 'FIL'

@@ -30,7 +30,7 @@ export const getServerSideProps = withSessionSSR(async function getServerSidePro
     return {
       redirect: {
         permanent: true,
-        destination: '/my-transfer-requests',
+        destination: '/transfer-credits',
       },
     }
   }
