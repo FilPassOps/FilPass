@@ -54,7 +54,7 @@ export const getServerSideProps = withSessionSSR(async function getServerSidePro
   if (!isBanned) {
     return {
       redirect: {
-        destination: '/my-transfer-requests',
+        destination: '/transfer-credits',
         permanent: false,
       },
     }

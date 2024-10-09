@@ -1,9 +1,7 @@
 import { Prisma } from '@prisma/client'
-import { APPROVER_ROLE } from 'domain/auth/constants'
 import { generateEmailHash } from 'lib/password'
 import prisma from 'lib/prisma'
 import { validate } from 'lib/yup'
-import { orderBy } from 'lodash'
 import { getUserByIdAndEmailValidator } from './validation'
 
 interface GetUserByIdAndEmailParams {
@@ -107,16 +105,6 @@ export async function getUserByIdAndEmail(params: GetUserByIdAndEmailParams) {
     select: select,
   })
 
-  const getApproverPrograms = () => {
-    const approverRole = user?.roles.find(r => r.role === APPROVER_ROLE)
-    const approverPrograms = approverRole?.userRolePrograms?.filter(p => p.isActive) || []
-    return orderBy(
-      approverPrograms.map(p => p.program).filter(p => p.isArchived === false),
-      ['name'],
-      ['asc'],
-    )
-  }
-
   if (!user) {
     return {
       error: {
@@ -131,7 +119,6 @@ export async function getUserByIdAndEmail(params: GetUserByIdAndEmailParams) {
     data: {
       ...user,
       files: undefined,
-      approverPrograms: getApproverPrograms(),
     },
   }
 }

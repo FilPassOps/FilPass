@@ -4,11 +4,9 @@ import Sortable from 'components/Shared/Sortable'
 import { Cell, Header, Table, TableBody, TableHead } from 'components/Shared/Table'
 import Timestamp from 'components/Shared/Timestamp'
 import { ViewReasonModal } from 'components/Shared/ViewReasonModal'
-import { APPROVER_ROLE } from 'domain/auth/constants'
 import { classNames } from 'lib/class-names'
 import { DateTime } from 'luxon'
 import { useEffect, useState } from 'react'
-import { ApproverProgramsListModal } from './Modals/ApproverProgramsListModal'
 import { BanUserModal } from './Modals/BanUserModal'
 import { UnbanUserModal } from './Modals/UnbanUserModal'
 import { SelectRoles } from './Shared/SelectRole'
@@ -24,11 +22,9 @@ interface User {
 }
 
 export const UserList = ({ data = [] }: UserListProps) => {
-  const [openProgramListModal, setOpenProgramListModal] = useState(false)
   const [openBanModal, setOpenBanModal] = useState(false)
   const [openUnbanModal, setOpenUnbanModal] = useState(false)
   const [viewReasonModalOpen, setViewReasonModalOpen] = useState(false)
-  const [programList, setProgramList] = useState([])
   const [selectedUser, setSelectedUser] = useState<User>()
   const [selectedUserViewReason, setSelectedUserViewReason] = useState<string>()
   const [scrolled, setScrolled] = useState(false)
@@ -63,10 +59,6 @@ export const UserList = ({ data = [] }: UserListProps) => {
             <Header style={{ minWidth: 200 }}>
               <Sortable by={'create_date'}>Create Date</Sortable>
             </Header>
-            <Header style={{ minWidth: 200 }}>
-              <Sortable by={'programs_assigned'}>Programs Assigned</Sortable>
-            </Header>
-            <Header></Header>
             <Header>Ban reason</Header>
             <Header>Action</Header>
           </tr>
@@ -82,19 +74,7 @@ export const UserList = ({ data = [] }: UserListProps) => {
               <Cell className="break-all">
                 <Timestamp date={user.created_at} format={DateTime.DATETIME_SHORT_WITH_SECONDS} />
               </Cell>
-              <Cell>{user.programs_assigned}</Cell>
-              <Cell>
-                <Button
-                  variant="outline-blue"
-                  disabled={!user?.roles?.includes(APPROVER_ROLE)}
-                  onClick={() => {
-                    setProgramList(user.approver_programs)
-                    setOpenProgramListModal(true)
-                  }}
-                >
-                  View
-                </Button>
-              </Cell>
+
               {/* @ts-ignore */}
               <Cell className="break-all">
                 {user.is_banned ? (
@@ -134,7 +114,6 @@ export const UserList = ({ data = [] }: UserListProps) => {
         </TableBody>
       </Table>
 
-      <ApproverProgramsListModal data={programList} open={openProgramListModal} onModalClosed={() => setOpenProgramListModal(false)} />
       <BanUserModal open={openBanModal} onModalClosed={() => setOpenBanModal(false)} user={selectedUser as User} />
       <UnbanUserModal open={openUnbanModal} onModalClosed={() => setOpenUnbanModal(false)} user={selectedUser as User} />
       <ViewReasonModal open={viewReasonModalOpen} onModalClosed={() => setViewReasonModalOpen(false)} reason={selectedUserViewReason} />

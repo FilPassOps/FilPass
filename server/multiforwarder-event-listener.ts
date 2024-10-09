@@ -1,5 +1,4 @@
 import { AppConfig, ChainNames } from 'config'
-import { transferPaymentConfirm } from 'domain/transfer/transfers-payment-confirm'
 import { ethers } from 'ethers'
 import { logger } from 'lib/logger'
 import { MultiForwarder, MultiForwarder__factory as MultiForwarderFactory } from 'typechain-types'
@@ -20,10 +19,8 @@ for (const [chainName, contract] of map.entries()) {
 
   contract.on(forwardEvent, (id, from, to, value, _total, event) => {
     logger.info(`${chainName} - Forward: ${event.transactionHash}`)
-    const chain = AppConfig.network.getChainByName(chainName)
-    const token = AppConfig.network.getNativeToken(chain)
-
-    transferPaymentConfirm({ id, from, to, value, transactionHash: event.transactionHash, tokenDecimal: token.decimals })
+    // const chain = AppConfig.network.getChainByName(chainName)
+    // const token = AppConfig.network.getNativeToken(chain)
   })
 
   contract.on(forwardERC20, (id, from, to, value, _total, tokenAddress, event) => {
@@ -34,7 +31,5 @@ for (const [chainName, contract] of map.entries()) {
       logger.error(`Token not found for address ${tokenAddress}`)
       return
     }
-
-    transferPaymentConfirm({ id, from, to, value, transactionHash: event.transactionHash, tokenDecimal: token.decimals })
   })
 }

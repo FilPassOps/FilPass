@@ -1,5 +1,5 @@
 import crypto from 'crypto'
-import { ADDRESS_MANAGER_ROLE, APPROVER_ROLE, CONTROLLER_ROLE, SUPERADMIN_ROLE, SystemRoles } from 'domain/auth/constants'
+import { ADDRESS_MANAGER_ROLE, SUPERADMIN_ROLE, SystemRoles } from 'domain/auth/constants'
 import { getSession, invalidateSession } from 'domain/auth/session'
 import { getUserByIdAndEmail } from 'domain/user/get-by-id-and-email'
 import { Request, RequestHandler } from 'express'
@@ -176,10 +176,6 @@ export function withRoles<T>(roles: SystemRoles[] = [], handler: NextApiHandlerW
 }
 
 export const withAddressManager = (handler: NextApiHandlerWithUser) => withRoles([ADDRESS_MANAGER_ROLE], handler)
-
-export const withController = (handler: NextApiHandlerWithUser) => withRoles([CONTROLLER_ROLE], handler)
-
-export const withApprover = (handler: NextApiHandlerWithUser) => withRoles([APPROVER_ROLE], handler)
 
 export const withSuperAdmin = (handler: NextApiHandlerWithUser) => withRoles([SUPERADMIN_ROLE], handler)
 

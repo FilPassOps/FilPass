@@ -1,5 +1,4 @@
 import { Prisma, UserFile } from '@prisma/client'
-import { APPROVER_ROLE, CONTROLLER_ROLE, VIEWER_ROLE } from 'domain/auth/constants'
 import { getFile, getReadStream } from 'lib/file-upload'
 import { SessionUser } from 'lib/middleware'
 import prisma from 'lib/prisma'
@@ -68,7 +67,7 @@ export async function getUserFile(params: GetUserFileParams) {
 }
 
 async function getFileDetails(params: GetUserFileParams) {
-  const { roles, id: userId } = params.user
+  const { id: userId } = params.user
   const { fields, errors } = await validate(getFileValidator, params)
 
   if (errors || !fields) {
@@ -84,32 +83,7 @@ async function getFileDetails(params: GetUserFileParams) {
 
   let query = Prisma.sql`SELECT * FROM user_file uf WHERE uf.public_id = ${filePublicId} AND uf.user_id = ${userId}`
 
-  if (roles.some(({ role }) => role === APPROVER_ROLE)) {
-    query = Prisma.sql`
-    SELECT
-    uf.*
-    FROM
-    user_file uf
-    INNER JOIN transfer_request tr ON
-    tr.user_file_id = uf.id
-    INNER JOIN "program" p ON
-    tr.program_id = p.id
-    AND p.is_active is true
-    INNER JOIN user_role_program urp ON
-    urp.program_id = p.id
-    AND urp.is_active is true
-    INNER JOIN user_role ur ON
-    ur.id = urp.user_role_id
-    AND ur.role::text = 'APPROVER'
-    AND ur.user_id = ${userId}
-    WHERE
-    uf.public_id = ${filePublicId}
-    UNION
-    SELECT uf.* FROM user_file uf WHERE uf.public_id = ${filePublicId}
-    LIMIT 1;
-    `
-  } else if (roles.some(({ role }) => role === VIEWER_ROLE)) {
-    query = Prisma.sql`
+  query = Prisma.sql`
     SELECT
     uf.*
     FROM
@@ -132,9 +106,6 @@ async function getFileDetails(params: GetUserFileParams) {
     SELECT uf.* FROM user_file uf WHERE uf.public_id = ${filePublicId}
     LIMIT 1;
     `
-  } else if (roles.some(({ role }) => role === CONTROLLER_ROLE)) {
-    query = Prisma.sql`SELECT * FROM user_file uf WHERE public_id = ${filePublicId}`
-  }
 
   const [file] = await prisma.$queryRaw<UserFile[]>(query)
 

@@ -1,5 +1,5 @@
 import { Role } from '@prisma/client'
-import { ADDRESS_MANAGER_ROLE, APPROVER_ROLE, CONTROLLER_ROLE, SUPERADMIN_ROLE } from 'domain/auth/constants'
+import { ADDRESS_MANAGER_ROLE, SUPERADMIN_ROLE } from 'domain/auth/constants'
 import { getSession, invalidateSession } from 'domain/auth/session'
 import { getUserByIdAndEmail } from 'domain/user/get-by-id-and-email'
 import { IncomingMessage } from 'http'
@@ -94,18 +94,6 @@ export function withAddressManagerSSR(
   handler: (context: GetServerSidePropsContext & { user: User }) => Promise<GetServerSidePropsResult<{ [key: string]: unknown }>>,
 ) {
   return withRolesSSR([ADDRESS_MANAGER_ROLE], handler)
-}
-
-export function withControllerSSR(
-  handler: (context: GetServerSidePropsContext & { user: User }) => Promise<GetServerSidePropsResult<{ [key: string]: unknown }>>,
-) {
-  return withRolesSSR([CONTROLLER_ROLE], handler)
-}
-
-export function withApproverSSR(
-  handler: (context: GetServerSidePropsContext & { user: User }) => Promise<GetServerSidePropsResult<{ [key: string]: unknown }>>,
-) {
-  return withRolesSSR([APPROVER_ROLE], handler)
 }
 
 export function withSuperAdminSSR(

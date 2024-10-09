@@ -1,6 +1,4 @@
 export const ADDRESS_MANAGER_ROLE = 'ADDRESS_MANAGER'
-export const CONTROLLER_ROLE = 'CONTROLLER'
-export const APPROVER_ROLE = 'APPROVER'
 export const SUPERADMIN_ROLE = 'SUPERADMIN'
 export const USER_ROLE = 'USER'
 export const VIEWER_ROLE = 'VIEWER'
