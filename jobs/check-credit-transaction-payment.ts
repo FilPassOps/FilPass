@@ -65,7 +65,6 @@ export default async function run() {
       }
 
       if (receipt.status === 1) {
-        console.log('offerPrice', userCredit.amount)
         // TODO: change to correct to use on balance and height
         const formattedPaidUsdcAmount = ethers.utils.formatUnits(receipt.logs[0].data, usdcDecimals)
         // const normalizedOfferPrice = ethers.utils.formatUnits(userCredit.offerPrice, usdcDecimals)

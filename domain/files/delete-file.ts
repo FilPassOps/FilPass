@@ -1,7 +1,6 @@
-import { REQUIRES_CHANGES_STATUS, SUBMITTED_STATUS } from 'domain/transfer-request/constants'
 import prisma from 'lib/prisma'
 import { validate } from 'lib/yup'
-import errorsMessages, { parametrizedErrorsMessages } from 'wordings-and-errors/errors-messages'
+import errorsMessages from 'wordings-and-errors/errors-messages'
 import { removeFileValidator } from './validation'
 import { User } from '@prisma/client'
 
@@ -31,27 +30,6 @@ export async function deleteFile(params: DeleteFileParams, user: User) {
       error: {
         status: 404,
         message: errorsMessages.not_found.message,
-      },
-    }
-  }
-
-  const activeTranferRequests = await prisma.transferRequest.findMany({
-    where: {
-      userFileId: fileData.id,
-      isActive: true,
-      status: { in: [SUBMITTED_STATUS, REQUIRES_CHANGES_STATUS] },
-    },
-    select: {
-      publicId: true,
-    },
-  })
-
-  if (activeTranferRequests.length) {
-    const publicIds = activeTranferRequests.map(({ publicId }) => publicId)
-    return {
-      error: {
-        status: 400,
-        message: parametrizedErrorsMessages.file_has_active_transfer_request.message(publicIds),
       },
     }
   }

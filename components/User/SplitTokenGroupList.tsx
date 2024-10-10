@@ -21,7 +21,7 @@ export const SplitTokenGroupList = ({ splitGroup, userCreditId }: SplitTokenGrou
                 <div>
                   <h3 className="font-semibold text-deep-koamaru">Split Token Group {index + 1}</h3>
                   <p className=" text-deep-koamaru">{split.totalTokens} tokens</p>
-                  <Timestamp date={split.createdAt.toString()} format={DateTime.DATE_SHORT} />
+                  <Timestamp date={split.createdAt.toString()} format={DateTime.DATETIME_SHORT} />
                 </div>
                 <LinkButton
                   href={`/transfer-credits/${userCreditId}/${split.splitGroup}`}

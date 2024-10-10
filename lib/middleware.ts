@@ -148,8 +148,6 @@ export function withUser<T>(handler: NextApiHandlerWithUser<T>): NextApiHandlerW
     }
 
     req.user = freshUser
-    req.controllerId = extractedRoles.controllerId
-    req.approverId = extractedRoles.approverId
     req.addressManagerId = extractedRoles.addressManagerId
     req.superAdminId = extractedRoles.superAdminId
     req.userRoleId = extractedRoles.userRoleId

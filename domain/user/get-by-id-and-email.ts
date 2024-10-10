@@ -21,21 +21,6 @@ const select = {
     select: {
       id: true,
       role: true,
-      userRolePrograms: {
-        select: {
-          isActive: true,
-          program: {
-            include: {
-              programCurrency: {
-                select: {
-                  currency: true,
-                  type: true,
-                },
-              },
-            },
-          },
-        },
-      },
     },
   },
   wallets: {
@@ -66,22 +51,7 @@ const select = {
   },
 }
 
-export type UserResult = Prisma.UserGetPayload<{ select: typeof select }> & {
-  approverPrograms: {
-    id: number
-    name: string
-    blockchain: {
-      id: number
-      name: string
-    }
-    programCurrency: {
-      type: string
-      currency: {
-        name: string
-      }
-    }[]
-  }[]
-}
+export type UserResult = Prisma.UserGetPayload<{ select: typeof select }>
 
 export async function getUserByIdAndEmail(params: GetUserByIdAndEmailParams) {
   const { fields, errors } = await validate(getUserByIdAndEmailValidator, params)

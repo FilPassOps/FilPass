@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: my_super_secret_pw
-      POSTGRES_DB: emissary
+      POSTGRES_DB: filpass
   app:
     build: .
     ports:

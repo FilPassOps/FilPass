@@ -9,64 +9,13 @@ datasource db {
 
 enum Role {
   USER
-  APPROVER
-  CONTROLLER
   SUPERADMIN
   ADDRESS_MANAGER
   VIEWER
 }
 
-enum TransferStatus {
-  PENDING
-  SUCCESS
-  FAILED
-  REJECTED
-}
-
-enum TransferRequestReviewStatus {
-  APPROVED
-  REJECTED
-  REQUIRES_CHANGES
-  BLOCKED
-}
-
-enum TransferRequestStatus {
-  SUBMITTED
-  VOIDED
-  APPROVED
-  PROCESSING
-  REJECTED_BY_APPROVER
-  REQUIRES_CHANGES
-  PAID
-  REJECTED_BY_CONTROLLER
-  SUBMITTED_BY_APPROVER
-  BLOCKED
-}
-
 enum FileType {
   ATTACHMENT
-}
-
-enum ProgramCurrencyType {
-  REQUEST
-  PAYMENT
-}
-
-enum ProgramVisibility {
-  EXTERNAL
-  INTERNAL
-}
-
-enum ProcessingStatus {
-  PENDING
-  RUNNING
-  SUCCESS
-  FAILED
-}
-
-enum NotificationName {
-  DOUBLE_SPENDING
-  TR_REQUIRES_CHANGE
 }
 
 enum CreditTransactionStatus {
@@ -76,107 +25,61 @@ enum CreditTransactionStatus {
 }
 
 model User {
-  id                            Int                    @id @default(autoincrement())
-  email                         String                 @unique
-  emailHash                     String?
-  password                      String?
-  isVerified                    Boolean                @default(false) @map("is_verified")
-  isActive                      Boolean                @default(true) @map("is_active")
-  isDraft                       Boolean                @default(false) @map("is_draft")
-  createdAt                     DateTime               @default(now()) @map("created_at")
-  updatedAt                     DateTime               @updatedAt @map("updated_at")
-  terms                         Boolean?
-  ownedTransferRequests         TransferRequest[]      @relation("requester")
-  receivedTransferRequests      TransferRequest[]      @relation("receiver")
-  files                         UserFile[]             @relation("file_owner")
-  filesAsUploader               UserFile[]             @relation("file_uploader")
-  roles                         UserRole[]
-  wallets                       UserWallet[]
-  walletVerifications           WalletVerification[]
-  ownedTransferRequestDrafts    TransferRequestDraft[] @relation("draft_requester")
-  receivedTransferRequestDrafts TransferRequestDraft[] @relation("draft_receiver")
-  authVerifications             AuthVerification[]
-  temporaryFiles                TemporaryFile[]
-  sessions                      Session[]
-  isBanned                      Boolean                @default(false) @map("is_banned")
-  banReason                     String?                @map("ban_reason")
-  banActionedBy                 UserRole?              @relation("BannedUsers", fields: [banActionedById], references: [id])
-  banActionedById               Int?                   @map("ban_actioned_by_id")
-  userCredit                    UserCredit[]
+  id                  Int                  @id @default(autoincrement())
+  email               String               @unique
+  emailHash           String?
+  password            String?
+  isVerified          Boolean              @default(false) @map("is_verified")
+  isActive            Boolean              @default(true) @map("is_active")
+  isDraft             Boolean              @default(false) @map("is_draft")
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
+  terms               Boolean?
+  files               UserFile[]           @relation("file_owner")
+  filesAsUploader     UserFile[]           @relation("file_uploader")
+  roles               UserRole[]
+  wallets             UserWallet[]
+  walletVerifications WalletVerification[]
+
+  authVerifications AuthVerification[]
+  temporaryFiles    TemporaryFile[]
+  sessions          Session[]
+  isBanned          Boolean            @default(false) @map("is_banned")
+  banReason         String?            @map("ban_reason")
+  banActionedBy     UserRole?          @relation("BannedUsers", fields: [banActionedById], references: [id])
+  banActionedById   Int?               @map("ban_actioned_by_id")
+  userCredit        UserCredit[]
 
   @@index([emailHash])
   @@map("user")
 }
 
 model UserRole {
-  id                       Int                        @id @default(autoincrement())
-  user                     User                       @relation(fields: [userId], references: [id])
-  userId                   Int                        @map("user_id")
-  role                     Role
-  isActive                 Boolean                    @default(true) @map("is_active")
-  createdAt                DateTime                   @default(now()) @map("created_at")
-  updatedAt                DateTime                   @updatedAt @map("updated_at")
-  userRolePrograms         UserRoleProgram[]
-  transferRequestReviews   TransferRequestReview[]
-  transferRequestChanges   TransferRequestHistory[]
-  transfers                Transfer[]
-  transferRequestApprovals TransferRequestApprovals[]
-  User                     User[]                     @relation("BannedUsers")
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int      @map("user_id")
+  role      Role
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  User      User[]   @relation("BannedUsers")
 
   @@map("user_role")
 }
 
-model UserRoleProgram {
-  id         Int                           @id @default(autoincrement())
-  userRole   UserRole                      @relation(fields: [userRoleId], references: [id])
-  userRoleId Int                           @map("user_role_id")
-  program    Program                       @relation(fields: [programId], references: [id])
-  programId  Int                           @map("program_id")
-  isActive   Boolean                       @default(true) @map("is_active")
-  createdAt  DateTime                      @default(now()) @map("created_at")
-  updatedAt  DateTime                      @updatedAt @map("updated_at")
-  groups     UserRoleProgramGroupMembers[]
-
-  @@index([userRoleId, isActive])
-  @@map("user_role_program")
-}
-
-model UserRoleProgramGroup {
-  id                          Int                           @id @default(autoincrement())
-  program                     Program                       @relation(fields: [programId], references: [id])
-  programId                   Int                           @map("program_id")
-  role                        Role
-  userRoleProgramGroupMembers UserRoleProgramGroupMembers[]
-  transferRequestApprovals    TransferRequestApprovals[]
-
-  @@map("user_role_program_group")
-}
-
-model UserRoleProgramGroupMembers {
-  id                     Int                  @id @default(autoincrement())
-  userRoleProgram        UserRoleProgram      @relation(fields: [userRoleProgramId], references: [id])
-  userRoleProgramId      Int                  @map("user_role_program_id")
-  userRoleProgramGroup   UserRoleProgramGroup @relation(fields: [userRoleProgramGroupId], references: [id])
-  userRoleProgramGroupId Int                  @map("user_role_program_group_id")
-
-  @@map("user_role_program_group_members")
-}
-
 model UserFile {
-  id              Int                    @id @default(autoincrement())
-  publicId        String?                @unique() @default(cuid()) @map("public_id")
-  user            User                   @relation(fields: [userId], references: [id], name: "file_owner")
-  userId          Int                    @map("user_id")
-  uploader        User?                  @relation(fields: [uploaderId], references: [id], name: "file_uploader")
-  uploaderId      Int?                   @map("uploader_id")
-  key             String
-  filename        String
-  type            FileType
-  isActive        Boolean                @default(true) @map("is_active")
-  createdAt       DateTime               @default(now()) @map("created_at")
-  updatedAt       DateTime               @updatedAt @map("updated_at")
-  attachment      TransferRequest[]      @relation("attachment")
-  attachmentDraft TransferRequestDraft[]
+  id         Int      @id @default(autoincrement())
+  publicId   String?  @unique() @default(cuid()) @map("public_id")
+  user       User     @relation(fields: [userId], references: [id], name: "file_owner")
+  userId     Int      @map("user_id")
+  uploader   User?    @relation(fields: [uploaderId], references: [id], name: "file_uploader")
+  uploaderId Int?     @map("uploader_id")
+  key        String
+  filename   String
+  type       FileType
+  isActive   Boolean  @default(true) @map("is_active")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   @@unique([id, key])
   @@index(publicId)
@@ -200,20 +103,19 @@ model TemporaryFile {
 }
 
 model UserWallet {
-  id               Int                 @id @default(autoincrement())
-  user             User                @relation(fields: [userId], references: [id])
-  userId           Int                 @map("user_id")
-  verification     WalletVerification? @relation(fields: [verificationId], references: [id])
-  verificationId   Int?                @map("verification_id")
-  isActive         Boolean             @default(true) @map("is_active")
-  address          String
-  blockchain       Blockchain          @relation(fields: [blockchainId], references: [id])
-  blockchainId     Int                 @map("blockchain_id")
-  name             String?
-  createdAt        DateTime            @default(now()) @map("created_at")
-  updatedAt        DateTime            @updatedAt @map("updated_at")
-  transferRequests TransferRequest[]
-  isDefault        Boolean             @default(false) @map("is_default")
+  id             Int                 @id @default(autoincrement())
+  user           User                @relation(fields: [userId], references: [id])
+  userId         Int                 @map("user_id")
+  verification   WalletVerification? @relation(fields: [verificationId], references: [id])
+  verificationId Int?                @map("verification_id")
+  isActive       Boolean             @default(true) @map("is_active")
+  address        String
+  blockchain     Blockchain          @relation(fields: [blockchainId], references: [id])
+  blockchainId   Int                 @map("blockchain_id")
+  name           String?
+  createdAt      DateTime            @default(now()) @map("created_at")
+  updatedAt      DateTime            @updatedAt @map("updated_at")
+  isDefault      Boolean             @default(false) @map("is_default")
 
   @@unique([userId, address, blockchainId])
   @@index([address])
@@ -241,165 +143,6 @@ model WalletVerification {
   @@map("wallet_verification")
 }
 
-model Program {
-  id                    Int                    @id @default(autoincrement())
-  name                  String                 @unique
-  isActive              Boolean                @default(true) @map("is_active")
-  isArchived            Boolean                @default(false) @map("is_archived")
-  createdAt             DateTime               @default(now()) @map("created_at")
-  updatedAt             DateTime               @updatedAt @map("updated_at")
-  visibility            ProgramVisibility?     @default(EXTERNAL) @map("visibility")
-  currency              Currency               @relation(fields: [currencyId], references: [id])
-  currencyId            Int                    @map("currency_id")
-  userRolePrograms      UserRoleProgram[]
-  transferRequests      TransferRequest[]
-  programCurrency       ProgramCurrency[]
-  transferRequestDrafts TransferRequestDraft[]
-  userRoleProgramGroups UserRoleProgramGroup[]
-
-  @@map("program")
-}
-
-model TransferRequest {
-  id                   Int                        @id @default(autoincrement())
-  uuid                 String                     @unique @default(dbgenerated("gen_random_uuid()"))
-  publicId             String                     @unique @default(dbgenerated("getnextpublicidbigint()")) @map("public_id")
-  requester            User                       @relation(fields: [requesterId], references: [id], name: "requester")
-  requesterId          Int                        @map("requester_id")
-  program              Program                    @relation(fields: [programId], references: [id])
-  programId            Int                        @map("program_id")
-  wallet               UserWallet                 @relation(fields: [userWalletId], references: [id])
-  userWalletId         Int                        @map("user_wallet_id")
-  receiver             User                       @relation(fields: [receiverId], references: [id], name: "receiver")
-  receiverId           Int                        @map("receiver_id")
-  team                 String
-  teamHash             String?                    @map("team_hash")
-  status               TransferRequestStatus      @default(SUBMITTED)
-  amount               String
-  currency             CurrencyUnit               @relation(fields: [currencyUnitId], references: [id])
-  currencyUnitId       Int                        @map("currency_unit_id")
-  terms                Boolean?
-  userFileId           Int?                       @map("user_file_id")
-  isActive             Boolean                    @default(true) @map("is_active")
-  createdAt            DateTime                   @default(now()) @map("created_at")
-  updatedAt            DateTime                   @updatedAt @map("updated_at")
-  expectedTransferDate DateTime                   @updatedAt @map("expected_transfer_date")
-  actorAddress         String                     @default("") @map("actor_address")
-  robustAddress        String                     @default("") @map("robust_address")
-  attachment           UserFile?                  @relation(fields: [attachmentId], references: [id], name: "attachment")
-  attachmentId         Int?                       @map("attachment_id")
-  reviews              TransferRequestReview[]
-  history              TransferRequestHistory[]
-  transfers            Transfer[]
-  approvals            TransferRequestApprovals[]
-
-  @@index([createdAt])
-  @@index([updatedAt])
-  @@index([programId])
-  @@index([teamHash])
-  @@index([publicId])
-  @@index([status])
-  @@index([isActive])
-  @@index([publicId, status, isActive])
-  @@map("transfer_request")
-}
-
-model TransferRequestReview {
-  id                Int                         @id @default(autoincrement())
-  approver          UserRole                    @relation(fields: [approverId], references: [id])
-  approverId        Int                         @map("approver_id")
-  transferRequest   TransferRequest             @relation(fields: [transferRequestId], references: [id])
-  transferRequestId Int                         @map("transfer_request_id")
-  status            TransferRequestReviewStatus
-  notes             String?
-  isActive          Boolean                     @default(true) @map("is_active")
-  createdAt         DateTime                    @default(now()) @map("created_at")
-  updatedAt         DateTime                    @updatedAt @map("updated_at")
-
-  @@map("transfer_request_review")
-}
-
-model TransferRequestDraft {
-  id             Int          @id @default(autoincrement())
-  publicId       String       @unique @default(dbgenerated("getnextpublicidbigint()")) @map("public_id")
-  requester      User         @relation(fields: [requesterId], references: [id], name: "draft_requester")
-  requesterId    Int          @map("requester_id")
-  receiver       User         @relation(fields: [receiverId], references: [id], name: "draft_receiver")
-  receiverId     Int          @map("receiver_id")
-  attachment     UserFile?    @relation(fields: [attachmentId], references: [id])
-  attachmentId   Int?         @map("attachment_id")
-  program        Program      @relation(fields: [programId], references: [id])
-  programId      Int          @map("program_id")
-  currency       CurrencyUnit @relation(fields: [currencyUnitId], references: [id])
-  currencyUnitId Int          @map("currency_unit_id")
-  team           String
-  teamHash       String?      @map("team_hash")
-  amount         String
-  createdAt      DateTime     @default(now()) @map("created_at")
-  updatedAt      DateTime     @updatedAt @map("updated_at")
-  isActive       Boolean      @default(true) @map("is_active")
-  isSubmitted    Boolean      @default(false) @map("is_submitted")
-
-  @@index([createdAt])
-  @@index([programId])
-  @@index([publicId])
-  @@index([teamHash])
-  @@map("transfer_request_draft")
-}
-
-model TransferRequestHistory {
-  id                Int             @id @default(autoincrement())
-  userRole          UserRole        @relation(fields: [userRoleId], references: [id])
-  userRoleId        Int             @map("user_role_id")
-  transferRequest   TransferRequest @relation(fields: [transferRequestId], references: [id])
-  transferRequestId Int             @map("transfer_request_id")
-  isActive          Boolean         @default(true) @map("is_active")
-  createdAt         DateTime        @default(now()) @map("created_at")
-  updatedAt         DateTime        @updatedAt @map("updated_at")
-  field             String          @map("field")
-  oldValue          String          @map("old_value")
-  newValue          String          @map("new_value")
-
-  @@map("transfer_request_history")
-}
-
-model TransferRequestApprovals {
-  id                     Int                  @id @default(autoincrement())
-  transferRequest        TransferRequest      @relation(fields: [transferRequestId], references: [id])
-  transferRequestId      Int                  @map("transfer_request_id")
-  userRole               UserRole             @relation(fields: [userRoleId], references: [id])
-  userRoleId             Int                  @map("user_role_id")
-  userRoleProgramGroup   UserRoleProgramGroup @relation(fields: [userRoleProgramGroupId], references: [id])
-  userRoleProgramGroupId Int                  @map("user_role_program_group_id")
-  createdAt              DateTime             @default(now()) @map("created_at")
-  updatedAt              DateTime             @updatedAt @map("updated_at")
-
-  @@map("transfer_request_approvals")
-}
-
-model Transfer {
-  id                   Int             @id @default(autoincrement())
-  transferRequest      TransferRequest @relation(fields: [transferRequestId], references: [id])
-  transferRequestId    Int             @map("transfer_request_id")
-  controller           UserRole        @relation(fields: [controllerId], references: [id])
-  controllerId         Int             @map("user_role_id")
-  status               TransferStatus  @default(PENDING)
-  txHash               String?         @map("tx_hash")
-  transferRef          String?         @map("transfer_ref")
-  from                 String?         @map("from")
-  to                   String?         @map("to")
-  notes                String?
-  isActive             Boolean         @default(true) @map("is_active")
-  createdAt            DateTime        @default(now()) @map("created_at")
-  updatedAt            DateTime        @updatedAt @map("updated_at")
-  amount               String?
-  amountCurrencyUnit   CurrencyUnit?   @relation(fields: [amountCurrencyUnitId], references: [id])
-  amountCurrencyUnitId Int?            @map("amount_currency_unit_id")
-
-  @@index([transferRef])
-  @@map("transfer")
-}
-
 model Currency {
   id           Int            @id @default(autoincrement())
   name         String         @unique
@@ -410,43 +153,23 @@ model Currency {
   createdAt    DateTime       @default(now()) @map("created_at")
   updatedAt    DateTime       @updatedAt @map("updated_at")
   units        CurrencyUnit[]
-  Program      Program[]
 
   @@map("currency")
 }
 
 model CurrencyUnit {
-  id                   Int                    @id @default(autoincrement())
-  currency             Currency               @relation(fields: [currencyId], references: [id])
-  currencyId           Int                    @map("currency_id")
-  name                 String
-  scale                Int
-  isActive             Boolean                @default(true) @map("is_active")
-  createdAt            DateTime               @default(now()) @map("created_at")
-  updatedAt            DateTime               @updatedAt @map("updated_at")
-  walletVerifications  WalletVerification[]
-  transferRequest      TransferRequest[]
-  programCurrency      ProgramCurrency[]
-  TransferRequestDraft TransferRequestDraft[]
-
-  Transfer Transfer[]
+  id                  Int                  @id @default(autoincrement())
+  currency            Currency             @relation(fields: [currencyId], references: [id])
+  currencyId          Int                  @map("currency_id")
+  name                String
+  scale               Int
+  isActive            Boolean              @default(true) @map("is_active")
+  createdAt           DateTime             @default(now()) @map("created_at")
+  updatedAt           DateTime             @updatedAt @map("updated_at")
+  walletVerifications WalletVerification[]
 
   @@unique([currencyId, name])
   @@map("currency_unit")
-}
-
-model ProgramCurrency {
-  id             Int                 @id @default(autoincrement())
-  currency       CurrencyUnit        @relation(fields: [currencyUnitId], references: [id])
-  currencyUnitId Int                 @map("currency_unit_id")
-  program        Program             @relation(fields: [programId], references: [id])
-  programId      Int                 @map("program_id")
-  type           ProgramCurrencyType
-  isActive       Boolean             @default(true) @map("is_active")
-  createdAt      DateTime            @default(now()) @map("created_at")
-  updateAt       DateTime            @updatedAt @map("updated_at")
-
-  @@map("program_currency")
 }
 
 model AuthVerification {
@@ -478,16 +201,6 @@ model Session {
   @@map("session")
 }
 
-model NotificationSettings {
-  id         Int              @id @default(autoincrement())
-  name       NotificationName @unique
-  lastSentAt DateTime         @default(now()) @map("last_sent_at")
-  createdAt  DateTime         @default(now()) @map("created_at")
-  updatedAt  DateTime         @updatedAt @map("updated_at")
-
-  @@map("notification_settings")
-}
-
 model BlockTracker {
   id          Int      @id @default(autoincrement())
   blockNumber Int      @map("block_number")
@@ -510,12 +223,12 @@ model Blockchain {
 }
 
 model StorageProvider {
-  id                 Int                 @id @default(autoincrement())
-  walletAddress      String              @unique @map("wallet_address")
-  createdAt          DateTime            @default(now()) @map("created_at")
-  updatedAt          DateTime            @updatedAt @map("updated_at")
+  id                 Int                  @id @default(autoincrement())
+  walletAddress      String               @unique @map("wallet_address")
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @updatedAt @map("updated_at")
   creditTransactions CreditTransaction[]
-  redeemTokenRequest      RedeemTokenRequest[]
+  redeemTokenRequest RedeemTokenRequest[]
   userCredit         UserCredit[]
 
   @@index([walletAddress])
@@ -540,44 +253,44 @@ model CreditTransaction {
 }
 
 model UserCredit {
-  id                 Int                 @id @default(autoincrement())
-  userId             Int                 @map("user_id")
-  user               User                @relation(fields: [userId], references: [id])
-  storageProviderId  Int                 @map("storage_provider_id")
-  storageProvider    StorageProvider     @relation(fields: [storageProviderId], references: [id])
-  amount             String              @map("amount")
-  totalHeight        String?             @default("0") @map("total_height")
-  totalWithdrawals   String              @default("0") @map("total_withdrawals")
-  totalRefunds       String              @default("0") @map("total_refunds")
-  creditTransactions CreditTransaction[]
-  createdAt          DateTime            @default(now()) @map("created_at")
-  updatedAt          DateTime            @updatedAt @map("updated_at")
-  refundStartsAt     DateTime?           @map("refund_starts_at")
-  withdrawStartsAt   DateTime?           @map("withdraw_starts_at")
-  withdrawExpiresAt  DateTime?           @map("withdraw_expires_at")
-  creditTokens       CreditToken[]
-  currentToken       CreditToken?        @relation("current_token", fields: [currentTokenId], references: [id])
-  currentTokenId     Int?                @unique @map("current_token_id")
-  refundCreditsRequest      RefundCreditsRequest[]
+  id                   Int                    @id @default(autoincrement())
+  userId               Int                    @map("user_id")
+  user                 User                   @relation(fields: [userId], references: [id])
+  storageProviderId    Int                    @map("storage_provider_id")
+  storageProvider      StorageProvider        @relation(fields: [storageProviderId], references: [id])
+  amount               String                 @map("amount")
+  totalHeight          String?                @default("0") @map("total_height")
+  totalWithdrawals     String                 @default("0") @map("total_withdrawals")
+  totalRefunds         String                 @default("0") @map("total_refunds")
+  creditTransactions   CreditTransaction[]
+  createdAt            DateTime               @default(now()) @map("created_at")
+  updatedAt            DateTime               @updatedAt @map("updated_at")
+  refundStartsAt       DateTime?              @map("refund_starts_at")
+  withdrawStartsAt     DateTime?              @map("withdraw_starts_at")
+  withdrawExpiresAt    DateTime?              @map("withdraw_expires_at")
+  creditTokens         CreditToken[]
+  currentToken         CreditToken?           @relation("current_token", fields: [currentTokenId], references: [id])
+  currentTokenId       Int?                   @unique @map("current_token_id")
+  refundCreditsRequest RefundCreditsRequest[]
 
   @@index([userId])
   @@map("user_credit")
 }
 
 model CreditToken {
-  id                Int             @id @default(autoincrement())
-  publicId          String          @unique @map("public_id")
-  userCreditId      Int             @map("user_credit_id")
-  height            String          @map("height")
-  amount            String          @map("amount")
-  token             String          @map("token")
-  redeemable        Boolean         @default(true) @map("redeemable")
-  createdAt         DateTime        @default(now()) @map("created_at")
-  updatedAt         DateTime        @updatedAt @map("updated_at")
-  splitGroup        String?         @default("1") @map("split_group")
-  redeemTokenRequest     RedeemTokenRequest[]
-  userCredit        UserCredit      @relation(fields: [userCreditId], references: [id])
-  currentUserCredit UserCredit?     @relation("current_token")
+  id                 Int                  @id @default(autoincrement())
+  publicId           String               @unique @map("public_id")
+  userCreditId       Int                  @map("user_credit_id")
+  height             String               @map("height")
+  amount             String               @map("amount")
+  token              String               @map("token")
+  redeemable         Boolean              @default(true) @map("redeemable")
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @updatedAt @map("updated_at")
+  splitGroup         String?              @default("1") @map("split_group")
+  redeemTokenRequest RedeemTokenRequest[]
+  userCredit         UserCredit           @relation(fields: [userCreditId], references: [id])
+  currentUserCredit  UserCredit?          @relation("current_token")
 
   @@index([userCreditId])
   @@index([splitGroup])
