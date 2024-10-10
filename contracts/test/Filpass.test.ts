@@ -53,7 +53,7 @@ describe('FilecoinDepositWithdrawRefund', function () {
 
       await expect(
         filpass.connect(oracle1).depositAmount(oracle1.address, recipient1.address, lockUpTime, { value: depositAmount }),
-      ).to.be.revertedWith('Only user can call this function')
+      ).to.be.revertedWithCustomError(filpass, 'OnlyUserAllowed')
     })
 
     it('Should revert when attempting to deposit zero amount', async function () {
@@ -63,7 +63,7 @@ describe('FilecoinDepositWithdrawRefund', function () {
 
       await expect(
         filpass.connect(user).depositAmount(oracle1.address, recipient1.address, lockUpTime, { value: depositAmount }),
-      ).to.be.revertedWith('Deposit amount must be greater than zero')
+      ).to.be.revertedWithCustomError(filpass, 'InsufficientDepositAmount')
     })
 
     it('Should revert when attempting to deposit with zero lock-up time', async function () {
@@ -73,7 +73,7 @@ describe('FilecoinDepositWithdrawRefund', function () {
 
       await expect(
         filpass.connect(user).depositAmount(oracle1.address, recipient1.address, lockUpTime, { value: depositAmount }),
-      ).to.be.revertedWith('Invalid lock-up time')
+      ).to.be.revertedWithCustomError(filpass, 'InvalidLockupTime')
     })
 
     it('Should correctly handle multiple deposits for the same Oracle-Recipient pair', async function () {
@@ -126,8 +126,9 @@ describe('FilecoinDepositWithdrawRefund', function () {
       await ethers.provider.send('evm_increaseTime', [8 * 24 * 60 * 60])
       await ethers.provider.send('evm_mine', [])
 
-      await expect(filpass.connect(oracle1).withdrawAmount(recipient1.address, depositAmount)).to.be.revertedWith(
-        'Cannot withdraw after refund time',
+      await expect(filpass.connect(oracle1).withdrawAmount(recipient1.address, depositAmount)).to.be.revertedWithCustomError(
+        filpass,
+        'RefundTimeNotPassed',
       )
     })
 
@@ -139,7 +140,10 @@ describe('FilecoinDepositWithdrawRefund', function () {
 
       await filpass.connect(user).depositAmount(oracle1.address, recipient1.address, lockUpTime, { value: depositAmount })
 
-      await expect(filpass.connect(oracle1).withdrawAmount(recipient1.address, withdrawAmount)).to.be.revertedWith('Insufficient funds')
+      await expect(filpass.connect(oracle1).withdrawAmount(recipient1.address, withdrawAmount)).to.be.revertedWithCustomError(
+        filpass,
+        'InsufficientFunds',
+      )
     })
 
     it('Should allow partial withdrawals and correctly update the remaining balance', async function () {
@@ -250,9 +254,9 @@ describe('FilecoinDepositWithdrawRefund', function () {
 
       await filpass.connect(user).depositAmount(oracle1.address, recipient1.address, lockUpTime, { value: depositAmount })
 
-      await expect(filpass.connect(user).refundAmount(ethers.constants.AddressZero, ethers.constants.AddressZero)).to.be.revertedWith(
-        'No eligible funds to refund across all Oracles and Recipients',
-      )
+      await expect(
+        filpass.connect(user).refundAmount(ethers.constants.AddressZero, ethers.constants.AddressZero),
+      ).to.be.revertedWithCustomError(filpass, 'NoEligibleFundsToRefund')
 
       const deposit = await filpass.deposits(oracle1.address, recipient1.address)
       expect(deposit.amount).to.equal(depositAmount)
@@ -275,7 +279,7 @@ describe('FilecoinDepositWithdrawRefund', function () {
     it('Should revert emergency withdrawal if no funds are available', async function () {
       const { filpass, user } = await loadFixture(deployContractFixture)
 
-      await expect(filpass.connect(user).emergencyWithdraw()).to.be.revertedWith('No funds to withdraw')
+      await expect(filpass.connect(user).emergencyWithdraw()).to.be.revertedWithCustomError(filpass, 'NoFundsToRefund')
     })
   })
 
@@ -289,7 +293,7 @@ describe('FilecoinDepositWithdrawRefund', function () {
           to: filpass.address,
           value: amount,
         }),
-      ).to.be.revertedWith('Direct deposits not allowed. Use depositAmount.')
+      ).to.be.revertedWithCustomError(filpass, 'DirectDepositsNotAllowed')
     })
 
     it('Should revert when calling a non-existent function', async function () {
@@ -305,7 +309,7 @@ describe('FilecoinDepositWithdrawRefund', function () {
           data: nonExistentFunctionSelector,
           value: amount,
         }),
-      ).to.be.revertedWith('Function does not exist.')
+      ).to.be.revertedWithCustomError(filpass, 'FunctionDoesNotExist')
     })
   })
 })
