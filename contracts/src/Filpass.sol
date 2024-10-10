@@ -39,12 +39,31 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
   event OracleRemoved(address indexed oracle);
   event RecipientRemoved(address indexed oracle, address indexed recipient);
 
+  error InvalidOracleAddress();
+  error InvalidRecipientAddress();
+  error InvalidLockupTime();
+  error InsufficientDepositAmount();
+  error InvalidParameters();
+  error MaxOraclesReached();
+  error MaxRecipientsReached();
+  error InsufficientFunds();
+  error RefundTimeNotPassed();
+  error RefundTransferFailed();
+  error RefundRemainingBalanceFailed();
+  error NoFundsToRefund();
+  error NoRecipientsForOracle();
+  error NoEligibleFundsToRefund();
+  error EmergencyWithdrawalFailed();
+  error DirectDepositsNotAllowed();
+  error FunctionDoesNotExist();
+  error WithdrawFailed();
+  error OnlyUserAllowed();
   /**
    * @dev Modifier to restrict function access exclusively to the designated user.
    * Reverts if the caller is not the user.
    */
   modifier onlyUser() {
-    require(msg.sender == user, 'Only user can call this function');
+    if (msg.sender != user) revert OnlyUserAllowed();
     _;
   }
 
@@ -64,18 +83,18 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
    * @param lockUpTime The lock-up period in days (e.g., 1 for 1 day, up to `MAX_LOCKUP_DAYS`).
    */
   function depositAmount(address oracleAddress, address recipient, uint256 lockUpTime) external payable onlyUser nonReentrant {
-    require(oracleAddress != address(0), 'Invalid oracle address');
-    require(recipient != address(0), 'Invalid recipient address');
-    require(lockUpTime > 0 && lockUpTime <= MAX_LOCKUP_DAYS, 'Invalid lock-up time');
-    require(msg.value > 0, 'Deposit amount must be greater than zero');
+    if (oracleAddress == address(0)) revert InvalidOracleAddress();
+    if (recipient == address(0)) revert InvalidRecipientAddress();
+    if (lockUpTime <= 0 || lockUpTime > MAX_LOCKUP_DAYS) revert InvalidLockupTime();
+    if (msg.value <= 0) revert InsufficientDepositAmount();
 
     if (!oracles.contains(oracleAddress)) {
-      require(oracles.length() < MAX_ORACLES, 'Maximum number of Oracles reached');
+      if (oracles.length() >= MAX_ORACLES) revert MaxOraclesReached();
       oracles.add(oracleAddress);
     }
 
     if (!recipientsPerOracle[oracleAddress].contains(recipient)) {
-      require(recipientsPerOracle[oracleAddress].length() < MAX_RECIPIENTS_PER_ORACLE, 'Maximum Recipients per Oracle reached');
+      if (recipientsPerOracle[oracleAddress].length() >= MAX_RECIPIENTS_PER_ORACLE) revert MaxRecipientsReached();
       recipientsPerOracle[oracleAddress].add(recipient);
     }
 
@@ -104,18 +123,18 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
    * @param requestedWithdrawAmount The amount of FIL to withdraw.
    */
   function withdrawAmount(address recipient, uint256 requestedWithdrawAmount) external nonReentrant {
-    require(recipient != address(0), 'Invalid recipient address');
+    if (recipient == address(0)) revert InvalidRecipientAddress();
 
     DepositInfo storage info = deposits[msg.sender][recipient];
-    require(info.amount >= requestedWithdrawAmount, 'Insufficient funds');
-    require(block.timestamp < info.refundTime, 'Cannot withdraw after refund time');
+    if (info.amount < requestedWithdrawAmount) revert InsufficientFunds();
+    if (block.timestamp >= info.refundTime) revert RefundTimeNotPassed();
 
     // Update the deposited amount before transferring funds to prevent reentrancy attacks.
     info.amount -= requestedWithdrawAmount;
 
     // Transfer the specified amount of FIL to the Recipient using a low-level call.
     (bool success, ) = payable(recipient).call{value: requestedWithdrawAmount}('');
-    require(success, 'Withdrawal transfer failed');
+    if (!success) revert WithdrawFailed();
 
     emit WithdrawalMade(msg.sender, recipient, requestedWithdrawAmount);
 
@@ -143,10 +162,10 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
       uint256 remainingBalance = address(this).balance;
       if (remainingBalance > 0) {
         (bool success, ) = payable(user).call{value: remainingBalance}('');
-        require(success, 'Transfer of remaining balance failed');
+        if (!success) revert RefundRemainingBalanceFailed();
       }
     } else {
-      revert('Invalid parameters. Provide either both addresses or set both to zero.');
+      revert InvalidParameters();
     }
   }
 
@@ -157,8 +176,8 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
    */
   function _refundSpecificPair(address oracleAddress, address recipient) internal {
     DepositInfo storage info = deposits[oracleAddress][recipient];
-    require(info.amount > 0, 'No funds to refund for this pair');
-    require(block.timestamp >= info.refundTime, 'Refund time has not passed for this pair');
+    if (info.amount == 0) revert NoFundsToRefund();
+    if (block.timestamp < info.refundTime) revert RefundTimeNotPassed();
 
     uint256 refundAmountValue = info.amount;
     info.amount = 0;
@@ -171,7 +190,7 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
 
     // Transfer the refund amount back to the user using a low-level call.
     (bool success, ) = payable(user).call{value: refundAmountValue}('');
-    require(success, 'Refund transfer failed for this pair');
+    if (!success) revert RefundTransferFailed();
 
     emit RefundMade(oracleAddress, recipient, refundAmountValue);
   }
@@ -182,8 +201,7 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
    */
   function _refundAllRecipientsForOracle(address oracleAddress) internal {
     EnumerableSet.AddressSet storage recipients = recipientsPerOracle[oracleAddress];
-
-    require(recipients.length() > 0, 'No Recipients found for this Oracle');
+    if (recipients.length() == 0) revert NoRecipientsForOracle();
 
     bool hasRefunds = false;
     // Iterate through all Recipients in reverse order and process refunds where applicable.
@@ -202,7 +220,7 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
 
         // Transfer the refund amount back to the user.
         (bool success, ) = payable(user).call{value: refundAmountValue}('');
-        require(success, 'Refund transfer failed for a Recipient');
+        if (!success) revert RefundTransferFailed();
 
         emit RefundMade(oracleAddress, currentRecipient, refundAmountValue);
       }
@@ -213,7 +231,7 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
       _removeOracle(oracleAddress);
     }
 
-    require(hasRefunds, 'No eligible funds to refund for this Oracle');
+    if (!hasRefunds) revert NoEligibleFundsToRefund();
   }
 
   function _refundAllOraclesAndRecipients() internal {
@@ -240,7 +258,7 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
 
           // Transfer the refund amount back to the user.
           (bool success, ) = payable(user).call{value: refundAmountValue}('');
-          require(success, 'Refund transfer failed for a Recipient');
+          if (!success) revert RefundTransferFailed();
 
           emit RefundMade(currentOracle, currentRecipient, refundAmountValue);
         }
@@ -252,7 +270,7 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
       }
     }
 
-    require(hasRefunds, 'No eligible funds to refund across all Oracles and Recipients');
+    if (!hasRefunds) revert NoEligibleFundsToRefund();
   }
 
   function _removeRecipient(address oracleAddress, address recipient) internal {
@@ -270,16 +288,16 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
    */
   function emergencyWithdraw() external onlyUser nonReentrant {
     uint256 balance = address(this).balance;
-    require(balance > 0, 'No funds to withdraw');
+    if (balance == 0) revert NoFundsToRefund();
     (bool success, ) = payable(user).call{value: balance}('');
-    require(success, 'Emergency withdrawal failed');
+    if (!success) revert EmergencyWithdrawalFailed();
   }
 
   /**
    * @dev Fallback function to prevent direct FIL transfers to the contract.
    */
   receive() external payable {
-    revert('Direct deposits not allowed. Use depositAmount.');
+    revert DirectDepositsNotAllowed();
   }
 
   /**
@@ -287,6 +305,6 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
    *      Reverts any such calls with a descriptive error message.
    */
   fallback() external payable {
-    revert('Function does not exist.');
+    revert FunctionDoesNotExist();
   }
 }
