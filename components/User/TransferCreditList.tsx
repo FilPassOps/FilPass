@@ -1,8 +1,8 @@
 import { ClipboardIcon } from '@heroicons/react/24/outline'
-import Big from 'big.js'
 import { Button, LinkButton } from 'components/Shared/Button'
 import { AppConfig } from 'config/system'
-import { formatUnits, parseUnits } from 'ethers/lib/utils'
+import { ethers } from 'ethers'
+import { formatUnits } from 'ethers/lib/utils'
 import { UserCreditItem } from 'pages/transfer-credits'
 
 interface TransferCreditListProps {
@@ -10,7 +10,7 @@ interface TransferCreditListProps {
 }
 
 export const TransferCreditList = ({ userCreditItems }: TransferCreditListProps) => {
-  const usdc = AppConfig.network.getTokenBySymbolAndBlockchainName('USDC', 'Ethereum')
+  const fil = AppConfig.network.getTokenBySymbolAndBlockchainName('tFIL', 'Filecoin')
 
   return (
     <div className="flex flex-col gap-4">
@@ -20,13 +20,14 @@ export const TransferCreditList = ({ userCreditItems }: TransferCreditListProps)
         </div>
       )}
       {userCreditItems.map(item => {
-        const currentHeight = Big(item.totalWithdrawals).plus(item.totalRefunds).toString()
-        const parsedCurrentHeight = parseUnits(currentHeight, usdc.decimals)
-        const totalHeight = parseUnits(item.totalHeight!, usdc.decimals)
+        const currentHeight = ethers.BigNumber.from(item.totalWithdrawals).add(item.totalRefunds)
+        const totalHeight = ethers.BigNumber.from(item.totalHeight)
 
-        const currentCredit = totalHeight.sub(parsedCurrentHeight)
+        const currentCredit = totalHeight.sub(currentHeight)
 
         const hasCredits = currentCredit.gt(0)
+
+        const parsedCurrentHeight = formatUnits(currentCredit, fil.decimals)
 
         return (
           <div key={item.id} className="bg-white rounded-lg shadow-md">
@@ -67,7 +68,7 @@ export const TransferCreditList = ({ userCreditItems }: TransferCreditListProps)
               <div className="flex flex-col gap-2">
                 <div>
                   <p className="text-gray-600">Current Credits:</p>
-                  <p className="text-xl font-bold text-deep-koamaru">{formatUnits(currentCredit, usdc.decimals)} Credits</p>
+                  <p className="text-xl font-bold text-deep-koamaru">{parsedCurrentHeight} Credits</p>
                 </div>
                 <div>
                   <p className="text-gray-600">Current Credits Token:</p>

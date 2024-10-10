@@ -1,7 +1,8 @@
 import prisma from 'lib/prisma'
 import { verifyJwt } from 'lib/jwt'
 import { redeemTokenValidator } from './validation'
-import Big from 'big.js'
+import { logger } from 'lib/logger'
+import { ethers } from 'ethers'
 
 interface RedeemTokenParams {
   walletAddress: string
@@ -18,14 +19,9 @@ export const redeemToken = async (props: RedeemTokenParams) => {
       throw new Error('Invalid token ')
     }
 
-    const { exp, sub, height } = result.data
+    const { sub, height } = result.data
 
-    // TODO: Even if token is expired we need to check in the database because the date could have changed
-    // if (new Date(exp * 1000) < new Date()) {
-    //   throw new Error('Token expired')
-    // }
-
-    if (height <= 0) {
+    if (ethers.BigNumber.from(height).isZero()) {
       throw new Error('Invalid token')
     }
 
@@ -50,6 +46,32 @@ export const redeemToken = async (props: RedeemTokenParams) => {
       throw new Error('Withdrawal expired')
     }
 
+    const lastTokenWithdrawal = await prisma.redeemTokenRequest.findFirst({
+      select: {
+        creditToken: {
+          select: {
+            height: true,
+          },
+        },
+      },
+      where: {
+        creditToken: {
+          userCreditId: creditToken.userCreditId,
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
+
+    if (lastTokenWithdrawal) {
+      const lastTokenWithdrawalHeight = ethers.BigNumber.from(lastTokenWithdrawal?.creditToken.height)
+
+      if (lastTokenWithdrawalHeight.gte(creditToken.height)) {
+        throw new Error('A bigger token was already redeemed')
+      }
+    }
+
     const storageProvider = await prisma.storageProvider.findUnique({
       where: {
         walletAddress: fields.walletAddress,
@@ -60,7 +82,15 @@ export const redeemToken = async (props: RedeemTokenParams) => {
       throw new Error('Storage provider not found')
     }
 
-    const totalWithdrawals = Big(creditToken.userCredit.totalWithdrawals).plus(creditToken.height).toString()
+    const totalWithdrawalsHeight = ethers.BigNumber.from(creditToken.userCredit.totalWithdrawals).add(creditToken.height)
+
+    if (totalWithdrawalsHeight.gt(creditToken.userCredit.totalHeight!)) {
+      logger.error('Total withdrawals is greater than total height ', {
+        totalWithdrawalsHeight,
+        totalHeight: creditToken.userCredit.totalHeight,
+      })
+      throw new Error('Something went wrong. Please contact support')
+    }
 
     await prisma.$transaction(async tx => {
       await tx.creditToken.update({
@@ -72,13 +102,13 @@ export const redeemToken = async (props: RedeemTokenParams) => {
         },
       })
 
-      if (totalWithdrawals) {
+      if (totalWithdrawalsHeight) {
         await tx.userCredit.update({
           where: {
             id: creditToken.userCreditId,
           },
           data: {
-            totalWithdrawals,
+            totalWithdrawals: totalWithdrawalsHeight.toString(),
           },
         })
       }
