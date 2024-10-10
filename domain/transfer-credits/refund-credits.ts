@@ -1,6 +1,7 @@
 import prisma from 'lib/prisma'
 import { refundCreditsValidator } from './validation'
-import Big from 'big.js'
+import { ethers } from 'ethers'
+import { logger } from 'lib/logger'
 
 interface RefundCreditsParams {
   id: number
@@ -26,19 +27,20 @@ export const refundCredits = async (props: RefundCreditsParams) => {
       throw new Error('Refund not started')
     }
 
-    const currentHeight = Big(userCredit.totalRefunds).plus(userCredit.totalWithdrawals)
-
     if (!userCredit.totalHeight) {
       throw new Error('Internal error')
     }
 
-    if (Big(userCredit.totalHeight).lte(currentHeight)) {
+    const currentHeight = ethers.BigNumber.from(userCredit.totalRefunds).add(userCredit.totalWithdrawals)
+    const totalHeight = ethers.BigNumber.from(userCredit.totalHeight)
+
+    if (currentHeight.gte(totalHeight)) {
       throw new Error('All credits already used or refunded')
     }
 
-    const remainCredits = Big(userCredit.totalHeight).minus(currentHeight)
+    const remainCredits = totalHeight.sub(currentHeight)
 
-    const totalRefunds = Big(userCredit.totalRefunds).plus(remainCredits).toString()
+    const totalRefunds = remainCredits.add(userCredit.totalRefunds).toString()
 
     await prisma.$transaction(async tx => {
       await tx.userCredit.update({
@@ -60,7 +62,7 @@ export const refundCredits = async (props: RefundCreditsParams) => {
 
     return { message: 'Success' }
   } catch (error) {
-    console.log('Error creating comment', error)
+    logger.error('Error refunding credits', error)
     return { error: 'Something went wrong' }
   }
 }

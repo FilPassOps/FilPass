@@ -6,7 +6,6 @@ import { AppConfig } from 'config/system'
 import { getUserCreditById } from 'domain/transfer-credits/get-user-credit-by-id'
 import { Divider } from 'components/Shared/Divider'
 import { TokenList } from 'components/User/TokenList'
-import Big from 'big.js'
 import { Layout } from 'components/Layout'
 import { UserCreditDetails } from '..'
 import { getTokensBySplitGroup } from 'domain/transfer-credits/get-tokens-by-split-group'
@@ -14,6 +13,8 @@ import { getItemsPerPage, PaginationWrapper } from 'components/Shared/Pagination
 import { ClipboardIcon } from '@heroicons/react/24/outline'
 import Timestamp from 'components/Shared/Timestamp'
 import { DateTime } from 'luxon'
+import { formatUnits } from 'ethers/lib/utils'
+import { ethers } from 'ethers'
 
 export interface CreditToken {
   id: number
@@ -35,8 +36,14 @@ const TokenSplitGroupDetails = ({ data, totalItems, pageSize }: TokenSplitGroupD
   const { userCreditDetails, splitTokensGroup } = data
   const [copiedField, setCopiedField] = useState<string | null>(null)
 
-  const currentHeight = Big(userCreditDetails.totalWithdrawals).plus(userCreditDetails.totalRefunds)
-  const currentCredits = Big(userCreditDetails.totalHeight).minus(currentHeight)
+  const fil = AppConfig.network.getTokenBySymbolAndBlockchainName('tFIL', 'Filecoin')
+
+  const currentHeight = ethers.BigNumber.from(userCreditDetails.totalWithdrawals).add(userCreditDetails.totalRefunds)
+  const currentCredits = ethers.BigNumber.from(userCreditDetails.totalHeight).sub(currentHeight)
+
+  const parsedCurrentCredits = formatUnits(currentCredits, fil.decimals)
+  const parsedUsedCredits = formatUnits(userCreditDetails.totalWithdrawals, fil.decimals)
+  const parsedRefundedCredits = formatUnits(userCreditDetails.totalRefunds, fil.decimals)
 
   const hasCredits = currentCredits.gt(0)
 
@@ -82,7 +89,7 @@ const TokenSplitGroupDetails = ({ data, totalItems, pageSize }: TokenSplitGroupD
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-1">
               <p className="text-gray-600 font-semibold">Current Credits:</p>
-              <p className=" text-deep-koamaru">{currentCredits.toString()}</p>
+              <p className=" text-deep-koamaru">{parsedCurrentCredits}</p>
             </div>
 
             <div className="col-span-1">
@@ -106,12 +113,12 @@ const TokenSplitGroupDetails = ({ data, totalItems, pageSize }: TokenSplitGroupD
 
             <div className="col-span-1">
               <p className="text-gray-600 font-semibold">Used Credits:</p>
-              <p className=" text-deep-koamaru">{userCreditDetails.totalWithdrawals}</p>
+              <p className=" text-deep-koamaru">{parsedUsedCredits}</p>
             </div>
 
             <div className="col-span-1">
               <p className="text-gray-600 font-semibold">Refunded Credits:</p>
-              <p className=" text-deep-koamaru">{userCreditDetails.totalRefunds}</p>
+              <p className=" text-deep-koamaru">{parsedRefundedCredits}</p>
             </div>
           </div>
         </div>
@@ -120,12 +127,7 @@ const TokenSplitGroupDetails = ({ data, totalItems, pageSize }: TokenSplitGroupD
           <Divider className="my-8" />
           <h2 className="text-2xl font-semibold text-deep-koamaru mb-4">Tokens</h2>
           <PaginationWrapper totalItems={totalItems} pageSize={pageSize}>
-            <TokenList
-              isOpen={true}
-              creditTokens={splitTokensGroup}
-              maxHeight={userCreditDetails.totalHeight}
-              currentHeight={currentHeight}
-            />
+            <TokenList isOpen={true} creditTokens={splitTokensGroup} currentHeight={currentHeight} />
           </PaginationWrapper>
         </div>
         <Divider className="my-8" />

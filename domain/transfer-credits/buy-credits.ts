@@ -1,6 +1,7 @@
 import prisma from 'lib/prisma'
 import { saveTransferCreditsValidator } from './validation'
 import { AppConfig } from 'config/system'
+import { parseUnits } from 'ethers/lib/utils'
 
 interface BuyCreditsParams {
   from: string
@@ -51,6 +52,8 @@ export const buyCredits = async (props: BuyCreditsParams) => {
       },
     })
 
+    const amount = parseUnits(fields.amount, fil.decimals).toString()
+
     // TODO: encrypt amount and other important info
     await prisma.$transaction(async tx => {
       if (!creditStorageProvider || !creditStorageProvider.id) {
@@ -64,7 +67,7 @@ export const buyCredits = async (props: BuyCreditsParams) => {
           data: {
             userId: fields.userId,
             storageProviderId: creditStorageProvider.id,
-            amount: fields.amount,
+            amount,
           },
         })
       }
@@ -75,7 +78,7 @@ export const buyCredits = async (props: BuyCreditsParams) => {
           storageProviderId: creditStorageProvider.id,
           transactionHash: fields.hash,
           status: 'PENDING',
-          amount: fields.amount,
+          amount,
           userCreditId: userCredit.id,
         },
       })

@@ -5,8 +5,6 @@ import { SplitTokenGroup } from 'pages/transfer-credits/[id]'
 
 interface SplitTokenGroupListProps {
   splitGroup: SplitTokenGroup[]
-  currentHeight: Big
-  maxHeight: string
   userCreditId: number
 }
 

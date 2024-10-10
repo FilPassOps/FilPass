@@ -1,4 +1,3 @@
-import Big from 'big.js'
 import { AppConfig } from 'config/system'
 import { randomUUID } from 'crypto'
 import { ethers } from 'ethers'
@@ -43,15 +42,18 @@ export default async function run() {
       return
     }
 
-    const chain = AppConfig.network.getChainByName('Ethereum')
-    const usdcDecimals = chain.tokens.find(t => t.symbol === 'USDC')?.decimals
+    const chain = AppConfig.network.getChainByName('Filecoin')
+    const filDecimals = chain.tokens.find(t => t.symbol === 'tFIL')?.decimals
 
-    if (!usdcDecimals) {
-      console.error('USDC decimals not found')
+    // TODO: change when using the contract
+    const etherChain = AppConfig.network.getChainByName('Ethereum')
+
+    if (!filDecimals) {
+      console.error('FIL decimals not found')
       return
     }
 
-    const provider = new ethers.providers.JsonRpcProvider(chain.rpcUrls[0])
+    const provider = new ethers.providers.JsonRpcProvider(etherChain.rpcUrls[0])
 
     for await (const { transactionHash, userCredit, id } of pendingTransactions) {
       if (!transactionHash || !userCredit || !userCredit.id) {
@@ -65,16 +67,10 @@ export default async function run() {
       }
 
       if (receipt.status === 1) {
-        // TODO: change to correct to use on balance and height
-        const formattedPaidUsdcAmount = ethers.utils.formatUnits(receipt.logs[0].data, usdcDecimals)
-        // const normalizedOfferPrice = ethers.utils.formatUnits(userCredit.offerPrice, usdcDecimals)
+        const paidAmount = ethers.BigNumber.from(receipt.logs[0].data)
 
-        // console.log('formattedPaidUsdcAmount', formattedPaidUsdcAmount)
-        // console.log('normalizedOfferPrice', normalizedOfferPrice)
-        // console.log('receipt.logs[0].data', receipt.logs[0].data)
-
-        // TODO: check the decimals
-        // if (formattedPaidUsdcAmount !== userCredit.offerPrice) {
+        // TODO: uncomment after using the contract
+        // if (!paidAmount.eq(userCredit.amount)) {
         //   await prisma.creditTransaction.update({
         //     where: {
         //       id,
@@ -83,16 +79,13 @@ export default async function run() {
         //       status: 'FAILED',
         //     },
         //   })
-        //   continue
         // }
 
         let withdrawStartsAt: Date | undefined
         let withdrawExpiresAt: Date | undefined
         let refundStartsAt: Date | undefined
 
-        const totalHeight = userCredit.totalHeight
-          ? Big(userCredit.totalHeight).plus(formattedPaidUsdcAmount).toString()
-          : Big(formattedPaidUsdcAmount).toString()
+        const totalHeight = userCredit.totalHeight ? paidAmount.add(userCredit.totalHeight).toString() : paidAmount.toString()
 
         const fistCredits = !userCredit.withdrawStartsAt
         const expiredCredit = userCredit.refundStartsAt && new Date() >= userCredit.refundStartsAt

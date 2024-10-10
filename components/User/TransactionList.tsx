@@ -3,6 +3,7 @@ import { BlockExplorerLink } from 'components/Shared/BlockExplorerLink'
 import { Cell, Header, Table, TableBody, TableHead } from 'components/Shared/Table'
 import { TokenIcon } from 'components/Shared/TokenIcon'
 import { AppConfig } from 'config/system'
+import { formatUnits } from 'ethers/lib/utils'
 import { DateTime } from 'luxon'
 import { CreditTransactionObject } from 'pages/transfer-credits/transaction-history'
 
@@ -12,6 +13,7 @@ interface TransactionListProps {
 
 export const TransactionList = ({ transactions }: TransactionListProps) => {
   const filecoin = AppConfig.network.getChainByName('Filecoin')
+  const fil = filecoin.tokens.find(token => token.symbol === 'tFIL')!
 
   return (
     <div className="flex flex-col relative py-4">
@@ -34,6 +36,7 @@ export const TransactionList = ({ transactions }: TransactionListProps) => {
           </TableHead>
           <TableBody>
             {transactions.map(transaction => {
+              const amount = formatUnits(transaction.userCredit.amount, fil.decimals!)
               return (
                 <tr key={transaction.id}>
                   {/* @ts-ignore */}
@@ -41,7 +44,7 @@ export const TransactionList = ({ transactions }: TransactionListProps) => {
                   {/* @ts-ignore */}
                   <Cell className="break-all">
                     <div className="flex items-center gap-2">
-                      <p>{transaction.userCredit.amount}</p>
+                      <p>{amount}</p>
                       <TokenIcon blockchainName={'Filecoin'} tokenSymbol={'tFIL'} width={20} height={20} />
                     </div>
                   </Cell>
