@@ -11,14 +11,8 @@ declare module 'iron-session' {
         id: number
         role: Role
       }[]
-      approverPrograms?: {
-        programId: number
-        visibility: boolean
-      }[]
     }
     identifier?: string
-    controllerId?: number
-    approverId?: number
     addressManagerId?: number
     superAdminId?: number
     userRoleId?: number

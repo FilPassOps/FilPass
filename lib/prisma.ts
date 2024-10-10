@@ -1,5 +1,5 @@
 import { Prisma, PrismaClient } from '@prisma/client'
-import { transferMiddleware, transferRequestMiddleware, userMiddleware } from 'prisma/middleware'
+import { userMiddleware } from 'prisma/middleware'
 import { logger } from './logger'
 
 // add prisma to the NodeJS global type
@@ -16,12 +16,6 @@ if (!global.prisma) {
   prisma.$use(async (params, next) => {
     if (params.model === 'User') {
       return await userMiddleware(params, next)
-    }
-    if (params.model === 'TransferRequest') {
-      return await transferRequestMiddleware(params, next)
-    }
-    if (params.model === 'Transfer') {
-      return await transferMiddleware(params, next)
     }
 
     return await next(params)

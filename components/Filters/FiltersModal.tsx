@@ -1,6 +1,5 @@
 import { Listbox, Transition } from '@headlessui/react'
 import { ChevronDownIcon, ChevronUpIcon, XMarkIcon } from '@heroicons/react/24/solid'
-import { Program } from '@prisma/client'
 import { Button } from 'components/Shared/Button'
 import { Modal } from 'components/Shared/Modal'
 import { fetcherWithParams } from 'lib/fetcher'
@@ -33,7 +32,6 @@ interface FiltersProps {
   isOpen: boolean
   closeModal: () => void
   handleFiltersCounter: (counter: number) => void
-  programs: Program[]
   statusOptions?: typeof statusFilterOptions
   teams?: string[]
   dateFilterLabel?: string
@@ -44,7 +42,6 @@ function FiltersModal({
   isOpen,
   closeModal,
   handleFiltersCounter,
-  programs,
   statusOptions,
   teams,
   dateFilterLabel = 'Create date',
@@ -61,15 +58,6 @@ function FiltersModal({
   const initialNetworkFilter: SelectOption[] = AppConfig.network.chains
     .filter(chain => networks?.includes(chain.name))
     .map(chain => ({ value: chain.name, label: chain.name }))
-
-  const programIds = query.programId
-    ?.toString()
-    .split(',')
-    .map(id => parseInt(id))
-
-  const initialProgramsFilter: SelectOption[] = programs
-    .filter(program => programIds?.includes(program.id))
-    .map(program => ({ value: program.id, label: program.name }))
 
   const initialRequestNumberFilter = query.number ?? ''
 
@@ -88,7 +76,6 @@ function FiltersModal({
   const initialWalletAddress = query.wallet?.toString()?.toLowerCase() ?? ''
 
   const [selectedNetwork, setSelectedNetwork] = useState<SelectOption[]>(initialNetworkFilter || [])
-  const [selectedPrograms, setSelectedPrograms] = useState<SelectOption[]>(initialProgramsFilter || [])
   const [requestNumber, setRequestNumber] = useState(initialRequestNumberFilter)
   const [selectedStatus, setSelectedStatus] = useState<StatusFilterOption | string>(initialStatusFilter)
   const [selectedTeams, setSelectedTeams] = useState<SelectOption[]>(initialTeamFilter || [])
@@ -123,7 +110,6 @@ function FiltersModal({
   })
 
   if (selectedNetwork.length > 0) selectedFilters++
-  if (selectedPrograms.length > 0) selectedFilters++
   if (requestNumber) selectedFilters++
   if (selectedStatus) selectedFilters++
   if (selectedTeams.length > 0) selectedFilters++
@@ -136,11 +122,7 @@ function FiltersModal({
     } else {
       delete query.network
     }
-    if (selectedPrograms.length > 0) {
-      query.programId = selectedPrograms.map(({ value }) => value).join(',')
-    } else {
-      delete query.programId
-    }
+
     if (requestNumber) {
       query.number = requestNumber.toString()
     } else {
@@ -178,7 +160,6 @@ function FiltersModal({
 
   const handleFilterClear = React.useCallback(() => {
     setSelectedNetwork([])
-    setSelectedPrograms([])
     setRequestNumber('')
     setSelectedStatus('')
     setSelectedTeams([])
@@ -289,17 +270,6 @@ function FiltersModal({
               onChange={selected => setSelectedNetwork(selected)}
               selectedOptions={selectedNetwork}
               setSelectedOptions={setSelectedNetwork}
-            />
-          </div>
-          <div>
-            <FilterLabel htmlFor="program">Program:</FilterLabel>
-            <Select
-              name="program"
-              placeholder="Filter and select program(s)"
-              options={programs.map(program => ({ value: program.id, label: program.name }))}
-              onChange={selected => setSelectedPrograms(selected)}
-              selectedOptions={selectedPrograms}
-              setSelectedOptions={setSelectedPrograms}
             />
           </div>
           {teams && (
