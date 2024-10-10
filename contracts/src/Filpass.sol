@@ -42,6 +42,7 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
   error InvalidOracleAddress();
   error InvalidRecipientAddress();
   error InvalidLockupTime();
+  error InvalidWithdrawAmount();
   error InsufficientDepositAmount();
   error InvalidParameters();
   error MaxOraclesReached();
@@ -76,8 +77,7 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
   }
 
   /**
-   * @dev Allows the user to deposit FIL specifying an Oracle and a Recipient.
-
+   * @notice Allows the user to deposit FIL specifying an Oracle and a Recipient.
    * @param oracleAddress The address of the Oracle authorized to withdraw funds.
    * @param recipient The address of the Recipient designated to receive withdrawals.
    * @param lockUpTime The lock-up period in days (e.g., 1 for 1 day, up to `MAX_LOCKUP_DAYS`).
@@ -85,8 +85,8 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
   function depositAmount(address oracleAddress, address recipient, uint256 lockUpTime) external payable onlyUser nonReentrant {
     if (oracleAddress == address(0)) revert InvalidOracleAddress();
     if (recipient == address(0)) revert InvalidRecipientAddress();
-    if (lockUpTime <= 0 || lockUpTime > MAX_LOCKUP_DAYS) revert InvalidLockupTime();
-    if (msg.value <= 0) revert InsufficientDepositAmount();
+    if (lockUpTime == 0 || lockUpTime > MAX_LOCKUP_DAYS) revert InvalidLockupTime();
+    if (msg.value == 0) revert InsufficientDepositAmount();
 
     if (!oracles.contains(oracleAddress)) {
       if (oracles.length() >= MAX_ORACLES) revert MaxOraclesReached();
@@ -118,12 +118,13 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
   }
 
   /**
-   * @dev Allows the designated Oracle to withdraw funds for a specific Recipient before the refund time.
+   * @notice Allows the designated Oracle to withdraw funds for a specific Recipient before the refund time.
    * @param recipient The address of the Recipient to receive the withdrawn funds.
    * @param requestedWithdrawAmount The amount of FIL to withdraw.
    */
   function withdrawAmount(address recipient, uint256 requestedWithdrawAmount) external nonReentrant {
     if (recipient == address(0)) revert InvalidRecipientAddress();
+    if (requestedWithdrawAmount == 0) revert InvalidWithdrawAmount();
 
     DepositInfo storage info = deposits[msg.sender][recipient];
     if (info.amount < requestedWithdrawAmount) revert InsufficientFunds();
@@ -147,7 +148,7 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
   }
 
   /**
-   * @dev Allows the user to refund funds based on the provided parameters.
+   * @notice Allows the user to refund funds based on the provided parameters.
    * @param oracleAddress The address of the Oracle associated with the funds. Set to `address(0)` to indicate all Oracles.
    * @param recipient The address of the Recipient associated with the funds. Set to `address(0)` to indicate all Recipients under the specified Oracle or all Recipients across all Oracles.
    */
@@ -170,7 +171,7 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
   }
 
   /**
-   * @dev Internal function to refund a specific Oracle-Recipient pair.
+   * @notice Internal function to refund a specific Oracle-Recipient pair.
    * @param oracleAddress The address of the Oracle.
    * @param recipient The address of the Recipient.
    */
@@ -196,7 +197,7 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
   }
 
   /**
-   * @dev Internal function to refund all available funds for all Recipients under a specific Oracle.
+   * @notice Internal function to refund all available funds for all Recipients under a specific Oracle.
    * @param oracleAddress The address of the Oracle.
    */
   function _refundAllRecipientsForOracle(address oracleAddress) internal {
@@ -234,6 +235,9 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
     if (!hasRefunds) revert NoEligibleFundsToRefund();
   }
 
+  /**
+   * @notice Internal function to refund all available funds for all Oracles and Recipients.
+   */
   function _refundAllOraclesAndRecipients() internal {
     bool hasRefunds = false;
 
@@ -284,7 +288,7 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
   }
 
   /**
-   * @dev Allows the user to recover any stranded FIL in the contract.
+   * @notice Allows the user to recover any stranded FIL in the contract.
    */
   function emergencyWithdraw() external onlyUser nonReentrant {
     uint256 balance = address(this).balance;
@@ -294,15 +298,14 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
   }
 
   /**
-   * @dev Fallback function to prevent direct FIL transfers to the contract.
+   * @notice Fallback function to prevent direct FIL transfers to the contract.
    */
   receive() external payable {
     revert DirectDepositsNotAllowed();
   }
 
   /**
-   * @dev Fallback function to handle calls to non-existent functions.
-   *      Reverts any such calls with a descriptive error message.
+   * @notice Fallback function to handle calls to non-existent functions.
    */
   fallback() external payable {
     revert FunctionDoesNotExist();
