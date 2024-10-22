@@ -2,7 +2,6 @@ import { Layout } from 'components/Layout'
 import { withUserSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { Button, LinkButton } from 'components/Shared/Button'
-import { CheckCircleIcon, ClipboardIcon, XCircleIcon } from '@heroicons/react/24/outline'
 import { ReactElement, useState } from 'react'
 import { AppConfig } from 'config/system'
 import { getUserCreditById } from 'domain/transfer-credits/get-user-credit-by-id'
@@ -12,11 +11,14 @@ import { Divider } from 'components/Shared/Divider'
 import { SplitTokensModal } from 'components/User/Modal/SplitTokensModal'
 import { api } from 'lib/api'
 import { useAlertDispatcher } from 'components/Layout/Alerts'
-import errorsMessages from 'wordings-and-errors/errors-messages'
 import { getSplitTokensGroup } from 'domain/transfer-credits/get-split-tokens-group'
 import { SplitTokenGroupList } from 'components/User/SplitTokenGroupList'
 import { ethers } from 'ethers'
 import { formatUnits } from 'ethers/lib/utils'
+import { useContract } from 'components/Web3/useContract'
+import { ErrorAlert } from 'components/Controller/MetaMaskPayment/Alerts'
+import { getPaymentErrorMessage } from 'components/Web3/utils'
+import { WithMetaMaskButton } from 'components/Web3/MetaMaskProvider'
 
 export interface CreditToken {
   id: number
@@ -46,10 +48,6 @@ export interface UserCreditDetails {
   amount: string
   creditTransactions: CreditTransaction[]
   creditTokens: CreditToken[]
-  currentToken: {
-    token: string
-    height: string
-  }
 }
 
 export interface SplitTokenGroup {
@@ -66,14 +64,15 @@ interface TransferCreditDetailsProps {
 }
 
 const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
-  const { dispatch } = useAlertDispatcher()
+  const { dispatch, close } = useAlertDispatcher()
+  const { refundAmount } = useContract()
 
   const { userCreditDetails } = data
-  const [copiedField, setCopiedField] = useState<string | null>(null)
   const [splitTokensModalOpen, setSplitTokensModalOpen] = useState(false)
   const [isRefundLoading, setIsRefundLoading] = useState(false)
 
-  const fil = AppConfig.network.getTokenBySymbolAndBlockchainName('tFIL', 'Filecoin')
+  const token = AppConfig.network.getTokenBySymbolAndBlockchainName('tFIL', 'Filecoin')
+  const network = AppConfig.network.getChainByToken(token)!
 
   const isWithdrawExpired = new Date(userCreditDetails.withdrawExpiresAt) < new Date()
   const isRefundStarted = new Date(userCreditDetails.refundStartsAt) < new Date()
@@ -81,44 +80,84 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
   const currentHeight = ethers.BigNumber.from(userCreditDetails.totalWithdrawals).add(userCreditDetails.totalRefunds)
   const currentCredits = ethers.BigNumber.from(userCreditDetails.totalHeight).sub(currentHeight)
 
-  const parsedCurrentCredits = formatUnits(currentCredits, fil.decimals)
-  const parsedUsedCredits = formatUnits(userCreditDetails.totalWithdrawals, fil.decimals)
-  const parsedRefundedCredits = formatUnits(userCreditDetails.totalRefunds, fil.decimals)
+  const parsedCurrentCredits = formatUnits(currentCredits, token.decimals)
 
   const hasCredits = currentCredits.gt(0)
 
-  const copyToClipboard = (text: string, field: string) => {
-    navigator.clipboard.writeText(text)
-    setCopiedField(field)
-    setTimeout(() => setCopiedField(null), 2000)
-  }
-
   const handleRefund = async () => {
-    setIsRefundLoading(true)
-    const { error } = await api.post('transfer-credits/refund-credits', {
-      userCreditId: userCreditDetails.id,
-    })
+    try {
+      setIsRefundLoading(true)
+      const systemWalletAddress = process.env.NEXT_PUBLIC_SYSTEM_WALLET_ADDRESS
 
-    if (error) {
+      if (!systemWalletAddress) {
+        dispatch({
+          type: 'error',
+          title: 'Refund failed',
+          config: {
+            closeable: true,
+          },
+          body: () => (
+            <ErrorAlert handleClose={() => close()}>
+              <span className="text-sm text-gray-600 text-center first-letter:uppercase pt-2">
+                Something went wrong with the oracle wallet. Please contact support if.
+              </span>
+            </ErrorAlert>
+          ),
+        })
+        return false
+      }
+
+      const result = await refundAmount(systemWalletAddress, userCreditDetails.creditTransactions[0].storageProvider.walletAddress)
+
+      if (result) {
+        await api.post('/transfer-credits/refund-credits', {
+          hash: result.hash,
+          id: userCreditDetails.id,
+        })
+
+        dispatch({
+          type: 'success',
+          title: 'Refund transaction sent',
+          config: {
+            closeable: true,
+          },
+          body: () => (
+            <>
+              <p className="text-sm text-gray-500 mb-4 text-center">
+                Your refund transaction has been successfully sent and is being processed.
+              </p>
+              <div className="mt-4 text-sm text-gray-500 text-center mb-4">
+                <a
+                  href={`${network?.blockExplorer.url}/${result.hash}`}
+                  onClick={() => close()}
+                  rel="noreferrer"
+                  target="_blank"
+                  className="underline text-green-700"
+                >
+                  Check the message
+                </a>
+              </div>
+            </>
+          ),
+        })
+      }
+    } catch (error: any) {
       dispatch({
-        title: 'Error refunding credits',
-        body: () => <p>{errorsMessages.something_went_wrong.message}</p>,
-        icon: () => <XCircleIcon className="text-red-500 h-12 w-12 mb-6" />,
+        type: 'error',
+        title: 'Refund failed',
         config: {
           closeable: true,
         },
+        body: () => (
+          <ErrorAlert handleClose={() => close()}>
+            <span className="text-sm text-gray-600 text-center first-letter:uppercase pt-2">{getPaymentErrorMessage(error)}</span>
+          </ErrorAlert>
+        ),
       })
-    } else {
-      dispatch({
-        title: 'Credits refunded',
-        body: () => <p>Credits refunded</p>,
-        icon: () => <CheckCircleIcon className="text-green-500 h-12 w-12 mb-6" />,
-        config: {
-          closeable: true,
-        },
-      })
+      return false
+    } finally {
+      setIsRefundLoading(false)
     }
-    setIsRefundLoading(false)
   }
 
   return (
@@ -141,28 +180,35 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
             <div className="mb-7 text-sm rounded-lg p-4 space-y-4 text-gamboge-orange bg-papaya-whip">
               <p className="font-bold">Attention</p>
               <p>
-                You currently have <strong>0</strong> credits. Please buy credits to continue using the service with this Storage Provider.
+                You currently have <strong>0</strong> credits. Please buy top up your credits to continue using the service with this
+                Receiver.
               </p>
             </div>
           )}
 
           <dl className={`sm:grid sm:grid-cols-2 sm:grid-flow-col `}>
             <div>
-              <dt className="text-gray-900 font-medium text-lg">Storage Provider Wallet</dt>
+              <dt className="text-gray-900 font-medium text-lg">Receiver Wallet</dt>
               <dd className="text-sm text-gray-500">{userCreditDetails.creditTransactions[0].storageProvider.walletAddress}</dd>
             </div>
 
             <div className="mt-4 sm:mt-0 text-sm text-gray-500">
               <div className="flex sm:justify-end">
-                <dt>Usage Expires on: </dt>
+                <dt>Credits Locked Until: </dt>
                 <dd>
-                  <Timestamp date={new Date(userCreditDetails.withdrawExpiresAt).toISOString()} format={DateTime.DATE_SHORT} />
+                  <Timestamp
+                    date={new Date(userCreditDetails.withdrawExpiresAt).toISOString()}
+                    format={DateTime.DATETIME_SHORT_WITH_SECONDS}
+                  />
                 </dd>
               </div>
               <div className="flex sm:justify-end">
                 <dt>Refund Starts on: </dt>
                 <dd>
-                  <Timestamp date={new Date(userCreditDetails.refundStartsAt).toISOString()} format={DateTime.DATE_SHORT} />
+                  <Timestamp
+                    date={new Date(userCreditDetails.refundStartsAt).toISOString()}
+                    format={DateTime.DATETIME_SHORT_WITH_SECONDS}
+                  />
                 </dd>
               </div>
             </div>
@@ -177,46 +223,17 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
               <p className="text-gray-600 font-semibold">Current Credits:</p>
               <p className=" text-deep-koamaru">{parsedCurrentCredits}</p>
             </div>
-
-            <div className="col-span-1">
-              <p className="text-gray-600 font-semibold">Current Credits Token:</p>
-              {hasCredits ? (
-                <div className="flex items-center gap-2">
-                  <p className="text-deep-koamaru">{`${userCreditDetails.currentToken.token.slice(
-                    0,
-                    6,
-                  )}...${userCreditDetails.currentToken.token.slice(-6)}`}</p>
-                  <Button variant="none" className="p-0" onClick={() => copyToClipboard(userCreditDetails.currentToken.token, 'token')}>
-                    <ClipboardIcon className="h-4 w-4" />
-                  </Button>
-                  {copiedField === 'token' && <span className="text-green-500 text-sm">Copied!</span>}
-                </div>
-              ) : (
-                '-'
-              )}
-              <div className="flex items-center gap-2"></div>
-            </div>
-
-            <div className="col-span-1">
-              <p className="text-gray-600 font-semibold">Used Credits:</p>
-              <p className=" text-deep-koamaru">{parsedUsedCredits}</p>
-            </div>
-
-            <div className="col-span-1">
-              <p className="text-gray-600 font-semibold">Refunded Credits:</p>
-              <p className=" text-deep-koamaru">{parsedRefundedCredits}</p>
-            </div>
           </div>
         </div>
 
         <div className="">
           <Divider className="my-8" />
-          <h2 className="text-2xl font-semibold text-deep-koamaru mb-4">Split Tokens Groups</h2>
+          <h2 className="text-2xl font-semibold text-deep-koamaru mb-4">Voucher Groups</h2>
           <SplitTokenGroupList splitGroup={data.splitTokensGroup} userCreditId={userCreditDetails.id} />
         </div>
         <Divider className="my-8" />
         <div className="py-6 flex items-center justify-center gap-4">
-          <LinkButton href="/transfer-credits" className="w-fit" variant="outline">
+          <LinkButton href="/transfer-credits" className="w-fit" variant="outline" disabled={isRefundLoading}>
             Back
           </LinkButton>
           <Button
@@ -225,36 +242,41 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
             }}
             variant="primary"
             className="w-fit"
-            disabled={isWithdrawExpired}
+            disabled={isWithdrawExpired || isRefundLoading}
             toolTipText={isWithdrawExpired ? 'This credit has expired' : ''}
           >
-            <p>Split Tokens</p>
+            <p>Create Vouchers</p>
           </Button>
-          <Button
-            variant="primary"
-            className="w-fit"
-            disabled={!isWithdrawExpired || !isRefundStarted || !hasCredits}
-            onClick={handleRefund}
-            loading={isRefundLoading}
-            toolTipText={
-              !isWithdrawExpired
-                ? ' This credit has not expired yet'
-                : !isRefundStarted
-                ? 'This credit cannot be refunded yet'
-                : !hasCredits
-                ? 'No more credits to refund'
-                : ''
-            }
-          >
-            Refund Credits
-          </Button>
+
           <LinkButton
             href={`/transfer-credits/buy?to=${userCreditDetails.creditTransactions[0].storageProvider.walletAddress}`}
             variant="primary"
             className="w-fit"
+            disabled={isRefundLoading}
           >
-            Buy Credits
+            Top Up
           </LinkButton>
+          <div className="w-fit">
+            <WithMetaMaskButton
+              targetChainId={network.chainId}
+              onClick={handleRefund}
+              connectWalletLabel="Connect MetaMask to refund"
+              switchChainLabel="Switch network to refund"
+              variant="red"
+              disabled={!isWithdrawExpired || !isRefundStarted || !hasCredits}
+              toolTipText={
+                !isWithdrawExpired
+                  ? ' This credit has not expired yet'
+                  : !isRefundStarted
+                  ? 'This credit cannot be refunded yet'
+                  : !hasCredits
+                  ? 'No more credits to refund'
+                  : ''
+              }
+            >
+              Refund Credits
+            </WithMetaMaskButton>
+          </div>
         </div>
       </div>
       <SplitTokensModal

@@ -1,7 +1,7 @@
 import { withUserSSR } from 'lib/ssr'
 import Head from 'next/head'
-import { Button, LinkButton } from 'components/Shared/Button'
-import { ReactElement, useState } from 'react'
+import { LinkButton } from 'components/Shared/Button'
+import { ReactElement } from 'react'
 import { AppConfig } from 'config/system'
 import { getUserCreditById } from 'domain/transfer-credits/get-user-credit-by-id'
 import { Divider } from 'components/Shared/Divider'
@@ -10,10 +10,8 @@ import { Layout } from 'components/Layout'
 import { UserCreditDetails } from '..'
 import { getTokensBySplitGroup } from 'domain/transfer-credits/get-tokens-by-split-group'
 import { getItemsPerPage, PaginationWrapper } from 'components/Shared/PaginationWrapper'
-import { ClipboardIcon } from '@heroicons/react/24/outline'
 import Timestamp from 'components/Shared/Timestamp'
 import { DateTime } from 'luxon'
-import { formatUnits } from 'ethers/lib/utils'
 import { ethers } from 'ethers'
 
 export interface CreditToken {
@@ -29,29 +27,16 @@ interface TokenSplitGroupDetailsProps {
     splitTokensGroup: CreditToken[]
   }
   totalItems: number
+  totalRedeemed: number
   pageSize: number
 }
 
-const TokenSplitGroupDetails = ({ data, totalItems, pageSize }: TokenSplitGroupDetailsProps) => {
+const TokenSplitGroupDetails = ({ data, totalItems, totalRedeemed, pageSize }: TokenSplitGroupDetailsProps) => {
   const { userCreditDetails, splitTokensGroup } = data
-  const [copiedField, setCopiedField] = useState<string | null>(null)
-
-  const fil = AppConfig.network.getTokenBySymbolAndBlockchainName('tFIL', 'Filecoin')
 
   const currentHeight = ethers.BigNumber.from(userCreditDetails.totalWithdrawals).add(userCreditDetails.totalRefunds)
-  const currentCredits = ethers.BigNumber.from(userCreditDetails.totalHeight).sub(currentHeight)
 
-  const parsedCurrentCredits = formatUnits(currentCredits, fil.decimals)
-  const parsedUsedCredits = formatUnits(userCreditDetails.totalWithdrawals, fil.decimals)
-  const parsedRefundedCredits = formatUnits(userCreditDetails.totalRefunds, fil.decimals)
-
-  const hasCredits = currentCredits.gt(0)
-
-  const copyToClipboard = (text: string, field: string) => {
-    navigator.clipboard.writeText(text)
-    setCopiedField(field)
-    setTimeout(() => setCopiedField(null), 2000)
-  }
+  const totalInFlight = totalItems - totalRedeemed
 
   return (
     <>
@@ -62,21 +47,27 @@ const TokenSplitGroupDetails = ({ data, totalItems, pageSize }: TokenSplitGroupD
         <div className="py-6">
           <dl className={`sm:grid sm:grid-cols-2 sm:grid-flow-col `}>
             <div>
-              <dt className="text-gray-900 font-medium text-lg">Storage Provider Wallet</dt>
+              <dt className="text-gray-900 font-medium text-lg">Receiver Wallet</dt>
               <dd className="text-sm text-gray-500">{userCreditDetails.creditTransactions[0].storageProvider.walletAddress}</dd>
             </div>
 
             <div className="mt-4 sm:mt-0 text-sm text-gray-500">
               <div className="flex sm:justify-end">
-                <dt>Usage Expires on: </dt>
+                <dt>Credits Locked Until: </dt>
                 <dd>
-                  <Timestamp date={new Date(userCreditDetails.withdrawExpiresAt).toISOString()} format={DateTime.DATE_SHORT} />
+                  <Timestamp
+                    date={new Date(userCreditDetails.withdrawExpiresAt).toISOString()}
+                    format={DateTime.DATETIME_SHORT_WITH_SECONDS}
+                  />
                 </dd>
               </div>
               <div className="flex sm:justify-end">
                 <dt>Refund Starts on: </dt>
                 <dd>
-                  <Timestamp date={new Date(userCreditDetails.refundStartsAt).toISOString()} format={DateTime.DATE_SHORT} />
+                  <Timestamp
+                    date={new Date(userCreditDetails.refundStartsAt).toISOString()}
+                    format={DateTime.DATETIME_SHORT_WITH_SECONDS}
+                  />
                 </dd>
               </div>
             </div>
@@ -84,50 +75,30 @@ const TokenSplitGroupDetails = ({ data, totalItems, pageSize }: TokenSplitGroupD
 
           <Divider className="my-8" />
 
-          <h2 className="text-2xl font-semibold text-deep-koamaru mb-4">Credit Details</h2>
+          <h2 className="text-2xl font-semibold text-deep-koamaru mb-4">Group Details</h2>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-1">
-              <p className="text-gray-600 font-semibold">Current Credits:</p>
-              <p className=" text-deep-koamaru">{parsedCurrentCredits}</p>
+              <p className="text-gray-600 font-semibold">Vouchers in Flight:</p>
+              <p className=" text-deep-koamaru">{totalInFlight}</p>
             </div>
 
             <div className="col-span-1">
-              <p className="text-gray-600 font-semibold">Current Credits Token:</p>
-              {hasCredits ? (
-                <div className="flex items-center gap-2">
-                  <p className="text-deep-koamaru">{`${userCreditDetails.currentToken.token.slice(
-                    0,
-                    6,
-                  )}...${userCreditDetails.currentToken.token.slice(-6)}`}</p>
-                  <Button variant="none" className="p-0" onClick={() => copyToClipboard(userCreditDetails.currentToken.token, 'token')}>
-                    <ClipboardIcon className="h-4 w-4" />
-                  </Button>
-                  {copiedField === 'token' && <span className="text-green-500 text-sm">Copied!</span>}
-                </div>
-              ) : (
-                '-'
-              )}
-              <div className="flex items-center gap-2"></div>
-            </div>
-
-            <div className="col-span-1">
-              <p className="text-gray-600 font-semibold">Used Credits:</p>
-              <p className=" text-deep-koamaru">{parsedUsedCredits}</p>
-            </div>
-
-            <div className="col-span-1">
-              <p className="text-gray-600 font-semibold">Refunded Credits:</p>
-              <p className=" text-deep-koamaru">{parsedRefundedCredits}</p>
+              <p className="text-gray-600 font-semibold">Vouchers Redeemed:</p>
+              <p className=" text-deep-koamaru">{totalRedeemed}</p>
             </div>
           </div>
         </div>
 
         <div className="">
           <Divider className="my-8" />
-          <h2 className="text-2xl font-semibold text-deep-koamaru mb-4">Tokens</h2>
+          <h2 className="text-2xl font-semibold text-deep-koamaru mb-4">Vouchers</h2>
           <PaginationWrapper totalItems={totalItems} pageSize={pageSize}>
-            <TokenList isOpen={true} creditTokens={splitTokensGroup} currentHeight={currentHeight} />
+            <TokenList
+              isOpen={true}
+              creditTokens={splitTokensGroup}
+              currentHeight={currentHeight}
+            />
           </PaginationWrapper>
         </div>
         <Divider className="my-8" />
@@ -144,7 +115,7 @@ const TokenSplitGroupDetails = ({ data, totalItems, pageSize }: TokenSplitGroupD
 export default TokenSplitGroupDetails
 
 TokenSplitGroupDetails.getLayout = function getLayout(page: ReactElement) {
-  return <Layout title="Token Group Details">{page}</Layout>
+  return <Layout title="Voucher Group Details">{page}</Layout>
 }
 
 export const getServerSideProps = withUserSSR(async ({ params, user, query }: any) => {
@@ -170,6 +141,7 @@ export const getServerSideProps = withUserSSR(async ({ params, user, query }: an
         splitTokensGroup: JSON.parse(JSON.stringify(splitTokensGroup.splitTokens)),
       },
       totalItems: splitTokensGroup?.total ?? 0,
+      totalRedeemed: splitTokensGroup?.totalRedeemed ?? 0,
       pageSize: pageSize,
     },
   }

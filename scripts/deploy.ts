@@ -4,7 +4,7 @@ async function main() {
   const [deployer] = await ethers.getSigners()
   console.log('Deploying contract with the account:', deployer.address)
 
-  const Contract = await ethers.getContractFactory('MultiForwarder')
+  const Contract = await ethers.getContractFactory('FilecoinDepositWithdrawRefund')
   const contract = await Contract.deploy()
 
   await contract.deployed()

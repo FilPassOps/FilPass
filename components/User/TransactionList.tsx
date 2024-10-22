@@ -1,14 +1,14 @@
-import { CreditTransactionStatus } from '@prisma/client'
+import { TransactionStatus } from '@prisma/client'
 import { BlockExplorerLink } from 'components/Shared/BlockExplorerLink'
 import { Cell, Header, Table, TableBody, TableHead } from 'components/Shared/Table'
 import { TokenIcon } from 'components/Shared/TokenIcon'
 import { AppConfig } from 'config/system'
+import { Transaction } from 'domain/transfer-credits/get-user-transaction-credits-by-user-id'
 import { formatUnits } from 'ethers/lib/utils'
 import { DateTime } from 'luxon'
-import { CreditTransactionObject } from 'pages/transfer-credits/transaction-history'
 
 interface TransactionListProps {
-  transactions: CreditTransactionObject[]
+  transactions: Transaction[]
 }
 
 export const TransactionList = ({ transactions }: TransactionListProps) => {
@@ -21,11 +21,11 @@ export const TransactionList = ({ transactions }: TransactionListProps) => {
         <Table>
           <TableHead>
             <tr>
-              <Header style={{ width: '5%' }}>Id</Header>
+              <Header style={{ width: '5%' }}>Operation</Header>
               {/* @ts-ignore */}
               <Header style={{ width: '10%' }}>Amount</Header>
               {/* @ts-ignore */}
-              <Header style={{ width: '25%' }}>Storage Provider Wallet</Header>
+              <Header style={{ width: '30%' }}>Receiver</Header>
               {/* @ts-ignore */}
               <Header style={{ width: '20%' }}>Created Date</Header>
               {/* @ts-ignore */}
@@ -36,11 +36,11 @@ export const TransactionList = ({ transactions }: TransactionListProps) => {
           </TableHead>
           <TableBody>
             {transactions.map(transaction => {
-              const amount = formatUnits(transaction.userCredit.amount, fil.decimals!)
+              const amount = formatUnits(transaction.amount, fil.decimals!)
               return (
-                <tr key={transaction.id}>
+                <tr key={transaction.id + transaction.type}>
                   {/* @ts-ignore */}
-                  <Cell className="break-all">{transaction.id}</Cell>
+                  <Cell className="break-all">{transaction.type}</Cell>
                   {/* @ts-ignore */}
                   <Cell className="break-all">
                     <div className="flex items-center gap-2">
@@ -49,21 +49,21 @@ export const TransactionList = ({ transactions }: TransactionListProps) => {
                     </div>
                   </Cell>
                   {/* @ts-ignore */}
-                  <Cell className="break-all">{transaction.storageProvider.walletAddress}</Cell>
+                  <Cell className="break-all">{transaction.wallet_address}</Cell>
                   {/* @ts-ignore */}
                   <Cell className="break-all">
-                    {DateTime.fromISO(transaction.createdAt).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS)}
+                    {DateTime.fromISO(transaction.created_at).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS)}
                   </Cell>
                   {/* @ts-ignore */}
                   <Cell className="break-all">
-                    <strong className={getStatusClass(transaction.status)}>{transaction.status}</strong>
+                    <strong className={getStatusClass(transaction.status as TransactionStatus)}>{transaction.status}</strong>
                   </Cell>
                   {/* @ts-ignore */}
                   <Cell className="break-all">
                     <BlockExplorerLink
                       blockExplorerName={filecoin.blockExplorer.name}
                       blockExplorerUrl={filecoin.blockExplorer.url}
-                      transactionHash={transaction.transactionHash}
+                      transactionHash={transaction.transaction_hash}
                     />
                   </Cell>
                 </tr>
@@ -79,7 +79,7 @@ export const TransactionList = ({ transactions }: TransactionListProps) => {
   )
 }
 
-const getStatusClass = (status: CreditTransactionStatus) => {
+const getStatusClass = (status: TransactionStatus) => {
   switch (status) {
     case 'PENDING':
       return 'text-yellow-500'

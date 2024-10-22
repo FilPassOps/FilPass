@@ -1,6 +1,6 @@
 import { ClipboardIcon } from '@heroicons/react/24/outline'
-import { TableDiv, TableHeader, Table } from 'components/Controller/MetaMaskPayment/Table'
 import { Button } from 'components/Shared/Button'
+import { Cell, Header, Table, TableBody, TableHead } from 'components/Shared/Table'
 import { AppConfig } from 'config/system'
 import { BigNumber, ethers } from 'ethers'
 import { formatUnits } from 'ethers/lib/utils'
@@ -21,38 +21,44 @@ export const TokenList = ({ creditTokens, currentHeight, isOpen }: TokenListProp
 
   return (
     <div className={`${isOpen ? 'block' : 'hidden'} py-3 md:p-3`}>
-      <div className="overflow-x-scroll">
-        <Table cols="grid-cols-4" className="bg-white">
-          <TableHeader>No</TableHeader>
-          <TableHeader>Height</TableHeader>
-          <TableHeader>Status</TableHeader>
-          <TableHeader>Token</TableHeader>
-
+      <Table>
+        <TableHead>
+          <tr>
+            <Header style={{ minWidth: 100, width: 100 }}>No</Header>
+            <Header style={{ minWidth: 250 }}>Exchanged so far</Header>
+            <Header style={{ minWidth: 250 }}>Current Amount</Header>
+            <Header style={{ minWidth: 200 }}>Status</Header>
+            <Header style={{ minWidth: 200 }}>Token</Header>
+          </tr>
+        </TableHead>
+        <TableBody>
           {creditTokens.map(tokenItem => {
             const tokenHeight = ethers.BigNumber.from(tokenItem.height)
+            const heightDiff = tokenHeight.sub(currentHeight)
+            const currentAmount = heightDiff.gt(0) ? heightDiff : ethers.BigNumber.from(0)
             const parsedTokenHeight = formatUnits(tokenHeight, fil.decimals)
+            const parsedCurrentAmount = formatUnits(currentAmount, fil.decimals)
             return (
-              <div key={tokenItem.id} className="contents">
-                <TableDiv>
-                  <div className="flex items-center gap-1">{`#${tokenItem.id}`}</div>
-                </TableDiv>
-                <TableDiv>{parsedTokenHeight}</TableDiv>
-                <TableDiv>
+              <tr key={tokenItem.id}>
+                <Cell>{`#${tokenItem.id}`}</Cell>
+                <Cell>{parsedTokenHeight}</Cell>
+                <Cell>{parsedCurrentAmount}</Cell>
+                <Cell>
                   <TokenStatus tokenHeight={tokenHeight} redeemable={tokenItem.redeemable} currentHeight={currentHeight} />
-                </TableDiv>
-                <TableDiv>
+                </Cell>
+                <Cell>
                   <div className="flex items-center justify-end gap-2">
                     <p className="text-deep-koamaru">{`${tokenItem.token.slice(0, 6)}...${tokenItem.token.slice(-6)}`}</p>
                     <Button variant="none" className="p-0" onClick={() => copyToClipboard(tokenItem.token)}>
                       <ClipboardIcon className="h-4 w-4" />
                     </Button>
                   </div>
-                </TableDiv>
-              </div>
+                </Cell>
+              </tr>
             )
           })}
-        </Table>
-      </div>
+        </TableBody>
+      </Table>
     </div>
   )
 }

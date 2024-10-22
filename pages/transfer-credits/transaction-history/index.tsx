@@ -5,22 +5,10 @@ import { getUserTransactionCreditsByUserId } from 'domain/transfer-credits/get-u
 import { AppConfig } from 'config/system'
 import { ReactElement } from 'react'
 import { TransactionList } from 'components/User/TransactionList'
-import { CreditTransaction } from '@prisma/client'
-
-export interface CreditTransactionObject extends Omit<CreditTransaction, 'createdAt'> {
-  createdAt: string
-  storageProvider: {
-    walletAddress: string
-  }
-  userCredit: {
-    expiresAt: string
-    amount: string
-    unit: string
-  }
-}
+import { Transaction } from 'domain/transfer-credits/get-user-transaction-credits-by-user-id'
 
 interface TransactionHistoryData {
-  transactions: CreditTransactionObject[]
+  transactions: Transaction[]
 }
 
 interface TransactionHistoryProps {

@@ -9,9 +9,9 @@ interface Config extends HardhatUserConfig {
   defaultNetwork: keyof Config['networks']
   networks: {
     calibration: HttpNetworkUserConfig
-    sepolia: HttpNetworkUserConfig
-    mumbai: HttpNetworkUserConfig
-    hardhat?: HardhatNetworkUserConfig
+    // sepolia: HttpNetworkUserConfig
+    // mumbai: HttpNetworkUserConfig
+    // hardhat?: HardhatNetworkUserConfig
   }
 }
 
@@ -25,21 +25,22 @@ const config: Config = {
       },
     },
   },
-  defaultNetwork: 'hardhat',
+  defaultNetwork: 'calibration',
   networks: {
-    hardhat: {},
+    // hardhat: {},
     calibration: {
       chainId: 314159,
       url: 'https://api.calibration.node.glif.io/rpc/v1',
+      accounts: [process.env.SYSTEM_WALLET_PRIVATE_KEY || ''],
     },
-    sepolia: {
-      chainId: 11155111,
-      url: 'https://ethereum-sepolia.blockpi.network/v1/rpc/public',
-    },
-    mumbai: {
-      chainId: 80001,
-      url: 'https://rpc-mumbai.maticvigil.com',
-    },
+    // sepolia: {
+    //   chainId: 11155111,
+    //   url: 'https://ethereum-sepolia.blockpi.network/v1/rpc/public',
+    // },
+    // mumbai: {
+    //   chainId: 80001,
+    //   url: 'https://rpc-mumbai.maticvigil.com',
+    // },
   },
   paths: {
     sources: './contracts/src',

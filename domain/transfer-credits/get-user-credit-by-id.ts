@@ -25,10 +25,15 @@ export const getUserCreditById = async (props: GetUserCreditByIdParams) => {
         withdrawExpiresAt: true,
         refundStartsAt: true,
         amount: true,
-        currentToken: {
+        contract: {
           select: {
-            token: true,
-            height: true,
+            address: true,
+            deployedFromAddress: true,
+          },
+        },
+        storageProvider: {
+          select: {
+            walletAddress: true,
           },
         },
         creditTransactions: {

@@ -31,14 +31,6 @@ export const getUserCredits = async (props: GetUserCreditsParams) => {
         refundStartsAt: true,
         withdrawExpiresAt: true,
         withdrawStartsAt: true,
-        currentToken: {
-          select: {
-            id: true,
-            token: true,
-            redeemable: true,
-            height: true,
-          },
-        },
         amount: true,
         creditTransactions: {
           select: {

@@ -44,6 +44,7 @@ export const splitTokensValidator = yup.object({
 export const refundCreditsValidator = yup.object({
   id: yup.number().required(),
   userId: yup.number().required(),
+  hash: yup.string().required(),
 })
 
 export const getSplitTokensGroupValidator = Yup.object().shape({
@@ -56,4 +57,9 @@ export const getSplitTokensBySplitGroupValidator = Yup.object().shape({
   userCreditId: Yup.number().required(),
   pageSize: Yup.number().required(),
   page: Yup.number().required(),
+})
+
+export const getLastVoucherRedeemedByUserCreditIdValidator = Yup.object().shape({
+  userCreditId: Yup.number().required(),
+  userId: Yup.number().required(),
 })

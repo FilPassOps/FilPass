@@ -2,6 +2,8 @@ import prisma from 'lib/prisma'
 import { saveTransferCreditsValidator } from './validation'
 import { AppConfig } from 'config/system'
 import { parseUnits } from 'ethers/lib/utils'
+import { TransactionStatus } from '@prisma/client'
+import { getContractsByUserId } from 'domain/contracts/get-contracts-by-user-id'
 
 interface BuyCreditsParams {
   from: string
@@ -28,7 +30,7 @@ export const buyCredits = async (props: BuyCreditsParams) => {
     // }
 
     if (!validateAddress(fields.to)) {
-      throw new Error('Invalid storage provider address')
+      throw new Error('Invalid receiver address')
     }
 
     let creditStorageProvider = await prisma.storageProvider.findUnique({
@@ -45,10 +47,17 @@ export const buyCredits = async (props: BuyCreditsParams) => {
       })
     }
 
+    const { data: contracts, error: contractsError } = await getContractsByUserId({ userId: fields.userId })
+
+    if (contractsError || !contracts) {
+      throw new Error('Contracts not found')
+    }
+
     const existingUserCredit = await prisma.userCredit.findFirst({
       where: {
         userId: fields.userId,
         storageProviderId: creditStorageProvider.id,
+        contractId: contracts[0].id,
       },
     })
 
@@ -57,7 +66,7 @@ export const buyCredits = async (props: BuyCreditsParams) => {
     // TODO: encrypt amount and other important info
     await prisma.$transaction(async tx => {
       if (!creditStorageProvider || !creditStorageProvider.id) {
-        throw new Error('Failed to create or find storage provider')
+        throw new Error('Failed to create or find receiver')
       }
 
       let userCredit = existingUserCredit
@@ -67,7 +76,7 @@ export const buyCredits = async (props: BuyCreditsParams) => {
           data: {
             userId: fields.userId,
             storageProviderId: creditStorageProvider.id,
-            amount,
+            contractId: contracts[0].id,
           },
         })
       }
@@ -77,7 +86,7 @@ export const buyCredits = async (props: BuyCreditsParams) => {
           from: fields.from,
           storageProviderId: creditStorageProvider.id,
           transactionHash: fields.hash,
-          status: 'PENDING',
+          status: TransactionStatus.PENDING,
           amount,
           userCreditId: userCredit.id,
         },
