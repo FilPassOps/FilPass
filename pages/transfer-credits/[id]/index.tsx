@@ -13,12 +13,13 @@ import { api } from 'lib/api'
 import { useAlertDispatcher } from 'components/Layout/Alerts'
 import { getSplitTokensGroup } from 'domain/transfer-credits/get-split-tokens-group'
 import { SplitTokenGroupList } from 'components/User/SplitTokenGroupList'
-import { ethers } from 'ethers'
+import { Contract, ethers } from 'ethers'
 import { formatUnits } from 'ethers/lib/utils'
 import { useContract } from 'components/Web3/useContract'
 import { ErrorAlert } from 'components/Controller/MetaMaskPayment/Alerts'
 import { getPaymentErrorMessage } from 'components/Web3/utils'
 import { WithMetaMaskButton } from 'components/Web3/MetaMaskProvider'
+import { getContractsByUserId } from 'domain/contracts/get-contracts-by-user-id'
 
 export interface CreditToken {
   id: number
@@ -60,12 +61,13 @@ interface TransferCreditDetailsProps {
   data: {
     userCreditDetails: UserCreditDetails
     splitTokensGroup: SplitTokenGroup[]
+    contracts: Contract[]
   }
 }
 
 const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
   const { dispatch, close } = useAlertDispatcher()
-  const { refundAmount } = useContract()
+  const { refundAmount } = useContract(data.contracts[0]?.address ?? null)
 
   const { userCreditDetails } = data
   const [splitTokensModalOpen, setSplitTokensModalOpen] = useState(false)
@@ -299,6 +301,8 @@ export const getServerSideProps = withUserSSR(async ({ params, user }: any) => {
 
   const userCreditDetails = data ? JSON.parse(JSON.stringify(data)) : null
 
+  const { data: contracts } = await getContractsByUserId({ userId: user.id })
+
   const { data: splitTokensGroup } = await getSplitTokensGroup({ userCreditId: userCreditDetails.id })
 
   return {
@@ -306,6 +310,7 @@ export const getServerSideProps = withUserSSR(async ({ params, user }: any) => {
       data: {
         userCreditDetails,
         splitTokensGroup: JSON.parse(JSON.stringify(splitTokensGroup)),
+        contracts: JSON.parse(JSON.stringify(contracts)),
       },
     },
   }
