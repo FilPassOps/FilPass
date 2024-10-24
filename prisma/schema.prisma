@@ -353,21 +353,32 @@ model UserCredit {
   refundStartsAt      DateTime?             @map("refund_starts_at")
   withdrawStartsAt    DateTime?             @map("withdraw_starts_at")
   withdrawExpiresAt   DateTime?             @map("withdraw_expires_at")
-  creditTokens        CreditToken[]
   contractId          Int                   @unique @map("contract_id")
   contract            Contract              @relation(fields: [contractId], references: [id])
   ledger              Ledger[]
   refundTransaction   RefundTransaction[]
   withdrawTransaction WithdrawTransaction[]
+  splitGroups         SplitGroup[]
 
   @@index([userId])
   @@map("user_credit")
 }
 
+model SplitGroup {
+  id           Int           @id @default(autoincrement())
+  userCreditId Int           @map("user_credit_id")
+  userCredit   UserCredit    @relation(fields: [userCreditId], references: [id])
+  creditTokens CreditToken[]
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  @@index([userCreditId])
+  @@map("split_group")
+}
+
 model CreditToken {
   id                  Int                  @id @default(autoincrement())
   publicId            String?              @unique() @map("public_id")
-  userCreditId        Int                  @map("user_credit_id")
   height              String               @map("height")
   amount              String               @map("amount")
   token               String               @map("token")
@@ -375,12 +386,14 @@ model CreditToken {
   valid               Boolean              @default(true) @map("valid")
   createdAt           DateTime             @default(now()) @map("created_at")
   updatedAt           DateTime             @updatedAt @map("updated_at")
-  splitGroup          String?              @default("1") @map("split_group")
-  userCredit          UserCredit           @relation(fields: [userCreditId], references: [id])
+  splitGroup          SplitGroup           @relation(fields: [splitGroupId], references: [id])
+  splitGroupId        Int                  @map("split_group_id")
   withdrawTransaction WithdrawTransaction?
 
-  @@index([userCreditId])
-  @@index([splitGroup])
+  @@index([splitGroupId])
+  @@index([publicId])
+  @@index([redeemable])
+  @@index([valid])
   @@map("credit_token")
 }
 

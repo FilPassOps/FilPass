@@ -60,8 +60,6 @@ export default async function run() {
 
     const provider = new ethers.providers.JsonRpcProvider(chain.rpcUrls[0])
 
-    // TODO: check if transaction is pending
-
     for await (const { transactionHash, userCredit, id, amount } of pendingTransactions) {
       if (!transactionHash || !userCredit || !userCredit.id) {
         continue

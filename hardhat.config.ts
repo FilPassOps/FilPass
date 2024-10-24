@@ -11,7 +11,7 @@ interface Config extends HardhatUserConfig {
     calibration: HttpNetworkUserConfig
     // sepolia: HttpNetworkUserConfig
     // mumbai: HttpNetworkUserConfig
-    // hardhat?: HardhatNetworkUserConfig
+    hardhat?: HardhatNetworkUserConfig
   }
 }
 
@@ -25,9 +25,9 @@ const config: Config = {
       },
     },
   },
-  defaultNetwork: 'calibration',
+  defaultNetwork: 'hardhat',
   networks: {
-    // hardhat: {},
+    hardhat: {},
     calibration: {
       chainId: 314159,
       url: 'https://api.calibration.node.glif.io/rpc/v1',

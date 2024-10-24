@@ -11,7 +11,7 @@ import { Divider } from 'components/Shared/Divider'
 import { SplitTokensModal } from 'components/User/Modal/SplitTokensModal'
 import { api } from 'lib/api'
 import { useAlertDispatcher } from 'components/Layout/Alerts'
-import { getSplitTokensGroup } from 'domain/transfer-credits/get-split-tokens-group'
+import { getSplitTokensGroupByUserCreditId } from 'domain/transfer-credits/get-split-tokens-group-by-user-credit-id'
 import { SplitTokenGroupList } from 'components/User/SplitTokenGroupList'
 import { Contract, ethers } from 'ethers'
 import { formatUnits } from 'ethers/lib/utils'
@@ -20,6 +20,7 @@ import { ErrorAlert } from 'components/Controller/MetaMaskPayment/Alerts'
 import { getPaymentErrorMessage } from 'components/Web3/utils'
 import { WithMetaMaskButton } from 'components/Web3/MetaMaskProvider'
 import { getContractsByUserId } from 'domain/contracts/get-contracts-by-user-id'
+import { getAvailableTokenNumber } from 'domain/transfer-credits/get-available-token-number'
 
 export interface CreditToken {
   id: number
@@ -49,6 +50,10 @@ export interface UserCreditDetails {
   amount: string
   creditTransactions: CreditTransaction[]
   creditTokens: CreditToken[]
+  contract: {
+    address: string
+    deployedFromAddress: string
+  }
 }
 
 export interface SplitTokenGroup {
@@ -61,15 +66,16 @@ interface TransferCreditDetailsProps {
   data: {
     userCreditDetails: UserCreditDetails
     splitTokensGroup: SplitTokenGroup[]
-    contracts: Contract[]
+    availableTokenNumber: number
   }
 }
 
 const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
   const { dispatch, close } = useAlertDispatcher()
-  const { refundAmount } = useContract(data.contracts[0]?.address ?? null)
+  const { userCreditDetails, availableTokenNumber } = data
 
-  const { userCreditDetails } = data
+  const { refundAmount } = useContract(data.userCreditDetails.contract.address ?? null)
+
   const [splitTokensModalOpen, setSplitTokensModalOpen] = useState(false)
   const [isRefundLoading, setIsRefundLoading] = useState(false)
 
@@ -188,10 +194,16 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
             </div>
           )}
 
-          <dl className={`sm:grid sm:grid-cols-2 sm:grid-flow-col `}>
+          <dl className={`sm:grid sm:grid-cols-2 sm:grid-flow-col items-center`}>
             <div>
-              <dt className="text-gray-900 font-medium text-lg">Receiver Wallet</dt>
-              <dd className="text-sm text-gray-500">{userCreditDetails.creditTransactions[0].storageProvider.walletAddress}</dd>
+              <div>
+                <dt className="text-gray-900 font-medium">Receiver</dt>
+                <dd className="text-sm text-gray-500">{userCreditDetails.creditTransactions[0].storageProvider.walletAddress}</dd>
+              </div>
+              <div>
+                <dt className="text-gray-900 font-medium">Contract</dt>
+                <dd className="text-sm text-gray-500">{userCreditDetails.contract.address}</dd>
+              </div>
             </div>
 
             <div className="mt-4 sm:mt-0 text-sm text-gray-500">
@@ -224,6 +236,10 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
             <div className="col-span-1">
               <p className="text-gray-600 font-semibold">Current Credits:</p>
               <p className=" text-deep-koamaru">{parsedCurrentCredits}</p>
+            </div>
+            <div className="col-span-1">
+              <p className="text-gray-600 font-semibold">Available Vouchers:</p>
+              <p className=" text-deep-koamaru">{availableTokenNumber}</p>
             </div>
           </div>
         </div>
@@ -285,6 +301,8 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
         onModalClosed={() => setSplitTokensModalOpen(false)}
         open={splitTokensModalOpen}
         userCreditId={userCreditDetails.id.toString()}
+        currentCredits={currentCredits}
+        availableTokenNumber={availableTokenNumber}
       />
     </>
   )
@@ -301,16 +319,16 @@ export const getServerSideProps = withUserSSR(async ({ params, user }: any) => {
 
   const userCreditDetails = data ? JSON.parse(JSON.stringify(data)) : null
 
-  const { data: contracts } = await getContractsByUserId({ userId: user.id })
+  const { data: splitTokensGroup } = await getSplitTokensGroupByUserCreditId({ userCreditId: userCreditDetails.id })
 
-  const { data: splitTokensGroup } = await getSplitTokensGroup({ userCreditId: userCreditDetails.id })
+  const { data: availableTokenNumber } = await getAvailableTokenNumber({ userId: user.id, userCreditId: userCreditDetails.id })
 
   return {
     props: {
       data: {
         userCreditDetails,
         splitTokensGroup: JSON.parse(JSON.stringify(splitTokensGroup)),
-        contracts: JSON.parse(JSON.stringify(contracts)),
+        availableTokenNumber,
       },
     },
   }

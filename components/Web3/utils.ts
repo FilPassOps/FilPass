@@ -27,7 +27,7 @@ export const getPaymentErrorMessage = (error: any) => {
   } else if (error.code === 4001 || error.code === 'ACTION_REJECTED') {
     return errorsMessages.user_rejected_payment.message
   } else if (error.code === -32603) {
-    if (error?.data?.message.includes('failed to estimate gas')) {
+    if (error?.data?.message?.includes('failed to estimate gas')) {
       if (error.data.message.includes('insufficient funds')) {
         return errorsMessages.not_enough_funds.message
       } else {
