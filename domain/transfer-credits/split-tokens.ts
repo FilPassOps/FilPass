@@ -1,10 +1,12 @@
 import prisma from 'lib/prisma'
 import { getUserCreditById } from './get-user-credit-by-id'
 import { splitCreditsValidator } from './validation'
-import { signJwt } from 'lib/jwt'
+import { sign } from 'lib/jwt'
 import { randomUUID } from 'node:crypto'
 import { ethers } from 'ethers'
 import { logger } from 'lib/logger'
+
+const ONE_HOUR_TIME = 1 * 60 * 60 * 1000
 
 interface SplitTokensParams {
   id: number
@@ -26,6 +28,10 @@ export const splitTokens = async (props: SplitTokensParams) => {
       throw new Error('Withdrawal expired')
     }
 
+    if (!data.contract) {
+      throw new Error('Contract not found')
+    }
+
     // TODO: check if the user has enough balance to split
 
     const splitGroup = randomUUID()
@@ -37,6 +43,9 @@ export const splitTokens = async (props: SplitTokensParams) => {
 
     const balancePerSplit = remaining.div(fields.splitNumber)
 
+    const expirationDateTime = new Date(data.withdrawExpiresAt.getTime() - ONE_HOUR_TIME).getTime()
+    const issuedAt = Math.floor(Date.now() / 1000)
+
     const splits = await Promise.all(
       Array(fields.splitNumber)
         .fill(null)
@@ -46,6 +55,7 @@ export const splitTokens = async (props: SplitTokensParams) => {
             .add(currentHeight)
             .toString()
 
+          // TODO: change it to guarantee uniqueness
           const tokenUuid = randomUUID()
 
           return {
@@ -54,13 +64,28 @@ export const splitTokens = async (props: SplitTokensParams) => {
             amount: balancePerSplit.toString(),
             publicId: tokenUuid,
             splitGroup,
-            token: await signJwt({
-              iss: process.env.SYSTEM_WALLET_ADDRESS,
-              exp: data.withdrawExpiresAt?.getTime(),
-              iat: Math.floor(Date.now() / 1000),
-              sub: tokenUuid,
-              height: splitHeight,
-            }),
+            token: sign(
+              {
+                iss: `${process.env.NEXT_PUBLIC_APP_URL}/.well-known/jwks.json`,
+                jti: tokenUuid,
+                exp: expirationDateTime,
+                iat: issuedAt,
+                voucher_type: 'filpass',
+                voucher_version: '1',
+                funder: data.contract.deployedFromAddress,
+                sub: data.contract.address,
+                aud: data.storageProvider.walletAddress,
+                voucher_lane: 0,
+                lane_total_amount: splitHeight,
+                lane_guaranteed_amount: balancePerSplit.toString(),
+                lane_guaranteed_until: data.withdrawExpiresAt?.getTime(),
+              },
+              process.env.PRIVATE_KEY as string,
+              {
+                keyid: '1234',
+                algorithm: 'RS256',
+              },
+            ),
           }
         }),
     )

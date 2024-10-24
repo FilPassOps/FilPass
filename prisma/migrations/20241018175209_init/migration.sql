@@ -5,7 +5,10 @@ CREATE TYPE "Role" AS ENUM ('USER', 'SUPERADMIN', 'ADDRESS_MANAGER', 'VIEWER');
 CREATE TYPE "FileType" AS ENUM ('ATTACHMENT');
 
 -- CreateEnum
-CREATE TYPE "CreditTransactionStatus" AS ENUM ('PENDING', 'SUCCESS', 'FAILED');
+CREATE TYPE "TransactionStatus" AS ENUM ('PENDING', 'SUCCESS', 'FAILED');
+
+-- CreateEnum
+CREATE TYPE "LedgerType" AS ENUM ('DEPOSIT', 'WITHDRAWAL', 'REFUND');
 
 -- CreateTable
 CREATE TABLE "user" (
@@ -188,15 +191,80 @@ CREATE TABLE "storage_provider" (
 CREATE TABLE "credit_transaction" (
     "id" SERIAL NOT NULL,
     "transaction_hash" TEXT NOT NULL,
-    "status" "CreditTransactionStatus" NOT NULL DEFAULT 'PENDING',
+    "status" "TransactionStatus" NOT NULL DEFAULT 'PENDING',
     "from" TEXT NOT NULL,
     "storage_provider_id" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "amount" TEXT NOT NULL,
     "user_credit_id" INTEGER NOT NULL,
+    "fail_reason" TEXT,
+    "confirmations" INTEGER NOT NULL DEFAULT 0,
+    "block_number" TEXT NOT NULL DEFAULT '0',
 
     CONSTRAINT "credit_transaction_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "refund_transaction" (
+    "id" SERIAL NOT NULL,
+    "transaction_hash" TEXT NOT NULL,
+    "status" "TransactionStatus" NOT NULL DEFAULT 'PENDING',
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+    "amount" TEXT NOT NULL,
+    "user_credit_id" INTEGER NOT NULL,
+    "fail_reason" TEXT,
+    "confirmations" INTEGER NOT NULL DEFAULT 0,
+    "block_number" TEXT NOT NULL DEFAULT '0',
+
+    CONSTRAINT "refund_transaction_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "deploy_contract_transaction" (
+    "id" SERIAL NOT NULL,
+    "transaction_hash" TEXT NOT NULL,
+    "wallet_address" TEXT NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "status" "TransactionStatus" NOT NULL DEFAULT 'PENDING',
+    "confirmations" INTEGER NOT NULL DEFAULT 0,
+    "block_number" TEXT NOT NULL DEFAULT '0',
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+    "fail_reason" TEXT,
+
+    CONSTRAINT "deploy_contract_transaction_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "contract" (
+    "id" SERIAL NOT NULL,
+    "address" TEXT NOT NULL,
+    "deployed_from_address" TEXT NOT NULL,
+    "transaction_id" INTEGER NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "contract_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "withdraw_transaction" (
+    "id" SERIAL NOT NULL,
+    "transaction_hash" TEXT NOT NULL,
+    "status" "TransactionStatus" NOT NULL DEFAULT 'PENDING',
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+    "amount" TEXT NOT NULL,
+    "user_credit_id" INTEGER NOT NULL,
+    "credit_token_id" INTEGER NOT NULL,
+    "fail_reason" TEXT,
+    "confirmations" INTEGER NOT NULL DEFAULT 0,
+    "block_number" TEXT NOT NULL DEFAULT '0',
+
+    CONSTRAINT "withdraw_transaction_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -204,7 +272,7 @@ CREATE TABLE "user_credit" (
     "id" SERIAL NOT NULL,
     "user_id" INTEGER NOT NULL,
     "storage_provider_id" INTEGER NOT NULL,
-    "amount" TEXT NOT NULL,
+    "amount" TEXT NOT NULL DEFAULT '0',
     "total_height" TEXT DEFAULT '0',
     "total_withdrawals" TEXT NOT NULL DEFAULT '0',
     "total_refunds" TEXT NOT NULL DEFAULT '0',
@@ -213,7 +281,7 @@ CREATE TABLE "user_credit" (
     "refund_starts_at" TIMESTAMP(3),
     "withdraw_starts_at" TIMESTAMP(3),
     "withdraw_expires_at" TIMESTAMP(3),
-    "current_token_id" INTEGER,
+    "contract_id" INTEGER NOT NULL,
 
     CONSTRAINT "user_credit_pkey" PRIMARY KEY ("id")
 );
@@ -221,12 +289,13 @@ CREATE TABLE "user_credit" (
 -- CreateTable
 CREATE TABLE "credit_token" (
     "id" SERIAL NOT NULL,
-    "public_id" TEXT NOT NULL,
+    "public_id" TEXT,
     "user_credit_id" INTEGER NOT NULL,
     "height" TEXT NOT NULL,
     "amount" TEXT NOT NULL,
     "token" TEXT NOT NULL,
     "redeemable" BOOLEAN NOT NULL DEFAULT true,
+    "valid" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "split_group" TEXT DEFAULT '1',
@@ -235,23 +304,14 @@ CREATE TABLE "credit_token" (
 );
 
 -- CreateTable
-CREATE TABLE "redeem_request" (
+CREATE TABLE "ledger" (
     "id" SERIAL NOT NULL,
-    "storage_provider_id" INTEGER NOT NULL,
-    "credit_token_id" INTEGER NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "redeem_request_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "refund_request" (
-    "id" SERIAL NOT NULL,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "amount" TEXT NOT NULL,
     "user_credit_id" INTEGER NOT NULL,
+    "amount" TEXT NOT NULL,
+    "type" "LedgerType" NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "refund_request_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "ledger_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -321,7 +381,52 @@ CREATE UNIQUE INDEX "credit_transaction_transaction_hash_key" ON "credit_transac
 CREATE INDEX "credit_transaction_transaction_hash_idx" ON "credit_transaction"("transaction_hash");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "user_credit_current_token_id_key" ON "user_credit"("current_token_id");
+CREATE INDEX "credit_transaction_status_idx" ON "credit_transaction"("status");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "refund_transaction_transaction_hash_key" ON "refund_transaction"("transaction_hash");
+
+-- CreateIndex
+CREATE INDEX "refund_transaction_transaction_hash_idx" ON "refund_transaction"("transaction_hash");
+
+-- CreateIndex
+CREATE INDEX "refund_transaction_status_idx" ON "refund_transaction"("status");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "deploy_contract_transaction_transaction_hash_key" ON "deploy_contract_transaction"("transaction_hash");
+
+-- CreateIndex
+CREATE INDEX "deploy_contract_transaction_user_id_idx" ON "deploy_contract_transaction"("user_id");
+
+-- CreateIndex
+CREATE INDEX "deploy_contract_transaction_transaction_hash_idx" ON "deploy_contract_transaction"("transaction_hash");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "contract_address_key" ON "contract"("address");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "contract_transaction_id_key" ON "contract"("transaction_id");
+
+-- CreateIndex
+CREATE INDEX "contract_user_id_idx" ON "contract"("user_id");
+
+-- CreateIndex
+CREATE INDEX "contract_deployed_from_address_idx" ON "contract"("deployed_from_address");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "withdraw_transaction_transaction_hash_key" ON "withdraw_transaction"("transaction_hash");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "withdraw_transaction_credit_token_id_key" ON "withdraw_transaction"("credit_token_id");
+
+-- CreateIndex
+CREATE INDEX "withdraw_transaction_transaction_hash_idx" ON "withdraw_transaction"("transaction_hash");
+
+-- CreateIndex
+CREATE INDEX "withdraw_transaction_status_idx" ON "withdraw_transaction"("status");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "user_credit_contract_id_key" ON "user_credit"("contract_id");
 
 -- CreateIndex
 CREATE INDEX "user_credit_user_id_idx" ON "user_credit"("user_id");
@@ -336,7 +441,7 @@ CREATE INDEX "credit_token_user_credit_id_idx" ON "credit_token"("user_credit_id
 CREATE INDEX "credit_token_split_group_idx" ON "credit_token"("split_group");
 
 -- CreateIndex
-CREATE INDEX "redeem_request_credit_token_id_idx" ON "redeem_request"("credit_token_id");
+CREATE INDEX "ledger_user_credit_id_idx" ON "ledger"("user_credit_id");
 
 -- AddForeignKey
 ALTER TABLE "user" ADD CONSTRAINT "user_ban_actioned_by_id_fkey" FOREIGN KEY ("ban_actioned_by_id") REFERENCES "user_role"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -390,22 +495,34 @@ ALTER TABLE "credit_transaction" ADD CONSTRAINT "credit_transaction_storage_prov
 ALTER TABLE "credit_transaction" ADD CONSTRAINT "credit_transaction_user_credit_id_fkey" FOREIGN KEY ("user_credit_id") REFERENCES "user_credit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "refund_transaction" ADD CONSTRAINT "refund_transaction_user_credit_id_fkey" FOREIGN KEY ("user_credit_id") REFERENCES "user_credit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "deploy_contract_transaction" ADD CONSTRAINT "deploy_contract_transaction_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "contract" ADD CONSTRAINT "contract_transaction_id_fkey" FOREIGN KEY ("transaction_id") REFERENCES "deploy_contract_transaction"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "contract" ADD CONSTRAINT "contract_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "withdraw_transaction" ADD CONSTRAINT "withdraw_transaction_user_credit_id_fkey" FOREIGN KEY ("user_credit_id") REFERENCES "user_credit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "withdraw_transaction" ADD CONSTRAINT "withdraw_transaction_credit_token_id_fkey" FOREIGN KEY ("credit_token_id") REFERENCES "credit_token"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "user_credit" ADD CONSTRAINT "user_credit_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "user_credit" ADD CONSTRAINT "user_credit_storage_provider_id_fkey" FOREIGN KEY ("storage_provider_id") REFERENCES "storage_provider"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "user_credit" ADD CONSTRAINT "user_credit_current_token_id_fkey" FOREIGN KEY ("current_token_id") REFERENCES "credit_token"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "user_credit" ADD CONSTRAINT "user_credit_contract_id_fkey" FOREIGN KEY ("contract_id") REFERENCES "contract"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "credit_token" ADD CONSTRAINT "credit_token_user_credit_id_fkey" FOREIGN KEY ("user_credit_id") REFERENCES "user_credit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "redeem_request" ADD CONSTRAINT "redeem_request_storage_provider_id_fkey" FOREIGN KEY ("storage_provider_id") REFERENCES "storage_provider"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "redeem_request" ADD CONSTRAINT "redeem_request_credit_token_id_fkey" FOREIGN KEY ("credit_token_id") REFERENCES "credit_token"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "refund_request" ADD CONSTRAINT "refund_request_user_credit_id_fkey" FOREIGN KEY ("user_credit_id") REFERENCES "user_credit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ledger" ADD CONSTRAINT "ledger_user_credit_id_fkey" FOREIGN KEY ("user_credit_id") REFERENCES "user_credit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

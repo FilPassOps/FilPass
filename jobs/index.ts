@@ -2,9 +2,24 @@ import Bottleneck from 'bottleneck'
 import { logger } from 'lib/logger'
 import schedule from 'node-schedule'
 
-import checkCreditTransactionPayment from './check-credit-transaction-payment'
+import checkBuyCreditsTransaction from './check-buy-credits-transaction'
+import checkRefundTransaction from './check-refund-transaction'
+import checkWithdrawTransaction from './check-withdraw-transaction'
+import checkDeployContractTransaction from './check-deploy-contract-transaction'
 
-const checkCreditTransactionPaymentLimiter = new Bottleneck({
+const checkBuyCreditsTransactionLimiter = new Bottleneck({
+  maxConcurrent: 1,
+})
+
+const checkRefundTransactionLimiter = new Bottleneck({
+  maxConcurrent: 1,
+})
+
+const checkWithdrawTransactionLimiter = new Bottleneck({
+  maxConcurrent: 1,
+})
+
+const checkDeployContractTransactionLimiter = new Bottleneck({
   maxConcurrent: 1,
 })
 
@@ -19,7 +34,10 @@ const job = (limiter: Bottleneck, job: () => Promise<void>) => {
     }
   }
 }
+schedule.scheduleJob('* * * * *', job(checkDeployContractTransactionLimiter, checkDeployContractTransaction))
 
-schedule.scheduleJob('* * * * *', job(checkCreditTransactionPaymentLimiter, checkCreditTransactionPayment))
+schedule.scheduleJob('* * * * *', job(checkBuyCreditsTransactionLimiter, checkBuyCreditsTransaction))
+schedule.scheduleJob('* * * * *', job(checkRefundTransactionLimiter, checkRefundTransaction))
+schedule.scheduleJob('* * * * *', job(checkWithdrawTransactionLimiter, checkWithdrawTransaction))
 
 logger.info(`> Jobs scheduled...`)

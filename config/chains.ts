@@ -147,7 +147,7 @@ const calibration = {
   chainId: '0x4cb2f',
   rpcUrls: ['https://api.calibration.node.glif.io'],
   blockExplorer: { name: 'Filfox', url: 'https://calibration.filfox.info/en/message' },
-  contractAddress: '0x8Ac6cfB4dBc9d164796E77113277F83D4Dfa3616',
+  contractAddress: '0x650413d87484FC2B9c9bC7b24963f7395a69909b',
   iconFileName: 'filecoin-icon.svg',
   tokens: [
     {

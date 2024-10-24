@@ -42,7 +42,7 @@ export const SuccessAlert: React.FC<React.PropsWithChildren<{ hash: string; hand
   blockExplorerUrl,
 }) => (
   <>
-    <p className="text-sm text-gray-500 mb-4 text-center">Your payment has been successfully sent.</p>
+    <p className="text-sm text-gray-500 mb-4 text-center">Your payment has been successfully sent and is being processed.</p>
     <div className="mt-4 text-sm text-gray-500 text-center mb-4">
       <a
         href={`${blockExplorerUrl}/${hash}`}

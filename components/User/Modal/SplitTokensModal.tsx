@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { splitTokensValidator } from 'domain/transfer-credits/validation'
+import { useRouter } from 'next/router'
 
 interface SplitTokensModalProps {
   onModalClosed: () => void
@@ -16,6 +17,7 @@ interface SplitTokensModalProps {
 export const SplitTokensModal = ({ onModalClosed, open, userCreditId }: SplitTokensModalProps) => {
   const [error, setError] = useState<any>()
   const [success, setSuccess] = useState<boolean>(false)
+  const router = useRouter()
 
   const {
     register,
@@ -50,21 +52,24 @@ export const SplitTokensModal = ({ onModalClosed, open, userCreditId }: SplitTok
     reset({ splitNumber: 0 })
     clearErrors()
     onModalClosed()
+
+    // Refresh the page after closing the modal
+    router.reload()
   }
 
   return (
     <Modal open={open} onModalClosed={handleCloseModal}>
       <form onSubmit={handleSubmit(handleSplitTokens)} className="space-y-6">
-        <h2 className="text-gray-900 text-lg text-center font-medium">Split Tokens</h2>
+        <h2 className="text-gray-900 text-lg text-center font-medium">Create Vouchers</h2>
         {error?.message && <p className="text-red-600 text-center text-sm mt-4">{error.message}</p>}
-        {success && <p className="text-green-600 text-center text-sm mt-4">Tokens split successfully</p>}
+        {success && <p className="text-green-600 text-center text-sm mt-4">Vouchers created successfully</p>}
         <NumberInput id="splitNumber" type="number" label="Split Number" error={errors.splitNumber} {...register('splitNumber')} />
         <div className="flex space-x-3">
           <Button variant="outline" onClick={onModalClosed}>
             Cancel
           </Button>
           <Button type="submit" disabled={isSubmitting} loading={isSubmitting}>
-            Split
+            Create
           </Button>
         </div>
       </form>

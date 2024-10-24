@@ -25,7 +25,7 @@ export async function getTokensBySplitGroup(props: GetTokensBySplitGroupProps) {
       take: pageSize,
       skip: pageSize * currentPage,
       orderBy: {
-        createdAt: 'desc',
+        id: 'asc',
       },
     })
 
@@ -39,7 +39,18 @@ export async function getTokensBySplitGroup(props: GetTokensBySplitGroupProps) {
       },
     })
 
-    return { data: { splitTokens, total } }
+    const totalRedeemed = await prisma.creditToken.count({
+      where: {
+        splitGroup: splitGroup,
+        redeemable: false,
+        userCredit: {
+          userId: userId,
+          id: userCreditId,
+        },
+      },
+    })
+
+    return { data: { splitTokens, total, totalRedeemed } }
   } catch (error) {
     console.error('Error fetching split tokens by split group:', error)
     throw error

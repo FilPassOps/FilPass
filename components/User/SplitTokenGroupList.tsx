@@ -17,8 +17,8 @@ export const SplitTokenGroupList = ({ splitGroup, userCreditId }: SplitTokenGrou
             <div key={split.splitGroup} className="border-b pb-4 last:border-b-0">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-semibold text-deep-koamaru">Split Token Group {index + 1}</h3>
-                  <p className=" text-deep-koamaru">{split.totalTokens} tokens</p>
+                  <h3 className="font-semibold text-deep-koamaru">Split Voucher Group {index + 1}</h3>
+                  <p className=" text-deep-koamaru">{split.totalTokens} vouchers</p>
                   <Timestamp date={split.createdAt.toString()} format={DateTime.DATETIME_SHORT} />
                 </div>
                 <LinkButton
@@ -33,7 +33,7 @@ export const SplitTokenGroupList = ({ splitGroup, userCreditId }: SplitTokenGrou
           ))}
         </div>
       ) : (
-        <p className="text-gray-600">No token groups yet.</p>
+        <p className="text-gray-600">No voucher groups yet.</p>
       )}
     </div>
   )

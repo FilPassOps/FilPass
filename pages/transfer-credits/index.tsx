@@ -2,7 +2,6 @@ import { Layout } from 'components/Layout'
 import { withUserSSR } from 'lib/ssr'
 import Head from 'next/head'
 import { LinkButton } from 'components/Shared/Button'
-import { ShoppingCartIcon } from '@heroicons/react/24/outline'
 import { ReactElement } from 'react'
 import { AppConfig } from 'config/system'
 import { getUserCredits } from 'domain/transfer-credits/get-user-credits'
@@ -15,6 +14,7 @@ export interface UserCreditItem {
   updatedAt: Date
   withdrawExpiresAt: Date
   isWithdrawExpired: boolean
+  refundStartsAt: Date
   isRefundStarted: boolean
   totalHeight: string
   totalWithdrawals: string
@@ -25,12 +25,6 @@ export interface UserCreditItem {
       walletAddress: string
     }
   }[]
-  currentToken: {
-    id: number
-    token: string
-    redeemable: boolean
-    height: string
-  }
 }
 
 interface TransferCreditsProps {
@@ -54,8 +48,7 @@ const TransferCredits = ({ data, totalItems, pageSize }: TransferCreditsProps) =
           <div className="flex gap-2 justify-start items-center">
             <div>
               <LinkButton href="/transfer-credits/buy" className="flex gap-2">
-                <ShoppingCartIcon className="h-5 w-5" />
-                <p>Buy Credits</p>
+                <p>Create channel</p>
               </LinkButton>
             </div>
             <div>

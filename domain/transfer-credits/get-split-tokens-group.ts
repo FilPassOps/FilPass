@@ -10,7 +10,7 @@ export const getSplitTokensGroup = async (props: GetSplitTokensGroupParams) => {
     const fields = await getSplitTokensGroupValidator.validate(props)
 
     const splitTokensGroup = await prisma.creditToken.groupBy({
-      by: ['splitGroup'],
+      by: ['splitGroup', 'createdAt'],
       where: {
         userCreditId: fields.userCreditId,
       },
@@ -21,7 +21,7 @@ export const getSplitTokensGroup = async (props: GetSplitTokensGroupParams) => {
         createdAt: true,
       },
       orderBy: {
-        splitGroup: 'asc',
+        createdAt: 'asc',
       },
       take: 10,
     })

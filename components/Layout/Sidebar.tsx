@@ -43,7 +43,7 @@ const navigation: NavigationItem[] = [
         roles: [USER_ROLE],
       },
       {
-        text: 'Buy Credits',
+        text: 'Create Channel',
         roles: [USER_ROLE],
         subPath: '/buy',
       },

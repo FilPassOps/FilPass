@@ -21,7 +21,7 @@ export async function deleteWallet(params: DeleteWalletParams) {
 
   const { id, userId } = fields
 
-  // TODO: validate if the wallet is tied to any existing storage provider credit
+  // TODO: validate if the wallet is tied to any existing receiver credit
 
   const deletedWallet = await prisma.userWallet.updateMany({
     where: {

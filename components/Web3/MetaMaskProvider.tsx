@@ -113,7 +113,7 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode | undefined
     if (MetaMaskOnboarding.isMetaMaskInstalled()) {
       const onChainChanged = (chainId: string) => {
         setChainId(chainId)
-        if (asPath.includes('/disbursement')) {
+        if (asPath.includes('/buy')) {
           window.location.reload()
         }
       }
@@ -186,7 +186,7 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode | undefined
 
 export const useMetaMask = () => useContext(WalletContext)
 
-interface WithMetaMaskButtonProps extends Omit<ButtonProps, 'loading' | 'disabled'> {
+interface WithMetaMaskButtonProps extends Omit<ButtonProps, 'loading'> {
   connectWalletLabel?: ReactNode
   switchChainLabel?: string
   defaultLabel?: string
@@ -217,7 +217,6 @@ export const WithMetaMaskButton: React.FC<React.PropsWithChildren<WithMetaMaskBu
   }, [busy])
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = async event => {
-    setLoading(event.currentTarget === ref.current)
     try {
       if (onBeforeClick) {
         await onBeforeClick()
@@ -253,7 +252,7 @@ export const WithMetaMaskButton: React.FC<React.PropsWithChildren<WithMetaMaskBu
         ref={ref}
         className={twMerge('flex items-center', className)}
         loading={busy || loading}
-        disabled={busy || loading || !props.targetChainId}
+        disabled={busy || loading || !props.targetChainId || rest.disabled}
         onClick={handleClick}
       >
         {buttonLabel()}
