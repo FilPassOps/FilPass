@@ -1,15 +1,15 @@
 import prisma from 'lib/prisma'
-import { getSplitTicketsGroupByUserCreditIdValidator } from './validation'
+import { getTicketGroupsByUserCreditIdValidator } from './validation'
 
-interface GetSplitTicketsGroupByUserCreditIdParams {
+interface GetTicketGroupsByUserCreditIdParams {
   userCreditId: number
 }
 
-export const getSplitTicketsGroupByUserCreditId = async (props: GetSplitTicketsGroupByUserCreditIdParams) => {
+export const getTicketGroupsByUserCreditId = async (props: GetTicketGroupsByUserCreditIdParams) => {
   try {
-    const fields = await getSplitTicketsGroupByUserCreditIdValidator.validate(props)
+    const fields = await getTicketGroupsByUserCreditIdValidator.validate(props)
 
-    const groups = await prisma.splitGroup.findMany({
+    const groups = await prisma.ticketGroup.findMany({
       where: {
         userCreditId: fields.userCreditId,
       },
@@ -21,14 +21,14 @@ export const getSplitTicketsGroupByUserCreditId = async (props: GetSplitTicketsG
     })
 
     const formattedResult = groups.map(group => ({
-      splitGroup: group.id,
+      ticketGroupId: group.id,
       totalTickets: group._count.creditTickets,
       createdAt: group.createdAt,
     }))
 
     return { data: formattedResult }
   } catch (error) {
-    console.error('Error getting split tickets group', error)
+    console.error('Error getting tickets group', error)
     return { error: 'Something went wrong' }
   }
 }

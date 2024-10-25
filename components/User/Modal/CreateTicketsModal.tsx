@@ -5,11 +5,11 @@ import { api } from 'lib/api'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { splitTicketsValidator } from 'domain/transfer-credits/validation'
+import { createTicketsValidator } from 'domain/transfer-credits/validation'
 import { useRouter } from 'next/router'
 import { BigNumber } from 'ethers'
 
-interface SplitTicketsModalProps {
+interface CreateTicketsModalProps {
   onModalClosed: () => void
   open: boolean
   userCreditId: string
@@ -17,7 +17,13 @@ interface SplitTicketsModalProps {
   availableTicketsNumber: number
 }
 
-export const SplitTicketsModal = ({ onModalClosed, open, userCreditId, currentCredits, availableTicketsNumber }: SplitTicketsModalProps) => {
+export const CreateTicketsModal = ({
+  onModalClosed,
+  open,
+  userCreditId,
+  currentCredits,
+  availableTicketsNumber,
+}: CreateTicketsModalProps) => {
   const [error, setError] = useState<any>()
   const [success, setSuccess] = useState<boolean>(false)
   const router = useRouter()
@@ -33,14 +39,12 @@ export const SplitTicketsModal = ({ onModalClosed, open, userCreditId, currentCr
       splitNumber: 0,
       creditPerTicket: 0,
     },
-    resolver: yupResolver(splitTicketsValidator(currentCredits, availableTicketsNumber)),
+    resolver: yupResolver(createTicketsValidator(currentCredits, availableTicketsNumber)),
   })
 
-  const handleSplitTickets = async (body: { splitNumber: number; creditPerTicket: number }) => {
-
-    console.log('values', body)
+  const handleCreateTickets = async (body: { splitNumber: number; creditPerTicket: number }) => {
     // TODO: verify the credits and check for a maximum number of splits
-    const { error } = await api.post('transfer-credits/split-tickets', {
+    const { error } = await api.post('transfer-credits/create-tickets', {
       userCreditId,
       splitNumber: body.splitNumber,
       creditPerTicket: body.creditPerTicket,
@@ -65,7 +69,7 @@ export const SplitTicketsModal = ({ onModalClosed, open, userCreditId, currentCr
 
   return (
     <Modal open={open} onModalClosed={handleCloseModal}>
-      <form onSubmit={handleSubmit(handleSplitTickets)} className="space-y-6">
+      <form onSubmit={handleSubmit(handleCreateTickets)} className="space-y-6">
         <h2 className="text-gray-900 text-lg text-center font-medium">Create Tickets</h2>
         {error?.message && <p className="text-red-600 text-center text-sm mt-4">{error.message}</p>}
         {success && <p className="text-green-600 text-center text-sm mt-4">Tickets created successfully</p>}

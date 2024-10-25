@@ -287,13 +287,13 @@ CREATE TABLE "user_credit" (
 );
 
 -- CreateTable
-CREATE TABLE "split_group" (
+CREATE TABLE "ticket_group" (
     "id" SERIAL NOT NULL,
     "user_credit_id" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "split_group_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "ticket_group_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -307,7 +307,7 @@ CREATE TABLE "credit_ticket" (
     "valid" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
-    "split_group_id" INTEGER NOT NULL,
+    "ticket_group_id" INTEGER NOT NULL,
 
     CONSTRAINT "credit_ticket_pkey" PRIMARY KEY ("id")
 );
@@ -441,13 +441,13 @@ CREATE UNIQUE INDEX "user_credit_contract_id_key" ON "user_credit"("contract_id"
 CREATE INDEX "user_credit_user_id_idx" ON "user_credit"("user_id");
 
 -- CreateIndex
-CREATE INDEX "split_group_user_credit_id_idx" ON "split_group"("user_credit_id");
+CREATE INDEX "ticket_group_user_credit_id_idx" ON "ticket_group"("user_credit_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "credit_ticket_public_id_key" ON "credit_ticket"("public_id");
 
 -- CreateIndex
-CREATE INDEX "credit_ticket_split_group_id_idx" ON "credit_ticket"("split_group_id");
+CREATE INDEX "credit_ticket_ticket_group_id_idx" ON "credit_ticket"("ticket_group_id");
 
 -- CreateIndex
 CREATE INDEX "credit_ticket_public_id_idx" ON "credit_ticket"("public_id");
@@ -540,10 +540,10 @@ ALTER TABLE "user_credit" ADD CONSTRAINT "user_credit_storage_provider_id_fkey" 
 ALTER TABLE "user_credit" ADD CONSTRAINT "user_credit_contract_id_fkey" FOREIGN KEY ("contract_id") REFERENCES "contract"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "split_group" ADD CONSTRAINT "split_group_user_credit_id_fkey" FOREIGN KEY ("user_credit_id") REFERENCES "user_credit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ticket_group" ADD CONSTRAINT "ticket_group_user_credit_id_fkey" FOREIGN KEY ("user_credit_id") REFERENCES "user_credit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "credit_ticket" ADD CONSTRAINT "credit_ticket_split_group_id_fkey" FOREIGN KEY ("split_group_id") REFERENCES "split_group"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "credit_ticket" ADD CONSTRAINT "credit_ticket_ticket_group_id_fkey" FOREIGN KEY ("ticket_group_id") REFERENCES "ticket_group"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ledger" ADD CONSTRAINT "ledger_user_credit_id_fkey" FOREIGN KEY ("user_credit_id") REFERENCES "user_credit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

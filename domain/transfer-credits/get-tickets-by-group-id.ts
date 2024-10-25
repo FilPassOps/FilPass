@@ -1,23 +1,23 @@
 import prisma from 'lib/prisma'
-import { getTicketsBySplitGroupIdValidator } from './validation'
+import { getTicketsByTicketGroupIdValidator } from './validation'
 
-interface GetTicketsBySplitGroupIdProps {
-  splitGroupId: number
+interface GetTicketsByTicketGroupIdProps {
+  ticketGroupId: number
   userId: number
   userCreditId: string
   pageSize: number
   page: number
 }
 
-export async function getTicketsBySplitGroupId(props: GetTicketsBySplitGroupIdProps) {
+export async function getTicketsByTicketGroupId(props: GetTicketsByTicketGroupIdProps) {
   try {
-    const { splitGroupId, userId, userCreditId, pageSize, page } = await getTicketsBySplitGroupIdValidator.validate(props)
+    const { ticketGroupId, userId, userCreditId, pageSize, page } = await getTicketsByTicketGroupIdValidator.validate(props)
     const currentPage = page - 1 < 0 ? 0 : page - 1
 
-    const splitTickets = await prisma.creditTicket.findMany({
+    const creditTickets = await prisma.creditTicket.findMany({
       where: {
-        splitGroup: {
-          id: splitGroupId,
+        ticketGroup: {
+          id: ticketGroupId,
           userCredit: {
             userId: userId,
             id: userCreditId,
@@ -33,8 +33,8 @@ export async function getTicketsBySplitGroupId(props: GetTicketsBySplitGroupIdPr
 
     const total = await prisma.creditTicket.count({
       where: {
-        splitGroup: {
-          id: splitGroupId,
+        ticketGroup: {
+          id: ticketGroupId,
           userCredit: {
             userId: userId,
             id: userCreditId,
@@ -45,8 +45,8 @@ export async function getTicketsBySplitGroupId(props: GetTicketsBySplitGroupIdPr
 
     const totalRedeemedInvalid = await prisma.creditTicket.count({
       where: {
-        splitGroup: {
-          id: splitGroupId,
+        ticketGroup: {
+          id: ticketGroupId,
           userCredit: {
             userId: userId,
             id: userCreditId,
@@ -56,9 +56,9 @@ export async function getTicketsBySplitGroupId(props: GetTicketsBySplitGroupIdPr
       },
     })
 
-    return { data: { splitTickets, total, totalRedeemedInvalid } }
+    return { data: { creditTickets, total, totalRedeemedInvalid } }
   } catch (error) {
-    console.error('Error fetching split tickets by split group:', error)
+    console.error('Error fetching tickets by ticket group:', error)
     throw error
   }
 }

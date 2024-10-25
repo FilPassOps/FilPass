@@ -34,7 +34,7 @@ export const getUserCreditByIdValidator = yup.object({
   userId: yup.number().required(),
 })
 
-export const splitCreditsValidator = yup.object({
+export const createTicketsValidatorBackend = yup.object({
   id: yup.number().required(),
   userId: yup.number().required(),
   splitNumber: yup.number().required(),
@@ -47,12 +47,12 @@ export const refundCreditsValidator = yup.object({
   hash: yup.string().required(),
 })
 
-export const getSplitTicketsGroupByUserCreditIdValidator = Yup.object().shape({
+export const getTicketGroupsByUserCreditIdValidator = Yup.object().shape({
   userCreditId: Yup.number().required('User credit ID is required'),
 })
 
-export const getTicketsBySplitGroupIdValidator = Yup.object().shape({
-  splitGroupId: Yup.number().required(),
+export const getTicketsByTicketGroupIdValidator = Yup.object().shape({
+  ticketGroupId: Yup.number().required(),
   userId: Yup.number().required(),
   userCreditId: Yup.number().required(),
   pageSize: Yup.number().required(),
@@ -64,7 +64,7 @@ export const getAvailableTicketsNumberValidator = Yup.object().shape({
   userCreditId: Yup.number().required(),
 })
 
-export const splitTicketsValidator = (currentCredits: BigNumber, availableTicketsNumber: number) => {
+export const createTicketsValidator = (currentCredits: BigNumber, availableTicketsNumber: number) => {
   return Yup.object()
     .shape({
       splitNumber: Yup.number()

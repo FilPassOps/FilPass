@@ -41,7 +41,7 @@ export const submitTicket = async (props: SubmitTicketParams): Promise<SubmitTic
 
     const creditTicket = await prisma.creditTicket.findUnique({
       include: {
-        splitGroup: {
+        ticketGroup: {
           include: {
             userCredit: true,
           },
@@ -60,20 +60,20 @@ export const submitTicket = async (props: SubmitTicketParams): Promise<SubmitTic
       throw new Error('Credit ticket already redeemed', { cause: 'INVALID' })
     }
 
-    if (creditTicket.splitGroup.userCredit.withdrawExpiresAt! < new Date()) {
+    if (creditTicket.ticketGroup.userCredit.withdrawExpiresAt! < new Date()) {
       throw new Error('Withdrawal expired', { cause: 'INVALID' })
     }
 
     const { data: contracts, error: contractsError } = await getContractsByUserId({
-      userId: creditTicket.splitGroup.userCredit.userId,
+      userId: creditTicket.ticketGroup.userCredit.userId,
     })
 
     if (contractsError || !contracts) {
       throw new Error('Contracts not found')
     }
 
-    const currentHeight = ethers.BigNumber.from(creditTicket.splitGroup.userCredit.totalWithdrawals).add(
-      creditTicket.splitGroup.userCredit.totalRefunds,
+    const currentHeight = ethers.BigNumber.from(creditTicket.ticketGroup.userCredit.totalWithdrawals).add(
+      creditTicket.ticketGroup.userCredit.totalRefunds,
     )
 
     if (currentHeight.gte(creditTicket.height)) {
@@ -95,7 +95,7 @@ export const submitTicket = async (props: SubmitTicketParams): Promise<SubmitTic
         creditTicketId: creditTicket.id,
         transactionHash: transaction.hash,
         amount: tokenAmount.toString(),
-        userCreditId: creditTicket.splitGroup.userCreditId,
+        userCreditId: creditTicket.ticketGroup.userCreditId,
         status: TransactionStatus.PENDING,
       },
     })

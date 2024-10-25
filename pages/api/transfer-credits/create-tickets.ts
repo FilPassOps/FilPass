@@ -1,4 +1,4 @@
-import { splitTickets } from 'domain/transfer-credits/split-tickets'
+import { createTickets } from 'domain/transfer-credits/create-tickets'
 import { newHandler, NextApiRequestWithSession, withMethods, withUser, withValidation } from 'lib/middleware'
 import yup from 'lib/yup'
 import { NextApiResponse } from 'next'
@@ -21,7 +21,7 @@ async function handler(req: Request, res: NextApiResponse) {
   }
 
   try {
-    const result = await splitTickets({
+    const result = await createTickets({
       id: Number(req.body.userCreditId),
       splitNumber: req.body.splitNumber,
       userId: user.id,

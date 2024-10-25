@@ -12,7 +12,7 @@ export async function getAvailableTicketsNumber(props: GetAvailableTicketsNumber
 
     const total = await prisma.creditTicket.count({
       where: {
-        splitGroup: {
+        ticketGroup: {
           userCredit: {
             userId: userId,
             id: userCreditId,
@@ -23,7 +23,7 @@ export async function getAvailableTicketsNumber(props: GetAvailableTicketsNumber
 
     const totalRedeemedInvalid = await prisma.creditTicket.count({
       where: {
-        splitGroup: {
+        ticketGroup: {
           userCredit: {
             userId: userId,
             id: userCreditId,
@@ -33,8 +33,8 @@ export async function getAvailableTicketsNumber(props: GetAvailableTicketsNumber
       },
     })
 
-    const availableTicketsNumber = process.env.NEXT_PUBLIC_MAX_SPLITS
-      ? parseInt(process.env.NEXT_PUBLIC_MAX_SPLITS) - (total - totalRedeemedInvalid)
+    const availableTicketsNumber = process.env.NEXT_PUBLIC_MAX_TICKETS
+      ? parseInt(process.env.NEXT_PUBLIC_MAX_TICKETS) - (total - totalRedeemedInvalid)
       : 0
 
     return { data: availableTicketsNumber }

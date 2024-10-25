@@ -16,10 +16,10 @@ import { useContract } from 'components/Web3/useContract'
 import { ErrorAlert } from 'components/Controller/MetaMaskPayment/Alerts'
 import { getPaymentErrorMessage } from 'components/Web3/utils'
 import { WithMetaMaskButton } from 'components/Web3/MetaMaskProvider'
-import { getSplitTicketsGroupByUserCreditId } from 'domain/transfer-credits/get-split-tickets-group-by-user-credit-id'
+import { getTicketGroupsByUserCreditId } from 'domain/transfer-credits/get-split-tickets-group-by-user-credit-id'
 import { getAvailableTicketsNumber } from 'domain/transfer-credits/get-available-tickets-number'
-import { SplitTicketsModal } from 'components/User/Modal/SplitTicketsModal'
-import { SplitTicketsGroupList } from 'components/User/SplitTicketsGroupList'
+import { CreateTicketsModal } from 'components/User/Modal/CreateTicketsModal'
+import { TicketGroupList } from 'components/User/TicketGroupList'
 
 export interface CreditTicket {
   id: number
@@ -55,8 +55,8 @@ export interface UserCreditDetails {
   }
 }
 
-export interface SplitTicketGroup {
-  splitGroup: string
+export interface TicketGroup {
+  ticketGroupId: string
   totalTickets: number
   createdAt: Date
 }
@@ -64,7 +64,7 @@ export interface SplitTicketGroup {
 interface TransferCreditDetailsProps {
   data: {
     userCreditDetails: UserCreditDetails
-    splitTicketsGroup: SplitTicketGroup[]
+    ticketGroups: TicketGroup[]
     availableTicketsNumber: number
   }
 }
@@ -75,7 +75,7 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
 
   const { refundAmount } = useContract(data.userCreditDetails.contract.address ?? null)
 
-  const [splitTicketsModalOpen, setSplitTicketsModalOpen] = useState(false)
+  const [createTicketsModalOpen, setCreateTicketsModalOpen] = useState(false)
   const [isRefundLoading, setIsRefundLoading] = useState(false)
 
   const token = AppConfig.network.getTokenBySymbolAndBlockchainName('tFIL', 'Filecoin')
@@ -246,7 +246,7 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
         <div className="">
           <Divider className="my-8" />
           <h2 className="text-2xl font-semibold text-deep-koamaru mb-4">Ticket Groups</h2>
-          <SplitTicketsGroupList splitGroup={data.splitTicketsGroup} userCreditId={userCreditDetails.id} />
+          <TicketGroupList ticketGroups={data.ticketGroups} userCreditId={userCreditDetails.id} />
         </div>
         <Divider className="my-8" />
         <div className="py-6 flex items-center justify-center gap-4">
@@ -255,7 +255,7 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
           </LinkButton>
           <Button
             onClick={() => {
-              setSplitTicketsModalOpen(true)
+              setCreateTicketsModalOpen(true)
             }}
             variant="primary"
             className="w-fit"
@@ -296,9 +296,9 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
           </div>
         </div>
       </div>
-      <SplitTicketsModal
-        onModalClosed={() => setSplitTicketsModalOpen(false)}
-        open={splitTicketsModalOpen}
+      <CreateTicketsModal
+        onModalClosed={() => setCreateTicketsModalOpen(false)}
+        open={createTicketsModalOpen}
         userCreditId={userCreditDetails.id.toString()}
         currentCredits={currentCredits}
         availableTicketsNumber={availableTicketsNumber}
@@ -318,7 +318,7 @@ export const getServerSideProps = withUserSSR(async ({ params, user }: any) => {
 
   const userCreditDetails = data ? JSON.parse(JSON.stringify(data)) : null
 
-  const { data: splitTicketsGroup } = await getSplitTicketsGroupByUserCreditId({ userCreditId: userCreditDetails.id })
+  const { data: ticketGroups } = await getTicketGroupsByUserCreditId({ userCreditId: userCreditDetails.id })
 
   const { data: availableTicketsNumber } = await getAvailableTicketsNumber({ userId: user.id, userCreditId: userCreditDetails.id })
 
@@ -326,7 +326,7 @@ export const getServerSideProps = withUserSSR(async ({ params, user }: any) => {
     props: {
       data: {
         userCreditDetails,
-        splitTicketsGroup: JSON.parse(JSON.stringify(splitTicketsGroup)),
+        ticketGroups: JSON.parse(JSON.stringify(ticketGroups)),
         availableTicketsNumber,
       },
     },

@@ -12,7 +12,7 @@ import Timestamp from 'components/Shared/Timestamp'
 import { DateTime } from 'luxon'
 import { ethers } from 'ethers'
 import { TicketList } from 'components/User/TicketList'
-import { getTicketsBySplitGroupId } from 'domain/transfer-credits/get-tickets-by-split-group-id'
+import { getTicketsByTicketGroupId } from 'domain/transfer-credits/get-tickets-by-group-id'
 
 export interface CreditTicket {
   id: number
@@ -21,18 +21,18 @@ export interface CreditTicket {
   redeemable: boolean
 }
 
-interface TicketSplitGroupDetailsProps {
+interface TicketGroupDetailsProps {
   data: {
     userCreditDetails: UserCreditDetails
-    splitTicketsGroup: CreditTicket[]
+    ticketGroup: CreditTicket[]
   }
   totalItems: number
   totalRedeemedInvalid: number
   pageSize: number
 }
 
-const TicketSplitGroupDetails = ({ data, totalItems, totalRedeemedInvalid, pageSize }: TicketSplitGroupDetailsProps) => {
-  const { userCreditDetails, splitTicketsGroup } = data
+const TicketGroupDetails = ({ data, totalItems, totalRedeemedInvalid, pageSize }: TicketGroupDetailsProps) => {
+  const { userCreditDetails, ticketGroup } = data
 
   const currentHeight = ethers.BigNumber.from(userCreditDetails.totalWithdrawals).add(userCreditDetails.totalRefunds)
 
@@ -100,7 +100,7 @@ const TicketSplitGroupDetails = ({ data, totalItems, totalRedeemedInvalid, pageS
           <Divider className="my-8" />
           <h2 className="text-2xl font-semibold text-deep-koamaru mb-4">Tickets</h2>
           <PaginationWrapper totalItems={totalItems} pageSize={pageSize}>
-            <TicketList isOpen={true} creditTickets={splitTicketsGroup} currentHeight={currentHeight} />
+            <TicketList isOpen={true} creditTickets={ticketGroup} currentHeight={currentHeight} />
           </PaginationWrapper>
         </div>
         <Divider className="my-8" />
@@ -114,9 +114,9 @@ const TicketSplitGroupDetails = ({ data, totalItems, totalRedeemedInvalid, pageS
   )
 }
 
-export default TicketSplitGroupDetails
+export default TicketGroupDetails
 
-TicketSplitGroupDetails.getLayout = function getLayout(page: ReactElement) {
+TicketGroupDetails.getLayout = function getLayout(page: ReactElement) {
   return <Layout title="Ticket Group Details">{page}</Layout>
 }
 
@@ -128,8 +128,8 @@ export const getServerSideProps = withUserSSR(async ({ params, user, query }: an
 
   const userCreditDetails = data ? JSON.parse(JSON.stringify(data)) : null
 
-  const { data: splitTicketsGroup } = await getTicketsBySplitGroupId({
-    splitGroupId: params.splitGroup,
+  const { data: ticketGroup } = await getTicketsByTicketGroupId({
+    ticketGroupId: params.ticketGroup,
     userId: user.id,
     userCreditId: params.id,
     pageSize,
@@ -140,10 +140,10 @@ export const getServerSideProps = withUserSSR(async ({ params, user, query }: an
     props: {
       data: {
         userCreditDetails,
-        splitTicketsGroup: JSON.parse(JSON.stringify(splitTicketsGroup.splitTickets)),
+        ticketGroup: JSON.parse(JSON.stringify(ticketGroup.creditTickets)),
       },
-      totalItems: splitTicketsGroup?.total ?? 0,
-      totalRedeemedInvalid: splitTicketsGroup?.totalRedeemedInvalid ?? 0,
+      totalItems: ticketGroup?.total ?? 0,
+      totalRedeemedInvalid: ticketGroup?.totalRedeemedInvalid ?? 0,
       pageSize: pageSize,
     },
   }

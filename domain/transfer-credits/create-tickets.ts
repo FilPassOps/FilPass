@@ -1,6 +1,6 @@
 import prisma from 'lib/prisma'
 import { getUserCreditById } from './get-user-credit-by-id'
-import { splitCreditsValidator } from './validation'
+import { createTicketsValidatorBackend } from './validation'
 import { sign } from 'lib/jwt'
 import { ethers } from 'ethers'
 import { logger } from 'lib/logger'
@@ -12,16 +12,16 @@ import { AppConfig } from 'config/system'
 
 const ONE_HOUR_TIME = 1 * 60 * 60 * 1000
 
-interface SplitTicketsParams {
+interface CreateTicketsParams {
   id: number
   userId: number
   splitNumber: number
   creditPerTicket: number
 }
 
-export const splitTickets = async (props: SplitTicketsParams) => {
+export const createTickets = async (props: CreateTicketsParams) => {
   try {
-    const fields = await splitCreditsValidator.validate(props)
+    const fields = await createTicketsValidatorBackend.validate(props)
 
     const { data, error } = await getUserCreditById({ id: fields.id, userId: fields.userId })
 
@@ -69,7 +69,7 @@ export const splitTickets = async (props: SplitTicketsParams) => {
     const expirationDateTime = new Date(data.withdrawExpiresAt.getTime() - ONE_HOUR_TIME).getTime()
     const issuedAt = Math.floor(Date.now() / 1000)
 
-    const splitGroup = await prisma.splitGroup.create({
+    const ticketGroup = await prisma.ticketGroup.create({
       data: {
         userCreditId: data.id,
       },
@@ -77,10 +77,10 @@ export const splitTickets = async (props: SplitTicketsParams) => {
 
     const creditPerTicketAmount = parseUnits(fields.creditPerTicket.toString(), fil.decimals)
 
-    const splits = Array(fields.splitNumber)
+    const tickets = Array(fields.splitNumber)
       .fill(null)
       .map((_, index) => {
-        const splitHeight = creditPerTicketAmount
+        const ticketHeight = creditPerTicketAmount
           .mul(index + 1)
           .add(currentHeight)
           .toString()
@@ -88,8 +88,8 @@ export const splitTickets = async (props: SplitTicketsParams) => {
         const publicId = uuidv1()
 
         return {
-          splitGroupId: splitGroup.id,
-          height: splitHeight,
+          ticketGroupId: ticketGroup.id,
+          height: ticketHeight,
           amount: creditPerTicketAmount.toString(),
           publicId,
           token: sign(
@@ -117,13 +117,13 @@ export const splitTickets = async (props: SplitTicketsParams) => {
         }
       })
 
-    const splitTickets = await prisma.creditTicket.createMany({
-      data: splits,
+    const createdTickets = await prisma.creditTicket.createMany({
+      data: tickets,
     })
 
-    return splitTickets
+    return createdTickets
   } catch (error) {
-    logger.error('Error splitting tickets', error)
+    logger.error('Error creating tickets', error)
     throw error
   }
 }
