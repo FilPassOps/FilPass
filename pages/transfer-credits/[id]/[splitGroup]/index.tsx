@@ -8,7 +8,7 @@ import { Divider } from 'components/Shared/Divider'
 import { TokenList } from 'components/User/TokenList'
 import { Layout } from 'components/Layout'
 import { UserCreditDetails } from '..'
-import { getTokensBySplitGroup } from 'domain/transfer-credits/get-tokens-by-split-group'
+import { getTokensBySplitGroupId } from 'domain/transfer-credits/get-tokens-by-split-group-id'
 import { getItemsPerPage, PaginationWrapper } from 'components/Shared/PaginationWrapper'
 import Timestamp from 'components/Shared/Timestamp'
 import { DateTime } from 'luxon'
@@ -27,16 +27,16 @@ interface TokenSplitGroupDetailsProps {
     splitTokensGroup: CreditToken[]
   }
   totalItems: number
-  totalRedeemed: number
+  totalRedeemedInvalid: number
   pageSize: number
 }
 
-const TokenSplitGroupDetails = ({ data, totalItems, totalRedeemed, pageSize }: TokenSplitGroupDetailsProps) => {
+const TokenSplitGroupDetails = ({ data, totalItems, totalRedeemedInvalid, pageSize }: TokenSplitGroupDetailsProps) => {
   const { userCreditDetails, splitTokensGroup } = data
 
   const currentHeight = ethers.BigNumber.from(userCreditDetails.totalWithdrawals).add(userCreditDetails.totalRefunds)
 
-  const totalInFlight = totalItems - totalRedeemed
+  const totalInFlight = totalItems - totalRedeemedInvalid
 
   return (
     <>
@@ -45,10 +45,16 @@ const TokenSplitGroupDetails = ({ data, totalItems, totalRedeemed, pageSize }: T
       </Head>
       <div className="container w-full max-w-3xl mx-auto">
         <div className="py-6">
-          <dl className={`sm:grid sm:grid-cols-2 sm:grid-flow-col `}>
+          <dl className={`sm:grid sm:grid-cols-2 sm:grid-flow-col items-center`}>
             <div>
-              <dt className="text-gray-900 font-medium text-lg">Receiver Wallet</dt>
-              <dd className="text-sm text-gray-500">{userCreditDetails.creditTransactions[0].storageProvider.walletAddress}</dd>
+              <div>
+                <dt className="text-gray-900 font-medium">Receiver</dt>
+                <dd className="text-sm text-gray-500">{userCreditDetails.creditTransactions[0].storageProvider.walletAddress}</dd>
+              </div>
+              <div>
+                <dt className="text-gray-900 font-medium">Contract</dt>
+                <dd className="text-sm text-gray-500">{userCreditDetails.contract.address}</dd>
+              </div>
             </div>
 
             <div className="mt-4 sm:mt-0 text-sm text-gray-500">
@@ -79,13 +85,13 @@ const TokenSplitGroupDetails = ({ data, totalItems, totalRedeemed, pageSize }: T
 
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-1">
-              <p className="text-gray-600 font-semibold">Vouchers in Flight:</p>
+              <p className="text-gray-600 font-semibold">In Flight:</p>
               <p className=" text-deep-koamaru">{totalInFlight}</p>
             </div>
 
             <div className="col-span-1">
-              <p className="text-gray-600 font-semibold">Vouchers Redeemed:</p>
-              <p className=" text-deep-koamaru">{totalRedeemed}</p>
+              <p className="text-gray-600 font-semibold">Redeemed/Invalid:</p>
+              <p className=" text-deep-koamaru">{totalRedeemedInvalid}</p>
             </div>
           </div>
         </div>
@@ -94,11 +100,7 @@ const TokenSplitGroupDetails = ({ data, totalItems, totalRedeemed, pageSize }: T
           <Divider className="my-8" />
           <h2 className="text-2xl font-semibold text-deep-koamaru mb-4">Vouchers</h2>
           <PaginationWrapper totalItems={totalItems} pageSize={pageSize}>
-            <TokenList
-              isOpen={true}
-              creditTokens={splitTokensGroup}
-              currentHeight={currentHeight}
-            />
+            <TokenList isOpen={true} creditTokens={splitTokensGroup} currentHeight={currentHeight} />
           </PaginationWrapper>
         </div>
         <Divider className="my-8" />
@@ -126,8 +128,8 @@ export const getServerSideProps = withUserSSR(async ({ params, user, query }: an
 
   const userCreditDetails = data ? JSON.parse(JSON.stringify(data)) : null
 
-  const { data: splitTokensGroup } = await getTokensBySplitGroup({
-    splitGroup: params.splitGroup,
+  const { data: splitTokensGroup } = await getTokensBySplitGroupId({
+    splitGroupId: params.splitGroup,
     userId: user.id,
     userCreditId: params.id,
     pageSize,
@@ -141,7 +143,7 @@ export const getServerSideProps = withUserSSR(async ({ params, user, query }: an
         splitTokensGroup: JSON.parse(JSON.stringify(splitTokensGroup.splitTokens)),
       },
       totalItems: splitTokensGroup?.total ?? 0,
-      totalRedeemed: splitTokensGroup?.totalRedeemed ?? 0,
+      totalRedeemedInvalid: splitTokensGroup?.totalRedeemedInvalid ?? 0,
       pageSize: pageSize,
     },
   }

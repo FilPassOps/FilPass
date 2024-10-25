@@ -1,10 +1,9 @@
 import { redeemToken } from 'domain/external/redeem-token'
-import { newHandler, NextApiRequestWithSession, withMethods, withValidation } from 'lib/middleware'
+import { newHandler, NextApiRequestWithSession, withExternalLimiter, withMethods, withValidation } from 'lib/middleware'
 import yup from 'lib/yup'
 import { NextApiResponse } from 'next'
 
 const requestSchema = yup.object({
-  walletAddress: yup.string().required(),
   token: yup.string().required(),
 })
 
@@ -15,7 +14,6 @@ interface Request extends NextApiRequestWithSession {
 async function handler(req: Request, res: NextApiResponse) {
   try {
     const result = await redeemToken({
-      walletAddress: req.body.walletAddress,
       token: req.body.token,
     })
 
@@ -26,4 +24,4 @@ async function handler(req: Request, res: NextApiResponse) {
   }
 }
 
-export default newHandler(withMethods(['POST'], withValidation(requestSchema, handler)))
+export default newHandler(withExternalLimiter(withMethods(['POST'], withValidation(requestSchema, handler))))

@@ -83,7 +83,11 @@ export default async function run() {
             async tx => {
               const txCreditToken = await tx.creditToken.findUnique({
                 include: {
-                  userCredit: true,
+                  splitGroup: {
+                    include: {
+                      userCredit: true,
+                    },
+                  },
                 },
                 where: {
                   redeemable: true,
@@ -95,25 +99,25 @@ export default async function run() {
                 return
               }
 
-              const currentHeight = ethers.BigNumber.from(txCreditToken.userCredit.totalWithdrawals).add(
-                txCreditToken.userCredit.totalRefunds,
+              const currentHeight = ethers.BigNumber.from(txCreditToken.splitGroup.userCredit.totalWithdrawals).add(
+                txCreditToken.splitGroup.userCredit.totalRefunds,
               )
               const tokenAmount = ethers.BigNumber.from(txCreditToken.height).sub(currentHeight)
-              const amount = ethers.BigNumber.from(txCreditToken.userCredit.amount).sub(tokenAmount)
+              const amount = ethers.BigNumber.from(txCreditToken.splitGroup.userCredit.amount).sub(tokenAmount)
 
               await tx.ledger.create({
                 data: {
-                  userCreditId: txCreditToken.userCreditId,
+                  userCreditId: txCreditToken.splitGroup.userCredit.id,
                   amount: tokenAmount.toString(),
                   type: LedgerType.WITHDRAWAL,
                 },
               })
 
-              const totalWithdrawals = ethers.BigNumber.from(txCreditToken.userCredit.totalWithdrawals).add(tokenAmount)
+              const totalWithdrawals = ethers.BigNumber.from(txCreditToken.splitGroup.userCredit.totalWithdrawals).add(tokenAmount)
 
               await tx.userCredit.update({
                 where: {
-                  id: txCreditToken.userCreditId,
+                  id: txCreditToken.splitGroup.userCredit.id,
                 },
                 data: {
                   amount: amount.toString(),
@@ -133,8 +137,7 @@ export default async function run() {
               await tx.creditToken.updateMany({
                 where: {
                   id: { lt: txCreditToken.id },
-                  userCreditId: txCreditToken.userCreditId,
-                  splitGroup: txCreditToken.splitGroup,
+                  splitGroupId: txCreditToken.splitGroup.id,
                   redeemable: true,
                 },
                 data: {

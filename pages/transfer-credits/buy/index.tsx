@@ -205,7 +205,7 @@ export const getServerSideProps = withUserSSR(async function getServerSideProps(
     props: {
       data: {
         contracts: JSON.parse(JSON.stringify(data)),
-        pendingContractTransactions: pendingContractTransactions ? JSON.parse(JSON.stringify(pendingContractTransactions)) : null,
+        pendingContractTransaction: pendingContractTransactions ? JSON.parse(JSON.stringify(pendingContractTransactions)) : null,
       },
     },
   }

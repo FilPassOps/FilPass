@@ -128,7 +128,7 @@ describe('FilecoinDepositWithdrawRefund', function () {
 
       await expect(filpass.connect(oracle1).withdrawAmount(recipient1.address, depositAmount)).to.be.revertedWithCustomError(
         filpass,
-        'RefundTimeNotPassed',
+        'WithdrawTimeExpired',
       )
     })
 

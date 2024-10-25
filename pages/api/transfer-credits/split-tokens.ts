@@ -6,6 +6,7 @@ import { NextApiResponse } from 'next'
 const requestSchema = yup.object({
   userCreditId: yup.string().required(),
   splitNumber: yup.number().required(),
+  creditPerVoucher: yup.number().required(),
 })
 
 interface Request extends NextApiRequestWithSession {
@@ -24,6 +25,7 @@ async function handler(req: Request, res: NextApiResponse) {
       id: Number(req.body.userCreditId),
       splitNumber: req.body.splitNumber,
       userId: user.id,
+      creditPerVoucher: req.body.creditPerVoucher,
     })
     return res.status(200).json(result)
   } catch (error: any) {

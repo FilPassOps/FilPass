@@ -58,6 +58,7 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
   error DirectDepositsNotAllowed();
   error FunctionDoesNotExist();
   error WithdrawFailed();
+  error WithdrawTimeExpired();
   error OnlyUserAllowed();
   /**
    * @dev Modifier to restrict function access exclusively to the designated user.
@@ -128,7 +129,7 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
 
     DepositInfo storage info = deposits[msg.sender][recipient];
     if (info.amount < requestedWithdrawAmount) revert InsufficientFunds();
-    if (block.timestamp >= info.refundTime) revert RefundTimeNotPassed();
+    if (block.timestamp >= info.refundTime) revert WithdrawTimeExpired();
 
     // Update the deposited amount before transferring funds to prevent reentrancy attacks.
     info.amount -= requestedWithdrawAmount;

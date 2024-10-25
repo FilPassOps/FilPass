@@ -9,7 +9,6 @@ import { getContractsByUserId } from 'domain/contracts/get-contracts-by-user-id'
 import { AppConfig } from 'config/system'
 
 interface RedeemTokenParams {
-  walletAddress: string
   token: string
 }
 
@@ -24,17 +23,15 @@ export const redeemToken = async (props: RedeemTokenParams): Promise<RedeemToken
 
     const chain = AppConfig.network.getChainByName('Filecoin')
 
-    // mark redeemed as soon as possible
-
     const result = verify(fields.token, process.env.PUBLIC_KEY as string)
 
-    if (!result.data.jti) {
+    if (!result.data.jti || !result.data.aud) {
       throw new Error('Invalid token', { cause: 'INVALID' })
     }
 
     const storageProvider = await prisma.storageProvider.findUnique({
       where: {
-        walletAddress: fields.walletAddress,
+        walletAddress: result.data.aud,
       },
     })
 
@@ -44,7 +41,11 @@ export const redeemToken = async (props: RedeemTokenParams): Promise<RedeemToken
 
     const creditToken = await prisma.creditToken.findUnique({
       include: {
-        userCredit: true,
+        splitGroup: {
+          include: {
+            userCredit: true,
+          },
+        },
       },
       where: {
         publicId: result.data.jti,
@@ -59,17 +60,21 @@ export const redeemToken = async (props: RedeemTokenParams): Promise<RedeemToken
       throw new Error('Credit token already redeemed', { cause: 'INVALID' })
     }
 
-    if (creditToken.userCredit.withdrawExpiresAt! < new Date()) {
+    if (creditToken.splitGroup.userCredit.withdrawExpiresAt! < new Date()) {
       throw new Error('Withdrawal expired', { cause: 'INVALID' })
     }
 
-    const { data: contracts, error: contractsError } = await getContractsByUserId({ userId: creditToken.userCredit.userId })
+    const { data: contracts, error: contractsError } = await getContractsByUserId({
+      userId: creditToken.splitGroup.userCredit.userId,
+    })
 
     if (contractsError || !contracts) {
       throw new Error('Contracts not found')
     }
 
-    const currentHeight = ethers.BigNumber.from(creditToken.userCredit.totalWithdrawals).add(creditToken.userCredit.totalRefunds)
+    const currentHeight = ethers.BigNumber.from(creditToken.splitGroup.userCredit.totalWithdrawals).add(
+      creditToken.splitGroup.userCredit.totalRefunds,
+    )
 
     if (currentHeight.gte(creditToken.height)) {
       throw new Error('A bigger token was already redeemed', { cause: 'INVALID' })
@@ -90,15 +95,13 @@ export const redeemToken = async (props: RedeemTokenParams): Promise<RedeemToken
         creditTokenId: creditToken.id,
         transactionHash: transaction.hash,
         amount: tokenAmount.toString(),
-        userCreditId: creditToken.userCreditId,
+        userCreditId: creditToken.splitGroup.userCreditId,
         status: TransactionStatus.PENDING,
       },
     })
 
     return { message: 'Success' }
   } catch (error) {
-    console.log(getPaymentErrorMessage(error as Error))
-
     if (error instanceof Error && error.cause === 'INVALID') {
       return { error: error.message }
     }

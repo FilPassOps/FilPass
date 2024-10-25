@@ -53,6 +53,14 @@ const globalLimiter = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 })
 
+const externalLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 10, // Limit each IP to 1000 requests per `window` (here, per minute)
+  keyGenerator: getIP,
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+})
+
 export function newHandler<T>(handler: NextApiHandler<T> | NextApiHandlerWithUser<T>) {
   return async (req: NextApiRequest, res: NextApiResponse<T | { message: string }>) => {
     try {
@@ -209,6 +217,11 @@ export const withAuthLimiter = (handler: NextApiHandler) => async (req: NextApiR
 
 export const withLimiter = (handler: NextApiHandler) => async (req: NextApiRequest, res: NextApiResponse) => {
   await runMiddleware(globalLimiter)(req, res)
+  return handler(req, res)
+}
+
+export const withExternalLimiter = (handler: NextApiHandler) => async (req: NextApiRequest, res: NextApiResponse) => {
+  await runMiddleware(externalLimiter)(req, res)
   return handler(req, res)
 }
 
