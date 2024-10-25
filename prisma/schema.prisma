@@ -326,8 +326,8 @@ model WithdrawTransaction {
   userCredit      UserCredit        @relation(fields: [userCreditId], references: [id])
   amount          String            @map("amount")
   userCreditId    Int               @map("user_credit_id")
-  creditTokenId   Int               @unique @map("credit_token_id")
-  creditToken     CreditToken       @relation(fields: [creditTokenId], references: [id])
+  creditTicketId  Int               @unique @map("credit_ticket_id")
+  creditTicket    CreditTicket      @relation(fields: [creditTicketId], references: [id])
   failReason      String?           @map("fail_reason")
   confirmations   Int               @default(0) @map("confirmations")
   blockNumber     String            @default("0") @map("block_number")
@@ -358,25 +358,25 @@ model UserCredit {
   ledger              Ledger[]
   refundTransaction   RefundTransaction[]
   withdrawTransaction WithdrawTransaction[]
-  splitGroups         SplitGroup[]
+  ticketGroups        TicketGroup[]
 
   @@index([userId])
   @@map("user_credit")
 }
 
-model SplitGroup {
+model TicketGroup {
   id           Int           @id @default(autoincrement())
   userCreditId Int           @map("user_credit_id")
   userCredit   UserCredit    @relation(fields: [userCreditId], references: [id])
-  creditTokens CreditToken[]
+  creditTickets CreditTicket[]
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @updatedAt @map("updated_at")
 
   @@index([userCreditId])
-  @@map("split_group")
+  @@map("ticket_group")
 }
 
-model CreditToken {
+model CreditTicket {
   id                  Int                  @id @default(autoincrement())
   publicId            String?              @unique() @map("public_id")
   height              String               @map("height")
@@ -386,15 +386,15 @@ model CreditToken {
   valid               Boolean              @default(true) @map("valid")
   createdAt           DateTime             @default(now()) @map("created_at")
   updatedAt           DateTime             @updatedAt @map("updated_at")
-  splitGroup          SplitGroup           @relation(fields: [splitGroupId], references: [id])
-  splitGroupId        Int                  @map("split_group_id")
+  ticketGroup         TicketGroup          @relation(fields: [ticketGroupId], references: [id])
+  ticketGroupId       Int                  @map("ticket_group_id")
   withdrawTransaction WithdrawTransaction?
 
-  @@index([splitGroupId])
+  @@index([ticketGroupId])
   @@index([publicId])
   @@index([redeemable])
   @@index([valid])
-  @@map("credit_token")
+  @@map("credit_ticket")
 }
 
 model Ledger {

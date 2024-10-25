@@ -1,27 +1,27 @@
 import prisma from 'lib/prisma'
 import { getUserCreditById } from './get-user-credit-by-id'
-import { splitCreditsValidator } from './validation'
+import { createTicketsValidatorBackend } from './validation'
 import { sign } from 'lib/jwt'
 import { ethers } from 'ethers'
 import { logger } from 'lib/logger'
-import { getAvailableTokenNumber } from './get-available-token-number'
-import { FIL, MIN_CREDIT_PER_VOUCHER } from './constants'
+import { getAvailableTicketsNumber } from './get-available-tickets-number'
+import { FIL, MIN_CREDIT_PER_TICKET } from './constants'
 import { v1 as uuidv1 } from 'uuid'
 import { parseUnits } from 'ethers/lib/utils'
 import { AppConfig } from 'config/system'
 
 const ONE_HOUR_TIME = 1 * 60 * 60 * 1000
 
-interface SplitTokensParams {
+interface CreateTicketsParams {
   id: number
   userId: number
   splitNumber: number
-  creditPerVoucher: number
+  creditPerTicket: number
 }
 
-export const splitTokens = async (props: SplitTokensParams) => {
+export const createTickets = async (props: CreateTicketsParams) => {
   try {
-    const fields = await splitCreditsValidator.validate(props)
+    const fields = await createTicketsValidatorBackend.validate(props)
 
     const { data, error } = await getUserCreditById({ id: fields.id, userId: fields.userId })
 
@@ -46,41 +46,41 @@ export const splitTokens = async (props: SplitTokensParams) => {
     const currentHeight = ethers.BigNumber.from(data.totalWithdrawals).add(data.totalRefunds)
     const totalHeight = ethers.BigNumber.from(data.totalHeight!)
     const remaining = totalHeight.sub(currentHeight)
-    const creditPerVoucher = parseUnits(fields.creditPerVoucher.toString(), FIL.decimals)
+    const creditPerTicket = parseUnits(fields.creditPerTicket.toString(), FIL.decimals)
 
-    const { data: availableTokenNumber } = await getAvailableTokenNumber({ userId: fields.userId, userCreditId: data.id })
+    const { data: availableTicketsNumber } = await getAvailableTicketsNumber({ userId: fields.userId, userCreditId: data.id })
 
-    if (availableTokenNumber < fields.splitNumber) {
-      throw new Error('Not enough available vouchers')
+    if (availableTicketsNumber < fields.splitNumber) {
+      throw new Error('Not enough available tickets')
     }
 
-    if (creditPerVoucher.lt(MIN_CREDIT_PER_VOUCHER)) {
-      throw new Error('Credit per voucher is too low')
+    if (creditPerTicket.lt(MIN_CREDIT_PER_TICKET)) {
+      throw new Error('Credit per ticket is too low')
     }
 
-    if (creditPerVoucher.gt(remaining)) {
-      throw new Error('Credit per voucher cannot exceed available credits')
+    if (creditPerTicket.gt(remaining)) {
+      throw new Error('Credit per ticket cannot exceed available credits')
     }
 
-    if (ethers.BigNumber.from(fields.splitNumber).mul(creditPerVoucher).gt(remaining)) {
+    if (ethers.BigNumber.from(fields.splitNumber).mul(creditPerTicket).gt(remaining)) {
       throw new Error('Total credits exceed available credits')
     }
 
     const expirationDateTime = new Date(data.withdrawExpiresAt.getTime() - ONE_HOUR_TIME).getTime()
     const issuedAt = Math.floor(Date.now() / 1000)
 
-    const splitGroup = await prisma.splitGroup.create({
+    const ticketGroup = await prisma.ticketGroup.create({
       data: {
         userCreditId: data.id,
       },
     })
 
-    const creditPerVoucherAmount = parseUnits(fields.creditPerVoucher.toString(), fil.decimals)
+    const creditPerTicketAmount = parseUnits(fields.creditPerTicket.toString(), fil.decimals)
 
-    const splits = Array(fields.splitNumber)
+    const tickets = Array(fields.splitNumber)
       .fill(null)
       .map((_, index) => {
-        const splitHeight = creditPerVoucherAmount
+        const ticketHeight = creditPerTicketAmount
           .mul(index + 1)
           .add(currentHeight)
           .toString()
@@ -88,9 +88,9 @@ export const splitTokens = async (props: SplitTokensParams) => {
         const publicId = uuidv1()
 
         return {
-          splitGroupId: splitGroup.id,
-          height: splitHeight,
-          amount: creditPerVoucherAmount.toString(),
+          ticketGroupId: ticketGroup.id,
+          height: ticketHeight,
+          amount: creditPerTicketAmount.toString(),
           publicId,
           token: sign(
             {
@@ -98,14 +98,14 @@ export const splitTokens = async (props: SplitTokensParams) => {
               jti: publicId,
               exp: expirationDateTime,
               iat: issuedAt,
-              voucher_type: 'filpass',
-              voucher_version: '1',
+              ticket_type: 'filpass',
+              ticket_version: '1',
               funder: data.contract.deployedFromAddress,
               sub: data.contract.address,
               aud: data.storageProvider.walletAddress,
-              voucher_lane: 0,
+              ticket_lane: 0,
               lane_total_amount: remaining.toString(),
-              lane_guaranteed_amount: creditPerVoucherAmount.toString(),
+              lane_guaranteed_amount: creditPerTicketAmount.toString(),
               lane_guaranteed_until: data.withdrawExpiresAt?.getTime(),
             },
             process.env.PRIVATE_KEY as string,
@@ -117,13 +117,13 @@ export const splitTokens = async (props: SplitTokensParams) => {
         }
       })
 
-    const splitCredits = await prisma.creditToken.createMany({
-      data: splits,
+    const createdTickets = await prisma.creditTicket.createMany({
+      data: tickets,
     })
 
-    return splitCredits
+    return createdTickets
   } catch (error) {
-    logger.error('Error splitting tokens', error)
+    logger.error('Error creating tickets', error)
     throw error
   }
 }

@@ -8,20 +8,20 @@ import { getUserCreditById } from 'domain/transfer-credits/get-user-credit-by-id
 import Timestamp from 'components/Shared/Timestamp'
 import { DateTime } from 'luxon'
 import { Divider } from 'components/Shared/Divider'
-import { SplitTokensModal } from 'components/User/Modal/SplitTokensModal'
 import { api } from 'lib/api'
 import { useAlertDispatcher } from 'components/Layout/Alerts'
-import { getSplitTokensGroupByUserCreditId } from 'domain/transfer-credits/get-split-tokens-group-by-user-credit-id'
-import { SplitTokenGroupList } from 'components/User/SplitTokenGroupList'
 import { ethers } from 'ethers'
 import { formatUnits } from 'ethers/lib/utils'
 import { useContract } from 'components/Web3/useContract'
 import { ErrorAlert } from 'components/Controller/MetaMaskPayment/Alerts'
 import { getPaymentErrorMessage } from 'components/Web3/utils'
 import { WithMetaMaskButton } from 'components/Web3/MetaMaskProvider'
-import { getAvailableTokenNumber } from 'domain/transfer-credits/get-available-token-number'
+import { getTicketGroupsByUserCreditId } from 'domain/transfer-credits/get-split-tickets-group-by-user-credit-id'
+import { getAvailableTicketsNumber } from 'domain/transfer-credits/get-available-tickets-number'
+import { CreateTicketsModal } from 'components/User/Modal/CreateTicketsModal'
+import { TicketGroupList } from 'components/User/TicketGroupList'
 
-export interface CreditToken {
+export interface CreditTicket {
   id: number
   height: string
   token: string
@@ -48,34 +48,34 @@ export interface UserCreditDetails {
   refundStartsAt: Date
   amount: string
   creditTransactions: CreditTransaction[]
-  creditTokens: CreditToken[]
+  creditTickets: CreditTicket[]
   contract: {
     address: string
     deployedFromAddress: string
   }
 }
 
-export interface SplitTokenGroup {
-  splitGroup: string
-  totalTokens: number
+export interface TicketGroup {
+  ticketGroupId: string
+  totalTickets: number
   createdAt: Date
 }
 
 interface TransferCreditDetailsProps {
   data: {
     userCreditDetails: UserCreditDetails
-    splitTokensGroup: SplitTokenGroup[]
-    availableTokenNumber: number
+    ticketGroups: TicketGroup[]
+    availableTicketsNumber: number
   }
 }
 
 const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
   const { dispatch, close } = useAlertDispatcher()
-  const { userCreditDetails, availableTokenNumber } = data
+  const { userCreditDetails, availableTicketsNumber } = data
 
   const { refundAmount } = useContract(data.userCreditDetails.contract.address ?? null)
 
-  const [splitTokensModalOpen, setSplitTokensModalOpen] = useState(false)
+  const [createTicketsModalOpen, setCreateTicketsModalOpen] = useState(false)
   const [isRefundLoading, setIsRefundLoading] = useState(false)
 
   const token = AppConfig.network.getTokenBySymbolAndBlockchainName('tFIL', 'Filecoin')
@@ -237,16 +237,16 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
               <p className=" text-deep-koamaru">{parsedCurrentCredits}</p>
             </div>
             <div className="col-span-1">
-              <p className="text-gray-600 font-semibold">Available Vouchers:</p>
-              <p className=" text-deep-koamaru">{availableTokenNumber}</p>
+              <p className="text-gray-600 font-semibold">Available Tickets:</p>
+              <p className=" text-deep-koamaru">{availableTicketsNumber}</p>
             </div>
           </div>
         </div>
 
         <div className="">
           <Divider className="my-8" />
-          <h2 className="text-2xl font-semibold text-deep-koamaru mb-4">Voucher Groups</h2>
-          <SplitTokenGroupList splitGroup={data.splitTokensGroup} userCreditId={userCreditDetails.id} />
+          <h2 className="text-2xl font-semibold text-deep-koamaru mb-4">Ticket Groups</h2>
+          <TicketGroupList ticketGroups={data.ticketGroups} userCreditId={userCreditDetails.id} />
         </div>
         <Divider className="my-8" />
         <div className="py-6 flex items-center justify-center gap-4">
@@ -255,14 +255,14 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
           </LinkButton>
           <Button
             onClick={() => {
-              setSplitTokensModalOpen(true)
+              setCreateTicketsModalOpen(true)
             }}
             variant="primary"
             className="w-fit"
             disabled={isWithdrawExpired || isRefundLoading}
             toolTipText={isWithdrawExpired ? 'This credit has expired' : ''}
           >
-            <p>Create Vouchers</p>
+            <p>Create Tickets</p>
           </Button>
 
           <LinkButton
@@ -296,12 +296,12 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
           </div>
         </div>
       </div>
-      <SplitTokensModal
-        onModalClosed={() => setSplitTokensModalOpen(false)}
-        open={splitTokensModalOpen}
+      <CreateTicketsModal
+        onModalClosed={() => setCreateTicketsModalOpen(false)}
+        open={createTicketsModalOpen}
         userCreditId={userCreditDetails.id.toString()}
         currentCredits={currentCredits}
-        availableTokenNumber={availableTokenNumber}
+        availableTicketsNumber={availableTicketsNumber}
       />
     </>
   )
@@ -318,16 +318,16 @@ export const getServerSideProps = withUserSSR(async ({ params, user }: any) => {
 
   const userCreditDetails = data ? JSON.parse(JSON.stringify(data)) : null
 
-  const { data: splitTokensGroup } = await getSplitTokensGroupByUserCreditId({ userCreditId: userCreditDetails.id })
+  const { data: ticketGroups } = await getTicketGroupsByUserCreditId({ userCreditId: userCreditDetails.id })
 
-  const { data: availableTokenNumber } = await getAvailableTokenNumber({ userId: user.id, userCreditId: userCreditDetails.id })
+  const { data: availableTicketsNumber } = await getAvailableTicketsNumber({ userId: user.id, userCreditId: userCreditDetails.id })
 
   return {
     props: {
       data: {
         userCreditDetails,
-        splitTokensGroup: JSON.parse(JSON.stringify(splitTokensGroup)),
-        availableTokenNumber,
+        ticketGroups: JSON.parse(JSON.stringify(ticketGroups)),
+        availableTicketsNumber,
       },
     },
   }

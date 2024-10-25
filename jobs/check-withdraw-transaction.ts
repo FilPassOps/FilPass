@@ -27,7 +27,7 @@ export default async function run() {
         id: true,
         transactionHash: true,
         amount: true,
-        creditToken: {
+        creditTicket: {
           select: {
             height: true,
             id: true,
@@ -60,7 +60,7 @@ export default async function run() {
 
     // TODO: check if transaction is pending
 
-    for await (const { transactionHash, userCredit, creditToken, id } of pendingTransactions) {
+    for await (const { transactionHash, userCredit, creditTicket, id } of pendingTransactions) {
       if (!transactionHash || !userCredit || !userCredit.id) {
         continue
       }
@@ -81,9 +81,9 @@ export default async function run() {
 
           await prisma.$transaction(
             async tx => {
-              const txCreditToken = await tx.creditToken.findUnique({
+              const txCreditTicket = await tx.creditTicket.findUnique({
                 include: {
-                  splitGroup: {
+                  ticketGroup: {
                     include: {
                       userCredit: true,
                     },
@@ -91,33 +91,35 @@ export default async function run() {
                 },
                 where: {
                   redeemable: true,
-                  id: creditToken.id,
+                  id: creditTicket.id,
                 },
               })
 
-              if (!txCreditToken) {
+              if (!txCreditTicket) {
                 return
               }
 
-              const currentHeight = ethers.BigNumber.from(txCreditToken.splitGroup.userCredit.totalWithdrawals).add(
-                txCreditToken.splitGroup.userCredit.totalRefunds,
+              const currentHeight = ethers.BigNumber.from(txCreditTicket.ticketGroup.userCredit.totalWithdrawals).add(
+                txCreditTicket.ticketGroup.userCredit.totalRefunds,
               )
-              const tokenAmount = ethers.BigNumber.from(txCreditToken.height).sub(currentHeight)
-              const amount = ethers.BigNumber.from(txCreditToken.splitGroup.userCredit.amount).sub(tokenAmount)
+              const ticketAmount = ethers.BigNumber.from(txCreditTicket.height).sub(currentHeight)
+              const amount = ethers.BigNumber.from(txCreditTicket.ticketGroup.userCredit.amount).sub(ticketAmount)
 
               await tx.ledger.create({
                 data: {
-                  userCreditId: txCreditToken.splitGroup.userCredit.id,
-                  amount: tokenAmount.toString(),
+                  userCreditId: txCreditTicket.ticketGroup.userCredit.id,
+                  amount: ticketAmount.toString(),
                   type: LedgerType.WITHDRAWAL,
                 },
               })
 
-              const totalWithdrawals = ethers.BigNumber.from(txCreditToken.splitGroup.userCredit.totalWithdrawals).add(tokenAmount)
+              const totalWithdrawals = ethers.BigNumber.from(txCreditTicket.ticketGroup.userCredit.totalWithdrawals).add(
+                ticketAmount,
+              )
 
               await tx.userCredit.update({
                 where: {
-                  id: txCreditToken.splitGroup.userCredit.id,
+                  id: txCreditTicket.ticketGroup.userCredit.id,
                 },
                 data: {
                   amount: amount.toString(),
@@ -125,19 +127,19 @@ export default async function run() {
                 },
               })
 
-              await tx.creditToken.update({
+              await tx.creditTicket.update({
                 where: {
-                  id: txCreditToken.id,
+                  id: txCreditTicket.id,
                 },
                 data: {
                   redeemable: false,
                 },
               })
 
-              await tx.creditToken.updateMany({
+              await tx.creditTicket.updateMany({
                 where: {
-                  id: { lt: txCreditToken.id },
-                  splitGroupId: txCreditToken.splitGroup.id,
+                  id: { lt: txCreditTicket.id },
+                  ticketGroupId: txCreditTicket.ticketGroupId,
                   redeemable: true,
                 },
                 data: {

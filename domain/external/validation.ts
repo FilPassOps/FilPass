@@ -1,5 +1,5 @@
 import yup from 'lib/yup'
 
-export const redeemTokenValidator = yup.object({
+export const submitTicketValidator = yup.object({
   token: yup.string().required(),
 })

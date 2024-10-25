@@ -259,7 +259,7 @@ CREATE TABLE "withdraw_transaction" (
     "updated_at" TIMESTAMP(3) NOT NULL,
     "amount" TEXT NOT NULL,
     "user_credit_id" INTEGER NOT NULL,
-    "credit_token_id" INTEGER NOT NULL,
+    "credit_ticket_id" INTEGER NOT NULL,
     "fail_reason" TEXT,
     "confirmations" INTEGER NOT NULL DEFAULT 0,
     "block_number" TEXT NOT NULL DEFAULT '0',
@@ -287,17 +287,17 @@ CREATE TABLE "user_credit" (
 );
 
 -- CreateTable
-CREATE TABLE "split_group" (
+CREATE TABLE "ticket_group" (
     "id" SERIAL NOT NULL,
     "user_credit_id" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "split_group_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "ticket_group_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "credit_token" (
+CREATE TABLE "credit_ticket" (
     "id" SERIAL NOT NULL,
     "public_id" TEXT,
     "height" TEXT NOT NULL,
@@ -307,9 +307,9 @@ CREATE TABLE "credit_token" (
     "valid" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
-    "split_group_id" INTEGER NOT NULL,
+    "ticket_group_id" INTEGER NOT NULL,
 
-    CONSTRAINT "credit_token_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "credit_ticket_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -426,7 +426,7 @@ CREATE INDEX "contract_deployed_from_address_idx" ON "contract"("deployed_from_a
 CREATE UNIQUE INDEX "withdraw_transaction_transaction_hash_key" ON "withdraw_transaction"("transaction_hash");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "withdraw_transaction_credit_token_id_key" ON "withdraw_transaction"("credit_token_id");
+CREATE UNIQUE INDEX "withdraw_transaction_credit_ticket_id_key" ON "withdraw_transaction"("credit_ticket_id");
 
 -- CreateIndex
 CREATE INDEX "withdraw_transaction_transaction_hash_idx" ON "withdraw_transaction"("transaction_hash");
@@ -441,22 +441,22 @@ CREATE UNIQUE INDEX "user_credit_contract_id_key" ON "user_credit"("contract_id"
 CREATE INDEX "user_credit_user_id_idx" ON "user_credit"("user_id");
 
 -- CreateIndex
-CREATE INDEX "split_group_user_credit_id_idx" ON "split_group"("user_credit_id");
+CREATE INDEX "ticket_group_user_credit_id_idx" ON "ticket_group"("user_credit_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "credit_token_public_id_key" ON "credit_token"("public_id");
+CREATE UNIQUE INDEX "credit_ticket_public_id_key" ON "credit_ticket"("public_id");
 
 -- CreateIndex
-CREATE INDEX "credit_token_split_group_id_idx" ON "credit_token"("split_group_id");
+CREATE INDEX "credit_ticket_ticket_group_id_idx" ON "credit_ticket"("ticket_group_id");
 
 -- CreateIndex
-CREATE INDEX "credit_token_public_id_idx" ON "credit_token"("public_id");
+CREATE INDEX "credit_ticket_public_id_idx" ON "credit_ticket"("public_id");
 
 -- CreateIndex
-CREATE INDEX "credit_token_redeemable_idx" ON "credit_token"("redeemable");
+CREATE INDEX "credit_ticket_redeemable_idx" ON "credit_ticket"("redeemable");
 
 -- CreateIndex
-CREATE INDEX "credit_token_valid_idx" ON "credit_token"("valid");
+CREATE INDEX "credit_ticket_valid_idx" ON "credit_ticket"("valid");
 
 -- CreateIndex
 CREATE INDEX "ledger_user_credit_id_idx" ON "ledger"("user_credit_id");
@@ -528,7 +528,7 @@ ALTER TABLE "contract" ADD CONSTRAINT "contract_user_id_fkey" FOREIGN KEY ("user
 ALTER TABLE "withdraw_transaction" ADD CONSTRAINT "withdraw_transaction_user_credit_id_fkey" FOREIGN KEY ("user_credit_id") REFERENCES "user_credit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "withdraw_transaction" ADD CONSTRAINT "withdraw_transaction_credit_token_id_fkey" FOREIGN KEY ("credit_token_id") REFERENCES "credit_token"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "withdraw_transaction" ADD CONSTRAINT "withdraw_transaction_credit_ticket_id_fkey" FOREIGN KEY ("credit_ticket_id") REFERENCES "credit_ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "user_credit" ADD CONSTRAINT "user_credit_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -540,10 +540,10 @@ ALTER TABLE "user_credit" ADD CONSTRAINT "user_credit_storage_provider_id_fkey" 
 ALTER TABLE "user_credit" ADD CONSTRAINT "user_credit_contract_id_fkey" FOREIGN KEY ("contract_id") REFERENCES "contract"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "split_group" ADD CONSTRAINT "split_group_user_credit_id_fkey" FOREIGN KEY ("user_credit_id") REFERENCES "user_credit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "ticket_group" ADD CONSTRAINT "ticket_group_user_credit_id_fkey" FOREIGN KEY ("user_credit_id") REFERENCES "user_credit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "credit_token" ADD CONSTRAINT "credit_token_split_group_id_fkey" FOREIGN KEY ("split_group_id") REFERENCES "split_group"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "credit_ticket" ADD CONSTRAINT "credit_ticket_ticket_group_id_fkey" FOREIGN KEY ("ticket_group_id") REFERENCES "ticket_group"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ledger" ADD CONSTRAINT "ledger_user_credit_id_fkey" FOREIGN KEY ("user_credit_id") REFERENCES "user_credit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

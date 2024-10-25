@@ -1,6 +1,6 @@
 import prisma from 'lib/prisma'
 import { verify } from 'lib/jwt'
-import { redeemTokenValidator } from './validation'
+import { submitTicketValidator } from './validation'
 import { ethers } from 'ethers'
 import { TransactionStatus } from '@prisma/client'
 import { FilecoinDepositWithdrawRefund__factory as FilecoinDepositWithdrawRefundFactory } from 'typechain-types'
@@ -8,18 +8,18 @@ import { getPaymentErrorMessage } from 'components/Web3/utils'
 import { getContractsByUserId } from 'domain/contracts/get-contracts-by-user-id'
 import { AppConfig } from 'config/system'
 
-interface RedeemTokenParams {
+interface SubmitTicketParams {
   token: string
 }
 
-interface RedeemTokenResult {
+interface SubmitTicketResult {
   message?: string
   error?: string
 }
 
-export const redeemToken = async (props: RedeemTokenParams): Promise<RedeemTokenResult> => {
+export const submitTicket = async (props: SubmitTicketParams): Promise<SubmitTicketResult> => {
   try {
-    const fields = await redeemTokenValidator.validate(props)
+    const fields = await submitTicketValidator.validate(props)
 
     const chain = AppConfig.network.getChainByName('Filecoin')
 
@@ -39,9 +39,9 @@ export const redeemToken = async (props: RedeemTokenParams): Promise<RedeemToken
       throw new Error('Storage provider not found', { cause: 'INVALID' })
     }
 
-    const creditToken = await prisma.creditToken.findUnique({
+    const creditTicket = await prisma.creditTicket.findUnique({
       include: {
-        splitGroup: {
+        ticketGroup: {
           include: {
             userCredit: true,
           },
@@ -52,35 +52,35 @@ export const redeemToken = async (props: RedeemTokenParams): Promise<RedeemToken
       },
     })
 
-    if (!creditToken) {
-      throw new Error('Credit token not found', { cause: 'INVALID' })
+    if (!creditTicket) {
+      throw new Error('Credit ticket not found', { cause: 'INVALID' })
     }
 
-    if (!creditToken.redeemable) {
-      throw new Error('Credit token already redeemed', { cause: 'INVALID' })
+    if (!creditTicket.redeemable) {
+      throw new Error('Credit ticket already redeemed', { cause: 'INVALID' })
     }
 
-    if (creditToken.splitGroup.userCredit.withdrawExpiresAt! < new Date()) {
+    if (creditTicket.ticketGroup.userCredit.withdrawExpiresAt! < new Date()) {
       throw new Error('Withdrawal expired', { cause: 'INVALID' })
     }
 
     const { data: contracts, error: contractsError } = await getContractsByUserId({
-      userId: creditToken.splitGroup.userCredit.userId,
+      userId: creditTicket.ticketGroup.userCredit.userId,
     })
 
     if (contractsError || !contracts) {
       throw new Error('Contracts not found')
     }
 
-    const currentHeight = ethers.BigNumber.from(creditToken.splitGroup.userCredit.totalWithdrawals).add(
-      creditToken.splitGroup.userCredit.totalRefunds,
+    const currentHeight = ethers.BigNumber.from(creditTicket.ticketGroup.userCredit.totalWithdrawals).add(
+      creditTicket.ticketGroup.userCredit.totalRefunds,
     )
 
-    if (currentHeight.gte(creditToken.height)) {
-      throw new Error('A bigger token was already redeemed', { cause: 'INVALID' })
+    if (currentHeight.gte(creditTicket.height)) {
+      throw new Error('A bigger ticket was already redeemed', { cause: 'INVALID' })
     }
 
-    const tokenAmount = ethers.BigNumber.from(creditToken.height).sub(currentHeight)
+    const tokenAmount = ethers.BigNumber.from(creditTicket.height).sub(currentHeight)
 
     const provider = new ethers.providers.JsonRpcProvider(chain.rpcUrls[0])
 
@@ -92,10 +92,10 @@ export const redeemToken = async (props: RedeemTokenParams): Promise<RedeemToken
 
     await prisma.withdrawTransaction.create({
       data: {
-        creditTokenId: creditToken.id,
+        creditTicketId: creditTicket.id,
         transactionHash: transaction.hash,
         amount: tokenAmount.toString(),
-        userCreditId: creditToken.splitGroup.userCreditId,
+        userCreditId: creditTicket.ticketGroup.userCreditId,
         status: TransactionStatus.PENDING,
       },
     })

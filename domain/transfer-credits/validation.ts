@@ -3,7 +3,7 @@ import { BigNumber, ethers } from 'ethers'
 import yup from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import * as Yup from 'yup'
-import { FIL, MIN_CREDIT_PER_VOUCHER } from './constants'
+import { FIL, MIN_CREDIT_PER_TICKET } from './constants'
 import { parseUnits } from 'ethers/lib/utils'
 
 export const getUserTransactionCreditsByUserIdValidator = yup.object({
@@ -34,11 +34,11 @@ export const getUserCreditByIdValidator = yup.object({
   userId: yup.number().required(),
 })
 
-export const splitCreditsValidator = yup.object({
+export const createTicketsValidatorBackend = yup.object({
   id: yup.number().required(),
   userId: yup.number().required(),
   splitNumber: yup.number().required(),
-  creditPerVoucher: yup.number().required(),
+  creditPerTicket: yup.number().required(),
 })
 
 export const refundCreditsValidator = yup.object({
@@ -47,43 +47,38 @@ export const refundCreditsValidator = yup.object({
   hash: yup.string().required(),
 })
 
-export const getSplitTokensGroupByUserCreditIdValidator = Yup.object().shape({
+export const getTicketGroupsByUserCreditIdValidator = Yup.object().shape({
   userCreditId: Yup.number().required('User credit ID is required'),
 })
 
-export const getSplitTokensBySplitGroupIdValidator = Yup.object().shape({
-  splitGroupId: Yup.number().required(),
+export const getTicketsByTicketGroupIdValidator = Yup.object().shape({
+  ticketGroupId: Yup.number().required(),
   userId: Yup.number().required(),
   userCreditId: Yup.number().required(),
   pageSize: Yup.number().required(),
   page: Yup.number().required(),
 })
 
-export const getAvailableTokenNumberValidator = Yup.object().shape({
+export const getAvailableTicketsNumberValidator = Yup.object().shape({
   userId: Yup.number().required(),
   userCreditId: Yup.number().required(),
 })
 
-export const getLastVoucherRedeemedByUserCreditIdValidator = Yup.object().shape({
-  userCreditId: Yup.number().required(),
-  userId: Yup.number().required(),
-})
-
-export const splitTokensValidator = (currentCredits: BigNumber, availableTokenNumber: number) => {
+export const createTicketsValidator = (currentCredits: BigNumber, availableTicketsNumber: number) => {
   return Yup.object()
     .shape({
       splitNumber: Yup.number()
-        .required('Number of vouchers is required')
-        .positive('Number of vouchers must be positive')
-        .integer('Number of vouchers must be an integer')
-        .max(availableTokenNumber, `Maximum ${availableTokenNumber} vouchers allowed`),
-      creditPerVoucher: Yup.number()
-        .required('Credit per voucher is required')
-        .positive('Credit per voucher must be positive')
-        .test('min-credit-per-voucher', 'Credit per voucher is too low', function (value) {
-          return parseUnits(value.toString(), FIL.decimals).gte(MIN_CREDIT_PER_VOUCHER)
+        .required('Number of tickets is required')
+        .positive('Number of tickets must be positive')
+        .integer('Number of tickets must be an integer')
+        .max(availableTicketsNumber, `Maximum ${availableTicketsNumber} tickets allowed`),
+      creditPerTicket: Yup.number()
+        .required('Credit per ticket is required')
+        .positive('Credit per ticket must be positive')
+        .test('min-credit-per-ticket', 'Credit per ticket is too low', function (value) {
+          return parseUnits(value.toString(), FIL.decimals).gte(MIN_CREDIT_PER_TICKET)
         })
-        .test('max-credit-per-voucher', 'Credit per voucher cannot exceed available credits', function (value) {
+        .test('max-credit-per-ticket', 'Credit per ticket cannot exceed available credits', function (value) {
           return parseUnits(value.toString(), FIL.decimals).lte(currentCredits)
         })
         .test('precision-check', 'Too many decimal places', function (value) {
@@ -92,9 +87,9 @@ export const splitTokensValidator = (currentCredits: BigNumber, availableTokenNu
         }),
     })
     .test('total-credits', 'Total credits exceed available credits', function (values) {
-      const { splitNumber, creditPerVoucher } = values
-      if (!splitNumber || !creditPerVoucher) return true // Skip validation if either value is missing
-      const totalCredits = parseUnits(creditPerVoucher.toString(), FIL.decimals).mul(splitNumber)
+      const { splitNumber, creditPerTicket } = values
+      if (!splitNumber || !creditPerTicket) return true // Skip validation if either value is missing
+      const totalCredits = parseUnits(creditPerTicket.toString(), FIL.decimals).mul(splitNumber)
       return totalCredits.lte(currentCredits)
     })
 }
