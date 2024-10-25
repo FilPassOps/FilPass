@@ -80,16 +80,15 @@ export const createTickets = async (props: CreateTicketsParams) => {
     const tickets = Array(fields.splitNumber)
       .fill(null)
       .map((_, index) => {
-        const ticketHeight = creditPerTicketAmount
-          .mul(index + 1)
-          .add(currentHeight)
-          .toString()
+        const ticketHeight = creditPerTicketAmount.mul(index + 1).add(currentHeight)
+
+        const ticketAmount = ticketHeight.sub(currentHeight)
 
         const publicId = uuidv1()
 
         return {
           ticketGroupId: ticketGroup.id,
-          height: ticketHeight,
+          height: ticketHeight.toString(),
           amount: creditPerTicketAmount.toString(),
           publicId,
           token: sign(
@@ -104,8 +103,8 @@ export const createTickets = async (props: CreateTicketsParams) => {
               sub: data.contract.address,
               aud: data.storageProvider.walletAddress,
               ticket_lane: 0,
-              lane_total_amount: remaining.toString(),
-              lane_guaranteed_amount: creditPerTicketAmount.toString(),
+              lane_total_amount: ticketHeight,
+              lane_guaranteed_amount: ticketAmount.toString(),
               lane_guaranteed_until: data.withdrawExpiresAt?.getTime(),
             },
             process.env.PRIVATE_KEY as string,
