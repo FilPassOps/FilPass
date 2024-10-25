@@ -1,4 +1,4 @@
-import { redeemToken } from 'domain/external/redeem-token'
+import { submitTicket } from 'domain/external/submit-ticket'
 import { newHandler, NextApiRequestWithSession, withExternalLimiter, withMethods, withValidation } from 'lib/middleware'
 import yup from 'lib/yup'
 import { NextApiResponse } from 'next'
@@ -13,7 +13,7 @@ interface Request extends NextApiRequestWithSession {
 
 async function handler(req: Request, res: NextApiResponse) {
   try {
-    const result = await redeemToken({
+    const result = await submitTicket({
       token: req.body.token,
     })
 

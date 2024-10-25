@@ -4,22 +4,22 @@ import { splitCreditsValidator } from './validation'
 import { sign } from 'lib/jwt'
 import { ethers } from 'ethers'
 import { logger } from 'lib/logger'
-import { getAvailableTokenNumber } from './get-available-token-number'
-import { FIL, MIN_CREDIT_PER_VOUCHER } from './constants'
+import { getAvailableTicketsNumber } from './get-available-tickets-number'
+import { FIL, MIN_CREDIT_PER_TICKET } from './constants'
 import { v1 as uuidv1 } from 'uuid'
 import { parseUnits } from 'ethers/lib/utils'
 import { AppConfig } from 'config/system'
 
 const ONE_HOUR_TIME = 1 * 60 * 60 * 1000
 
-interface SplitTokensParams {
+interface SplitTicketsParams {
   id: number
   userId: number
   splitNumber: number
-  creditPerVoucher: number
+  creditPerTicket: number
 }
 
-export const splitTokens = async (props: SplitTokensParams) => {
+export const splitTickets = async (props: SplitTicketsParams) => {
   try {
     const fields = await splitCreditsValidator.validate(props)
 
@@ -46,23 +46,23 @@ export const splitTokens = async (props: SplitTokensParams) => {
     const currentHeight = ethers.BigNumber.from(data.totalWithdrawals).add(data.totalRefunds)
     const totalHeight = ethers.BigNumber.from(data.totalHeight!)
     const remaining = totalHeight.sub(currentHeight)
-    const creditPerVoucher = parseUnits(fields.creditPerVoucher.toString(), FIL.decimals)
+    const creditPerTicket = parseUnits(fields.creditPerTicket.toString(), FIL.decimals)
 
-    const { data: availableTokenNumber } = await getAvailableTokenNumber({ userId: fields.userId, userCreditId: data.id })
+    const { data: availableTicketsNumber } = await getAvailableTicketsNumber({ userId: fields.userId, userCreditId: data.id })
 
-    if (availableTokenNumber < fields.splitNumber) {
-      throw new Error('Not enough available vouchers')
+    if (availableTicketsNumber < fields.splitNumber) {
+      throw new Error('Not enough available tickets')
     }
 
-    if (creditPerVoucher.lt(MIN_CREDIT_PER_VOUCHER)) {
-      throw new Error('Credit per voucher is too low')
+    if (creditPerTicket.lt(MIN_CREDIT_PER_TICKET)) {
+      throw new Error('Credit per ticket is too low')
     }
 
-    if (creditPerVoucher.gt(remaining)) {
-      throw new Error('Credit per voucher cannot exceed available credits')
+    if (creditPerTicket.gt(remaining)) {
+      throw new Error('Credit per ticket cannot exceed available credits')
     }
 
-    if (ethers.BigNumber.from(fields.splitNumber).mul(creditPerVoucher).gt(remaining)) {
+    if (ethers.BigNumber.from(fields.splitNumber).mul(creditPerTicket).gt(remaining)) {
       throw new Error('Total credits exceed available credits')
     }
 
@@ -75,12 +75,12 @@ export const splitTokens = async (props: SplitTokensParams) => {
       },
     })
 
-    const creditPerVoucherAmount = parseUnits(fields.creditPerVoucher.toString(), fil.decimals)
+    const creditPerTicketAmount = parseUnits(fields.creditPerTicket.toString(), fil.decimals)
 
     const splits = Array(fields.splitNumber)
       .fill(null)
       .map((_, index) => {
-        const splitHeight = creditPerVoucherAmount
+        const splitHeight = creditPerTicketAmount
           .mul(index + 1)
           .add(currentHeight)
           .toString()
@@ -90,7 +90,7 @@ export const splitTokens = async (props: SplitTokensParams) => {
         return {
           splitGroupId: splitGroup.id,
           height: splitHeight,
-          amount: creditPerVoucherAmount.toString(),
+          amount: creditPerTicketAmount.toString(),
           publicId,
           token: sign(
             {
@@ -98,14 +98,14 @@ export const splitTokens = async (props: SplitTokensParams) => {
               jti: publicId,
               exp: expirationDateTime,
               iat: issuedAt,
-              voucher_type: 'filpass',
-              voucher_version: '1',
+              ticket_type: 'filpass',
+              ticket_version: '1',
               funder: data.contract.deployedFromAddress,
               sub: data.contract.address,
               aud: data.storageProvider.walletAddress,
-              voucher_lane: 0,
+              ticket_lane: 0,
               lane_total_amount: remaining.toString(),
-              lane_guaranteed_amount: creditPerVoucherAmount.toString(),
+              lane_guaranteed_amount: creditPerTicketAmount.toString(),
               lane_guaranteed_until: data.withdrawExpiresAt?.getTime(),
             },
             process.env.PRIVATE_KEY as string,
@@ -117,13 +117,13 @@ export const splitTokens = async (props: SplitTokensParams) => {
         }
       })
 
-    const splitCredits = await prisma.creditToken.createMany({
+    const splitTickets = await prisma.creditTicket.createMany({
       data: splits,
     })
 
-    return splitCredits
+    return splitTickets
   } catch (error) {
-    logger.error('Error splitting tokens', error)
+    logger.error('Error splitting tickets', error)
     throw error
   }
 }

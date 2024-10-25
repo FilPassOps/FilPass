@@ -326,8 +326,8 @@ model WithdrawTransaction {
   userCredit      UserCredit        @relation(fields: [userCreditId], references: [id])
   amount          String            @map("amount")
   userCreditId    Int               @map("user_credit_id")
-  creditTokenId   Int               @unique @map("credit_token_id")
-  creditToken     CreditToken       @relation(fields: [creditTokenId], references: [id])
+  creditTicketId  Int               @unique @map("credit_ticket_id")
+  creditTicket    CreditTicket      @relation(fields: [creditTicketId], references: [id])
   failReason      String?           @map("fail_reason")
   confirmations   Int               @default(0) @map("confirmations")
   blockNumber     String            @default("0") @map("block_number")
@@ -368,7 +368,7 @@ model SplitGroup {
   id           Int           @id @default(autoincrement())
   userCreditId Int           @map("user_credit_id")
   userCredit   UserCredit    @relation(fields: [userCreditId], references: [id])
-  creditTokens CreditToken[]
+  creditTickets CreditTicket[]
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @updatedAt @map("updated_at")
 
@@ -376,7 +376,7 @@ model SplitGroup {
   @@map("split_group")
 }
 
-model CreditToken {
+model CreditTicket {
   id                  Int                  @id @default(autoincrement())
   publicId            String?              @unique() @map("public_id")
   height              String               @map("height")
@@ -394,7 +394,7 @@ model CreditToken {
   @@index([publicId])
   @@index([redeemable])
   @@index([valid])
-  @@map("credit_token")
+  @@map("credit_ticket")
 }
 
 model Ledger {

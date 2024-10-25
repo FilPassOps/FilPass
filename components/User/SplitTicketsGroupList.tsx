@@ -1,14 +1,14 @@
 import { LinkButton } from 'components/Shared/Button'
 import Timestamp from 'components/Shared/Timestamp'
 import { DateTime } from 'luxon'
-import { SplitTokenGroup } from 'pages/transfer-credits/[id]'
+import { SplitTicketGroup } from 'pages/transfer-credits/[id]'
 
-interface SplitTokenGroupListProps {
-  splitGroup: SplitTokenGroup[]
+interface SplitTicketsGroupListProps {
+  splitGroup: SplitTicketGroup[]
   userCreditId: number
 }
 
-export const SplitTokenGroupList = ({ splitGroup, userCreditId }: SplitTokenGroupListProps) => {
+export const SplitTicketsGroupList = ({ splitGroup, userCreditId }: SplitTicketsGroupListProps) => {
   return (
     <div>
       {splitGroup.length > 0 ? (
@@ -17,8 +17,8 @@ export const SplitTokenGroupList = ({ splitGroup, userCreditId }: SplitTokenGrou
             <div key={split.splitGroup} className="border-b pb-4 last:border-b-0">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-semibold text-deep-koamaru">Split Voucher Group {index + 1}</h3>
-                  <p className=" text-deep-koamaru">{split.totalTokens} vouchers</p>
+                  <h3 className="font-semibold text-deep-koamaru">Split Tickets Group {index + 1}</h3>
+                  <p className=" text-deep-koamaru">{split.totalTickets} tickets</p>
                   <Timestamp date={split.createdAt.toString()} format={DateTime.DATETIME_SHORT} />
                 </div>
                 <LinkButton
@@ -33,7 +33,7 @@ export const SplitTokenGroupList = ({ splitGroup, userCreditId }: SplitTokenGrou
           ))}
         </div>
       ) : (
-        <p className="text-gray-600">No voucher groups yet.</p>
+        <p className="text-gray-600">No ticket groups yet.</p>
       )}
     </div>
   )

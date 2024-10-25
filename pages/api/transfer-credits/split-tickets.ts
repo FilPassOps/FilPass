@@ -1,4 +1,4 @@
-import { splitTokens } from 'domain/transfer-credits/split-tokens'
+import { splitTickets } from 'domain/transfer-credits/split-tickets'
 import { newHandler, NextApiRequestWithSession, withMethods, withUser, withValidation } from 'lib/middleware'
 import yup from 'lib/yup'
 import { NextApiResponse } from 'next'
@@ -6,7 +6,7 @@ import { NextApiResponse } from 'next'
 const requestSchema = yup.object({
   userCreditId: yup.string().required(),
   splitNumber: yup.number().required(),
-  creditPerVoucher: yup.number().required(),
+  creditPerTicket: yup.number().required(),
 })
 
 interface Request extends NextApiRequestWithSession {
@@ -21,11 +21,11 @@ async function handler(req: Request, res: NextApiResponse) {
   }
 
   try {
-    const result = await splitTokens({
+    const result = await splitTickets({
       id: Number(req.body.userCreditId),
       splitNumber: req.body.splitNumber,
       userId: user.id,
-      creditPerVoucher: req.body.creditPerVoucher,
+      creditPerTicket: req.body.creditPerTicket,
     })
     return res.status(200).json(result)
   } catch (error: any) {

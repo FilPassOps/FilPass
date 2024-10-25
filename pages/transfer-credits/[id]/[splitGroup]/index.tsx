@@ -5,34 +5,34 @@ import { ReactElement } from 'react'
 import { AppConfig } from 'config/system'
 import { getUserCreditById } from 'domain/transfer-credits/get-user-credit-by-id'
 import { Divider } from 'components/Shared/Divider'
-import { TokenList } from 'components/User/TokenList'
 import { Layout } from 'components/Layout'
 import { UserCreditDetails } from '..'
-import { getTokensBySplitGroupId } from 'domain/transfer-credits/get-tokens-by-split-group-id'
 import { getItemsPerPage, PaginationWrapper } from 'components/Shared/PaginationWrapper'
 import Timestamp from 'components/Shared/Timestamp'
 import { DateTime } from 'luxon'
 import { ethers } from 'ethers'
+import { TicketList } from 'components/User/TicketList'
+import { getTicketsBySplitGroupId } from 'domain/transfer-credits/get-tickets-by-split-group-id'
 
-export interface CreditToken {
+export interface CreditTicket {
   id: number
   height: string
   token: string
   redeemable: boolean
 }
 
-interface TokenSplitGroupDetailsProps {
+interface TicketSplitGroupDetailsProps {
   data: {
     userCreditDetails: UserCreditDetails
-    splitTokensGroup: CreditToken[]
+    splitTicketsGroup: CreditTicket[]
   }
   totalItems: number
   totalRedeemedInvalid: number
   pageSize: number
 }
 
-const TokenSplitGroupDetails = ({ data, totalItems, totalRedeemedInvalid, pageSize }: TokenSplitGroupDetailsProps) => {
-  const { userCreditDetails, splitTokensGroup } = data
+const TicketSplitGroupDetails = ({ data, totalItems, totalRedeemedInvalid, pageSize }: TicketSplitGroupDetailsProps) => {
+  const { userCreditDetails, splitTicketsGroup } = data
 
   const currentHeight = ethers.BigNumber.from(userCreditDetails.totalWithdrawals).add(userCreditDetails.totalRefunds)
 
@@ -98,9 +98,9 @@ const TokenSplitGroupDetails = ({ data, totalItems, totalRedeemedInvalid, pageSi
 
         <div className="">
           <Divider className="my-8" />
-          <h2 className="text-2xl font-semibold text-deep-koamaru mb-4">Vouchers</h2>
+          <h2 className="text-2xl font-semibold text-deep-koamaru mb-4">Tickets</h2>
           <PaginationWrapper totalItems={totalItems} pageSize={pageSize}>
-            <TokenList isOpen={true} creditTokens={splitTokensGroup} currentHeight={currentHeight} />
+            <TicketList isOpen={true} creditTickets={splitTicketsGroup} currentHeight={currentHeight} />
           </PaginationWrapper>
         </div>
         <Divider className="my-8" />
@@ -114,10 +114,10 @@ const TokenSplitGroupDetails = ({ data, totalItems, totalRedeemedInvalid, pageSi
   )
 }
 
-export default TokenSplitGroupDetails
+export default TicketSplitGroupDetails
 
-TokenSplitGroupDetails.getLayout = function getLayout(page: ReactElement) {
-  return <Layout title="Voucher Group Details">{page}</Layout>
+TicketSplitGroupDetails.getLayout = function getLayout(page: ReactElement) {
+  return <Layout title="Ticket Group Details">{page}</Layout>
 }
 
 export const getServerSideProps = withUserSSR(async ({ params, user, query }: any) => {
@@ -128,7 +128,7 @@ export const getServerSideProps = withUserSSR(async ({ params, user, query }: an
 
   const userCreditDetails = data ? JSON.parse(JSON.stringify(data)) : null
 
-  const { data: splitTokensGroup } = await getTokensBySplitGroupId({
+  const { data: splitTicketsGroup } = await getTicketsBySplitGroupId({
     splitGroupId: params.splitGroup,
     userId: user.id,
     userCreditId: params.id,
@@ -140,10 +140,10 @@ export const getServerSideProps = withUserSSR(async ({ params, user, query }: an
     props: {
       data: {
         userCreditDetails,
-        splitTokensGroup: JSON.parse(JSON.stringify(splitTokensGroup.splitTokens)),
+        splitTicketsGroup: JSON.parse(JSON.stringify(splitTicketsGroup.splitTickets)),
       },
-      totalItems: splitTokensGroup?.total ?? 0,
-      totalRedeemedInvalid: splitTokensGroup?.totalRedeemedInvalid ?? 0,
+      totalItems: splitTicketsGroup?.total ?? 0,
+      totalRedeemedInvalid: splitTicketsGroup?.totalRedeemedInvalid ?? 0,
       pageSize: pageSize,
     },
   }

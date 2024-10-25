@@ -1,13 +1,13 @@
 import prisma from 'lib/prisma'
-import { getSplitTokensGroupByUserCreditIdValidator } from './validation'
+import { getSplitTicketsGroupByUserCreditIdValidator } from './validation'
 
-interface GetSplitTokensGroupByUserCreditIdParams {
+interface GetSplitTicketsGroupByUserCreditIdParams {
   userCreditId: number
 }
 
-export const getSplitTokensGroupByUserCreditId = async (props: GetSplitTokensGroupByUserCreditIdParams) => {
+export const getSplitTicketsGroupByUserCreditId = async (props: GetSplitTicketsGroupByUserCreditIdParams) => {
   try {
-    const fields = await getSplitTokensGroupByUserCreditIdValidator.validate(props)
+    const fields = await getSplitTicketsGroupByUserCreditIdValidator.validate(props)
 
     const groups = await prisma.splitGroup.findMany({
       where: {
@@ -15,20 +15,20 @@ export const getSplitTokensGroupByUserCreditId = async (props: GetSplitTokensGro
       },
       include: {
         _count: {
-          select: { creditTokens: true },
+          select: { creditTickets: true },
         },
       },
     })
 
     const formattedResult = groups.map(group => ({
       splitGroup: group.id,
-      totalTokens: group._count.creditTokens,
+      totalTickets: group._count.creditTickets,
       createdAt: group.createdAt,
     }))
 
     return { data: formattedResult }
   } catch (error) {
-    console.error('Error getting split tokens group', error)
+    console.error('Error getting split tickets group', error)
     return { error: 'Something went wrong' }
   }
 }

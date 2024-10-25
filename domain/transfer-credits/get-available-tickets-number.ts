@@ -1,16 +1,16 @@
 import prisma from 'lib/prisma'
-import { getAvailableTokenNumberValidator } from './validation'
+import { getAvailableTicketsNumberValidator } from './validation'
 
-interface GetAvailableTokenNumberProps {
+interface GetAvailableTicketsNumberProps {
   userId: number
   userCreditId: number
 }
 
-export async function getAvailableTokenNumber(props: GetAvailableTokenNumberProps) {
+export async function getAvailableTicketsNumber(props: GetAvailableTicketsNumberProps) {
   try {
-    const { userId, userCreditId } = await getAvailableTokenNumberValidator.validate(props)
+    const { userId, userCreditId } = await getAvailableTicketsNumberValidator.validate(props)
 
-    const total = await prisma.creditToken.count({
+    const total = await prisma.creditTicket.count({
       where: {
         splitGroup: {
           userCredit: {
@@ -21,7 +21,7 @@ export async function getAvailableTokenNumber(props: GetAvailableTokenNumberProp
       },
     })
 
-    const totalRedeemedInvalid = await prisma.creditToken.count({
+    const totalRedeemedInvalid = await prisma.creditTicket.count({
       where: {
         splitGroup: {
           userCredit: {
@@ -33,13 +33,13 @@ export async function getAvailableTokenNumber(props: GetAvailableTokenNumberProp
       },
     })
 
-    const availableTokenNumber = process.env.NEXT_PUBLIC_MAX_SPLITS
+    const availableTicketsNumber = process.env.NEXT_PUBLIC_MAX_SPLITS
       ? parseInt(process.env.NEXT_PUBLIC_MAX_SPLITS) - (total - totalRedeemedInvalid)
       : 0
 
-    return { data: availableTokenNumber }
+    return { data: availableTicketsNumber }
   } catch (error) {
-    console.error('Error fetching available token number:', error)
+    console.error('Error fetching available tickets number:', error)
     throw error
   }
 }

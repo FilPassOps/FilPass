@@ -1,7 +1,7 @@
 import prisma from 'lib/prisma'
-import { getSplitTokensBySplitGroupIdValidator } from './validation'
+import { getTicketsBySplitGroupIdValidator } from './validation'
 
-interface GetTokensBySplitGroupIdProps {
+interface GetTicketsBySplitGroupIdProps {
   splitGroupId: number
   userId: number
   userCreditId: string
@@ -9,12 +9,12 @@ interface GetTokensBySplitGroupIdProps {
   page: number
 }
 
-export async function getTokensBySplitGroupId(props: GetTokensBySplitGroupIdProps) {
+export async function getTicketsBySplitGroupId(props: GetTicketsBySplitGroupIdProps) {
   try {
-    const { splitGroupId, userId, userCreditId, pageSize, page } = await getSplitTokensBySplitGroupIdValidator.validate(props)
+    const { splitGroupId, userId, userCreditId, pageSize, page } = await getTicketsBySplitGroupIdValidator.validate(props)
     const currentPage = page - 1 < 0 ? 0 : page - 1
 
-    const splitTokens = await prisma.creditToken.findMany({
+    const splitTickets = await prisma.creditTicket.findMany({
       where: {
         splitGroup: {
           id: splitGroupId,
@@ -31,7 +31,7 @@ export async function getTokensBySplitGroupId(props: GetTokensBySplitGroupIdProp
       },
     })
 
-    const total = await prisma.creditToken.count({
+    const total = await prisma.creditTicket.count({
       where: {
         splitGroup: {
           id: splitGroupId,
@@ -43,7 +43,7 @@ export async function getTokensBySplitGroupId(props: GetTokensBySplitGroupIdProp
       },
     })
 
-    const totalRedeemedInvalid = await prisma.creditToken.count({
+    const totalRedeemedInvalid = await prisma.creditTicket.count({
       where: {
         splitGroup: {
           id: splitGroupId,
@@ -56,9 +56,9 @@ export async function getTokensBySplitGroupId(props: GetTokensBySplitGroupIdProp
       },
     })
 
-    return { data: { splitTokens, total, totalRedeemedInvalid } }
+    return { data: { splitTickets, total, totalRedeemedInvalid } }
   } catch (error) {
-    console.error('Error fetching split tokens by split group:', error)
+    console.error('Error fetching split tickets by split group:', error)
     throw error
   }
 }
