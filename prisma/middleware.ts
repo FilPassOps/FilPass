@@ -1,4 +1,4 @@
-import { decryptPII } from 'lib/emissary-crypto'
+import { decryptPII } from 'lib/crypto'
 
 interface DecryptUserParams {
   email: string

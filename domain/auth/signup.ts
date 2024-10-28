@@ -1,4 +1,4 @@
-import { encryptPII } from 'lib/emissary-crypto'
+import { encryptPII } from 'lib/crypto'
 import { generateEmailHash, generatePasswordHash } from 'lib/password'
 import prisma, { newPrismaTransaction } from 'lib/prisma'
 import { validate } from 'lib/yup'

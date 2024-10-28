@@ -1,5 +1,4 @@
 import { Tooltip } from 'components/Layout/Tooltip'
-import { DeleteWalletAddressModal } from 'components/TransferRequest/TransferRequestForm/DeleteWalletAddressModal'
 import { LoadingIndicator } from 'components/Shared/LoadingIndicator'
 import { WalletAddress } from 'components/Shared/WalletAddress'
 import { WarningPopup } from 'components/Shared/WarningPopup'
@@ -7,6 +6,7 @@ import { api } from 'lib/api'
 import { classNames } from 'lib/class-names'
 import { useState } from 'react'
 import errorsMessages from 'wordings-and-errors/errors-messages'
+import { DeleteWalletAddressModal } from './Modal/DeleteWalletAddressModal'
 
 interface Wallet {
   id: number

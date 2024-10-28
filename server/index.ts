@@ -21,7 +21,6 @@ app.prepare().then(() => {
   })
 
   import('jobs/index')
-  import('./multiforwarder-event-listener')
 })
 
 function handleExit(signal: string) {
