@@ -1,5 +1,5 @@
 import { Prisma as PrismaClient } from '@prisma/client'
-import { decryptPII } from 'lib/emissary-crypto'
+import { decryptPII } from 'lib/crypto'
 import prisma from 'lib/prisma'
 import { validate } from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'

@@ -2,9 +2,6 @@
 CREATE TYPE "Role" AS ENUM ('USER', 'SUPERADMIN', 'ADDRESS_MANAGER', 'VIEWER');
 
 -- CreateEnum
-CREATE TYPE "FileType" AS ENUM ('ATTACHMENT');
-
--- CreateEnum
 CREATE TYPE "TransactionStatus" AS ENUM ('PENDING', 'SUCCESS', 'FAILED');
 
 -- CreateEnum
@@ -39,37 +36,6 @@ CREATE TABLE "user_role" (
     "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "user_role_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "user_file" (
-    "id" SERIAL NOT NULL,
-    "public_id" TEXT,
-    "user_id" INTEGER NOT NULL,
-    "uploader_id" INTEGER,
-    "key" TEXT NOT NULL,
-    "filename" TEXT NOT NULL,
-    "type" "FileType" NOT NULL,
-    "is_active" BOOLEAN NOT NULL DEFAULT true,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "user_file_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "temporary_file" (
-    "id" SERIAL NOT NULL,
-    "public_id" TEXT,
-    "uploader_id" INTEGER,
-    "key" TEXT NOT NULL,
-    "filename" TEXT NOT NULL,
-    "type" "FileType" NOT NULL,
-    "is_active" BOOLEAN NOT NULL DEFAULT true,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "temporary_file_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -330,24 +296,6 @@ CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 CREATE INDEX "user_emailHash_idx" ON "user"("emailHash");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "user_file_public_id_key" ON "user_file"("public_id");
-
--- CreateIndex
-CREATE INDEX "user_file_public_id_idx" ON "user_file"("public_id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "user_file_id_key_key" ON "user_file"("id", "key");
-
--- CreateIndex
-CREATE UNIQUE INDEX "temporary_file_public_id_key" ON "temporary_file"("public_id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "temporary_file_key_key" ON "temporary_file"("key");
-
--- CreateIndex
-CREATE INDEX "temporary_file_public_id_idx" ON "temporary_file"("public_id");
-
--- CreateIndex
 CREATE INDEX "user_wallet_address_idx" ON "user_wallet"("address");
 
 -- CreateIndex
@@ -466,15 +414,6 @@ ALTER TABLE "user" ADD CONSTRAINT "user_ban_actioned_by_id_fkey" FOREIGN KEY ("b
 
 -- AddForeignKey
 ALTER TABLE "user_role" ADD CONSTRAINT "user_role_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "user_file" ADD CONSTRAINT "user_file_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "user_file" ADD CONSTRAINT "user_file_uploader_id_fkey" FOREIGN KEY ("uploader_id") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "temporary_file" ADD CONSTRAINT "temporary_file_uploader_id_fkey" FOREIGN KEY ("uploader_id") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "user_wallet" ADD CONSTRAINT "user_wallet_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
