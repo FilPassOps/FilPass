@@ -1,4 +1,4 @@
-import { LedgerType, Prisma, TransactionStatus } from '@prisma/client'
+import { CreditTicketStatus, LedgerType, Prisma, TransactionStatus } from '@prisma/client'
 import { AppConfig } from 'config/system'
 import { ethers } from 'ethers'
 import prisma from 'lib/prisma'
@@ -117,6 +117,20 @@ export default async function run() {
                   totalRefunds,
                   amount: '0',
                   totalHeight: totalHeight.toString(),
+                },
+              })
+
+              // TODO: check if delete it
+
+              await tx.creditTicket.updateMany({
+                where: {
+                  ticketGroup: {
+                    userCreditId: txUserCredit.id,
+                  },
+                  status: CreditTicketStatus.VALID,
+                },
+                data: {
+                  status: CreditTicketStatus.REFUNDED,
                 },
               })
             },

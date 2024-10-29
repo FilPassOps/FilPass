@@ -13,30 +13,34 @@ import { DateTime } from 'luxon'
 import { ethers } from 'ethers'
 import { TicketList } from 'components/User/TicketList'
 import { getTicketsByTicketGroupId } from 'domain/transfer-credits/get-tickets-by-group-id'
+import { CreditTicketStatus } from '@prisma/client'
 
 export interface CreditTicket {
   id: number
   height: string
   token: string
-  redeemable: boolean
+  status: CreditTicketStatus
 }
 
 interface TicketGroupDetailsProps {
   data: {
     userCreditDetails: UserCreditDetails
     ticketGroup: CreditTicket[]
+    expired: boolean
+    expiresAt: string
+    createdAt: string
   }
   totalItems: number
-  totalRedeemedInvalid: number
+  totalRedeemed: number
   pageSize: number
 }
 
-const TicketGroupDetails = ({ data, totalItems, totalRedeemedInvalid, pageSize }: TicketGroupDetailsProps) => {
-  const { userCreditDetails, ticketGroup } = data
+const TicketGroupDetails = ({ data, totalItems, totalRedeemed, pageSize }: TicketGroupDetailsProps) => {
+  const { userCreditDetails, ticketGroup, expired, expiresAt, createdAt } = data
 
   const currentHeight = ethers.BigNumber.from(userCreditDetails.totalWithdrawals).add(userCreditDetails.totalRefunds)
 
-  const totalInFlight = totalItems - totalRedeemedInvalid
+  const totalInFlight = totalItems - totalRedeemed
 
   return (
     <>
@@ -83,15 +87,28 @@ const TicketGroupDetails = ({ data, totalItems, totalRedeemedInvalid, pageSize }
 
           <h2 className="text-2xl font-semibold text-deep-koamaru mb-4">Group Details</h2>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-1">
-              <p className="text-gray-600 font-semibold">In Flight:</p>
-              <p className=" text-deep-koamaru">{totalInFlight}</p>
-            </div>
+          <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-1">
+                <p className="text-gray-600 font-semibold">In Flight:</p>
+                <p className=" text-deep-koamaru">{totalInFlight}</p>
+              </div>
 
-            <div className="col-span-1">
-              <p className="text-gray-600 font-semibold">Redeemed/Invalid:</p>
-              <p className=" text-deep-koamaru">{totalRedeemedInvalid}</p>
+              <div className="col-span-1">
+                <p className="text-gray-600 font-semibold">Redeemed:</p>
+                <p className=" text-deep-koamaru">{totalRedeemed}</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-1">
+                <p className="text-gray-600 font-semibold">Created At:</p>
+                <Timestamp date={createdAt} format={DateTime.DATETIME_SHORT_WITH_SECONDS} />
+              </div>
+
+              <div className="col-span-1">
+                <p className="text-gray-600 font-semibold">Expires At:</p>
+                <Timestamp date={expiresAt} format={DateTime.DATETIME_SHORT_WITH_SECONDS} />
+              </div>
             </div>
           </div>
         </div>
@@ -100,7 +117,7 @@ const TicketGroupDetails = ({ data, totalItems, totalRedeemedInvalid, pageSize }
           <Divider className="my-8" />
           <h2 className="text-2xl font-semibold text-deep-koamaru mb-4">Tickets</h2>
           <PaginationWrapper totalItems={totalItems} pageSize={pageSize}>
-            <TicketList isOpen={true} creditTickets={ticketGroup} currentHeight={currentHeight} />
+            <TicketList isOpen={true} creditTickets={ticketGroup} expired={expired} currentHeight={currentHeight} />
           </PaginationWrapper>
         </div>
         <Divider className="my-8" />
@@ -141,9 +158,12 @@ export const getServerSideProps = withUserSSR(async ({ params, user, query }: an
       data: {
         userCreditDetails,
         ticketGroup: JSON.parse(JSON.stringify(ticketGroup.creditTickets)),
+        expired: ticketGroup.expired,
+        expiresAt: JSON.parse(JSON.stringify(ticketGroup.expiresAt)),
+        createdAt: JSON.parse(JSON.stringify(ticketGroup.createdAt)),
       },
       totalItems: ticketGroup?.total ?? 0,
-      totalRedeemedInvalid: ticketGroup?.totalRedeemedInvalid ?? 0,
+      totalRedeemed: ticketGroup?.totalRedeemed ?? 0,
       pageSize: pageSize,
     },
   }

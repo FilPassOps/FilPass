@@ -1,5 +1,6 @@
 import prisma from 'lib/prisma'
 import { getTicketsByTicketGroupIdValidator } from './validation'
+import { CreditTicketStatus } from '@prisma/client'
 
 interface GetTicketsByTicketGroupIdProps {
   ticketGroupId: number
@@ -13,6 +14,12 @@ export async function getTicketsByTicketGroupId(props: GetTicketsByTicketGroupId
   try {
     const { ticketGroupId, userId, userCreditId, pageSize, page } = await getTicketsByTicketGroupIdValidator.validate(props)
     const currentPage = page - 1 < 0 ? 0 : page - 1
+
+    const group = await prisma.ticketGroup.findUnique({
+      where: {
+        id: ticketGroupId,
+      },
+    })
 
     const creditTickets = await prisma.creditTicket.findMany({
       where: {
@@ -43,7 +50,7 @@ export async function getTicketsByTicketGroupId(props: GetTicketsByTicketGroupId
       },
     })
 
-    const totalRedeemedInvalid = await prisma.creditTicket.count({
+    const totalRedeemed = await prisma.creditTicket.count({
       where: {
         ticketGroup: {
           id: ticketGroupId,
@@ -52,11 +59,13 @@ export async function getTicketsByTicketGroupId(props: GetTicketsByTicketGroupId
             id: userCreditId,
           },
         },
-        OR: [{ redeemable: false }, { valid: false }],
+        status: CreditTicketStatus.REDEEMED,
       },
     })
 
-    return { data: { creditTickets, total, totalRedeemedInvalid } }
+    return {
+      data: { creditTickets, total, totalRedeemed, expired: group?.expired, expiresAt: group?.expiresAt, createdAt: group?.createdAt },
+    }
   } catch (error) {
     console.error('Error fetching tickets by ticket group:', error)
     throw error

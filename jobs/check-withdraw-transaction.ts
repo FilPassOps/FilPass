@@ -1,4 +1,4 @@
-import { LedgerType, Prisma, TransactionStatus } from '@prisma/client'
+import { CreditTicketStatus, LedgerType, Prisma, TransactionStatus } from '@prisma/client'
 import { AppConfig } from 'config/system'
 import { ethers } from 'ethers'
 import prisma from 'lib/prisma'
@@ -90,7 +90,7 @@ export default async function run() {
                   },
                 },
                 where: {
-                  redeemable: true,
+                  status: CreditTicketStatus.VALID,
                   id: creditTicket.id,
                 },
               })
@@ -132,7 +132,7 @@ export default async function run() {
                   id: txCreditTicket.id,
                 },
                 data: {
-                  redeemable: false,
+                  status: CreditTicketStatus.REDEEMED,
                 },
               })
 
@@ -140,10 +140,10 @@ export default async function run() {
                 where: {
                   id: { lt: txCreditTicket.id },
                   ticketGroupId: txCreditTicket.ticketGroupId,
-                  redeemable: true,
+                  status: CreditTicketStatus.VALID,
                 },
                 data: {
-                  valid: false,
+                   status: CreditTicketStatus.INVALID,
                 },
               })
 

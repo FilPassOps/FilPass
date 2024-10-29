@@ -1,5 +1,5 @@
 import { MAX_INTEGER_VALUE } from 'domain/constants'
-import { BigNumber, ethers } from 'ethers'
+import { BigNumber } from 'ethers'
 import yup from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import * as Yup from 'yup'
@@ -90,6 +90,11 @@ export const createTicketsValidator = (currentCredits: BigNumber, availableTicke
       const { splitNumber, creditPerTicket } = values
       if (!splitNumber || !creditPerTicket) return true // Skip validation if either value is missing
       const totalCredits = parseUnits(creditPerTicket.toString(), FIL.decimals).mul(splitNumber)
-      return totalCredits.lte(currentCredits)
+      if (totalCredits.lte(currentCredits)) return true
+
+      return this.createError({
+        path: 'creditPerTicket',
+        message: 'Total credits exceed available credits',
+      })
     })
 }

@@ -1,5 +1,6 @@
 import prisma from 'lib/prisma'
 import { getAvailableTicketsNumberValidator } from './validation'
+import { CreditTicketStatus } from '@prisma/client'
 
 interface GetAvailableTicketsNumberProps {
   userId: number
@@ -10,7 +11,7 @@ export async function getAvailableTicketsNumber(props: GetAvailableTicketsNumber
   try {
     const { userId, userCreditId } = await getAvailableTicketsNumberValidator.validate(props)
 
-    const total = await prisma.creditTicket.count({
+    const totalValid = await prisma.creditTicket.count({
       where: {
         ticketGroup: {
           userCredit: {
@@ -18,23 +19,12 @@ export async function getAvailableTicketsNumber(props: GetAvailableTicketsNumber
             id: userCreditId,
           },
         },
-      },
-    })
-
-    const totalRedeemedInvalid = await prisma.creditTicket.count({
-      where: {
-        ticketGroup: {
-          userCredit: {
-            userId: userId,
-            id: userCreditId,
-          },
-        },
-        OR: [{ redeemable: false }, { valid: false }],
+        status: CreditTicketStatus.VALID,
       },
     })
 
     const availableTicketsNumber = process.env.NEXT_PUBLIC_MAX_TICKETS
-      ? parseInt(process.env.NEXT_PUBLIC_MAX_TICKETS) - (total - totalRedeemedInvalid)
+      ? parseInt(process.env.NEXT_PUBLIC_MAX_TICKETS) - totalValid
       : 0
 
     return { data: availableTicketsNumber }

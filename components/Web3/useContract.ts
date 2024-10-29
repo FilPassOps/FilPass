@@ -87,7 +87,6 @@ export const useContract = (contractAddress: string | null) => {
       setBusy(true)
       const factory = new FilecoinDepositWithdrawRefundFactory(signer)
       const contract = await factory.deploy()
-      console.log('Contract deployed to:', contract.address)
       return contract
     } catch (error: any) {
       console.error('Error deploying contract', error)
