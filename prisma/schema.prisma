@@ -26,6 +26,14 @@ enum LedgerType {
   REFUND
 }
 
+enum CreditTicketStatus {
+  REFUNDED
+  EXPIRED
+  REDEEMED
+  VALID
+  INVALID
+}
+
 model User {
   id                  Int                  @id @default(autoincrement())
   email               String               @unique
@@ -323,12 +331,14 @@ model UserCredit {
 }
 
 model TicketGroup {
-  id           Int           @id @default(autoincrement())
-  userCreditId Int           @map("user_credit_id")
-  userCredit   UserCredit    @relation(fields: [userCreditId], references: [id])
+  id            Int            @id @default(autoincrement())
+  userCreditId  Int            @map("user_credit_id")
+  userCredit    UserCredit     @relation(fields: [userCreditId], references: [id])
   creditTickets CreditTicket[]
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
+  expiresAt     DateTime?      @map("expires_at")
+  expired       Boolean        @default(false) @map("expired")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
 
   @@index([userCreditId])
   @@map("ticket_group")
@@ -340,18 +350,16 @@ model CreditTicket {
   height              String               @map("height")
   amount              String               @map("amount")
   token               String               @map("token")
-  redeemable          Boolean              @default(true) @map("redeemable")
-  valid               Boolean              @default(true) @map("valid")
   createdAt           DateTime             @default(now()) @map("created_at")
   updatedAt           DateTime             @updatedAt @map("updated_at")
   ticketGroup         TicketGroup          @relation(fields: [ticketGroupId], references: [id])
   ticketGroupId       Int                  @map("ticket_group_id")
   withdrawTransaction WithdrawTransaction?
+  status              CreditTicketStatus   @default(VALID) @map("status")
 
   @@index([ticketGroupId])
   @@index([publicId])
-  @@index([redeemable])
-  @@index([valid])
+  @@index([status])
   @@map("credit_ticket")
 }
 

@@ -20,12 +20,13 @@ import { getAvailableTicketsNumber } from 'domain/transfer-credits/get-available
 import { CreateTicketsModal } from 'components/User/Modal/CreateTicketsModal'
 import { TicketGroupList } from 'components/User/TicketGroupList'
 import { ErrorAlert } from 'components/User/Alerts'
+import { CreditTicketStatus } from '@prisma/client'
 
 export interface CreditTicket {
   id: number
   height: string
   token: string
-  redeemable: boolean
+  status: CreditTicketStatus
 }
 
 interface CreditTransaction {

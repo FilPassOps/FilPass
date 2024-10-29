@@ -7,6 +7,9 @@ CREATE TYPE "TransactionStatus" AS ENUM ('PENDING', 'SUCCESS', 'FAILED');
 -- CreateEnum
 CREATE TYPE "LedgerType" AS ENUM ('DEPOSIT', 'WITHDRAWAL', 'REFUND');
 
+-- CreateEnum
+CREATE TYPE "CreditTicketStatus" AS ENUM ('REFUNDED', 'EXPIRED', 'REDEEMED', 'VALID', 'INVALID');
+
 -- CreateTable
 CREATE TABLE "user" (
     "id" SERIAL NOT NULL,
@@ -256,6 +259,8 @@ CREATE TABLE "user_credit" (
 CREATE TABLE "ticket_group" (
     "id" SERIAL NOT NULL,
     "user_credit_id" INTEGER NOT NULL,
+    "expires_at" TIMESTAMP(3),
+    "expired" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -269,11 +274,10 @@ CREATE TABLE "credit_ticket" (
     "height" TEXT NOT NULL,
     "amount" TEXT NOT NULL,
     "token" TEXT NOT NULL,
-    "redeemable" BOOLEAN NOT NULL DEFAULT true,
-    "valid" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "ticket_group_id" INTEGER NOT NULL,
+    "status" "CreditTicketStatus" NOT NULL DEFAULT 'VALID',
 
     CONSTRAINT "credit_ticket_pkey" PRIMARY KEY ("id")
 );
@@ -401,10 +405,7 @@ CREATE INDEX "credit_ticket_ticket_group_id_idx" ON "credit_ticket"("ticket_grou
 CREATE INDEX "credit_ticket_public_id_idx" ON "credit_ticket"("public_id");
 
 -- CreateIndex
-CREATE INDEX "credit_ticket_redeemable_idx" ON "credit_ticket"("redeemable");
-
--- CreateIndex
-CREATE INDEX "credit_ticket_valid_idx" ON "credit_ticket"("valid");
+CREATE INDEX "credit_ticket_status_idx" ON "credit_ticket"("status");
 
 -- CreateIndex
 CREATE INDEX "ledger_user_credit_id_idx" ON "ledger"("user_credit_id");

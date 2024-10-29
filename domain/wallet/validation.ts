@@ -15,3 +15,9 @@ export const setDefaultValidator = yup
     token: yup.string().required(),
   })
   .required()
+
+export const getWalletsByUserIdValidator = yup
+  .object({
+    userId: yup.number().integer().positive().max(MAX_INTEGER_VALUE).typeError(errorsMessages.required_field.message).required(),
+  })
+  .required()

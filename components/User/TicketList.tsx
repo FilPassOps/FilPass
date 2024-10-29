@@ -1,4 +1,5 @@
 import { ClipboardIcon } from '@heroicons/react/24/outline'
+import { CreditTicketStatus } from '@prisma/client'
 import { Button } from 'components/Shared/Button'
 import { Cell, Header, Table, TableBody, TableHead } from 'components/Shared/Table'
 import { AppConfig } from 'config/system'
@@ -8,11 +9,12 @@ import { CreditTicket } from 'pages/transfer-credits/[id]'
 
 interface TicketListProps {
   creditTickets: CreditTicket[]
+  expired: boolean
   currentHeight: BigNumber
   isOpen: boolean
 }
 
-export const TicketList = ({ creditTickets, currentHeight, isOpen }: TicketListProps) => {
+export const TicketList = ({ creditTickets, currentHeight, isOpen, expired }: TicketListProps) => {
   const fil = AppConfig.network.getTokenBySymbolAndBlockchainName('tFIL', 'Filecoin')
 
   const copyToClipboard = (text: string) => {
@@ -21,14 +23,14 @@ export const TicketList = ({ creditTickets, currentHeight, isOpen }: TicketListP
 
   return (
     <div className={`${isOpen ? 'block' : 'hidden'} py-3 md:p-3`}>
-      <Table>
+      <Table style={{ display: 'table' }}>
         <TableHead>
           <tr>
-            <Header style={{ minWidth: 100, width: 100 }}>No</Header>
-            <Header style={{ minWidth: 250 }}>Exchanged so far</Header>
-            <Header style={{ minWidth: 250 }}>Current Amount</Header>
-            <Header style={{ minWidth: 200 }}>Status</Header>
-            <Header style={{ minWidth: 200 }}>JSON Token</Header>
+            <Header style={{ width: '10%' }}>No</Header>
+            <Header style={{ width: '25%' }}>Exchanged so far</Header>
+            <Header style={{ width: '25%' }}>Current Amount</Header>
+            <Header style={{ width: '20%' }}>Status</Header>
+            <Header style={{ width: '20%' }}>JSON Token</Header>
           </tr>
         </TableHead>
         <TableBody>
@@ -44,7 +46,7 @@ export const TicketList = ({ creditTickets, currentHeight, isOpen }: TicketListP
                 <Cell>{parsedTicketHeight}</Cell>
                 <Cell>{parsedCurrentAmount}</Cell>
                 <Cell>
-                  <TicketStatus ticketHeight={ticketHeight} redeemable={ticketItem.redeemable} currentHeight={currentHeight} />
+                  <TicketStatus ticketHeight={ticketHeight} status={ticketItem.status} expired={expired} currentHeight={currentHeight} />
                 </Cell>
                 <Cell>
                   <div className="flex items-center justify-end gap-2">
@@ -64,14 +66,17 @@ export const TicketList = ({ creditTickets, currentHeight, isOpen }: TicketListP
 }
 
 interface TicketStatusProps {
-  redeemable: boolean
+  status: CreditTicketStatus
+  expired: boolean
   ticketHeight: BigNumber
   currentHeight: BigNumber
 }
 
-export const TicketStatus = ({ redeemable, ticketHeight, currentHeight }: TicketStatusProps) => {
-  if (!redeemable) {
-    return <span className={`text-gray-500 bg-gray-500/10 py-1 px-2 rounded-full w-fit h-fit`}>Redeemed</span>
+export const TicketStatus = ({ status, ticketHeight, currentHeight }: TicketStatusProps) => {
+  if (status === CreditTicketStatus.EXPIRED) {
+    return <span className={`text-gray-500 bg-gray-500/10 py-1 px-2 rounded-full w-fit h-fit`}>Expired</span>
+  } else if (status === CreditTicketStatus.REFUNDED) {
+    return <span className={`text-gray-500 bg-gray-500/10 py-1 px-2 rounded-full w-fit h-fit`}>Refunded</span>
   } else if (ticketHeight.lte(currentHeight)) {
     return <span className={`text-red-500 bg-red-500/10 py-1 px-2 rounded-full w-fit h-fit`}>Insufficient</span>
   } else {
