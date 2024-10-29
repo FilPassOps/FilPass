@@ -1,5 +1,6 @@
 import prisma from 'lib/prisma'
 import { getPendingContractTransactionValidator } from './validation'
+import { TransactionStatus } from '@prisma/client'
 
 interface GetPendingContractTransactionsProps {
   userId: number
@@ -11,7 +12,7 @@ export async function getPendingContractTransactions({ userId }: GetPendingContr
   const pendingTransactions = await prisma.deployContractTransaction.findMany({
     where: {
       userId: fields.userId,
-      status: 'PENDING',
+      status: TransactionStatus.PENDING,
     },
   })
 

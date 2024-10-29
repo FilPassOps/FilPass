@@ -64,7 +64,9 @@ export const CreateTicketsModal = ({
     clearErrors()
     onModalClosed()
 
-    router.reload()
+    if (success) {
+      router.reload()
+    }
   }
 
   return (
@@ -87,7 +89,7 @@ export const CreateTicketsModal = ({
           })}
         />
         <div className="flex space-x-3">
-          <Button variant="outline" onClick={onModalClosed}>
+          <Button variant="outline" onClick={handleCloseModal}>
             Cancel
           </Button>
           <Button type="submit" disabled={isSubmitting} loading={isSubmitting}>

@@ -66,12 +66,14 @@ export const createTickets = async (props: CreateTicketsParams) => {
       throw new Error('Total credits exceed available credits')
     }
 
+    // TODO: check to set it at a fixed time
     const expirationDateTime = new Date(data.withdrawExpiresAt.getTime() - ONE_HOUR_TIME).getTime()
     const issuedAt = Math.floor(Date.now() / 1000)
 
     const ticketGroup = await prisma.ticketGroup.create({
       data: {
         userCreditId: data.id,
+        expiresAt: data.withdrawExpiresAt,
       },
     })
 

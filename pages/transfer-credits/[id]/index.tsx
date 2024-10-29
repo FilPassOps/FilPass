@@ -13,19 +13,20 @@ import { useAlertDispatcher } from 'components/Layout/Alerts'
 import { ethers } from 'ethers'
 import { formatUnits } from 'ethers/lib/utils'
 import { useContract } from 'components/Web3/useContract'
-import { ErrorAlert } from 'components/Controller/MetaMaskPayment/Alerts'
 import { getPaymentErrorMessage } from 'components/Web3/utils'
 import { WithMetaMaskButton } from 'components/Web3/MetaMaskProvider'
 import { getTicketGroupsByUserCreditId } from 'domain/transfer-credits/get-split-tickets-group-by-user-credit-id'
 import { getAvailableTicketsNumber } from 'domain/transfer-credits/get-available-tickets-number'
 import { CreateTicketsModal } from 'components/User/Modal/CreateTicketsModal'
 import { TicketGroupList } from 'components/User/TicketGroupList'
+import { ErrorAlert } from 'components/User/Alerts'
+import { CreditTicketStatus } from '@prisma/client'
 
 export interface CreditTicket {
   id: number
   height: string
   token: string
-  redeemable: boolean
+  status: CreditTicketStatus
 }
 
 interface CreditTransaction {

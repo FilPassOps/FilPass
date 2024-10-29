@@ -2,9 +2,8 @@ import prisma from 'lib/prisma'
 import { verify } from 'lib/jwt'
 import { submitTicketValidator } from './validation'
 import { ethers } from 'ethers'
-import { TransactionStatus } from '@prisma/client'
+import { CreditTicketStatus, TransactionStatus } from '@prisma/client'
 import { FilecoinDepositWithdrawRefund__factory as FilecoinDepositWithdrawRefundFactory } from 'typechain-types'
-import { getPaymentErrorMessage } from 'components/Web3/utils'
 import { getContractsByUserId } from 'domain/contracts/get-contracts-by-user-id'
 import { AppConfig } from 'config/system'
 
@@ -56,8 +55,8 @@ export const submitTicket = async (props: SubmitTicketParams): Promise<SubmitTic
       throw new Error('Credit ticket not found', { cause: 'INVALID' })
     }
 
-    if (!creditTicket.redeemable) {
-      throw new Error('Credit ticket already redeemed', { cause: 'INVALID' })
+    if (creditTicket.status !== CreditTicketStatus.VALID) {
+      throw new Error('Credit ticket cannot be redeemed', { cause: 'INVALID' })
     }
 
     if (creditTicket.ticketGroup.userCredit.withdrawExpiresAt! < new Date()) {

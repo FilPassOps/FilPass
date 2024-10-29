@@ -4,11 +4,11 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { api } from 'lib/api'
 import { useAlertDispatcher } from 'components/Layout/Alerts'
-import { ErrorAlert, SuccessAlert } from 'components/Controller/MetaMaskPayment/Alerts'
+import { ErrorAlert, SuccessAlert } from 'components/User/Alerts'
 import { ReactElement, useState } from 'react'
 import { LinkButton } from 'components/Shared/Button'
 import { NumberInput, TextInput } from 'components/Shared/FormInput'
-import { WithMetaMaskButton } from 'components/Web3/MetaMaskProvider'
+import { useMetaMask, WithMetaMaskButton } from 'components/Web3/MetaMaskProvider'
 import { AppConfig } from 'config/system'
 import { buyTransferCreditsValidator } from 'domain/transfer-credits/validation'
 import yup from 'lib/yup'
@@ -18,8 +18,10 @@ import { getPaymentErrorMessage } from 'components/Web3/utils'
 import { DeployContractModal } from 'components/User/Modal/DeployContractModal'
 import { withUserSSR } from 'lib/ssr'
 import { getContractsByUserId } from 'domain/contracts/get-contracts-by-user-id'
-import { Contract, DeployContractTransaction } from '@prisma/client'
+import { Contract, DeployContractTransaction, UserWallet } from '@prisma/client'
 import { getPendingContractTransactions } from 'domain/contracts/get-pending-contract-transactions'
+import { getWalletsByUserId } from 'domain/wallet/get-wallets-by-user-id'
+import { validateWalletAddress } from 'lib/blockchain-utils'
 
 type FormValue = yup.InferType<typeof buyTransferCreditsValidator>
 
@@ -27,13 +29,17 @@ interface BuyCreditsProps {
   data: {
     contracts: Contract[]
     pendingContractTransactions: DeployContractTransaction[] | null
+    wallets: UserWallet[]
   }
 }
 
 const BuyCredits = ({ data }: BuyCreditsProps) => {
   const [open, setOpen] = useState(false)
+  const [contractDeployedError, setContractDeployedError] = useState<{ message: string } | undefined>(undefined)
+  const [receiverWalletError, setReceiverWalletError] = useState<{ message: string } | undefined>(undefined)
   const { dispatch, close } = useAlertDispatcher()
   const router = useRouter()
+  const { wallet } = useMetaMask()
 
   const to = router.query.to as string
 
@@ -56,17 +62,57 @@ const BuyCredits = ({ data }: BuyCreditsProps) => {
       storageProviderWallet: to || '',
     },
     shouldFocusError: true,
+    mode: 'onSubmit',
   })
 
   const handleFormSubmit = async (values: FormValue) => {
     try {
       if (!values.amount || !values.storageProviderWallet) return
 
-      if (data.contracts.length === 0) {
-        setOpen(true)
+      setReceiverWalletError(undefined)
+      setContractDeployedError(undefined)
+
+      const storageProviderWallet = validateWalletAddress(values.storageProviderWallet)
+
+      if (!storageProviderWallet) {
+        setReceiverWalletError({
+          message: `Invalid receiver wallet address.`,
+        })
         return
       }
 
+      if (hasContracts) {
+        const contract = data.contracts.find(contract => contract.deployedFromAddress === wallet)
+
+        // TODO: if multiple contract, change deploy a different contract
+        if (!contract) {
+          setContractDeployedError({
+            message: `You already have a contract deployed with ${data.contracts[0].deployedFromAddress} wallet address.`,
+          })
+          return
+        }
+
+        setContractDeployedError(undefined)
+        await handleDepositAmount(values, storageProviderWallet)
+      } else {
+        const existingWallet = data.wallets.find(dataWallet => dataWallet.address === wallet)
+
+        if (!existingWallet) {
+          setContractDeployedError({
+            message: `Your wallet is not registered. Please register your wallet on Profile & Settings page first.`,
+          })
+          return
+        }
+
+        setOpen(true)
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const handleDepositAmount = async (values: FormValue, storageProviderWallet: string) => {
+    try {
       const systemWalletAddress = process.env.NEXT_PUBLIC_SYSTEM_WALLET_ADDRESS
 
       if (!systemWalletAddress) {
@@ -87,13 +133,13 @@ const BuyCredits = ({ data }: BuyCreditsProps) => {
         return false
       }
 
-      const result = await depositAmount(systemWalletAddress, values.storageProviderWallet, 1, values.amount.toString())
+      const result = await depositAmount(systemWalletAddress, storageProviderWallet, 1, values.amount.toString())
 
       if (result) {
         await api.post('/transfer-credits', {
           hash: result.hash,
           from: result.from,
-          to: values.storageProviderWallet,
+          to: storageProviderWallet,
           amount: values.amount,
         })
 
@@ -133,11 +179,21 @@ const BuyCredits = ({ data }: BuyCreditsProps) => {
           <div className="flex flex-col gap-4 justify-between">
             <div className="flex flex-col gap-2">
               <TextInput
+                label="MetaMask Wallet"
+                id="metaMaskWallet"
+                type="text"
+                disabled={true}
+                value={wallet || '-'}
+                error={contractDeployedError}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <TextInput
                 label="Receiver Wallet"
                 id="storageProviderWallet"
                 type="text"
                 placeholder="Insert a valid address"
-                error={errors.storageProviderWallet}
+                error={errors.storageProviderWallet || receiverWalletError}
                 {...register(`storageProviderWallet`)}
               />
               <p className="text-gray-600 text-xs">Check if you are transferring to the correct receiver wallet.</p>
@@ -166,7 +222,7 @@ const BuyCredits = ({ data }: BuyCreditsProps) => {
             <div className="w-fit">
               <WithMetaMaskButton
                 targetChainId={network.chainId}
-                onClick={hasContracts ? handleSubmit(handleFormSubmit) : () => setOpen(true)}
+                onClick={handleSubmit(handleFormSubmit)}
                 connectWalletLabel={`Connect MetaMask to ${to ? 'Top Up' : 'Create Channel'}`}
                 switchChainLabel={`Switch network to ${to ? 'Top Up' : 'Create Channel'}`}
               >
@@ -201,11 +257,14 @@ export const getServerSideProps = withUserSSR(async function getServerSideProps(
 
   const pendingContractTransactions = await getPendingContractTransactions({ userId: user.id })
 
+  const { data: wallets } = await getWalletsByUserId({ userId: user.id })
+
   return {
     props: {
       data: {
         contracts: JSON.parse(JSON.stringify(data)),
-        pendingContractTransaction: pendingContractTransactions ? JSON.parse(JSON.stringify(pendingContractTransactions)) : null,
+        pendingContractTransactions: pendingContractTransactions ? JSON.parse(JSON.stringify(pendingContractTransactions)) : null,
+        wallets: JSON.parse(JSON.stringify(wallets)),
       },
     },
   }

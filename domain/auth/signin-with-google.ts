@@ -1,5 +1,5 @@
 import { Role } from '@prisma/client'
-import { encryptPII } from 'lib/emissary-crypto'
+import { encryptPII } from 'lib/crypto'
 import { generateEmailHash } from 'lib/password'
 import prisma from 'lib/prisma'
 

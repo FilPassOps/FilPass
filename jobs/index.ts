@@ -6,7 +6,7 @@ import checkBuyCreditsTransaction from './check-buy-credits-transaction'
 import checkRefundTransaction from './check-refund-transaction'
 import checkWithdrawTransaction from './check-withdraw-transaction'
 import checkDeployContractTransaction from './check-deploy-contract-transaction'
-
+import checkExpiredTicketGroups from './check-expired-ticket-groups'
 const checkBuyCreditsTransactionLimiter = new Bottleneck({
   maxConcurrent: 1,
 })
@@ -23,6 +23,10 @@ const checkDeployContractTransactionLimiter = new Bottleneck({
   maxConcurrent: 1,
 })
 
+const checkExpiredTicketGroupsLimiter = new Bottleneck({
+  maxConcurrent: 1,
+})
+
 const job = (limiter: Bottleneck, job: () => Promise<void>) => {
   return async () => {
     try {
@@ -35,6 +39,7 @@ const job = (limiter: Bottleneck, job: () => Promise<void>) => {
   }
 }
 schedule.scheduleJob('* * * * *', job(checkDeployContractTransactionLimiter, checkDeployContractTransaction))
+schedule.scheduleJob('* * * * *', job(checkExpiredTicketGroupsLimiter, checkExpiredTicketGroups))
 
 schedule.scheduleJob('* * * * *', job(checkBuyCreditsTransactionLimiter, checkBuyCreditsTransaction))
 schedule.scheduleJob('* * * * *', job(checkRefundTransactionLimiter, checkRefundTransaction))

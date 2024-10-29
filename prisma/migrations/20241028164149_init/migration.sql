@@ -2,13 +2,13 @@
 CREATE TYPE "Role" AS ENUM ('USER', 'SUPERADMIN', 'ADDRESS_MANAGER', 'VIEWER');
 
 -- CreateEnum
-CREATE TYPE "FileType" AS ENUM ('ATTACHMENT');
-
--- CreateEnum
 CREATE TYPE "TransactionStatus" AS ENUM ('PENDING', 'SUCCESS', 'FAILED');
 
 -- CreateEnum
 CREATE TYPE "LedgerType" AS ENUM ('DEPOSIT', 'WITHDRAWAL', 'REFUND');
+
+-- CreateEnum
+CREATE TYPE "CreditTicketStatus" AS ENUM ('REFUNDED', 'EXPIRED', 'REDEEMED', 'VALID', 'INVALID');
 
 -- CreateTable
 CREATE TABLE "user" (
@@ -39,37 +39,6 @@ CREATE TABLE "user_role" (
     "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "user_role_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "user_file" (
-    "id" SERIAL NOT NULL,
-    "public_id" TEXT,
-    "user_id" INTEGER NOT NULL,
-    "uploader_id" INTEGER,
-    "key" TEXT NOT NULL,
-    "filename" TEXT NOT NULL,
-    "type" "FileType" NOT NULL,
-    "is_active" BOOLEAN NOT NULL DEFAULT true,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "user_file_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "temporary_file" (
-    "id" SERIAL NOT NULL,
-    "public_id" TEXT,
-    "uploader_id" INTEGER,
-    "key" TEXT NOT NULL,
-    "filename" TEXT NOT NULL,
-    "type" "FileType" NOT NULL,
-    "is_active" BOOLEAN NOT NULL DEFAULT true,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "temporary_file_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -290,6 +259,8 @@ CREATE TABLE "user_credit" (
 CREATE TABLE "ticket_group" (
     "id" SERIAL NOT NULL,
     "user_credit_id" INTEGER NOT NULL,
+    "expires_at" TIMESTAMP(3),
+    "expired" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -303,11 +274,10 @@ CREATE TABLE "credit_ticket" (
     "height" TEXT NOT NULL,
     "amount" TEXT NOT NULL,
     "token" TEXT NOT NULL,
-    "redeemable" BOOLEAN NOT NULL DEFAULT true,
-    "valid" BOOLEAN NOT NULL DEFAULT true,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "ticket_group_id" INTEGER NOT NULL,
+    "status" "CreditTicketStatus" NOT NULL DEFAULT 'VALID',
 
     CONSTRAINT "credit_ticket_pkey" PRIMARY KEY ("id")
 );
@@ -328,24 +298,6 @@ CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
 -- CreateIndex
 CREATE INDEX "user_emailHash_idx" ON "user"("emailHash");
-
--- CreateIndex
-CREATE UNIQUE INDEX "user_file_public_id_key" ON "user_file"("public_id");
-
--- CreateIndex
-CREATE INDEX "user_file_public_id_idx" ON "user_file"("public_id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "user_file_id_key_key" ON "user_file"("id", "key");
-
--- CreateIndex
-CREATE UNIQUE INDEX "temporary_file_public_id_key" ON "temporary_file"("public_id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "temporary_file_key_key" ON "temporary_file"("key");
-
--- CreateIndex
-CREATE INDEX "temporary_file_public_id_idx" ON "temporary_file"("public_id");
 
 -- CreateIndex
 CREATE INDEX "user_wallet_address_idx" ON "user_wallet"("address");
@@ -453,10 +405,7 @@ CREATE INDEX "credit_ticket_ticket_group_id_idx" ON "credit_ticket"("ticket_grou
 CREATE INDEX "credit_ticket_public_id_idx" ON "credit_ticket"("public_id");
 
 -- CreateIndex
-CREATE INDEX "credit_ticket_redeemable_idx" ON "credit_ticket"("redeemable");
-
--- CreateIndex
-CREATE INDEX "credit_ticket_valid_idx" ON "credit_ticket"("valid");
+CREATE INDEX "credit_ticket_status_idx" ON "credit_ticket"("status");
 
 -- CreateIndex
 CREATE INDEX "ledger_user_credit_id_idx" ON "ledger"("user_credit_id");
@@ -466,15 +415,6 @@ ALTER TABLE "user" ADD CONSTRAINT "user_ban_actioned_by_id_fkey" FOREIGN KEY ("b
 
 -- AddForeignKey
 ALTER TABLE "user_role" ADD CONSTRAINT "user_role_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "user_file" ADD CONSTRAINT "user_file_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "user_file" ADD CONSTRAINT "user_file_uploader_id_fkey" FOREIGN KEY ("uploader_id") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "temporary_file" ADD CONSTRAINT "temporary_file_uploader_id_fkey" FOREIGN KEY ("uploader_id") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "user_wallet" ADD CONSTRAINT "user_wallet_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

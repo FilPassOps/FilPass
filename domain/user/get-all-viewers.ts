@@ -1,5 +1,5 @@
 import { VIEWER_ROLE } from 'domain/auth/constants'
-import { decryptPII } from 'lib/emissary-crypto'
+import { decryptPII } from 'lib/crypto'
 import prisma from 'lib/prisma'
 
 export async function getAllViewers() {

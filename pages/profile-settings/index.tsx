@@ -1,6 +1,6 @@
 import { PlusCircleIcon } from '@heroicons/react/24/solid'
 import { Layout } from 'components/Layout'
-import { WalletModal } from 'components/TransferRequest/WalletModal'
+import { WalletModal } from 'components/User/Modal/WalletModal'
 import { WalletList } from 'components/User/WalletList'
 import { Button } from 'components/Shared/Button'
 import { AppConfig } from 'config'
