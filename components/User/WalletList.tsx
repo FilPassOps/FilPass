@@ -1,14 +1,7 @@
-import { Tooltip } from 'components/Layout/Tooltip'
-import { LoadingIndicator } from 'components/Shared/LoadingIndicator'
-import { WalletAddress } from 'components/Shared/WalletAddress'
-import { WarningPopup } from 'components/Shared/WarningPopup'
-import { api } from 'lib/api'
-import { classNames } from 'lib/class-names'
 import { useState } from 'react'
-import errorsMessages from 'wordings-and-errors/errors-messages'
 import { DeleteWalletAddressModal } from './Modal/DeleteWalletAddressModal'
 
-interface Wallet {
+export interface Wallet {
   id: number
   address: string
   name: string
@@ -46,74 +39,20 @@ export const WalletList = ({ data = [], isLoading, setLoading, refresh }: Wallet
   )
 }
 
-const ListItems = ({ items, isLoading, setLoading, refresh }: ListItemsProps) => {
+const ListItems = ({ items, refresh }: ListItemsProps) => {
   const [currentWallet, setcurrentWallet] = useState<Wallet>()
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
-  const [openWarningPopup, setOpenWarningPopup] = useState(false)
-
-  const handleRemove = (wallet: Wallet) => {
-    if (wallet.isDefault) {
-      return alert(`You can't remove the wallet because it is a default wallet, please assign another default wallet to continue.`)
-    }
-    setcurrentWallet(wallet)
-    setOpenDeleteModal(true)
-  }
-
-  const handeSetDefault = async (wallet: Wallet) => {
-    setLoading(true)
-    setcurrentWallet(wallet)
-    const { error } = await api.post('/wallets/set-default', { id: wallet.id })
-    if (error) {
-      setLoading(false)
-      return alert(error.message || errorsMessages.something_went_wrong.message)
-    }
-
-    setOpenWarningPopup(true)
-    setLoading(false)
-  }
 
   return (
     <>
       {items.map((wallet, index) => {
-        const hoverMessage = wallet.isDefault ? 'The wallet is already set as default' : undefined
-
         return (
           <div key={wallet.id} className={`flex flex-col gap-1 px-3 py-4 ${index > 0 ? 'border-t border-gray-200' : ''}`}>
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-sm flex-1">
-              <>
-                <WalletAddress
-                  address={wallet.address}
-                  label={wallet.name}
-                  blockchain={wallet.blockchain.name}
-                  shortenLength="short"
-                  className="sm:hidden"
-                  enableVerifiedIcon={false}
-                />
-                <WalletAddress
-                  address={wallet.address}
-                  label={wallet.name}
-                  blockchain={wallet.blockchain.name}
-                  className="hidden sm:flex"
-                  enableVerifiedIcon={false}
-                />
-              </>
-              <div className="flex items-center">
-                <div>{isLoading && wallet.id === currentWallet?.id && <LoadingIndicator className="mr-3 text-green-600" />}</div>
-                <div className="text-sm pr-4 border-r border-gray-200">
-                  <Tooltip content={hoverMessage}>
-                    <button
-                      className={classNames(wallet.isDefault ? 'text-gray-400 pointer-events-auto' : 'text-green-700 hover:underline')}
-                      onClick={() => handeSetDefault(wallet)}
-                      disabled={wallet.isDefault || isLoading}
-                    >
-                      Set as default
-                    </button>
-                  </Tooltip>
-                </div>
-                <div className="text-sm ml-4">
-                  <button className="text-red-600 hover:underline" onClick={() => handleRemove(wallet)} disabled={isLoading}>
-                    Remove
-                  </button>
+              <div key={wallet.id} className={`flex flex-col gap-1  ${index > 0 ? 'border-t border-gray-200' : ''}`}>
+                <div className="flex flex-col items-start justify-between gap-1 text-sm flex-1">
+                  <p className="text-gray-500 text-sm">Wallet Address</p>
+                  <p>{wallet.address}</p>
                 </div>
               </div>
             </div>
@@ -129,13 +68,6 @@ const ListItems = ({ items, isLoading, setLoading, refresh }: ListItemsProps) =>
           refresh()
         }}
         wallet={currentWallet}
-      />
-
-      <WarningPopup
-        isOpen={openWarningPopup}
-        setIsOpen={() => setOpenWarningPopup(false)}
-        title="Setting default wallet"
-        message="Please check your email inbox and confirm the change"
       />
     </>
   )

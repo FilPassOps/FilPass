@@ -40,6 +40,10 @@ export interface AppConfig {
       }
       rpcUrls: readonly string[]
     }
+    getFilecoin: () => {
+      network: Chain
+      token: NativeToken | ERC20Token
+    }
   }
 }
 
@@ -71,6 +75,7 @@ export const AppConfig = {
     getTokenByTokenAddress,
     getNativeToken,
     getTokenByIdentifier,
+    getFilecoin,
   },
 } as const satisfies AppConfig
 
@@ -155,4 +160,14 @@ function getNativeToken(chain: Chain) {
   const tokens = chain.tokens
   const index = tokens.findIndex(token => !isERC20Token(token))
   return tokens[index]
+}
+
+function getFilecoin() {
+  const network = getChainByName('Filecoin')
+  const token = network.tokens.find(token => token.symbol === 'tFIL') as NativeToken
+
+  return {
+    network,
+    token,
+  }
 }

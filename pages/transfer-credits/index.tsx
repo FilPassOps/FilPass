@@ -19,6 +19,9 @@ export interface UserCreditItem {
   totalHeight: string
   totalWithdrawals: string
   totalRefunds: string
+  contract: {
+    address: string
+  }
   creditTransactions: {
     id: number
     storageProvider: {

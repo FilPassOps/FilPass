@@ -77,6 +77,8 @@ export const TicketStatus = ({ status, ticketHeight, currentHeight }: TicketStat
     return <span className={`text-gray-500 bg-gray-500/10 py-1 px-2 rounded-full w-fit h-fit`}>Expired</span>
   } else if (status === CreditTicketStatus.REFUNDED) {
     return <span className={`text-gray-500 bg-gray-500/10 py-1 px-2 rounded-full w-fit h-fit`}>Refunded</span>
+  } else if (status === CreditTicketStatus.REDEEMED) {
+    return <span className={`text-gray-500 bg-gray-500/10 py-1 px-2 rounded-full w-fit h-fit`}>Redeemed</span>
   } else if (ticketHeight.lte(currentHeight)) {
     return <span className={`text-red-500 bg-red-500/10 py-1 px-2 rounded-full w-fit h-fit`}>Insufficient</span>
   } else {

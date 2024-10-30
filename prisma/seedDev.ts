@@ -1,4 +1,3 @@
-import { Blockchain } from '@prisma/client'
 import { hash } from 'bcrypt'
 
 import { loadEnvConfig } from '@next/env'
@@ -11,11 +10,7 @@ const prisma = new PrismaClient()
 const salt = process.env.EMAIL_KEY || ''
 const password = '$2b$10$uRaqhFBl8ox3GFuZc2GE6euiv3AWKLmN8dbfPUmkSZh2P7u8km6wC' // password
 
-let blockchainList: Blockchain[] = []
-
 async function main() {
-  blockchainList = await getBlockchainValues()
-
   await Promise.all([createSuperAdmin(), createViewer()])
 
   for (let i = 0; i < 150; i++) {
@@ -35,23 +30,6 @@ async function createUser(index: number) {
     },
   })
 
-  const promises = AppConfig.network.chains.map((chain, index) => {
-    const blockchainId = blockchainList.find(blockchain => blockchain.name === chain.name)?.id
-
-    if (!blockchainId) throw new Error(`Blockchain ${chain.name} not found`)
-
-    return prisma.userWallet.create({
-      data: {
-        address: '0xe1d4a6d35d980ef93cc3be03c543edec2948c3d1',
-        userId: user.id,
-        blockchainId,
-        isDefault: index === 0,
-      },
-    })
-  })
-
-  const userWallets = await Promise.all(promises)
-
   const userRole = await prisma.userRole.create({
     data: {
       userId: user.id,
@@ -59,7 +37,7 @@ async function createUser(index: number) {
     },
   })
 
-  return { user, userRole, userWallets }
+  return { user, userRole }
 }
 
 async function createViewer() {
@@ -88,10 +66,6 @@ async function createViewer() {
   })
 
   return viewerRole
-}
-
-async function getBlockchainValues() {
-  return await prisma.blockchain.findMany({})
 }
 
 async function createSuperAdmin() {

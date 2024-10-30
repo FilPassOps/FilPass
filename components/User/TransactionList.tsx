@@ -17,7 +17,7 @@ export const TransactionList = ({ transactions }: TransactionListProps) => {
   const fil = filecoin.tokens.find(token => token.symbol === 'tFIL')!
 
   return (
-    <div className="flex flex-col relative py-4">
+    <div className="flex flex-col relative py-4 overflow-x-auto">
       <Table style={{ display: 'table' }}>
         <TableHead>
           <tr>

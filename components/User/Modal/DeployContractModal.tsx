@@ -11,20 +11,29 @@ import { getPaymentErrorMessage } from 'components/Web3/utils'
 import { CheckIcon, ExclamationTriangleIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { DeployContractTransaction } from '@prisma/client'
 import { Button } from 'components/Shared/Button'
+import { TextInput } from 'components/Shared/FormInput'
+import { Wallet } from '../WalletList'
 
-const token = AppConfig.network.getTokenBySymbolAndBlockchainName('tFIL', 'Filecoin')
-const network = AppConfig.network.getChainByToken(token)!
+const { network } = AppConfig.network.getFilecoin()
 
 interface DeployContractModalProps {
   onModalClosed: () => void
   open: boolean
   contractAddress: string | null
   pendingContractTransactions: DeployContractTransaction[] | null
+  wallets: Wallet[] | null
 }
 
-export const DeployContractModal = ({ onModalClosed, open, contractAddress, pendingContractTransactions }: DeployContractModalProps) => {
+export const DeployContractModal = ({
+  onModalClosed,
+  open,
+  contractAddress,
+  pendingContractTransactions,
+  wallets,
+}: DeployContractModalProps) => {
   const [error, setError] = useState<any>()
   const [success, setSuccess] = useState<boolean>(false)
+  const [contractDeployedError, setContractDeployedError] = useState<{ message: string } | null>(null)
   const [transactionHash, setTransactionHash] = useState<string | null>(null)
   const { deployContract } = useContract(contractAddress)
   const { wallet } = useMetaMask()
@@ -34,14 +43,21 @@ export const DeployContractModal = ({ onModalClosed, open, contractAddress, pend
 
   const handleFormSubmit = async () => {
     try {
+      const existingWallet = wallets?.find(wallet => wallet.address === wallet.address)
+
+      if (!existingWallet) {
+        setContractDeployedError({
+          message: `Your wallet is not registered. Please register your wallet on Wallet Settings first.`,
+        })
+        return
+      }
+
       const contract = await deployContract()
 
-      const result = await api.post('/contracts/deploy', {
+      await api.post('/contracts/deploy', {
         walletAddress: wallet,
         hash: contract.deployTransaction.hash,
       })
-
-      console.log(result)
 
       setTransactionHash(contract.deployTransaction.hash)
 
@@ -55,7 +71,10 @@ export const DeployContractModal = ({ onModalClosed, open, contractAddress, pend
     setError(null)
     setSuccess(false)
     onModalClosed()
-    router.reload()
+
+    if (success) {
+      router.reload()
+    }
   }
 
   return (
@@ -67,7 +86,7 @@ export const DeployContractModal = ({ onModalClosed, open, contractAddress, pend
         (pendingTransaction ? (
           <PendingTransactionContent transactionHash={pendingTransaction.transactionHash} onClose={handleCloseModal} />
         ) : (
-          <DeployContractContent onDeploy={handleFormSubmit} />
+          <DeployContractContent onDeploy={handleFormSubmit} wallet={wallet || ''} contractDeployedError={contractDeployedError} />
         ))}
     </Modal>
   )
@@ -117,18 +136,31 @@ const PendingTransactionContent: React.FC<{ transactionHash: string; onClose: ()
   </div>
 )
 
-const DeployContractContent: React.FC<{ onDeploy: () => Promise<void> }> = ({ onDeploy }) => (
-  <div className="space-y-9 text-center">
-    <h2 className="text-gray-900 text-lg font-medium">Deploy Your Contract</h2>
-    <p className="text-gray-500 text-sm">
-      To start using the platform, first you need to deploy your contract. Remember to carefully select your MetaMask wallet before
+const DeployContractContent: React.FC<{
+  onDeploy: () => Promise<void>
+  wallet: string | null
+  contractDeployedError: { message: string } | null
+}> = ({ onDeploy, wallet, contractDeployedError }) => (
+  <div className="w-full h-full flex flex-col justify-center items-center space-y-6 sm:px-11">
+    <p className="font-medium text-lg text-gray-900 text-center">Deploy Your Contract</p>
+    <p className="text-gray-500 text-sm text-center">
+      To start using the platform, first you need to deploy your contract. Remember to carefully select your wallet on MetaMask before
       deploying the contract.
     </p>
-    <div className="flex space-x-3 items-center justify-center">
+
+    <form className="w-full h-full space-y-8">
+      <TextInput
+        label="MetaMask Wallet"
+        id="metaMaskWallet"
+        type="text"
+        disabled={true}
+        value={wallet || '-'}
+        error={contractDeployedError}
+      />
       <WithMetaMaskButton targetChainId={network.chainId} onClick={onDeploy}>
         Deploy Contract
       </WithMetaMaskButton>
-    </div>
+    </form>
   </div>
 )
 

@@ -32,6 +32,11 @@ export const getUserCredits = async (props: GetUserCreditsParams) => {
         withdrawExpiresAt: true,
         withdrawStartsAt: true,
         amount: true,
+        contract: {
+          select: {
+            address: true,
+          },
+        },
         creditTransactions: {
           select: {
             id: true,
