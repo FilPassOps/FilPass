@@ -18,6 +18,9 @@ export const getTicketGroupsByUserCreditId = async (props: GetTicketGroupsByUser
           select: { creditTickets: true },
         },
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
     })
 
     const formattedResult = groups.map(group => ({

@@ -15,7 +15,6 @@ import yup from 'lib/yup'
 import { useRouter } from 'next/router'
 import { useContract } from 'components/Web3/useContract'
 import { getPaymentErrorMessage } from 'components/Web3/utils'
-import { DeployContractModal } from 'components/User/Modal/DeployContractModal'
 import { withUserSSR } from 'lib/ssr'
 import { getContractsByUserId } from 'domain/contracts/get-contracts-by-user-id'
 import { Contract, DeployContractTransaction, UserWallet } from '@prisma/client'
@@ -34,17 +33,15 @@ interface BuyCreditsProps {
 }
 
 const BuyCredits = ({ data }: BuyCreditsProps) => {
-  const [open, setOpen] = useState(false)
-  const [contractDeployedError, setContractDeployedError] = useState<{ message: string } | undefined>(undefined)
   const [receiverWalletError, setReceiverWalletError] = useState<{ message: string } | undefined>(undefined)
+  const [metamaskWalletError, setMetamaskWalletError] = useState<{ message: string } | undefined>(undefined)
   const { dispatch, close } = useAlertDispatcher()
   const router = useRouter()
   const { wallet } = useMetaMask()
 
   const to = router.query.to as string
 
-  const token = AppConfig.network.getTokenBySymbolAndBlockchainName('tFIL', 'Filecoin')
-  const network = AppConfig.network.getChainByToken(token)!
+  const { network } = AppConfig.network.getFilecoin()
 
   const hasContracts = data.contracts?.length > 0
 
@@ -70,7 +67,6 @@ const BuyCredits = ({ data }: BuyCreditsProps) => {
       if (!values.amount || !values.storageProviderWallet) return
 
       setReceiverWalletError(undefined)
-      setContractDeployedError(undefined)
 
       const storageProviderWallet = validateWalletAddress(values.storageProviderWallet)
 
@@ -86,25 +82,25 @@ const BuyCredits = ({ data }: BuyCreditsProps) => {
 
         // TODO: if multiple contract, change deploy a different contract
         if (!contract) {
-          setContractDeployedError({
-            message: `You already have a contract deployed with ${data.contracts[0].deployedFromAddress} wallet address.`,
+          setMetamaskWalletError({
+            message: `Your contract is not deployed with this wallet address.`,
           })
           return
         }
 
-        setContractDeployedError(undefined)
+        setMetamaskWalletError(undefined)
         await handleDepositAmount(values, storageProviderWallet)
       } else {
         const existingWallet = data.wallets.find(dataWallet => dataWallet.address === wallet)
 
         if (!existingWallet) {
-          setContractDeployedError({
-            message: `Your wallet is not registered. Please register your wallet on Profile & Settings page first.`,
+          setMetamaskWalletError({
+            message: `Your wallet is not registered. Please register your wallet on Wallet Settings first.`,
           })
           return
         }
 
-        setOpen(true)
+        setMetamaskWalletError(undefined)
       }
     } catch (error) {
       console.error(error)
@@ -184,7 +180,7 @@ const BuyCredits = ({ data }: BuyCreditsProps) => {
                 type="text"
                 disabled={true}
                 value={wallet || '-'}
-                error={contractDeployedError}
+                error={metamaskWalletError}
               />
             </div>
             <div className="flex flex-col gap-2">
@@ -232,12 +228,6 @@ const BuyCredits = ({ data }: BuyCreditsProps) => {
           </div>
         </form>
       </div>
-      <DeployContractModal
-        open={open}
-        onModalClosed={() => setOpen(false)}
-        contractAddress={data.contracts[0]?.address}
-        pendingContractTransactions={data.pendingContractTransactions}
-      />
     </div>
   )
 }

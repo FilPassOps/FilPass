@@ -55,12 +55,12 @@ export const submitTicket = async (props: SubmitTicketParams): Promise<SubmitTic
       throw new Error('Credit ticket not found', { cause: 'INVALID' })
     }
 
-    if (creditTicket.status !== CreditTicketStatus.VALID) {
-      throw new Error('Credit ticket cannot be redeemed', { cause: 'INVALID' })
+    if (creditTicket.ticketGroup.expiresAt! < new Date() || creditTicket.ticketGroup.userCredit.withdrawExpiresAt! < new Date()) {
+      throw new Error('Withdrawal expired', { cause: 'INVALID' })
     }
 
-    if (creditTicket.ticketGroup.userCredit.withdrawExpiresAt! < new Date()) {
-      throw new Error('Withdrawal expired', { cause: 'INVALID' })
+    if (creditTicket.status !== CreditTicketStatus.VALID) {
+      throw new Error('Credit ticket cannot be redeemed', { cause: 'INVALID' })
     }
 
     const { data: contracts, error: contractsError } = await getContractsByUserId({

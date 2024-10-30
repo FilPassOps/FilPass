@@ -60,9 +60,14 @@ export const TransferCreditList = ({ userCreditItems }: TransferCreditListProps)
                         )}...${item.creditTransactions[0].storageProvider.walletAddress.slice(-5)}`
                       : item.creditTransactions[0].storageProvider.walletAddress}
                   </h2>
+
                   <div>
-                    <p className="text-gray-600">Current Credits:</p>
-                    <p className="text-xl font-bold text-deep-koamaru">{parsedCurrentHeight} Credits</p>
+                    <p className="text-gray-600 font-semibold">Contract:</p>
+                    <p className="text-deep-koamaru">{item.contract.address}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-600 font-semibold">Current Credits:</p>
+                    <p className="text-deep-koamaru">{parsedCurrentHeight} Credits</p>
                   </div>
                 </div>
                 <div className="flex flex-col gap-2">
