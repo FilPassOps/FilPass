@@ -14,6 +14,7 @@ import { Divider } from 'components/Shared/Divider'
 import { DeployContractModal } from 'components/User/Modal/DeployContractModal'
 import { getContractsByUserId } from 'domain/contracts/get-contracts-by-user-id'
 import { ContractList } from 'components/User/ContractList'
+import { getPendingContractTransactions } from 'domain/contracts/get-pending-contract-transactions'
 
 interface UserSettingsProps {
   data: any
@@ -75,15 +76,27 @@ export default function UserSettings({ data }: UserSettingsProps) {
                 variant="primary"
                 className="flex justify-center items-center space-x-2 text-white text-sm w-max"
                 onClick={() => setOpenDeployContractModal(true)}
-                disabled={hasDeployedContract}
-                toolTipText={hasDeployedContract ? 'You already have a contract deployed' : ''}
+                disabled={hasDeployedContract || data.pendingContractTransactions.length > 0}
+                toolTipText={
+                  hasDeployedContract
+                    ? 'You already have a contract deployed'
+                    : data.pendingContractTransactions.length > 0
+                    ? 'Your contract deployment is in progress'
+                    : ''
+                }
               >
                 <PlusCircleIcon className="h-5 w-5 mr-2" />
                 Deploy Contract
               </Button>
             </div>
             <div className="w-full lg:w-2/3">
-              <ContractList data={data.contracts} isLoading={isLoading} setLoading={setIsLoading} refresh={refresh} />
+              <ContractList
+                data={data.contracts}
+                isLoading={isLoading}
+                setLoading={setIsLoading}
+                refresh={refresh}
+                deployContractTransaction={data.pendingContractTransactions[0]}
+              />
             </div>
           </div>
         </div>
@@ -103,7 +116,6 @@ export default function UserSettings({ data }: UserSettingsProps) {
         open={openDeployContractModal}
         onModalClosed={() => setOpenDeployContractModal(false)}
         contractAddress={data.contracts[0]?.address}
-        pendingContractTransactions={data.pendingContractTransactions}
         wallets={data.user.wallets}
       />
     </>
@@ -123,11 +135,14 @@ export const getServerSideProps = withUserSSR(async function getServerSideProps(
 
   const { data: contracts } = await getContractsByUserId({ userId: user.id })
 
+  const { data: pendingContractTransactions } = await getPendingContractTransactions({ userId: user.id })
+
   return {
     props: {
       data: {
         user: JSON.parse(JSON.stringify(data)),
         contracts: JSON.parse(JSON.stringify(contracts)),
+        pendingContractTransactions: JSON.parse(JSON.stringify(pendingContractTransactions)),
       },
     },
   }

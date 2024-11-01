@@ -3,8 +3,11 @@ import { BigNumber } from 'ethers'
 import yup from 'lib/yup'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 import * as Yup from 'yup'
-import { FIL, MIN_CREDIT_PER_TICKET } from './constants'
+import { MIN_CREDIT_PER_TICKET } from './constants'
 import { parseUnits } from 'ethers/lib/utils'
+import { AppConfig } from 'config/system'
+
+const { token } = AppConfig.network.getFilecoin()
 
 export const getUserTransactionCreditsByUserIdValidator = yup.object({
   userId: yup.number().required(),
@@ -76,10 +79,10 @@ export const createTicketsValidator = (currentCredits: BigNumber, availableTicke
         .required('Credit per ticket is required')
         .positive('Credit per ticket must be positive')
         .test('min-credit-per-ticket', 'Credit per ticket is too low', function (value) {
-          return parseUnits(value.toString(), FIL.decimals).gte(MIN_CREDIT_PER_TICKET)
+          return parseUnits(value.toString(), token.decimals).gte(MIN_CREDIT_PER_TICKET)
         })
         .test('max-credit-per-ticket', 'Credit per ticket cannot exceed available credits', function (value) {
-          return parseUnits(value.toString(), FIL.decimals).lte(currentCredits)
+          return parseUnits(value.toString(), token.decimals).lte(currentCredits)
         })
         .test('precision-check', 'Too many decimal places', function (value) {
           const parts = value.toString().split('.')
@@ -89,7 +92,7 @@ export const createTicketsValidator = (currentCredits: BigNumber, availableTicke
     .test('total-credits', 'Total credits exceed available credits', function (values) {
       const { splitNumber, creditPerTicket } = values
       if (!splitNumber || !creditPerTicket) return true // Skip validation if either value is missing
-      const totalCredits = parseUnits(creditPerTicket.toString(), FIL.decimals).mul(splitNumber)
+      const totalCredits = parseUnits(creditPerTicket.toString(), token.decimals).mul(splitNumber)
       if (totalCredits.lte(currentCredits)) return true
 
       return this.createError({

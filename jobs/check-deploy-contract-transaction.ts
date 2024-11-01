@@ -3,11 +3,10 @@ import { AppConfig } from 'config/system'
 import { ethers } from 'ethers'
 import prisma from 'lib/prisma'
 
-const chain = AppConfig.network.getChainByName('Filecoin')
+const { network } = AppConfig.network.getFilecoin()
 
 export default async function run() {
   try {
-    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000) // 15 minutes ago
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000) // 24 hours ago
 
     const pendingTransactions = await prisma.deployContractTransaction.findMany({
@@ -15,7 +14,6 @@ export default async function run() {
         status: TransactionStatus.PENDING,
         createdAt: {
           gte: twentyFourHoursAgo,
-          // lte: fifteenMinutesAgo,
         },
       },
       select: {
@@ -32,7 +30,7 @@ export default async function run() {
       return
     }
 
-    const provider = new ethers.providers.JsonRpcProvider(chain.rpcUrls[0])
+    const provider = new ethers.providers.JsonRpcProvider(network.rpcUrls[0])
 
     for await (const { transactionHash, id, userId, walletAddress } of pendingTransactions) {
       if (!transactionHash) {
