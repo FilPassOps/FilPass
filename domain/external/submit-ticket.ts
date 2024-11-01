@@ -6,6 +6,7 @@ import { CreditTicketStatus, TransactionStatus } from '@prisma/client'
 import { FilecoinDepositWithdrawRefund__factory as FilecoinDepositWithdrawRefundFactory } from 'typechain-types'
 import { getContractsByUserId } from 'domain/contracts/get-contracts-by-user-id'
 import { AppConfig } from 'config/system'
+import { getPaymentErrorMessage } from 'components/Web3/utils'
 
 interface SubmitTicketParams {
   token: string
@@ -85,9 +86,9 @@ export const submitTicket = async (props: SubmitTicketParams): Promise<SubmitTic
 
     const wallet = new ethers.Wallet(process.env.SYSTEM_WALLET_PRIVATE_KEY as string, provider)
 
-    const filpass = new ethers.Contract(contracts[0].address, FilecoinDepositWithdrawRefundFactory.abi, wallet)
+    const filpass = FilecoinDepositWithdrawRefundFactory.connect(contracts[0].address, wallet)
 
-    const transaction = await filpass.withdrawAmount(storageProvider.walletAddress, tokenAmount.toString())
+    const transaction = await filpass.withdrawAmount(result.data)
 
     await prisma.withdrawTransaction.create({
       data: {
@@ -101,6 +102,7 @@ export const submitTicket = async (props: SubmitTicketParams): Promise<SubmitTic
 
     return { message: 'Success' }
   } catch (error) {
+    console.log('error', getPaymentErrorMessage(error))
     if (error instanceof Error && error.cause === 'INVALID') {
       return { error: error.message }
     }
