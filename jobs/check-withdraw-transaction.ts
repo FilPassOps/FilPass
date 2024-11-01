@@ -7,12 +7,10 @@ import { FilecoinDepositWithdrawRefund__factory as FilecoinDepositWithdrawRefund
 const contractInterface = FilecoinDepositWithdrawRefundFactory.createInterface()
 const withdrawMadeEvent = contractInterface.getEvent('WithdrawalMade')
 
-const chain = AppConfig.network.getChainByName('Filecoin')
-const filDecimals = chain.tokens.find(t => t.symbol === 'tFIL')?.decimals
+const { network, token } = AppConfig.network.getFilecoin()
 
 export default async function run() {
   try {
-    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000) // 15 minutes ago
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000) // 24 hours ago
 
     const pendingTransactions = await prisma.withdrawTransaction.findMany({
@@ -20,7 +18,6 @@ export default async function run() {
         status: TransactionStatus.PENDING,
         createdAt: {
           gte: twentyFourHoursAgo,
-          // lte: fifteenMinutesAgo,
         },
       },
       select: {
@@ -51,12 +48,12 @@ export default async function run() {
       return
     }
 
-    if (!filDecimals) {
+    if (!token.decimals) {
       console.error('FIL decimals not found')
       return
     }
 
-    const provider = new ethers.providers.JsonRpcProvider(chain.rpcUrls[0])
+    const provider = new ethers.providers.JsonRpcProvider(network.rpcUrls[0])
 
     // TODO: check if transaction is pending
 

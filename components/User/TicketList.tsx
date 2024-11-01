@@ -1,4 +1,4 @@
-import { ClipboardIcon } from '@heroicons/react/24/outline'
+import { ClipboardIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline'
 import { CreditTicketStatus } from '@prisma/client'
 import { Button } from 'components/Shared/Button'
 import { Cell, Header, Table, TableBody, TableHead } from 'components/Shared/Table'
@@ -15,14 +15,48 @@ interface TicketListProps {
 }
 
 export const TicketList = ({ creditTickets, currentHeight, isOpen, expired }: TicketListProps) => {
-  const fil = AppConfig.network.getTokenBySymbolAndBlockchainName('tFIL', 'Filecoin')
+  const { token } = AppConfig.network.getFilecoin()
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
   }
 
+  const downloadTickets = () => {
+    try {
+      const ticketsData = creditTickets.map(({ id, token, height, status }) => ({
+        id,
+        token,
+        height,
+        status,
+      }))
+
+      const blob = new Blob([JSON.stringify(ticketsData, null, 2)], {
+        type: 'application/json;charset=utf-8',
+      })
+
+      const url = URL.createObjectURL(blob)
+
+      try {
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `tickets-${new Date().toISOString().split('T')[0]}.json`
+        link.click()
+      } finally {
+        URL.revokeObjectURL(url)
+      }
+    } catch (error) {
+      console.error('Failed to download tickets:', error)
+    }
+  }
+
   return (
-    <div className={`${isOpen ? 'block' : 'hidden'} py-3 md:p-3`}>
+    <div className={`${isOpen ? 'block' : 'hidden'} py-3 md:p-3 overflow-x-auto`}>
+      <div className="flex justify-end mb-4">
+        <Button variant="secondary" onClick={downloadTickets} className="flex items-center gap-2">
+          <ArrowDownTrayIcon className="h-4 w-4" />
+          <p>Download Tickets</p>
+        </Button>
+      </div>
       <Table style={{ display: 'table' }}>
         <TableHead>
           <tr>
@@ -38,8 +72,8 @@ export const TicketList = ({ creditTickets, currentHeight, isOpen, expired }: Ti
             const ticketHeight = ethers.BigNumber.from(ticketItem.height)
             const heightDiff = ticketHeight.sub(currentHeight)
             const currentAmount = heightDiff.gt(0) ? heightDiff : ethers.BigNumber.from(0)
-            const parsedTicketHeight = formatUnits(ticketHeight, fil.decimals)
-            const parsedCurrentAmount = formatUnits(currentAmount, fil.decimals)
+            const parsedTicketHeight = formatUnits(ticketHeight, token.decimals)
+            const parsedCurrentAmount = formatUnits(currentAmount, token.decimals)
             return (
               <tr key={ticketItem.id}>
                 <Cell>{`#${ticketItem.id}`}</Cell>
@@ -77,6 +111,8 @@ export const TicketStatus = ({ status, ticketHeight, currentHeight }: TicketStat
     return <span className={`text-gray-500 bg-gray-500/10 py-1 px-2 rounded-full w-fit h-fit`}>Expired</span>
   } else if (status === CreditTicketStatus.REFUNDED) {
     return <span className={`text-gray-500 bg-gray-500/10 py-1 px-2 rounded-full w-fit h-fit`}>Refunded</span>
+  } else if (status === CreditTicketStatus.REDEEMED) {
+    return <span className={`text-gray-500 bg-gray-500/10 py-1 px-2 rounded-full w-fit h-fit`}>Redeemed</span>
   } else if (ticketHeight.lte(currentHeight)) {
     return <span className={`text-red-500 bg-red-500/10 py-1 px-2 rounded-full w-fit h-fit`}>Insufficient</span>
   } else {

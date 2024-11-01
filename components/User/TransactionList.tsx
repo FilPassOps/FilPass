@@ -13,11 +13,10 @@ interface TransactionListProps {
 }
 
 export const TransactionList = ({ transactions }: TransactionListProps) => {
-  const filecoin = AppConfig.network.getChainByName('Filecoin')
-  const fil = filecoin.tokens.find(token => token.symbol === 'tFIL')!
+  const { token, network } = AppConfig.network.getFilecoin()
 
   return (
-    <div className="flex flex-col relative py-4">
+    <div className="flex flex-col relative py-4 overflow-x-auto">
       <Table style={{ display: 'table' }}>
         <TableHead>
           <tr>
@@ -32,7 +31,7 @@ export const TransactionList = ({ transactions }: TransactionListProps) => {
         </TableHead>
         <TableBody>
           {transactions.map(transaction => {
-            const amount = formatUnits(transaction.amount, fil.decimals!)
+            const amount = formatUnits(transaction.amount, token.decimals!)
             return (
               <tr key={transaction.id + transaction.type}>
                 <Cell className="break-all">
@@ -58,8 +57,8 @@ export const TransactionList = ({ transactions }: TransactionListProps) => {
                 </Cell>
                 <Cell className="break-all">
                   <BlockExplorerLink
-                    blockExplorerName={filecoin.blockExplorer.name}
-                    blockExplorerUrl={filecoin.blockExplorer.url}
+                    blockExplorerName={network.blockExplorer.name}
+                    blockExplorerUrl={network.blockExplorer.url}
                     transactionHash={transaction.transaction_hash}
                   />
                 </Cell>

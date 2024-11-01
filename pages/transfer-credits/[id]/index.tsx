@@ -79,8 +79,7 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
   const [createTicketsModalOpen, setCreateTicketsModalOpen] = useState(false)
   const [isRefundLoading, setIsRefundLoading] = useState(false)
 
-  const token = AppConfig.network.getTokenBySymbolAndBlockchainName('tFIL', 'Filecoin')
-  const network = AppConfig.network.getChainByToken(token)!
+  const { token, network } = AppConfig.network.getFilecoin()
 
   const isWithdrawExpired = new Date(userCreditDetails.withdrawExpiresAt) < new Date()
   const isRefundStarted = new Date(userCreditDetails.refundStartsAt) < new Date()
@@ -206,19 +205,19 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
               </div>
             </div>
 
-            <div className="mt-4 sm:mt-0 text-sm text-gray-500">
-              <div className="flex sm:justify-end">
-                <dt>Credits Locked Until: </dt>
-                <dd>
+            <div className="mt-4 sm:mt-0 text-gray-500 flex items-end flex-col">
+              <div className="flex flex-col sm:justify-end text-end">
+                <dt className="text-gray-900 font-medium">Credits Locked Until:</dt>
+                <dd className="text-sm text-gray-500">
                   <Timestamp
                     date={new Date(userCreditDetails.withdrawExpiresAt).toISOString()}
                     format={DateTime.DATETIME_SHORT_WITH_SECONDS}
                   />
                 </dd>
               </div>
-              <div className="flex sm:justify-end">
-                <dt>Refund Starts on: </dt>
-                <dd>
+              <div className="flex flex-col sm:justify-end text-end">
+                <dt className="text-gray-900 font-medium">Refund Starts on:</dt>
+                <dd className="text-sm text-gray-500">
                   <Timestamp
                     date={new Date(userCreditDetails.refundStartsAt).toISOString()}
                     format={DateTime.DATETIME_SHORT_WITH_SECONDS}

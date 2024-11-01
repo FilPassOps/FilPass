@@ -18,9 +18,9 @@ export const buyCredits = async (props: BuyCreditsParams) => {
   try {
     const fields = await saveTransferCreditsValidator.validate(props)
 
-    const fil = AppConfig.network.getTokenBySymbolAndBlockchainName('tFIL', 'Filecoin')
+    const { token } = AppConfig.network.getFilecoin()
 
-    if (!fil) {
+    if (!token) {
       throw new Error('FIL token not found')
     }
 
@@ -61,7 +61,7 @@ export const buyCredits = async (props: BuyCreditsParams) => {
       },
     })
 
-    const amount = parseUnits(fields.amount, fil.decimals).toString()
+    const amount = parseUnits(fields.amount, token.decimals).toString()
 
     // TODO: encrypt amount and other important info
     await prisma.$transaction(async tx => {

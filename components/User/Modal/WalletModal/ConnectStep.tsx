@@ -82,7 +82,6 @@ export function ConnectStep({ onBackClick, onNextStepClick, wallet, blockchainNa
           error={errors.address || submitErrors?.address}
           {...register('address')}
         />
-        <TextInput label="Wallet Label (Optional)" id="name" maxLength={100} {...register('name')} />
         <div className="flex justify-center items-center space-x-6">
           <Button variant="outline" onClick={onBackClick}>
             Back

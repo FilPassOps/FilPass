@@ -1,7 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { SelectNetworkInput } from 'components/Shared/SelectNetworkInput'
 import { WithMetaMaskButton } from 'components/Web3/MetaMaskProvider'
-import { ChainIds } from 'config'
+import { AppConfig, ChainIds } from 'config'
 import yup from 'lib/yup'
 import { useForm } from 'react-hook-form'
 
@@ -11,6 +11,8 @@ interface ChainSelectionProps {
 }
 
 export function ChainSelection({ onConnectionMethodClick, chainIdFilter }: ChainSelectionProps) {
+  const { network } = AppConfig.network.getFilecoin()
+
   const {
     control,
     handleSubmit,
@@ -18,7 +20,7 @@ export function ChainSelection({ onConnectionMethodClick, chainIdFilter }: Chain
     formState: { errors },
   } = useForm({
     defaultValues: {
-      chainId: undefined,
+      chainId: network.chainId,
     },
     resolver: yupResolver(
       yup.object({
@@ -37,7 +39,7 @@ export function ChainSelection({ onConnectionMethodClick, chainIdFilter }: Chain
     <div className="w-full h-full flex flex-col gap-4 justify-center items-center space-y-6 sm:px-11 my-6">
       <span className="flex flex-col gap-2">
         <p className="font-medium text-lg text-gray-900 text-center">Connect Wallet</p>
-        <p className="font-normal text-sm text-gray-500 text-center">Connect a default wallet address.</p>
+        <p className="font-normal text-sm text-gray-500 text-center">Connect a wallet address.</p>
       </span>
       <form onSubmit={handleSubmit(handleSubmitForm)} className="flex flex-col gap-4 w-full h-full space-y-6 ">
         <SelectNetworkInput

@@ -16,5 +16,5 @@ export async function getPendingContractTransactions({ userId }: GetPendingContr
     },
   })
 
-  return pendingTransactions
+  return { data: pendingTransactions }
 }

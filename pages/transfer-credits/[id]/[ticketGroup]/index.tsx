@@ -36,7 +36,7 @@ interface TicketGroupDetailsProps {
 }
 
 const TicketGroupDetails = ({ data, totalItems, totalRedeemed, pageSize }: TicketGroupDetailsProps) => {
-  const { userCreditDetails, ticketGroup, expired, expiresAt, createdAt } = data
+  const { userCreditDetails, ticketGroup, expired } = data
 
   const currentHeight = ethers.BigNumber.from(userCreditDetails.totalWithdrawals).add(userCreditDetails.totalRefunds)
 
@@ -61,19 +61,19 @@ const TicketGroupDetails = ({ data, totalItems, totalRedeemed, pageSize }: Ticke
               </div>
             </div>
 
-            <div className="mt-4 sm:mt-0 text-sm text-gray-500">
-              <div className="flex sm:justify-end">
-                <dt>Credits Locked Until: </dt>
-                <dd>
+            <div className="mt-4 sm:mt-0 text-gray-500 flex items-end flex-col">
+              <div className="flex flex-col sm:justify-end text-end">
+                <dt className="text-gray-900 font-medium">Credits Locked Until:</dt>
+                <dd className="text-sm text-gray-500">
                   <Timestamp
                     date={new Date(userCreditDetails.withdrawExpiresAt).toISOString()}
                     format={DateTime.DATETIME_SHORT_WITH_SECONDS}
                   />
                 </dd>
               </div>
-              <div className="flex sm:justify-end">
-                <dt>Refund Starts on: </dt>
-                <dd>
+              <div className="flex flex-col sm:justify-end text-end">
+                <dt className="text-gray-900 font-medium">Refund Starts on:</dt>
+                <dd className="text-sm text-gray-500">
                   <Timestamp
                     date={new Date(userCreditDetails.refundStartsAt).toISOString()}
                     format={DateTime.DATETIME_SHORT_WITH_SECONDS}
@@ -97,17 +97,6 @@ const TicketGroupDetails = ({ data, totalItems, totalRedeemed, pageSize }: Ticke
               <div className="col-span-1">
                 <p className="text-gray-600 font-semibold">Redeemed:</p>
                 <p className=" text-deep-koamaru">{totalRedeemed}</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-1">
-                <p className="text-gray-600 font-semibold">Created At:</p>
-                <Timestamp date={createdAt} format={DateTime.DATETIME_SHORT_WITH_SECONDS} />
-              </div>
-
-              <div className="col-span-1">
-                <p className="text-gray-600 font-semibold">Expires At:</p>
-                <Timestamp date={expiresAt} format={DateTime.DATETIME_SHORT_WITH_SECONDS} />
               </div>
             </div>
           </div>

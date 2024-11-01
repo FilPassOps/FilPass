@@ -15,7 +15,6 @@ import yup from 'lib/yup'
 import { useRouter } from 'next/router'
 import { useContract } from 'components/Web3/useContract'
 import { getPaymentErrorMessage } from 'components/Web3/utils'
-import { DeployContractModal } from 'components/User/Modal/DeployContractModal'
 import { withUserSSR } from 'lib/ssr'
 import { getContractsByUserId } from 'domain/contracts/get-contracts-by-user-id'
 import { Contract, DeployContractTransaction, UserWallet } from '@prisma/client'
@@ -34,17 +33,15 @@ interface BuyCreditsProps {
 }
 
 const BuyCredits = ({ data }: BuyCreditsProps) => {
-  const [open, setOpen] = useState(false)
-  const [contractDeployedError, setContractDeployedError] = useState<{ message: string } | undefined>(undefined)
   const [receiverWalletError, setReceiverWalletError] = useState<{ message: string } | undefined>(undefined)
+  const [metamaskWalletError, setMetamaskWalletError] = useState<{ message: string } | undefined>(undefined)
   const { dispatch, close } = useAlertDispatcher()
   const router = useRouter()
   const { wallet } = useMetaMask()
 
   const to = router.query.to as string
 
-  const token = AppConfig.network.getTokenBySymbolAndBlockchainName('tFIL', 'Filecoin')
-  const network = AppConfig.network.getChainByToken(token)!
+  const { network } = AppConfig.network.getFilecoin()
 
   const hasContracts = data.contracts?.length > 0
 
@@ -70,7 +67,6 @@ const BuyCredits = ({ data }: BuyCreditsProps) => {
       if (!values.amount || !values.storageProviderWallet) return
 
       setReceiverWalletError(undefined)
-      setContractDeployedError(undefined)
 
       const storageProviderWallet = validateWalletAddress(values.storageProviderWallet)
 
@@ -84,27 +80,43 @@ const BuyCredits = ({ data }: BuyCreditsProps) => {
       if (hasContracts) {
         const contract = data.contracts.find(contract => contract.deployedFromAddress === wallet)
 
-        // TODO: if multiple contract, change deploy a different contract
         if (!contract) {
-          setContractDeployedError({
-            message: `You already have a contract deployed with ${data.contracts[0].deployedFromAddress} wallet address.`,
+          setMetamaskWalletError({
+            message: `Your contract is not deployed with this wallet address. Use the same wallet address as the one on Profile & Settings.`,
           })
           return
         }
 
-        setContractDeployedError(undefined)
+        setMetamaskWalletError(undefined)
         await handleDepositAmount(values, storageProviderWallet)
       } else {
+        if (!data.wallets || data.wallets.length === 0) {
+          setMetamaskWalletError({
+            message: `You have no wallets registered. Please register a wallet on Profile & Settings first.`,
+          })
+          return
+        }
+
         const existingWallet = data.wallets.find(dataWallet => dataWallet.address === wallet)
 
         if (!existingWallet) {
-          setContractDeployedError({
-            message: `Your wallet is not registered. Please register your wallet on Profile & Settings page first.`,
+          setMetamaskWalletError({
+            message: `Use the same wallet address as the one on Profile & Settings.`,
           })
           return
         }
 
-        setOpen(true)
+        if (data.pendingContractTransactions && data.pendingContractTransactions.length > 0) {
+          setMetamaskWalletError({
+            message: `Your contract deployment is currently in progress. Check your transaction status on Profile & Settings.`,
+          })
+          return
+        }
+
+        setMetamaskWalletError({
+          message: `You don not have a contract deployed. Please deploy a contract on Profile & Settings first.`,
+        })
+        return
       }
     } catch (error) {
       console.error(error)
@@ -184,7 +196,7 @@ const BuyCredits = ({ data }: BuyCreditsProps) => {
                 type="text"
                 disabled={true}
                 value={wallet || '-'}
-                error={contractDeployedError}
+                error={metamaskWalletError}
               />
             </div>
             <div className="flex flex-col gap-2">
@@ -232,12 +244,6 @@ const BuyCredits = ({ data }: BuyCreditsProps) => {
           </div>
         </form>
       </div>
-      <DeployContractModal
-        open={open}
-        onModalClosed={() => setOpen(false)}
-        contractAddress={data.contracts[0]?.address}
-        pendingContractTransactions={data.pendingContractTransactions}
-      />
     </div>
   )
 }
@@ -255,7 +261,7 @@ BuyCredits.getLayout = function getLayout(page: ReactElement) {
 export const getServerSideProps = withUserSSR(async function getServerSideProps({ user }) {
   const { data } = await getContractsByUserId({ userId: user.id })
 
-  const pendingContractTransactions = await getPendingContractTransactions({ userId: user.id })
+  const { data: pendingContractTransactions } = await getPendingContractTransactions({ userId: user.id })
 
   const { data: wallets } = await getWalletsByUserId({ userId: user.id })
 
