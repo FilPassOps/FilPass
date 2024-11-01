@@ -1,8 +1,10 @@
-import { Contract } from '@prisma/client'
+import { Contract, DeployContractTransaction } from '@prisma/client'
+import { AppConfig } from 'config/system'
 
 interface ContractListProps {
   data?: Contract[]
   isLoading?: boolean
+  deployContractTransaction?: DeployContractTransaction
   setLoading: (loading: boolean) => void
   refresh: () => void
 }
@@ -14,7 +16,25 @@ interface ListItemsProps {
   refresh: () => void
 }
 
-export const ContractList = ({ data = [], isLoading, setLoading, refresh }: ContractListProps) => {
+const { network } = AppConfig.network.getFilecoin()
+
+export const ContractList = ({ data = [], isLoading, setLoading, refresh, deployContractTransaction }: ContractListProps) => {
+  if (deployContractTransaction) {
+    return (
+      <p className="text-sm">
+        Your contract deployment is currently <strong className=" text-yellow-500">in progress</strong>.{' '}
+        <a
+          href={`${network?.blockExplorer.url}/${deployContractTransaction.transactionHash}`}
+          rel="noreferrer"
+          target="_blank"
+          className="underline text-green-700"
+        >
+          Check your transaction status here
+        </a>
+      </p>
+    )
+  }
+
   if (!data.length) {
     return <p className="text-sm">You haven&apos;t deployed any contracts. Click Deploy Contract button to deploy one.</p>
   }

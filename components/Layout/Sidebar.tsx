@@ -34,7 +34,7 @@ interface NavigationItem {
 const navigation: NavigationItem[] = [
   {
     target: '/transfer-credits',
-    text: 'Transfer Credits',
+    text: 'Channels',
     icon: CircleStackIcon,
     roles: [USER_ROLE],
     items: [

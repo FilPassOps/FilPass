@@ -9,7 +9,7 @@ interface TransferCreditListProps {
 }
 
 export const TransferCreditList = ({ userCreditItems }: TransferCreditListProps) => {
-  const fil = AppConfig.network.getTokenBySymbolAndBlockchainName('tFIL', 'Filecoin')
+  const { token } = AppConfig.network.getFilecoin()
 
   return (
     <div className="flex flex-col gap-4">
@@ -26,7 +26,7 @@ export const TransferCreditList = ({ userCreditItems }: TransferCreditListProps)
 
         const hasCredits = currentCredit.gt(0)
 
-        const parsedCurrentHeight = formatUnits(currentCredit, fil.decimals)
+        const parsedCurrentHeight = formatUnits(currentCredit, token.decimals)
 
         return (
           <div key={item.id} className="bg-white rounded-lg shadow-md">

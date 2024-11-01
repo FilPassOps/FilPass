@@ -44,7 +44,7 @@ const TransferCredits = ({ data, totalItems, pageSize }: TransferCreditsProps) =
   return (
     <>
       <Head>
-        <title>{`Transfer Credits - ${AppConfig.app.name}`}</title>
+        <title>{`Overview - ${AppConfig.app.name}`}</title>
       </Head>
       <div className="w-full flex flex-col gap-4">
         <div className="flex flex-col gap-5">
@@ -73,7 +73,7 @@ export default TransferCredits
 
 TransferCredits.getLayout = function getLayout(page: ReactElement) {
   return (
-    <Layout title="Transfer Credits" containerClass="bg-gray-50 h-screen">
+    <Layout title="Overview" containerClass="bg-gray-50 h-screen">
       {page}
     </Layout>
   )

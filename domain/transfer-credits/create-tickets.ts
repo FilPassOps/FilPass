@@ -5,7 +5,7 @@ import { sign } from 'lib/jwt'
 import { ethers } from 'ethers'
 import { logger } from 'lib/logger'
 import { getAvailableTicketsNumber } from './get-available-tickets-number'
-import { FIL, MIN_CREDIT_PER_TICKET } from './constants'
+import { MIN_CREDIT_PER_TICKET } from './constants'
 import { v1 as uuidv1 } from 'uuid'
 import { parseUnits } from 'ethers/lib/utils'
 import { AppConfig } from 'config/system'
@@ -37,16 +37,16 @@ export const createTickets = async (props: CreateTicketsParams) => {
       throw new Error('Contract not found')
     }
 
-    const fil = AppConfig.network.getTokenBySymbolAndBlockchainName('tFIL', 'Filecoin')
+    const { token } = AppConfig.network.getFilecoin()
 
-    if (!fil) {
+    if (!token) {
       throw new Error('FIL token not found')
     }
 
     const currentHeight = ethers.BigNumber.from(data.totalWithdrawals).add(data.totalRefunds)
     const totalHeight = ethers.BigNumber.from(data.totalHeight!)
     const remaining = totalHeight.sub(currentHeight)
-    const creditPerTicket = parseUnits(fields.creditPerTicket.toString(), FIL.decimals)
+    const creditPerTicket = parseUnits(fields.creditPerTicket.toString(), token.decimals)
 
     const { data: availableTicketsNumber } = await getAvailableTicketsNumber({ userId: fields.userId, userCreditId: data.id })
 
@@ -77,7 +77,7 @@ export const createTickets = async (props: CreateTicketsParams) => {
       },
     })
 
-    const creditPerTicketAmount = parseUnits(fields.creditPerTicket.toString(), fil.decimals)
+    const creditPerTicketAmount = parseUnits(fields.creditPerTicket.toString(), token.decimals)
 
     const tickets = Array(fields.splitNumber)
       .fill(null)

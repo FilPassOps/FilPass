@@ -80,10 +80,9 @@ const BuyCredits = ({ data }: BuyCreditsProps) => {
       if (hasContracts) {
         const contract = data.contracts.find(contract => contract.deployedFromAddress === wallet)
 
-        // TODO: if multiple contract, change deploy a different contract
         if (!contract) {
           setMetamaskWalletError({
-            message: `Your contract is not deployed with this wallet address.`,
+            message: `Your contract is not deployed with this wallet address. Use the same wallet address as the one on Profile & Settings.`,
           })
           return
         }
@@ -91,16 +90,33 @@ const BuyCredits = ({ data }: BuyCreditsProps) => {
         setMetamaskWalletError(undefined)
         await handleDepositAmount(values, storageProviderWallet)
       } else {
-        const existingWallet = data.wallets.find(dataWallet => dataWallet.address === wallet)
-
-        if (!existingWallet) {
+        if (!data.wallets || data.wallets.length === 0) {
           setMetamaskWalletError({
-            message: `Your wallet is not registered. Please register your wallet on Wallet Settings first.`,
+            message: `You have no wallets registered. Please register a wallet on Profile & Settings first.`,
           })
           return
         }
 
-        setMetamaskWalletError(undefined)
+        const existingWallet = data.wallets.find(dataWallet => dataWallet.address === wallet)
+
+        if (!existingWallet) {
+          setMetamaskWalletError({
+            message: `Use the same wallet address as the one on Profile & Settings.`,
+          })
+          return
+        }
+
+        if (data.pendingContractTransactions && data.pendingContractTransactions.length > 0) {
+          setMetamaskWalletError({
+            message: `Your contract deployment is currently in progress. Check your transaction status on Profile & Settings.`,
+          })
+          return
+        }
+
+        setMetamaskWalletError({
+          message: `You don not have a contract deployed. Please deploy a contract on Profile & Settings first.`,
+        })
+        return
       }
     } catch (error) {
       console.error(error)
@@ -245,7 +261,7 @@ BuyCredits.getLayout = function getLayout(page: ReactElement) {
 export const getServerSideProps = withUserSSR(async function getServerSideProps({ user }) {
   const { data } = await getContractsByUserId({ userId: user.id })
 
-  const pendingContractTransactions = await getPendingContractTransactions({ userId: user.id })
+  const { data: pendingContractTransactions } = await getPendingContractTransactions({ userId: user.id })
 
   const { data: wallets } = await getWalletsByUserId({ userId: user.id })
 

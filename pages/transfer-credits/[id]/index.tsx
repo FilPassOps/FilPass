@@ -79,8 +79,7 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
   const [createTicketsModalOpen, setCreateTicketsModalOpen] = useState(false)
   const [isRefundLoading, setIsRefundLoading] = useState(false)
 
-  const token = AppConfig.network.getTokenBySymbolAndBlockchainName('tFIL', 'Filecoin')
-  const network = AppConfig.network.getChainByToken(token)!
+  const { token, network } = AppConfig.network.getFilecoin()
 
   const isWithdrawExpired = new Date(userCreditDetails.withdrawExpiresAt) < new Date()
   const isRefundStarted = new Date(userCreditDetails.refundStartsAt) < new Date()

@@ -5,22 +5,20 @@ import prisma from 'lib/prisma'
 import { FilecoinDepositWithdrawRefund__factory as FilecoinDepositWithdrawRefundFactory } from 'typechain-types'
 
 // 45 days
-const WITHDRAW_DAYS_TIME = 45 * 24 * 60 * 60 * 1000
+const WITHDRAW_DAYS_TIME = parseInt(process.env.NEXT_PUBLIC_WITHDRAW_DAYS || '45') * 24 * 60 * 60 * 1000
 
 // 1 day
-const LOCK_DAYS_TIME = 1 * 24 * 60 * 60 * 1000
+const LOCK_DAYS_TIME = parseInt(process.env.NEXT_PUBLIC_LOCK_DAYS || '1') * 24 * 60 * 60 * 1000
 
 const ONE_DAY_TIME = 1 * 24 * 60 * 60 * 1000
 
 const contractInterface = FilecoinDepositWithdrawRefundFactory.createInterface()
 const depositMadeEvent = contractInterface.getEvent('DepositMade')
 
-const chain = AppConfig.network.getChainByName('Filecoin')
-const filDecimals = chain.tokens.find(t => t.symbol === 'tFIL')?.decimals
+const { network, token } = AppConfig.network.getFilecoin()
 
 export default async function run() {
   try {
-    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000) // 15 minutes ago
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000) // 24 hours ago
 
     const pendingTransactions = await prisma.creditTransaction.findMany({
@@ -28,7 +26,6 @@ export default async function run() {
         status: TransactionStatus.PENDING,
         createdAt: {
           gte: twentyFourHoursAgo,
-          // lte: fifteenMinutesAgo,
         },
       },
       select: {
@@ -53,12 +50,12 @@ export default async function run() {
       return
     }
 
-    if (!filDecimals) {
+    if (!token.decimals) {
       console.error('FIL decimals not found')
       return
     }
 
-    const provider = new ethers.providers.JsonRpcProvider(chain.rpcUrls[0])
+    const provider = new ethers.providers.JsonRpcProvider(network.rpcUrls[0])
 
     for await (const { transactionHash, userCredit, id, amount } of pendingTransactions) {
       if (!transactionHash || !userCredit || !userCredit.id) {
