@@ -3,6 +3,50 @@ import { ethers } from 'hardhat'
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers'
 import { FilecoinDepositWithdrawRefund } from 'typechain-types'
 import { anyUint } from '@nomicfoundation/hardhat-chai-matchers/withArgs'
+import { BigNumber } from 'ethers'
+
+// Add this interface to match the DecodedToken struct in the contract
+interface DecodedToken {
+  iss: string
+  jti: string
+  exp: number
+  iat: number
+  ticket_type: string
+  ticket_version: string
+  funder: string
+  sub: string
+  aud: string
+  ticket_lane: number
+  lane_total_amount: BigNumber
+  lane_guaranteed_amount: BigNumber
+  lane_guaranteed_until: number
+}
+
+// Add this utility function to create DecodedToken objects
+function createDecodedToken(
+  funder: string,
+  oracle: string,
+  recipient: string,
+  amount: BigNumber,
+  expirationDays: number = 7,
+): DecodedToken {
+  const now = Math.floor(Date.now() / 1000)
+  return {
+    iss: 'https://example.com/.well-known/jwks.json',
+    jti: ethers.utils.id(Date.now().toString()), // Generate a unique identifier
+    exp: now + 3600, // 1 hour from now
+    iat: now,
+    ticket_type: 'filpass',
+    ticket_version: '1',
+    funder: funder,
+    sub: oracle,
+    aud: recipient,
+    ticket_lane: 0,
+    lane_total_amount: amount,
+    lane_guaranteed_amount: amount,
+    lane_guaranteed_until: now + expirationDays * 24 * 60 * 60,
+  }
+}
 
 describe('FilecoinDepositWithdrawRefund', function () {
   async function deployContractFixture() {
@@ -107,12 +151,15 @@ describe('FilecoinDepositWithdrawRefund', function () {
 
       await filpass.connect(user).depositAmount(oracle1.address, recipient1.address, lockUpTime, { value: depositAmount })
 
-      await expect(filpass.connect(oracle1).withdrawAmount(recipient1.address, depositAmount))
+      const decodedToken = createDecodedToken(user.address, oracle1.address, recipient1.address, depositAmount)
+
+      await expect(filpass.connect(oracle1).withdrawAmount(decodedToken))
         .to.emit(filpass, 'WithdrawalMade')
         .withArgs(oracle1.address, recipient1.address, depositAmount)
 
       const deposit = await filpass.deposits(oracle1.address, recipient1.address)
       expect(deposit.amount).to.equal(0)
+      expect(deposit.exchangedSoFar).to.equal(depositAmount)
     })
 
     it('Should revert if withdrawal is attempted after refund time', async function () {
@@ -126,10 +173,12 @@ describe('FilecoinDepositWithdrawRefund', function () {
       await ethers.provider.send('evm_increaseTime', [8 * 24 * 60 * 60])
       await ethers.provider.send('evm_mine', [])
 
-      await expect(filpass.connect(oracle1).withdrawAmount(recipient1.address, depositAmount)).to.be.revertedWithCustomError(
-        filpass,
-        'WithdrawTimeExpired',
-      )
+      const decodedToken = createDecodedToken(user.address, oracle1.address, recipient1.address, depositAmount)
+
+      await expect(filpass.connect(oracle1).withdrawAmount(decodedToken)).to.be.revertedWithCustomError(filpass, 'WithdrawTimeExpired')
+
+      const deposit = await filpass.deposits(oracle1.address, recipient1.address)
+      expect(deposit.exchangedSoFar).to.equal(0)
     })
 
     it('Should revert when attempting to withdraw more than the deposited amount', async function () {
@@ -140,10 +189,24 @@ describe('FilecoinDepositWithdrawRefund', function () {
 
       await filpass.connect(user).depositAmount(oracle1.address, recipient1.address, lockUpTime, { value: depositAmount })
 
-      await expect(filpass.connect(oracle1).withdrawAmount(recipient1.address, withdrawAmount)).to.be.revertedWithCustomError(
-        filpass,
-        'InsufficientFunds',
-      )
+      const decodedToken = createDecodedToken(user.address, oracle1.address, recipient1.address, withdrawAmount)
+
+      await expect(filpass.connect(oracle1).withdrawAmount(decodedToken)).to.be.revertedWithCustomError(filpass, 'InsufficientFunds')
+
+      const deposit = await filpass.deposits(oracle1.address, recipient1.address)
+      expect(deposit.exchangedSoFar).to.equal(0)
+    })
+
+    it('Should revert if withdrawal amount is zero', async function () {
+      const { filpass, user, oracle1, recipient1 } = await loadFixture(deployContractFixture)
+      const depositAmount = ethers.utils.parseEther('1')
+      const lockUpTime = 7
+
+      await filpass.connect(user).depositAmount(oracle1.address, recipient1.address, lockUpTime, { value: depositAmount })
+
+      const decodedToken = createDecodedToken(user.address, oracle1.address, recipient1.address, ethers.constants.Zero)
+
+      await expect(filpass.connect(oracle1).withdrawAmount(decodedToken)).to.be.revertedWithCustomError(filpass, 'InvalidWithdrawAmount')
     })
 
     it('Should allow partial withdrawals and correctly update the remaining balance', async function () {
@@ -154,23 +217,29 @@ describe('FilecoinDepositWithdrawRefund', function () {
 
       await filpass.connect(user).depositAmount(oracle1.address, recipient1.address, lockUpTime, { value: depositAmount })
 
+      const decodedToken1 = createDecodedToken(user.address, oracle1.address, recipient1.address, partialWithdrawAmount)
+
+      const decodedToken2 = createDecodedToken(user.address, oracle1.address, recipient1.address, partialWithdrawAmount.mul(2))
+
       // Partial withdrawal
-      await expect(filpass.connect(oracle1).withdrawAmount(recipient1.address, partialWithdrawAmount))
+      await expect(filpass.connect(oracle1).withdrawAmount(decodedToken1))
         .to.emit(filpass, 'WithdrawalMade')
         .withArgs(oracle1.address, recipient1.address, partialWithdrawAmount)
 
       // Check remaining balance
       const remainingDeposit = await filpass.deposits(oracle1.address, recipient1.address)
       expect(remainingDeposit.amount).to.equal(depositAmount.sub(partialWithdrawAmount))
+      expect(remainingDeposit.exchangedSoFar).to.equal(decodedToken1.lane_total_amount)
 
       // Another partial withdrawal
-      await expect(filpass.connect(oracle1).withdrawAmount(recipient1.address, partialWithdrawAmount))
+      await expect(filpass.connect(oracle1).withdrawAmount(decodedToken2))
         .to.emit(filpass, 'WithdrawalMade')
         .withArgs(oracle1.address, recipient1.address, partialWithdrawAmount)
 
       // Check final balance
       const finalDeposit = await filpass.deposits(oracle1.address, recipient1.address)
       expect(finalDeposit.amount).to.equal(depositAmount.sub(partialWithdrawAmount.mul(2)))
+      expect(finalDeposit.exchangedSoFar).to.equal(decodedToken2.lane_total_amount)
     })
   })
 
@@ -191,6 +260,7 @@ describe('FilecoinDepositWithdrawRefund', function () {
 
       const deposit = await filpass.deposits(oracle1.address, recipient1.address)
       expect(deposit.amount).to.equal(0)
+      expect(deposit.exchangedSoFar).to.equal(depositAmount)
     })
 
     it('Should refund all recipients for a specific oracle', async function () {
@@ -214,7 +284,9 @@ describe('FilecoinDepositWithdrawRefund', function () {
       const deposit1 = await filpass.deposits(oracle1.address, recipient1.address)
       const deposit2 = await filpass.deposits(oracle1.address, recipient2.address)
       expect(deposit1.amount).to.equal(0)
+      expect(deposit1.exchangedSoFar).to.equal(depositAmount1)
       expect(deposit2.amount).to.equal(0)
+      expect(deposit2.exchangedSoFar).to.equal(depositAmount2)
     })
 
     it('Should refund only eligible deposits when refunding all Oracles and Recipients', async function () {
@@ -244,7 +316,34 @@ describe('FilecoinDepositWithdrawRefund', function () {
       const deposit1 = await filpass.deposits(oracle1.address, recipient1.address)
       const deposit2 = await filpass.deposits(oracle2.address, recipient2.address)
       expect(deposit1.amount).to.equal(0)
+      expect(deposit1.exchangedSoFar).to.equal(depositAmount1)
       expect(deposit2.amount).to.equal(depositAmount2)
+      expect(deposit2.exchangedSoFar).to.equal(0)
+    })
+
+    it('Should refund remaining balance after partial withdrawals', async function () {
+      const { filpass, user, oracle1, recipient1 } = await loadFixture(deployContractFixture)
+      const depositAmount = ethers.utils.parseEther('3')
+      const partialWithdrawAmount = ethers.utils.parseEther('1')
+      const lockUpTime = 7
+
+      await filpass.connect(user).depositAmount(oracle1.address, recipient1.address, lockUpTime, { value: depositAmount })
+
+      const decodedToken = createDecodedToken(user.address, oracle1.address, recipient1.address, partialWithdrawAmount)
+      await filpass.connect(oracle1).withdrawAmount(decodedToken)
+
+      await ethers.provider.send('evm_increaseTime', [8 * 24 * 60 * 60])
+      await ethers.provider.send('evm_mine', [])
+
+      // Refund remaining balance
+      const remainingAmount = depositAmount.sub(partialWithdrawAmount)
+      await expect(filpass.connect(user).refundAmount(oracle1.address, recipient1.address))
+        .to.emit(filpass, 'RefundMade')
+        .withArgs(oracle1.address, recipient1.address, remainingAmount)
+
+      const deposit = await filpass.deposits(oracle1.address, recipient1.address)
+      expect(deposit.amount).to.equal(0)
+      expect(deposit.exchangedSoFar).to.equal(depositAmount)
     })
 
     it('Should revert when attempting to refund with no eligible funds', async function () {
@@ -260,6 +359,7 @@ describe('FilecoinDepositWithdrawRefund', function () {
 
       const deposit = await filpass.deposits(oracle1.address, recipient1.address)
       expect(deposit.amount).to.equal(depositAmount)
+      expect(deposit.exchangedSoFar).to.equal(0)
     })
   })
 

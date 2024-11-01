@@ -11,6 +11,22 @@ import '@openzeppelin/contracts/utils/structs/EnumerableSet.sol';
 contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
   using EnumerableSet for EnumerableSet.AddressSet;
 
+  struct DecodedToken {
+    string iss;
+    string jti;
+    uint256 exp;
+    uint256 iat;
+    string ticket_type;
+    string ticket_version;
+    address funder;
+    address sub;
+    address aud;
+    uint256 ticket_lane;
+    uint256 lane_total_amount;
+    uint256 lane_guaranteed_amount;
+    uint256 lane_guaranteed_until;
+  }
+
   mapping(address => mapping(address => DepositInfo)) public deposits;
   EnumerableSet.AddressSet private oracles;
   mapping(address => EnumerableSet.AddressSet) private recipientsPerOracle;
@@ -31,6 +47,7 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
   struct DepositInfo {
     uint256 amount; // Total FIL amount deposited.
     uint256 refundTime; // UNIX timestamp after which the user can request a refund.
+    uint256 exchangedSoFar; // Total FIL amount exchanged so far.
   }
 
   event DepositMade(address indexed oracle, address indexed recipient, uint256 amount, uint256 refundTime);
@@ -102,6 +119,7 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
     DepositInfo storage info = deposits[oracleAddress][recipient];
     bool isFirstDeposit = (info.refundTime == 0);
     info.amount += msg.value;
+    info.exchangedSoFar = 0;
 
     uint256 proposedRefundTime = block.timestamp + (lockUpTime * 1 days);
 
@@ -120,28 +138,32 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
 
   /**
    * @notice Allows the designated Oracle to withdraw funds for a specific Recipient before the refund time.
-   * @param recipient The address of the Recipient to receive the withdrawn funds.
-   * @param requestedWithdrawAmount The amount of FIL to withdraw.
+   * @param decodedToken The decoded token object containing withdrawal information.
    */
-  function withdrawAmount(address recipient, uint256 requestedWithdrawAmount) external nonReentrant {
-    if (recipient == address(0)) revert InvalidRecipientAddress();
-    if (requestedWithdrawAmount == 0) revert InvalidWithdrawAmount();
+  function withdrawAmount(DecodedToken memory decodedToken) external nonReentrant {
+    if (decodedToken.aud == address(0)) revert InvalidRecipientAddress();
+    if (decodedToken.lane_guaranteed_amount == 0 || decodedToken.lane_total_amount == 0) revert InvalidWithdrawAmount();
 
-    DepositInfo storage info = deposits[msg.sender][recipient];
-    if (info.amount < requestedWithdrawAmount) revert InsufficientFunds();
+    DepositInfo storage info = deposits[msg.sender][decodedToken.aud];
+    if (info.exchangedSoFar > decodedToken.lane_total_amount) revert InsufficientFunds();
     if (block.timestamp >= info.refundTime) revert WithdrawTimeExpired();
 
+    uint256 amountToWithdraw = decodedToken.lane_total_amount - info.exchangedSoFar;
+
+    if (amountToWithdraw > info.amount) revert InsufficientFunds();
+
     // Update the deposited amount before transferring funds to prevent reentrancy attacks.
-    info.amount -= requestedWithdrawAmount;
+    info.amount -= amountToWithdraw;
+    info.exchangedSoFar = decodedToken.lane_total_amount;
 
     // Transfer the specified amount of FIL to the Recipient using a low-level call.
-    (bool success, ) = payable(recipient).call{value: requestedWithdrawAmount}('');
+    (bool success, ) = payable(decodedToken.aud).call{value: amountToWithdraw}('');
     if (!success) revert WithdrawFailed();
 
-    emit WithdrawalMade(msg.sender, recipient, requestedWithdrawAmount);
+    emit WithdrawalMade(msg.sender, decodedToken.aud, amountToWithdraw);
 
     if (info.amount == 0) {
-      _removeRecipient(msg.sender, recipient);
+      _removeRecipient(msg.sender, decodedToken.aud);
       if (recipientsPerOracle[msg.sender].length() == 0) {
         _removeOracle(msg.sender);
       }
@@ -184,6 +206,7 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
     uint256 refundAmountValue = info.amount;
     info.amount = 0;
     info.refundTime = 0; // Reset refund time
+    info.exchangedSoFar += refundAmountValue;
 
     _removeRecipient(oracleAddress, recipient);
     if (recipientsPerOracle[oracleAddress].length() == 0) {
@@ -217,6 +240,7 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
         info.amount = 0;
         info.refundTime = 0; // Reset refund time
         hasRefunds = true;
+        info.exchangedSoFar += refundAmountValue;
 
         _removeRecipient(oracleAddress, currentRecipient);
 
@@ -258,7 +282,7 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
           info.amount = 0;
           info.refundTime = 0; // Reset refund time
           hasRefunds = true;
-
+          info.exchangedSoFar += refundAmountValue;
           _removeRecipient(currentOracle, currentRecipient);
 
           // Transfer the refund amount back to the user.
