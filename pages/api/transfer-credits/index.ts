@@ -24,6 +24,7 @@ async function handlePostRequest(req: NextApiRequestWithSession, res: NextApiRes
     userId: user.id,
     hash: req.body.hash,
     unit: req.body.unit,
+    additionalTicketDays: req.body.additionalTicketDays,
   })
 
   if (error) {

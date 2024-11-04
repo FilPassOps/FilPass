@@ -10,7 +10,7 @@ import { LinkButton } from 'components/Shared/Button'
 import { NumberInput, TextInput } from 'components/Shared/FormInput'
 import { useMetaMask, WithMetaMaskButton } from 'components/Web3/MetaMaskProvider'
 import { AppConfig } from 'config/system'
-import { buyTransferCreditsValidator } from 'domain/transfer-credits/validation'
+import { topUpTransferCreditsValidator } from 'domain/transfer-credits/validation'
 import yup from 'lib/yup'
 import { useRouter } from 'next/router'
 import { useContract } from 'components/Web3/useContract'
@@ -22,9 +22,9 @@ import { getPendingContractTransactions } from 'domain/contracts/get-pending-con
 import { getWalletsByUserId } from 'domain/wallet/get-wallets-by-user-id'
 import { validateWalletAddress } from 'lib/blockchain-utils'
 
-type FormValue = yup.InferType<typeof buyTransferCreditsValidator>
+type FormValue = yup.InferType<typeof topUpTransferCreditsValidator>
 
-interface BuyCreditsProps {
+interface TopUpProps {
   data: {
     contracts: Contract[]
     pendingContractTransactions: DeployContractTransaction[] | null
@@ -32,7 +32,7 @@ interface BuyCreditsProps {
   }
 }
 
-const BuyCredits = ({ data }: BuyCreditsProps) => {
+const TopUp = ({ data }: TopUpProps) => {
   const [receiverWalletError, setReceiverWalletError] = useState<{ message: string } | undefined>(undefined)
   const [metamaskWalletError, setMetamaskWalletError] = useState<{ message: string } | undefined>(undefined)
   const { dispatch, close } = useAlertDispatcher()
@@ -49,14 +49,15 @@ const BuyCredits = ({ data }: BuyCreditsProps) => {
 
   const {
     register,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, defaultValues },
     reset,
     handleSubmit,
   } = useForm({
-    resolver: yupResolver(buyTransferCreditsValidator),
+    resolver: yupResolver(topUpTransferCreditsValidator),
     defaultValues: {
-      amount: 0,
+      amount: 1,
       storageProviderWallet: to || '',
+      additionalTicketDays: Number(process.env.NEXT_PUBLIC_SUBMIT_TICKET_DAYS) || 1,
     },
     shouldFocusError: true,
     mode: 'onSubmit',
@@ -114,7 +115,7 @@ const BuyCredits = ({ data }: BuyCreditsProps) => {
         }
 
         setMetamaskWalletError({
-          message: `You don not have a contract deployed. Please deploy a contract on Profile & Settings first.`,
+          message: `You do not have a contract deployed. Please deploy a contract on Profile & Settings first.`,
         })
         return
       }
@@ -145,7 +146,12 @@ const BuyCredits = ({ data }: BuyCreditsProps) => {
         return false
       }
 
-      const result = await depositAmount(systemWalletAddress, storageProviderWallet, 1, values.amount.toString())
+      const result = await depositAmount(
+        systemWalletAddress,
+        storageProviderWallet,
+        values.additionalTicketDays || Number(process.env.NEXT_PUBLIC_SUBMIT_TICKET_DAYS),
+        values.amount.toString(),
+      )
 
       if (result) {
         await api.post('/transfer-credits', {
@@ -153,6 +159,7 @@ const BuyCredits = ({ data }: BuyCreditsProps) => {
           from: result.from,
           to: storageProviderWallet,
           amount: values.amount,
+          additionalTicketDays: values.additionalTicketDays || Number(process.env.NEXT_PUBLIC_SUBMIT_TICKET_DAYS),
         })
 
         dispatch({
@@ -184,7 +191,7 @@ const BuyCredits = ({ data }: BuyCreditsProps) => {
   return (
     <div className="h-full min-h-screen">
       <Head>
-        <title>Create Channel</title>
+        <title>Top Up</title>
       </Head>
       <div className="h-full max-w-3xl mx-auto">
         <form className="flex flex-col gap-4 mt-5 h-full flex-grow">
@@ -204,25 +211,34 @@ const BuyCredits = ({ data }: BuyCreditsProps) => {
                 label="Receiver Wallet"
                 id="storageProviderWallet"
                 type="text"
+                disabled={true}
                 placeholder="Insert a valid address"
                 error={errors.storageProviderWallet || receiverWalletError}
                 {...register(`storageProviderWallet`)}
               />
-              <p className="text-gray-600 text-xs">Check if you are transferring to the correct receiver wallet.</p>
             </div>
 
             <NumberInput
-              //  @ts-ignore
               label="Amount"
               placeholder="Insert the amount in FIL"
               error={errors.amount}
               decimalScale={6}
+              defaultValue={defaultValues?.amount}
               {...register('amount', {
                 setValueAs: val => {
                   const parsedValue = parseFloat(String(val).replaceAll(/[, \s]+/g, ''))
                   return isNaN(parsedValue) ? 0 : parsedValue
                 },
               })}
+            />
+
+            <NumberInput
+              label="Additional Ticket Days"
+              placeholder="Insert the additional ticket days"
+              error={errors.additionalTicketDays}
+              defaultValue={defaultValues?.additionalTicketDays}
+              decimalScale={0}
+              {...register('additionalTicketDays')}
             />
           </div>
           <div className="flex items-center justify-end col-span-2 gap-3">
@@ -235,10 +251,10 @@ const BuyCredits = ({ data }: BuyCreditsProps) => {
               <WithMetaMaskButton
                 targetChainId={network.chainId}
                 onClick={handleSubmit(handleFormSubmit)}
-                connectWalletLabel={`Connect MetaMask to ${to ? 'Top Up' : 'Create Channel'}`}
-                switchChainLabel={`Switch network to ${to ? 'Top Up' : 'Create Channel'}`}
+                connectWalletLabel={`Connect MetaMask to Top Up`}
+                switchChainLabel={`Switch network to Top Up`}
               >
-                {to ? 'Top Up' : 'Create Channel'}
+                Top Up
               </WithMetaMaskButton>
             </div>
           </div>
@@ -248,11 +264,11 @@ const BuyCredits = ({ data }: BuyCreditsProps) => {
   )
 }
 
-export default BuyCredits
+export default TopUp
 
-BuyCredits.getLayout = function getLayout(page: ReactElement) {
+TopUp.getLayout = function getLayout(page: ReactElement) {
   return (
-    <Layout title="Create Channel" containerClass="">
+    <Layout title="Top Up" containerClass="">
       {page}
     </Layout>
   )

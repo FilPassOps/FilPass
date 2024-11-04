@@ -15,7 +15,17 @@ export const getUserTransactionCreditsByUserIdValidator = yup.object({
   pageSize: yup.number().required(),
 })
 
-export const buyTransferCreditsValidator = yup.object({
+export const topUpTransferCreditsValidator = yup.object({
+  amount: yup.number().positive().typeError(errorsMessages.required_field.message).required(),
+  storageProviderWallet: yup.string().required(),
+  additionalTicketDays: yup
+    .number()
+    .min(1, 'Additional ticket days must be greater than 0')
+    .max(365, 'Additional ticket days must be less than 365 days')
+    .required(),
+})
+
+export const createChannelValidator = yup.object({
   amount: yup.number().positive().typeError(errorsMessages.required_field.message).required(),
   storageProviderWallet: yup.string().required(),
 })
@@ -26,6 +36,7 @@ export const saveTransferCreditsValidator = yup.object({
   to: yup.string().required(),
   userId: yup.number().required(),
   hash: yup.string().required(),
+  additionalTicketDays: yup.number().optional(),
 })
 
 export const getUserCreditsValidator = yup.object({
@@ -52,32 +63,35 @@ export const refundCreditsValidator = yup.object({
   hash: yup.string().required(),
 })
 
-export const getTicketGroupsByUserCreditIdValidator = Yup.object().shape({
+export const getTicketGroupsByUserCreditIdValidator = yup.object({
   userCreditId: Yup.number().required('User credit ID is required'),
 })
 
-export const getTicketsByTicketGroupIdValidator = Yup.object().shape({
-  ticketGroupId: Yup.number().required(),
-  userId: Yup.number().required(),
-  userCreditId: Yup.number().required(),
-  pageSize: Yup.number().required(),
-  page: Yup.number().required(),
+export const getTicketsByTicketGroupIdValidator = yup.object({
+  ticketGroupId: yup.number().required(),
+  userId: yup.number().required(),
+  userCreditId: yup.number().required(),
+  pageSize: yup.number().required(),
+  page: yup.number().required(),
 })
 
-export const getAvailableTicketsNumberValidator = Yup.object().shape({
-  userId: Yup.number().required(),
-  userCreditId: Yup.number().required(),
+export const getAvailableTicketsNumberValidator = yup.object({
+  userId: yup.number().required(),
+  userCreditId: yup.number().required(),
 })
 
 export const createTicketsValidator = (currentCredits: BigNumber, availableTicketsNumber: number) => {
-  return Yup.object()
+  return yup
+    .object()
     .shape({
-      splitNumber: Yup.number()
+      splitNumber: yup
+        .number()
         .required('Number of tickets is required')
         .positive('Number of tickets must be positive')
         .integer('Number of tickets must be an integer')
         .max(availableTicketsNumber, `Maximum ${availableTicketsNumber} tickets allowed`),
-      creditPerTicket: Yup.number()
+      creditPerTicket: yup
+        .number()
         .required('Credit per ticket is required')
         .positive('Credit per ticket must be positive')
         .test('min-credit-per-ticket', 'Credit per ticket is too low', function (value) {
@@ -104,7 +118,12 @@ export const createTicketsValidator = (currentCredits: BigNumber, availableTicke
     })
 }
 
-export const getAllSubmitTicketTransactionsValidator = Yup.object().shape({
-  pageSize: Yup.number().required(),
-  page: Yup.number().required(),
+export const getAllSubmitTicketTransactionsValidator = yup.object({
+  pageSize: yup.number().required(),
+  page: yup.number().required(),
+})
+
+export const getUserCreditByReceiverWalletValidator = yup.object({
+  receiverWallet: yup.string().required(),
+  userId: yup.number().required(),
 })

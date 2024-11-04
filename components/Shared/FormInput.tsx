@@ -13,6 +13,7 @@ interface NumberInputProps {
   id: string
   name: string
   label: string
+  defaultValue?: string
   leftIcon?: React.ReactNode
   rightIcon?: React.ReactNode
   className?: string
@@ -21,13 +22,21 @@ interface NumberInputProps {
 }
 
 export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
-  ({ error, id, label, rightIcon, leftIcon, className = '', disabled, ...props }, ref) => {
+  ({ error, id, label, rightIcon, leftIcon, className = '', disabled, defaultValue, ...props }, ref) => {
     const classes = getInputClasses({ error, disabled })
+
     return (
       <InputController id={id} label={label} error={error} name={props.name}>
         <div className="relative w-full">
           {leftIcon && <div className="absolute flex justify-center items-center text-gray-500 left-3 inset-y-0">{leftIcon}</div>}
-          <NumericFormat id={id} getInputRef={ref} className={twMerge(classes, className)} disabled={disabled} {...props} />
+          <NumericFormat
+            id={id}
+            getInputRef={ref}
+            defaultValue={defaultValue}
+            className={twMerge(classes, className)}
+            disabled={disabled}
+            {...props}
+          />
           {rightIcon && <div className="absolute flex justify-center items-center text-gray-500 right-3 inset-y-0">{rightIcon}</div>}
         </div>
       </InputController>
