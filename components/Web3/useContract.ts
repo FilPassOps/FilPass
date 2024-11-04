@@ -16,9 +16,9 @@ export const useContract = (contractAddress: string | null) => {
   const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner>()
   const [filpass, setFilpass] = useState<FilecoinDepositWithdrawRefund>()
 
-  const filecoin = AppConfig.network.getChainByName('Filecoin')
+  const { network } = AppConfig.network.getFilecoin()
 
-  const connectedToTargetChain = wallet && chainId === filecoin.chainId
+  const connectedToTargetChain = wallet && chainId === network.chainId
 
   useEffect(() => {
     const provider = new ethers.providers.Web3Provider(window.ethereum as ExternalProvider)

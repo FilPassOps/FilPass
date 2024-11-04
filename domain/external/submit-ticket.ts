@@ -21,7 +21,7 @@ export const submitTicket = async (props: SubmitTicketParams): Promise<SubmitTic
   try {
     const fields = await submitTicketValidator.validate(props)
 
-    const chain = AppConfig.network.getChainByName('Filecoin')
+    const { network } = AppConfig.network.getFilecoin()
 
     const result = verify(fields.token, process.env.PUBLIC_KEY as string)
 
@@ -37,6 +37,24 @@ export const submitTicket = async (props: SubmitTicketParams): Promise<SubmitTic
 
     if (!storageProvider) {
       throw new Error('Storage provider not found', { cause: 'INVALID' })
+    }
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    const withdrawTransactionCount = await prisma.withdrawTransaction.count({
+      where: {
+        userCredit: {
+          storageProviderId: storageProvider.id,
+        },
+        createdAt: {
+          gte: today,
+        },
+      },
+    })
+
+    if (withdrawTransactionCount >= parseInt(process.env.WITHDRAW_TRANSACTION_LIMIT as string)) {
+      throw new Error('Withdraw transaction limit exceeded for today', { cause: 'INVALID' })
     }
 
     const creditTicket = await prisma.creditTicket.findUnique({
@@ -82,7 +100,7 @@ export const submitTicket = async (props: SubmitTicketParams): Promise<SubmitTic
 
     const tokenAmount = ethers.BigNumber.from(creditTicket.height).sub(currentHeight)
 
-    const provider = new ethers.providers.JsonRpcProvider(chain.rpcUrls[0])
+    const provider = new ethers.providers.JsonRpcProvider(network.rpcUrls[0])
 
     const wallet = new ethers.Wallet(process.env.SYSTEM_WALLET_PRIVATE_KEY as string, provider)
 

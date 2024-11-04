@@ -179,7 +179,7 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
               <p className="font-bold">Attention</p>
               <p>
                 This credit has expired on <strong>{new Date(userCreditDetails.withdrawExpiresAt).toLocaleString()}</strong>. <br />
-                You can only refund your credits.
+                You can only refund your credits or top up to continue using the service with this Receiver.
               </p>
             </div>
           )}
