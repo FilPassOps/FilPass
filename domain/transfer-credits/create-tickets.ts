@@ -92,6 +92,7 @@ export const createTickets = async (props: CreateTicketsParams) => {
           ticketGroupId: ticketGroup.id,
           height: ticketHeight.toString(),
           amount: creditPerTicketAmount.toString(),
+          approximatedHeight: ticketHeight.toBigInt(),
           publicId,
           token: sign(
             {

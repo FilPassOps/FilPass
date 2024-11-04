@@ -357,6 +357,7 @@ model CreditTicket {
   ticketGroupId       Int                  @map("ticket_group_id")
   withdrawTransaction WithdrawTransaction?
   status              CreditTicketStatus   @default(VALID) @map("status")
+  approximatedHeight  BigInt               @map("approximated_height")
 
   @@index([ticketGroupId])
   @@index([publicId])

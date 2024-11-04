@@ -22,6 +22,16 @@ export async function getTicketsByTicketGroupId(props: GetTicketsByTicketGroupId
     })
 
     const creditTickets = await prisma.creditTicket.findMany({
+      select: {
+        id: true,
+        height: true,
+        amount: true,
+        createdAt: true,
+        status: true,
+        publicId: true,
+        token: true,
+        ticketGroupId: true,
+      },
       where: {
         ticketGroup: {
           id: ticketGroupId,

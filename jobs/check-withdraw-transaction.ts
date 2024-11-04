@@ -129,8 +129,10 @@ export default async function run() {
 
               await tx.creditTicket.updateMany({
                 where: {
-                  id: { lt: txCreditTicket.id },
-                  ticketGroupId: txCreditTicket.ticketGroupId,
+                  approximatedHeight: { lte: txCreditTicket.approximatedHeight },
+                  ticketGroup: {
+                    userCreditId: txCreditTicket.ticketGroup.userCreditId,
+                  },
                   status: CreditTicketStatus.VALID,
                 },
                 data: {
