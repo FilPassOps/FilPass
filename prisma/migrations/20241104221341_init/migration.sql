@@ -279,6 +279,7 @@ CREATE TABLE "credit_ticket" (
     "updated_at" TIMESTAMP(3) NOT NULL,
     "ticket_group_id" INTEGER NOT NULL,
     "status" "CreditTicketStatus" NOT NULL DEFAULT 'VALID',
+    "approximated_height" BIGINT NOT NULL,
 
     CONSTRAINT "credit_ticket_pkey" PRIMARY KEY ("id")
 );
