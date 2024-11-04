@@ -170,6 +170,7 @@ CREATE TABLE "credit_transaction" (
     "fail_reason" TEXT,
     "confirmations" INTEGER NOT NULL DEFAULT 0,
     "block_number" TEXT NOT NULL DEFAULT '0',
+    "additional_ticket_days" INTEGER NOT NULL,
 
     CONSTRAINT "credit_transaction_pkey" PRIMARY KEY ("id")
 );

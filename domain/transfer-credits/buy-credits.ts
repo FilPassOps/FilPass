@@ -12,22 +12,17 @@ interface BuyCreditsParams {
   userId: number
   hash: string
   unit: string
+  additionalTicketDays: number
 }
 
 export const buyCredits = async (props: BuyCreditsParams) => {
   try {
     const fields = await saveTransferCreditsValidator.validate(props)
-
     const { token } = AppConfig.network.getFilecoin()
 
     if (!token) {
       throw new Error('FIL token not found')
     }
-
-    // TODO: check minimum offer price
-    // if (fields.offerPrice === '0') {
-    //   throw new Error('Offer price cannot be 0')
-    // }
 
     if (!validateAddress(fields.to)) {
       throw new Error('Invalid receiver address')
@@ -42,7 +37,7 @@ export const buyCredits = async (props: BuyCreditsParams) => {
     if (!creditStorageProvider) {
       creditStorageProvider = await prisma.storageProvider.create({
         data: {
-          walletAddress: fields.to,
+          walletAddress: fields.to.toLowerCase(),
         },
       })
     }
@@ -89,6 +84,7 @@ export const buyCredits = async (props: BuyCreditsParams) => {
           status: TransactionStatus.PENDING,
           amount,
           userCreditId: userCredit.id,
+          additionalTicketDays: fields.additionalTicketDays || Number(process.env.NEXT_PUBLIC_SUBMIT_TICKET_DAYS),
         },
       })
     })

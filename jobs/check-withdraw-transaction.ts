@@ -55,8 +55,6 @@ export default async function run() {
 
     const provider = new ethers.providers.JsonRpcProvider(network.rpcUrls[0])
 
-    // TODO: check if transaction is pending
-
     for await (const { transactionHash, userCredit, creditTicket, id } of pendingTransactions) {
       if (!transactionHash || !userCredit || !userCredit.id) {
         continue
@@ -73,8 +71,6 @@ export default async function run() {
           const parsed = contractInterface.parseLog(log)
 
           if (parsed.name !== withdrawMadeEvent.name) return
-
-          // const paidAmount = ethers.BigNumber.from(parsed.args.amount)
 
           await prisma.$transaction(
             async tx => {
@@ -110,9 +106,7 @@ export default async function run() {
                 },
               })
 
-              const totalWithdrawals = ethers.BigNumber.from(txCreditTicket.ticketGroup.userCredit.totalWithdrawals).add(
-                ticketAmount,
-              )
+              const totalWithdrawals = ethers.BigNumber.from(txCreditTicket.ticketGroup.userCredit.totalWithdrawals).add(ticketAmount)
 
               await tx.userCredit.update({
                 where: {
@@ -140,7 +134,7 @@ export default async function run() {
                   status: CreditTicketStatus.VALID,
                 },
                 data: {
-                   status: CreditTicketStatus.INVALID,
+                  status: CreditTicketStatus.INVALID,
                 },
               })
 

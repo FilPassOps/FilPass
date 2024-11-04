@@ -266,7 +266,7 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
           </Button>
 
           <LinkButton
-            href={`/transfer-credits/buy?to=${userCreditDetails.creditTransactions[0].storageProvider.walletAddress}`}
+            href={`/transfer-credits/top-up?to=${userCreditDetails.creditTransactions[0].storageProvider.walletAddress}`}
             variant="primary"
             className="w-fit"
             disabled={isRefundLoading}

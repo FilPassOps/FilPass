@@ -4,9 +4,6 @@ import { ethers } from 'ethers'
 import prisma from 'lib/prisma'
 import { FilecoinDepositWithdrawRefund__factory as FilecoinDepositWithdrawRefundFactory } from 'typechain-types'
 
-// 45 days
-const WITHDRAW_DAYS_TIME = parseInt(process.env.NEXT_PUBLIC_WITHDRAW_DAYS || '45') * 24 * 60 * 60 * 1000
-
 // 1 day
 const LOCK_DAYS_TIME = parseInt(process.env.NEXT_PUBLIC_LOCK_DAYS || '1') * 24 * 60 * 60 * 1000
 
@@ -32,6 +29,7 @@ export default async function run() {
         id: true,
         transactionHash: true,
         amount: true,
+        additionalTicketDays: true,
         userCredit: {
           select: {
             id: true,
@@ -57,7 +55,7 @@ export default async function run() {
 
     const provider = new ethers.providers.JsonRpcProvider(network.rpcUrls[0])
 
-    for await (const { transactionHash, userCredit, id, amount } of pendingTransactions) {
+    for await (const { transactionHash, userCredit, id, amount, additionalTicketDays } of pendingTransactions) {
       if (!transactionHash || !userCredit || !userCredit.id) {
         continue
       }
@@ -122,13 +120,15 @@ export default async function run() {
               const fistCredits = !txUserCredit.withdrawStartsAt
               const expiredCredit = txUserCredit.refundStartsAt && new Date() >= txUserCredit.refundStartsAt
 
+              const ticketTime = additionalTicketDays * 24 * 60 * 60 * 1000
+
               if (fistCredits || expiredCredit) {
                 withdrawStartsAt = new Date()
-                withdrawExpiresAt = new Date(withdrawStartsAt.getTime() + WITHDRAW_DAYS_TIME)
+                withdrawExpiresAt = new Date(withdrawStartsAt.getTime() + ticketTime)
                 refundStartsAt = new Date(withdrawExpiresAt.getTime() + LOCK_DAYS_TIME + ONE_DAY_TIME)
               } else {
                 withdrawStartsAt = userCredit.withdrawStartsAt!
-                withdrawExpiresAt = new Date(userCredit.withdrawExpiresAt!.getTime() + WITHDRAW_DAYS_TIME)
+                withdrawExpiresAt = new Date(userCredit.withdrawExpiresAt!.getTime() + ticketTime)
                 refundStartsAt = new Date(withdrawExpiresAt.getTime() + ONE_DAY_TIME)
               }
 

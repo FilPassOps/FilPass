@@ -50,8 +50,8 @@ const TransferCredits = ({ data, totalItems, pageSize }: TransferCreditsProps) =
         <div className="flex flex-col gap-5">
           <div className="flex gap-2 justify-start items-center">
             <div>
-              <LinkButton href="/transfer-credits/buy" className="flex gap-2">
-                <p>Create channel</p>
+              <LinkButton href="/transfer-credits/create-channel" className="flex gap-2">
+                <p>Create Channel</p>
               </LinkButton>
             </div>
             <div>

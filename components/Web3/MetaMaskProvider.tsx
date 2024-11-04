@@ -113,7 +113,7 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode | undefined
     if (MetaMaskOnboarding.isMetaMaskInstalled()) {
       const onChainChanged = (chainId: string) => {
         setChainId(chainId)
-        if (asPath.includes('/buy')) {
+        if (asPath.includes('/top-up')) {
           window.location.reload()
         }
       }
