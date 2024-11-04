@@ -38,7 +38,9 @@ interface TicketGroupDetailsProps {
 const TicketGroupDetails = ({ data, totalItems, totalRedeemed, pageSize }: TicketGroupDetailsProps) => {
   const { userCreditDetails, ticketGroup, expired } = data
 
-  const currentHeight = ethers.BigNumber.from(userCreditDetails.totalWithdrawals).add(userCreditDetails.totalRefunds)
+  const currentHeight = ethers.BigNumber.from(userCreditDetails?.totalWithdrawals ?? 0).add(
+    userCreditDetails?.totalRefunds ?? 0
+  )
 
   const totalInFlight = totalItems - totalRedeemed
 

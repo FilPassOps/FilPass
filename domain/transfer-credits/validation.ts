@@ -11,6 +11,8 @@ const { token } = AppConfig.network.getFilecoin()
 
 export const getUserTransactionCreditsByUserIdValidator = yup.object({
   userId: yup.number().required(),
+  currentPage: yup.number().required(),
+  pageSize: yup.number().required(),
 })
 
 export const buyTransferCreditsValidator = yup.object({
@@ -101,3 +103,8 @@ export const createTicketsValidator = (currentCredits: BigNumber, availableTicke
       })
     })
 }
+
+export const getAllSubmitTicketTransactionsValidator = Yup.object().shape({
+  pageSize: Yup.number().required(),
+  page: Yup.number().required(),
+})

@@ -6,6 +6,7 @@ import { AppConfig } from 'config/system'
 import { ReactElement } from 'react'
 import { TransactionList } from 'components/User/TransactionList'
 import { Transaction } from 'domain/transfer-credits/get-user-transaction-credits-by-user-id'
+import { getItemsPerPage, PaginationWrapper } from 'components/Shared/PaginationWrapper'
 
 interface TransactionHistoryData {
   transactions: Transaction[]
@@ -17,7 +18,7 @@ interface TransactionHistoryProps {
   pageSize: number
 }
 
-const TransactionHistory = ({ data }: TransactionHistoryProps) => {
+const TransactionHistory = ({ data, totalItems, pageSize }: TransactionHistoryProps) => {
   if (!data) {
     return <div>Loading...</div>
   }
@@ -28,7 +29,9 @@ const TransactionHistory = ({ data }: TransactionHistoryProps) => {
         <title>{`Transaction History - ${AppConfig.app.name}`}</title>
       </Head>
       <div className="w-full">
-        <TransactionList transactions={data.transactions} />
+        <PaginationWrapper totalItems={totalItems} pageSize={pageSize}>
+          <TransactionList transactions={data.transactions} />
+        </PaginationWrapper>
       </div>
     </>
   )
@@ -44,8 +47,11 @@ TransactionHistory.getLayout = function getLayout(page: ReactElement) {
   )
 }
 
-export const getServerSideProps = withUserSSR(async ({ user }: any) => {
-  const { data } = await getUserTransactionCreditsByUserId({ userId: user.id })
+export const getServerSideProps = withUserSSR(async ({ user, query }: any) => {
+  const pageSize = getItemsPerPage(query.itemsPerPage)
+  const page = query.page && typeof query.page === 'string' ? parseInt(query.page) : 1
+
+  const { data, total } = await getUserTransactionCreditsByUserId({ userId: user.id, currentPage: page, pageSize })
 
   const transactions = data?.length ? JSON.parse(JSON.stringify(data)) : []
 
@@ -54,6 +60,8 @@ export const getServerSideProps = withUserSSR(async ({ user }: any) => {
       data: {
         transactions,
       },
+      totalItems: total,
+      pageSize,
     },
   }
 })

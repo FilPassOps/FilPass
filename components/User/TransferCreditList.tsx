@@ -35,7 +35,7 @@ export const TransferCreditList = ({ userCreditItems }: TransferCreditListProps)
                 <p className="font-bold">Attention</p>
                 <p>
                   This credit has expired on {new Date(item.withdrawExpiresAt).toLocaleString()}. <br />
-                  You can only refund your credits.
+                  You can only refund your credits or top up to continue using the service with this Receiver.
                 </p>
               </div>
             )}

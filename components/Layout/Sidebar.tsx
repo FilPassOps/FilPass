@@ -1,5 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
-import { CircleStackIcon, IdentificationIcon, LifebuoyIcon, UserIcon, UsersIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import {
+  CircleStackIcon,
+  DocumentTextIcon,
+  IdentificationIcon,
+  LifebuoyIcon,
+  UserIcon,
+  UsersIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/solid'
 
 import { useAuth } from 'components/Authentication/Provider'
@@ -65,6 +73,12 @@ const navigation: NavigationItem[] = [
     text: 'User Address',
     icon: IdentificationIcon,
     roles: [ADDRESS_MANAGER_ROLE],
+  },
+  {
+    target: '/transaction-manager',
+    text: 'Transactions',
+    icon: DocumentTextIcon,
+    roles: [SUPERADMIN_ROLE],
   },
   {
     target: '/profile-settings',
