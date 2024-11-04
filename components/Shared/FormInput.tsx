@@ -30,7 +30,6 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
         <div className="relative w-full">
           {leftIcon && <div className="absolute flex justify-center items-center text-gray-500 left-3 inset-y-0">{leftIcon}</div>}
           <NumericFormat
-            // defaultValue={ref?}
             id={id}
             getInputRef={ref}
             defaultValue={defaultValue}
