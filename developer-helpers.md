@@ -9,9 +9,11 @@
   - [DML Migrations (Data changes)](#dml-migrations-data-changes)
 - [Jobs](#jobs)
   - [Running Jobs](#running-jobs)
-    - [Requires change](#requires-change)
-    - [Check pending transfer requests](#check-pending-transfer-requests)
-- [Adding a New Token to Emissary](#adding-a-new-token-to-emissary)
+    - [Check deploy contract transaction](#check-deploy-contract-transaction)
+    - [Check submit ticket transaction](#check-submit-ticket-transaction)
+    - [Check buy credits transaction](#check-buy-credits-transaction)
+    - [Check refund transaction](#check-refund-transaction)
+    - [Check expired ticket groups](#check-expired-ticket-groups)
 - [Tests](#tests)
   - [Unit Tests](#unit-tests)
   - [Contract Tests](#contract-tests)
@@ -19,7 +21,7 @@
 
 ## Introduction
 
-Here are some useful commands and configuration details to help you contribute or use Emissary.
+Here are some useful commands and configuration details to help you use FilPass.
 
 
 ## Database
@@ -38,9 +40,6 @@ If you want to start the system with test data like users, programs, transfer re
 
   - Users with specific roles (the email domain for specific users is defined on the config.js file)
 
-    - test-approver / password
-    - test-controller / password
-    - test-viewer / password
     - test-super / password
 
 ### Database Migrations
@@ -68,52 +67,28 @@ The jobs are located in the `/jobs` folder. They start running with `npm run ser
 
 ### Running Jobs
 
-#### Requires change
+#### Check deploy contract transaction
 
-`/jobs/requires-change-notification.ts`
+Responsible to check if there are any pending deploy contract transactions and check on the blockchain if the transaction was successful or not, and update the transaction status and the contract table accordingly.
 
-The requires change job is used to send a notification to the users that have a transfer request that requires change for more than 30 days.
-The job runs at 06:00 AM every day in the server timezone.
+#### Check submit ticket transaction
 
-#### Check pending transfer requests
-
-`/jobs/check-pending-transfer.ts`
-
-The check pending transfer job is responsible to check if there are any pending transfer requests and check on the blockchain if the transfer was successful or not, and update the transfer request status accordingly.
-The job runs every 2 minutes.
+Responsible to check if there are any pending submit ticket transactions and check on the blockchain if the transaction was successful or not, and update the transaction status, user credits, and the ticket table accordingly.
 
 
-## Adding a New Token to Emissary
+#### Check buy credits transaction
 
-Emissary supports a variety of tokens. To integrate a new token into the system, simply follow these steps:
+Responsible to check if there are any pending buy credits transactions and check on the blockchain if the transaction was successful or not, and update the transaction status and user credits accordingly.
 
-1. **Icon Addition**:
-   - Place the icon of the new token into the `/public/blockchain-icons` directory. This icon represents the token in the Emissary interface.
 
-2. **Token Information Update**:
-   - Update the `chains.ts` file with the new token's details. This file contains essential information about different chains supported by Emissary. For detailed guidance on how to format and enter this information, refer to the [Chain Configuration Documentation](/docs/chains-config.md).
+#### Check refund transaction
 
-3. **Network Configuration**:
-   - Modify the `hardhat.config.ts` file to include the new token. Specifically, add an `accounts` attribute under the network configuration where the token will be deployed. For example:
+Responsible to check if there are any pending refund transactions and check on the blockchain if the transaction was successful or not, and update the transaction status, user credits, and the tickets accordingly.
 
-     ```javascript
-     YOUR_CHAIN_NAME: {
-       chainId: 11155111,
-       url: 'https://ethereum-sepolia.blockpi.network/v1/rpc/public',
-       accounts: [YOUR_PRIVATE_KEY],
-     },
-     ```
+#### Check expired ticket groups
 
-4. **Deploying the Contract**:
-   - Execute the deployment command. Replace `YOUR_CHAIN_NAME` in the command below with the actual name of the chain to which you are deploying:
+Responsible to check if there are any expired ticket groups and update the ticket group status and the tickets status accordingly.
 
-     ```shell
-     npm run deploy:YOUR_CHAIN_NAME
-     ```
-
-   This command initiates the deployment of the contract to the specified blockchain network.
-
-By following these steps, you can seamlessly add new tokens to the Emissary system, enhancing its functionality and compatibility.
 
 ## Tests
 

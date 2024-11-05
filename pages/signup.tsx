@@ -11,7 +11,7 @@ export default function SignUp() {
 
   useEffect(() => {
     if (query?.from === 'draft-email') {
-      Cookie.set('@Emissary:fromDraftEmail', JSON.stringify(query), { expires: 14 })
+      Cookie.set('@Filpass:fromDraftEmail', JSON.stringify(query), { expires: 14 })
     }
   }, [query])
 

@@ -1,5 +1,5 @@
 name: Have you encountered an issue?
-description: Create a bug report for Emissary
+description: Create a bug report for FilPass
 title: '[Bug]: '
 labels: ['Bug']
 body:
@@ -7,10 +7,10 @@ body:
     attributes:
       label: Verify latest release
       options:
-        - label: I verified that the issue exists in the latest Emissary release.
+        - label: I verified that the issue exists in the latest FilPass release.
           required: true
       description: >-
-        Please check the latest version of Emissary. Some issues may already be fixed in the latest version, so please verify that your issue reproduces before opening a new issue.
+        Please check the latest version of FilPass. Some issues may already be fixed in the latest version, so please verify that your issue reproduces before opening a new issue.
   - type: textarea
     validations:
       required: true
