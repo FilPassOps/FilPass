@@ -4,7 +4,7 @@ import schedule from 'node-schedule'
 
 import checkBuyCreditsTransaction from './check-buy-credits-transaction'
 import checkRefundTransaction from './check-refund-transaction'
-import checkWithdrawTransaction from './check-withdraw-transaction'
+import checkSubmitTicketTransaction from './check-submit-ticket-transaction'
 import checkDeployContractTransaction from './check-deploy-contract-transaction'
 import checkExpiredTicketGroups from './check-expired-ticket-groups'
 const checkBuyCreditsTransactionLimiter = new Bottleneck({
@@ -15,7 +15,7 @@ const checkRefundTransactionLimiter = new Bottleneck({
   maxConcurrent: 1,
 })
 
-const checkWithdrawTransactionLimiter = new Bottleneck({
+const checkSubmitTicketTransactionLimiter = new Bottleneck({
   maxConcurrent: 1,
 })
 
@@ -43,6 +43,6 @@ schedule.scheduleJob('* * * * *', job(checkExpiredTicketGroupsLimiter, checkExpi
 
 schedule.scheduleJob('* * * * *', job(checkBuyCreditsTransactionLimiter, checkBuyCreditsTransaction))
 schedule.scheduleJob('* * * * *', job(checkRefundTransactionLimiter, checkRefundTransaction))
-schedule.scheduleJob('* * * * *', job(checkWithdrawTransactionLimiter, checkWithdrawTransaction))
+schedule.scheduleJob('* * * * *', job(checkSubmitTicketTransactionLimiter, checkSubmitTicketTransaction))
 
 logger.info(`> Jobs scheduled...`)

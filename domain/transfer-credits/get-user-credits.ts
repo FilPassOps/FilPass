@@ -25,12 +25,12 @@ export const getUserCredits = async (props: GetUserCreditsParams) => {
       select: {
         id: true,
         totalHeight: true,
-        totalWithdrawals: true,
+        totalSubmitTicket: true,
         totalRefunds: true,
         updatedAt: true,
         refundStartsAt: true,
-        withdrawExpiresAt: true,
-        withdrawStartsAt: true,
+        submitTicketExpiresAt: true,
+        submitTicketStartsAt: true,
         amount: true,
         contract: {
           select: {
@@ -40,7 +40,7 @@ export const getUserCredits = async (props: GetUserCreditsParams) => {
         creditTransactions: {
           select: {
             id: true,
-            storageProvider: {
+            receiver: {
               select: {
                 walletAddress: true,
               },
@@ -69,7 +69,7 @@ export const getUserCredits = async (props: GetUserCreditsParams) => {
     const userCreditItems = userCredit.map(item => {
       return {
         ...item,
-        isWithdrawExpired: item.withdrawExpiresAt && item.withdrawExpiresAt < new Date(),
+        isSubmitTicketExpired: item.submitTicketExpiresAt && item.submitTicketExpiresAt < new Date(),
         isRefundStarted: item.refundStartsAt && item.refundStartsAt < new Date(),
       }
     })

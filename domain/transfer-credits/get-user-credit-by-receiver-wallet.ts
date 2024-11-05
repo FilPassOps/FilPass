@@ -12,7 +12,7 @@ export const getUserCreditByReceiverWallet = async (props: GetUserCreditByReceiv
 
     const userCredit = await prisma.userCredit.findFirst({
       where: {
-        storageProvider: {
+        receiver: {
           walletAddress: fields.receiverWallet.toLowerCase(),
         },
         userId: fields.userId,

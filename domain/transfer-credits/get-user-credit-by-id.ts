@@ -19,10 +19,10 @@ export const getUserCreditById = async (props: GetUserCreditByIdParams) => {
         id: true,
         totalHeight: true,
         totalRefunds: true,
-        totalWithdrawals: true,
+        totalSubmitTicket: true,
         updatedAt: true,
-        withdrawStartsAt: true,
-        withdrawExpiresAt: true,
+        submitTicketStartsAt: true,
+        submitTicketExpiresAt: true,
         refundStartsAt: true,
         amount: true,
         contract: {
@@ -31,7 +31,7 @@ export const getUserCreditById = async (props: GetUserCreditByIdParams) => {
             deployedFromAddress: true,
           },
         },
-        storageProvider: {
+        receiver: {
           select: {
             walletAddress: true,
           },
@@ -39,7 +39,7 @@ export const getUserCreditById = async (props: GetUserCreditByIdParams) => {
         creditTransactions: {
           select: {
             id: true,
-            storageProvider: {
+            receiver: {
               select: {
                 walletAddress: true,
               },

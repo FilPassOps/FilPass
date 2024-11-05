@@ -38,7 +38,7 @@ interface TicketGroupDetailsProps {
 const TicketGroupDetails = ({ data, totalItems, totalRedeemed, pageSize }: TicketGroupDetailsProps) => {
   const { userCreditDetails, ticketGroup, expired } = data
 
-  const currentHeight = ethers.BigNumber.from(userCreditDetails?.totalWithdrawals ?? 0).add(
+  const currentHeight = ethers.BigNumber.from(userCreditDetails?.totalSubmitTicket ?? 0).add(
     userCreditDetails?.totalRefunds ?? 0
   )
 
@@ -55,7 +55,7 @@ const TicketGroupDetails = ({ data, totalItems, totalRedeemed, pageSize }: Ticke
             <div>
               <div>
                 <dt className="text-gray-900 font-medium">Receiver</dt>
-                <dd className="text-sm text-gray-500">{userCreditDetails.creditTransactions[0].storageProvider.walletAddress}</dd>
+                <dd className="text-sm text-gray-500">{userCreditDetails.creditTransactions[0].receiver.walletAddress}</dd>
               </div>
               <div>
                 <dt className="text-gray-900 font-medium">Contract</dt>
@@ -68,7 +68,7 @@ const TicketGroupDetails = ({ data, totalItems, totalRedeemed, pageSize }: Ticke
                 <dt className="text-gray-900 font-medium">Credits Locked Until:</dt>
                 <dd className="text-sm text-gray-500">
                   <Timestamp
-                    date={new Date(userCreditDetails.withdrawExpiresAt).toISOString()}
+                    date={new Date(userCreditDetails.submitTicketExpiresAt).toISOString()}
                     format={DateTime.DATETIME_SHORT_WITH_SECONDS}
                   />
                 </dd>

@@ -19,7 +19,7 @@ export const TransferCreditList = ({ userCreditItems }: TransferCreditListProps)
         </div>
       )}
       {userCreditItems.map(item => {
-        const currentHeight = ethers.BigNumber.from(item.totalWithdrawals).add(item.totalRefunds)
+        const currentHeight = ethers.BigNumber.from(item.totalSubmitTicket).add(item.totalRefunds)
         const totalHeight = ethers.BigNumber.from(item.totalHeight)
 
         const currentCredit = totalHeight.sub(currentHeight)
@@ -34,7 +34,7 @@ export const TransferCreditList = ({ userCreditItems }: TransferCreditListProps)
               <div className="text-gamboge-orange bg-papaya-whip p-4 rounded-t-lg" role="alert">
                 <p className="font-bold">Attention</p>
                 <p>
-                  This credit has expired on {new Date(item.withdrawExpiresAt).toLocaleString()}. <br />
+                  This credit has expired on {new Date(item.submitTicketExpiresAt).toLocaleString()}. <br />
                   You can only refund your credits or top up to continue using the service with this Receiver.
                 </p>
               </div>
@@ -53,12 +53,12 @@ export const TransferCreditList = ({ userCreditItems }: TransferCreditListProps)
                 <div className="flex flex-col gap-2">
                   <h2 className="text-2xl font-semibold text-deep-koamaru mb-2">
                     Receiver:{' '}
-                    {item.creditTransactions[0].storageProvider.walletAddress.length > 30
-                      ? `${item.creditTransactions[0].storageProvider.walletAddress.slice(
+                    {item.creditTransactions[0].receiver.walletAddress.length > 30
+                      ? `${item.creditTransactions[0].receiver.walletAddress.slice(
                           0,
                           5,
-                        )}...${item.creditTransactions[0].storageProvider.walletAddress.slice(-5)}`
-                      : item.creditTransactions[0].storageProvider.walletAddress}
+                        )}...${item.creditTransactions[0].receiver.walletAddress.slice(-5)}`
+                      : item.creditTransactions[0].receiver.walletAddress}
                   </h2>
 
                   <div>
@@ -73,7 +73,7 @@ export const TransferCreditList = ({ userCreditItems }: TransferCreditListProps)
                 <div className="flex flex-col gap-2">
                   <div className="text-left md:text-right">
                     <p className="text-gray-600">Credits Locked Until:</p>
-                    <p className={'text-sm text-gray-500'}>{new Date(item.withdrawExpiresAt).toLocaleString()}</p>
+                    <p className={'text-sm text-gray-500'}>{new Date(item.submitTicketExpiresAt).toLocaleString()}</p>
                   </div>
                   <div className="text-left md:text-right">
                     <p className="text-gray-600">Refund Starts on:</p>

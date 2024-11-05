@@ -3,7 +3,7 @@ import { verify } from 'lib/jwt'
 import { submitTicketValidator } from './validation'
 import { ethers } from 'ethers'
 import { CreditTicketStatus, TransactionStatus } from '@prisma/client'
-import { FilecoinDepositWithdrawRefund__factory as FilecoinDepositWithdrawRefundFactory } from 'typechain-types'
+import { FilPass__factory as FilPassFactory } from 'typechain-types'
 import { getContractsByUserId } from 'domain/contracts/get-contracts-by-user-id'
 import { AppConfig } from 'config/system'
 import { getPaymentErrorMessage } from 'components/Web3/utils'
@@ -29,23 +29,23 @@ export const submitTicket = async (props: SubmitTicketParams): Promise<SubmitTic
       throw new Error('Invalid token', { cause: 'INVALID' })
     }
 
-    const storageProvider = await prisma.storageProvider.findUnique({
+    const receiver = await prisma.receiver.findUnique({
       where: {
         walletAddress: result.data.aud,
       },
     })
 
-    if (!storageProvider) {
-      throw new Error('Storage provider not found', { cause: 'INVALID' })
+    if (!receiver) {
+      throw new Error('Receiver provider not found', { cause: 'INVALID' })
     }
 
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
-    const withdrawTransactionCount = await prisma.withdrawTransaction.count({
+    const submitTicketTransactionCount = await prisma.submitTicketTransaction.count({
       where: {
         userCredit: {
-          storageProviderId: storageProvider.id,
+          receiverId: receiver.id,
         },
         createdAt: {
           gte: today,
@@ -53,8 +53,8 @@ export const submitTicket = async (props: SubmitTicketParams): Promise<SubmitTic
       },
     })
 
-    if (withdrawTransactionCount >= parseInt(process.env.WITHDRAW_TRANSACTION_LIMIT as string)) {
-      throw new Error('Withdraw transaction limit exceeded for today', { cause: 'INVALID' })
+    if (submitTicketTransactionCount >= parseInt(process.env.SUBMIT_TICKET_TRANSACTION_LIMIT as string)) {
+      throw new Error('Submit ticket transaction limit exceeded for today', { cause: 'INVALID' })
     }
 
     const creditTicket = await prisma.creditTicket.findUnique({
@@ -74,8 +74,8 @@ export const submitTicket = async (props: SubmitTicketParams): Promise<SubmitTic
       throw new Error('Credit ticket not found', { cause: 'INVALID' })
     }
 
-    if (creditTicket.ticketGroup.expiresAt! < new Date() || creditTicket.ticketGroup.userCredit.withdrawExpiresAt! < new Date()) {
-      throw new Error('Withdrawal expired', { cause: 'INVALID' })
+    if (creditTicket.ticketGroup.expiresAt! < new Date() || creditTicket.ticketGroup.userCredit.submitTicketExpiresAt! < new Date()) {
+      throw new Error('Submit ticket expired', { cause: 'INVALID' })
     }
 
     if (creditTicket.status !== CreditTicketStatus.VALID) {
@@ -90,7 +90,7 @@ export const submitTicket = async (props: SubmitTicketParams): Promise<SubmitTic
       throw new Error('Contracts not found')
     }
 
-    const currentHeight = ethers.BigNumber.from(creditTicket.ticketGroup.userCredit.totalWithdrawals).add(
+    const currentHeight = ethers.BigNumber.from(creditTicket.ticketGroup.userCredit.totalSubmitTicket).add(
       creditTicket.ticketGroup.userCredit.totalRefunds,
     )
 
@@ -104,11 +104,11 @@ export const submitTicket = async (props: SubmitTicketParams): Promise<SubmitTic
 
     const wallet = new ethers.Wallet(process.env.SYSTEM_WALLET_PRIVATE_KEY as string, provider)
 
-    const filpass = FilecoinDepositWithdrawRefundFactory.connect(contracts[0].address, wallet)
+    const filpass = FilPassFactory.connect(contracts[0].address, wallet)
 
-    const transaction = await filpass.withdrawAmount(result.data)
+    const transaction = await filpass.submitTicket(result.data)
 
-    await prisma.withdrawTransaction.create({
+    await prisma.submitTicketTransaction.create({
       data: {
         creditTicketId: creditTicket.id,
         transactionHash: transaction.hash,

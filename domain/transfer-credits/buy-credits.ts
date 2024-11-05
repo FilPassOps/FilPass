@@ -28,14 +28,14 @@ export const buyCredits = async (props: BuyCreditsParams) => {
       throw new Error('Invalid receiver address')
     }
 
-    let creditStorageProvider = await prisma.storageProvider.findUnique({
+    let creditReceiver = await prisma.receiver.findUnique({
       where: {
         walletAddress: fields.to,
       },
     })
 
-    if (!creditStorageProvider) {
-      creditStorageProvider = await prisma.storageProvider.create({
+    if (!creditReceiver) {
+      creditReceiver = await prisma.receiver.create({
         data: {
           walletAddress: fields.to.toLowerCase(),
         },
@@ -51,7 +51,7 @@ export const buyCredits = async (props: BuyCreditsParams) => {
     const existingUserCredit = await prisma.userCredit.findFirst({
       where: {
         userId: fields.userId,
-        storageProviderId: creditStorageProvider.id,
+        receiverId: creditReceiver.id,
         contractId: contracts[0].id,
       },
     })
@@ -60,7 +60,7 @@ export const buyCredits = async (props: BuyCreditsParams) => {
 
     // TODO: encrypt amount and other important info
     await prisma.$transaction(async tx => {
-      if (!creditStorageProvider || !creditStorageProvider.id) {
+      if (!creditReceiver || !creditReceiver.id) {
         throw new Error('Failed to create or find receiver')
       }
 
@@ -70,7 +70,7 @@ export const buyCredits = async (props: BuyCreditsParams) => {
         userCredit = await tx.userCredit.create({
           data: {
             userId: fields.userId,
-            storageProviderId: creditStorageProvider.id,
+            receiverId: creditReceiver.id,
             contractId: contracts[0].id,
           },
         })
@@ -79,7 +79,7 @@ export const buyCredits = async (props: BuyCreditsParams) => {
       await tx.creditTransaction.create({
         data: {
           from: fields.from,
-          storageProviderId: creditStorageProvider.id,
+          receiverId: creditReceiver.id,
           transactionHash: fields.hash,
           status: TransactionStatus.PENDING,
           amount,

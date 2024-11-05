@@ -12,19 +12,19 @@ export interface UserCreditItem {
   id: number
   height: string
   updatedAt: Date
-  withdrawExpiresAt: Date
-  isWithdrawExpired: boolean
+  submitTicketExpiresAt: Date
+  isSubmitTicketExpired: boolean
   refundStartsAt: Date
   isRefundStarted: boolean
   totalHeight: string
-  totalWithdrawals: string
+  totalSubmitTicket: string
   totalRefunds: string
   contract: {
     address: string
   }
   creditTransactions: {
     id: number
-    storageProvider: {
+    receiver: {
       walletAddress: string
     }
   }[]

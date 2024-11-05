@@ -2,10 +2,10 @@ import { CreditTicketStatus, LedgerType, Prisma, TransactionStatus } from '@pris
 import { AppConfig } from 'config/system'
 import { ethers } from 'ethers'
 import prisma from 'lib/prisma'
-import { FilecoinDepositWithdrawRefund__factory as FilecoinDepositWithdrawRefundFactory } from 'typechain-types'
+import { FilPass__factory as FilPassFactory } from 'typechain-types'
 
-const contractInterface = FilecoinDepositWithdrawRefundFactory.createInterface()
-const withdrawMadeEvent = contractInterface.getEvent('WithdrawalMade')
+const contractInterface = FilPassFactory.createInterface()
+const ticketSubmittedEvent = contractInterface.getEvent('TicketSubmitted')
 
 const { network, token } = AppConfig.network.getFilecoin()
 
@@ -13,7 +13,7 @@ export default async function run() {
   try {
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000) // 24 hours ago
 
-    const pendingTransactions = await prisma.withdrawTransaction.findMany({
+    const pendingTransactions = await prisma.submitTicketTransaction.findMany({
       where: {
         status: TransactionStatus.PENDING,
         createdAt: {
@@ -34,8 +34,8 @@ export default async function run() {
           select: {
             id: true,
             refundStartsAt: true,
-            withdrawStartsAt: true,
-            withdrawExpiresAt: true,
+            submitTicketStartsAt: true,
+            submitTicketExpiresAt: true,
             totalHeight: true,
           },
         },
@@ -70,7 +70,7 @@ export default async function run() {
         receipt.logs.forEach(async log => {
           const parsed = contractInterface.parseLog(log)
 
-          if (parsed.name !== withdrawMadeEvent.name) return
+          if (parsed.name !== ticketSubmittedEvent.name) return
 
           await prisma.$transaction(
             async tx => {
@@ -92,7 +92,7 @@ export default async function run() {
                 return
               }
 
-              const currentHeight = ethers.BigNumber.from(txCreditTicket.ticketGroup.userCredit.totalWithdrawals).add(
+              const currentHeight = ethers.BigNumber.from(txCreditTicket.ticketGroup.userCredit.totalSubmitTicket).add(
                 txCreditTicket.ticketGroup.userCredit.totalRefunds,
               )
               const ticketAmount = ethers.BigNumber.from(txCreditTicket.height).sub(currentHeight)
@@ -102,11 +102,11 @@ export default async function run() {
                 data: {
                   userCreditId: txCreditTicket.ticketGroup.userCredit.id,
                   amount: ticketAmount.toString(),
-                  type: LedgerType.WITHDRAWAL,
+                  type: LedgerType.SUBMIT_TICKET,
                 },
               })
 
-              const totalWithdrawals = ethers.BigNumber.from(txCreditTicket.ticketGroup.userCredit.totalWithdrawals).add(ticketAmount)
+              const totalSubmitTicket = ethers.BigNumber.from(txCreditTicket.ticketGroup.userCredit.totalSubmitTicket).add(ticketAmount)
 
               await tx.userCredit.update({
                 where: {
@@ -114,7 +114,7 @@ export default async function run() {
                 },
                 data: {
                   amount: amount.toString(),
-                  totalWithdrawals: totalWithdrawals.toString(),
+                  totalSubmitTicket: totalSubmitTicket.toString(),
                 },
               })
 
@@ -140,7 +140,7 @@ export default async function run() {
                 },
               })
 
-              await tx.withdrawTransaction.update({
+              await tx.submitTicketTransaction.update({
                 where: {
                   id,
                 },
@@ -154,9 +154,9 @@ export default async function run() {
             { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
           )
         })
-        console.log('Withdraw made successfully with transaction hash', transactionHash)
+        console.log('Submit ticket made successfully with transaction hash', transactionHash)
       } else {
-        await prisma.withdrawTransaction.update({
+        await prisma.submitTicketTransaction.update({
           where: {
             transactionHash,
           },
@@ -165,7 +165,7 @@ export default async function run() {
             failReason: `Transaction failed with the following receipt status: ${receipt.status}`,
           },
         })
-        console.log('Withdraw made failed with transaction hash', transactionHash)
+        console.log('Submit ticket made failed with transaction hash', transactionHash)
       }
     }
   } catch (error) {

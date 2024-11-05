@@ -5,7 +5,7 @@ CREATE TYPE "Role" AS ENUM ('USER', 'SUPERADMIN', 'ADDRESS_MANAGER', 'VIEWER');
 CREATE TYPE "TransactionStatus" AS ENUM ('PENDING', 'SUCCESS', 'FAILED');
 
 -- CreateEnum
-CREATE TYPE "LedgerType" AS ENUM ('DEPOSIT', 'WITHDRAWAL', 'REFUND');
+CREATE TYPE "LedgerType" AS ENUM ('DEPOSIT', 'SUBMIT_TICKET', 'REFUND');
 
 -- CreateEnum
 CREATE TYPE "CreditTicketStatus" AS ENUM ('REFUNDED', 'EXPIRED', 'REDEEMED', 'VALID', 'INVALID');
@@ -147,13 +147,13 @@ CREATE TABLE "blockchain" (
 );
 
 -- CreateTable
-CREATE TABLE "storage_provider" (
+CREATE TABLE "receiver" (
     "id" SERIAL NOT NULL,
     "wallet_address" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "storage_provider_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "receiver_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -162,7 +162,7 @@ CREATE TABLE "credit_transaction" (
     "transaction_hash" TEXT NOT NULL,
     "status" "TransactionStatus" NOT NULL DEFAULT 'PENDING',
     "from" TEXT NOT NULL,
-    "storage_provider_id" INTEGER NOT NULL,
+    "receiver_id" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "amount" TEXT NOT NULL,
@@ -221,7 +221,7 @@ CREATE TABLE "contract" (
 );
 
 -- CreateTable
-CREATE TABLE "withdraw_transaction" (
+CREATE TABLE "submit_ticket_transaction" (
     "id" SERIAL NOT NULL,
     "transaction_hash" TEXT NOT NULL,
     "status" "TransactionStatus" NOT NULL DEFAULT 'PENDING',
@@ -234,23 +234,23 @@ CREATE TABLE "withdraw_transaction" (
     "confirmations" INTEGER NOT NULL DEFAULT 0,
     "block_number" TEXT NOT NULL DEFAULT '0',
 
-    CONSTRAINT "withdraw_transaction_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "submit_ticket_transaction_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "user_credit" (
     "id" SERIAL NOT NULL,
     "user_id" INTEGER NOT NULL,
-    "storage_provider_id" INTEGER NOT NULL,
+    "receiver_id" INTEGER NOT NULL,
     "amount" TEXT NOT NULL DEFAULT '0',
     "total_height" TEXT DEFAULT '0',
-    "total_withdrawals" TEXT NOT NULL DEFAULT '0',
+    "total_submit_ticket" TEXT NOT NULL DEFAULT '0',
     "total_refunds" TEXT NOT NULL DEFAULT '0',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "refund_starts_at" TIMESTAMP(3),
-    "withdraw_starts_at" TIMESTAMP(3),
-    "withdraw_expires_at" TIMESTAMP(3),
+    "submit_ticket_starts_at" TIMESTAMP(3),
+    "submit_ticket_expires_at" TIMESTAMP(3),
     "contract_id" INTEGER NOT NULL,
 
     CONSTRAINT "user_credit_pkey" PRIMARY KEY ("id")
@@ -332,10 +332,10 @@ CREATE UNIQUE INDEX "blockchain_name_key" ON "blockchain"("name");
 CREATE UNIQUE INDEX "blockchain_chain_id_key" ON "blockchain"("chain_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "storage_provider_wallet_address_key" ON "storage_provider"("wallet_address");
+CREATE UNIQUE INDEX "receiver_wallet_address_key" ON "receiver"("wallet_address");
 
 -- CreateIndex
-CREATE INDEX "storage_provider_wallet_address_idx" ON "storage_provider"("wallet_address");
+CREATE INDEX "receiver_wallet_address_idx" ON "receiver"("wallet_address");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "credit_transaction_transaction_hash_key" ON "credit_transaction"("transaction_hash");
@@ -377,16 +377,16 @@ CREATE INDEX "contract_user_id_idx" ON "contract"("user_id");
 CREATE INDEX "contract_deployed_from_address_idx" ON "contract"("deployed_from_address");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "withdraw_transaction_transaction_hash_key" ON "withdraw_transaction"("transaction_hash");
+CREATE UNIQUE INDEX "submit_ticket_transaction_transaction_hash_key" ON "submit_ticket_transaction"("transaction_hash");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "withdraw_transaction_credit_ticket_id_key" ON "withdraw_transaction"("credit_ticket_id");
+CREATE UNIQUE INDEX "submit_ticket_transaction_credit_ticket_id_key" ON "submit_ticket_transaction"("credit_ticket_id");
 
 -- CreateIndex
-CREATE INDEX "withdraw_transaction_transaction_hash_idx" ON "withdraw_transaction"("transaction_hash");
+CREATE INDEX "submit_ticket_transaction_transaction_hash_idx" ON "submit_ticket_transaction"("transaction_hash");
 
 -- CreateIndex
-CREATE INDEX "withdraw_transaction_status_idx" ON "withdraw_transaction"("status");
+CREATE INDEX "submit_ticket_transaction_status_idx" ON "submit_ticket_transaction"("status");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "user_credit_contract_id_key" ON "user_credit"("contract_id");
@@ -449,7 +449,7 @@ ALTER TABLE "auth_verification" ADD CONSTRAINT "auth_verification_user_id_fkey" 
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "credit_transaction" ADD CONSTRAINT "credit_transaction_storage_provider_id_fkey" FOREIGN KEY ("storage_provider_id") REFERENCES "storage_provider"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "credit_transaction" ADD CONSTRAINT "credit_transaction_receiver_id_fkey" FOREIGN KEY ("receiver_id") REFERENCES "receiver"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "credit_transaction" ADD CONSTRAINT "credit_transaction_user_credit_id_fkey" FOREIGN KEY ("user_credit_id") REFERENCES "user_credit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -467,16 +467,16 @@ ALTER TABLE "contract" ADD CONSTRAINT "contract_transaction_id_fkey" FOREIGN KEY
 ALTER TABLE "contract" ADD CONSTRAINT "contract_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "withdraw_transaction" ADD CONSTRAINT "withdraw_transaction_user_credit_id_fkey" FOREIGN KEY ("user_credit_id") REFERENCES "user_credit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "submit_ticket_transaction" ADD CONSTRAINT "submit_ticket_transaction_user_credit_id_fkey" FOREIGN KEY ("user_credit_id") REFERENCES "user_credit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "withdraw_transaction" ADD CONSTRAINT "withdraw_transaction_credit_ticket_id_fkey" FOREIGN KEY ("credit_ticket_id") REFERENCES "credit_ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "submit_ticket_transaction" ADD CONSTRAINT "submit_ticket_transaction_credit_ticket_id_fkey" FOREIGN KEY ("credit_ticket_id") REFERENCES "credit_ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "user_credit" ADD CONSTRAINT "user_credit_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "user_credit" ADD CONSTRAINT "user_credit_storage_provider_id_fkey" FOREIGN KEY ("storage_provider_id") REFERENCES "storage_provider"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "user_credit" ADD CONSTRAINT "user_credit_receiver_id_fkey" FOREIGN KEY ("receiver_id") REFERENCES "receiver"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "user_credit" ADD CONSTRAINT "user_credit_contract_id_fkey" FOREIGN KEY ("contract_id") REFERENCES "contract"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

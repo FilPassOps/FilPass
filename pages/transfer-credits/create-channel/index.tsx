@@ -52,7 +52,7 @@ const CreateChannel = ({ data }: CreateChannelProps) => {
     resolver: yupResolver(createChannelValidator),
     defaultValues: {
       amount: 1,
-      storageProviderWallet: '',
+      receiverWallet: '',
     },
     shouldFocusError: true,
     mode: 'onSubmit',
@@ -60,14 +60,14 @@ const CreateChannel = ({ data }: CreateChannelProps) => {
 
   const handleFormSubmit = async (values: FormValue) => {
     try {
-      if (!values.amount || !values.storageProviderWallet) return
+      if (!values.amount || !values.receiverWallet) return
 
       setReceiverWalletError(undefined)
       setMetamaskWalletError(undefined)
 
-      const storageProviderWallet = validateWalletAddress(values.storageProviderWallet)
+      const receiverWallet = validateWalletAddress(values.receiverWallet)
 
-      if (!storageProviderWallet) {
+      if (!receiverWallet) {
         setReceiverWalletError({
           message: `Invalid receiver wallet address.`,
         })
@@ -85,7 +85,7 @@ const CreateChannel = ({ data }: CreateChannelProps) => {
         }
 
         const { data: userCredit } = await api.post('/transfer-credits/get-user-credit-by-receiver-wallet', {
-          receiverWallet: storageProviderWallet,
+          receiverWallet: receiverWallet,
         })
 
         if (userCredit) {
@@ -96,7 +96,7 @@ const CreateChannel = ({ data }: CreateChannelProps) => {
         }
 
         setMetamaskWalletError(undefined)
-        await handleDepositAmount(values, storageProviderWallet)
+        await handleDepositAmount(values, receiverWallet)
       } else {
         if (!data.wallets || data.wallets.length === 0) {
           setMetamaskWalletError({
@@ -131,7 +131,7 @@ const CreateChannel = ({ data }: CreateChannelProps) => {
     }
   }
 
-  const handleDepositAmount = async (values: FormValue, storageProviderWallet: string) => {
+  const handleDepositAmount = async (values: FormValue, receiverWallet: string) => {
     try {
       const systemWalletAddress = process.env.NEXT_PUBLIC_SYSTEM_WALLET_ADDRESS
 
@@ -153,13 +153,13 @@ const CreateChannel = ({ data }: CreateChannelProps) => {
         return false
       }
 
-      const result = await depositAmount(systemWalletAddress, storageProviderWallet, 1, values.amount.toString())
+      const result = await depositAmount(systemWalletAddress, receiverWallet, 1, values.amount.toString())
 
       if (result) {
         await api.post('/transfer-credits', {
           hash: result.hash,
           from: result.from,
-          to: storageProviderWallet,
+          to: receiverWallet,
           amount: values.amount,
         })
 
@@ -210,11 +210,11 @@ const CreateChannel = ({ data }: CreateChannelProps) => {
             <div className="flex flex-col gap-2">
               <TextInput
                 label="Receiver Wallet"
-                id="storageProviderWallet"
+                id="receiverWallet"
                 type="text"
                 placeholder="Insert a valid address"
-                error={errors.storageProviderWallet || receiverWalletError}
-                {...register(`storageProviderWallet`)}
+                error={errors.receiverWallet || receiverWalletError}
+                {...register(`receiverWallet`)}
               />
               <p className="text-gray-600 text-xs">Check if you are transferring to the correct receiver wallet.</p>
             </div>
