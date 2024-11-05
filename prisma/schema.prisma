@@ -35,20 +35,19 @@ enum CreditTicketStatus {
 }
 
 model User {
-  id                  Int                  @id @default(autoincrement())
-  email               String               @unique
-  emailHash           String?
-  password            String?
-  isVerified          Boolean              @default(false) @map("is_verified")
-  isActive            Boolean              @default(true) @map("is_active")
-  isDraft             Boolean              @default(false) @map("is_draft")
-  createdAt           DateTime             @default(now()) @map("created_at")
-  updatedAt           DateTime             @updatedAt @map("updated_at")
-  terms               Boolean?
-  roles               UserRole[]
-  wallets             UserWallet[]
-  walletVerifications WalletVerification[]
-
+  id                        Int                         @id @default(autoincrement())
+  email                     String                      @unique
+  emailHash                 String?
+  password                  String?
+  isVerified                Boolean                     @default(false) @map("is_verified")
+  isActive                  Boolean                     @default(true) @map("is_active")
+  isDraft                   Boolean                     @default(false) @map("is_draft")
+  createdAt                 DateTime                    @default(now()) @map("created_at")
+  updatedAt                 DateTime                    @updatedAt @map("updated_at")
+  terms                     Boolean?
+  roles                     UserRole[]
+  wallets                   UserWallet[]
+  walletVerifications       WalletVerification[]
   authVerifications         AuthVerification[]
   sessions                  Session[]
   isBanned                  Boolean                     @default(false) @map("is_banned")

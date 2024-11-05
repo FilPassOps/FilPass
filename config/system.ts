@@ -164,7 +164,10 @@ function getNativeToken(chain: Chain) {
 
 function getFilecoin() {
   const network = getChainByName('Filecoin')
-  const token = network.tokens.find(token => token.symbol === 'tFIL') as NativeToken
+
+  const tokenName = process.env.IS_DEV ? 'tFIL' : 'FIL'
+
+  const token = network.tokens.find(token => token.symbol === tokenName) as NativeToken
 
   return {
     network,
