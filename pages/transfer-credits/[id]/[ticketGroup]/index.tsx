@@ -55,7 +55,7 @@ const TicketGroupDetails = ({ data, totalItems, totalRedeemed, pageSize }: Ticke
             <div>
               <div>
                 <dt className="text-gray-900 font-medium">Receiver</dt>
-                <dd className="text-sm text-gray-500">{userCreditDetails.creditTransactions[0].storageProvider.walletAddress}</dd>
+                <dd className="text-sm text-gray-500">{userCreditDetails.creditTransactions[0].receiver.walletAddress}</dd>
               </div>
               <div>
                 <dt className="text-gray-900 font-medium">Contract</dt>

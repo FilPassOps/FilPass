@@ -147,13 +147,13 @@ CREATE TABLE "blockchain" (
 );
 
 -- CreateTable
-CREATE TABLE "storage_provider" (
+CREATE TABLE "receiver" (
     "id" SERIAL NOT NULL,
     "wallet_address" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "storage_provider_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "receiver_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -162,7 +162,7 @@ CREATE TABLE "credit_transaction" (
     "transaction_hash" TEXT NOT NULL,
     "status" "TransactionStatus" NOT NULL DEFAULT 'PENDING',
     "from" TEXT NOT NULL,
-    "storage_provider_id" INTEGER NOT NULL,
+    "receiver_id" INTEGER NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "amount" TEXT NOT NULL,
@@ -241,7 +241,7 @@ CREATE TABLE "withdraw_transaction" (
 CREATE TABLE "user_credit" (
     "id" SERIAL NOT NULL,
     "user_id" INTEGER NOT NULL,
-    "storage_provider_id" INTEGER NOT NULL,
+    "receiver_id" INTEGER NOT NULL,
     "amount" TEXT NOT NULL DEFAULT '0',
     "total_height" TEXT DEFAULT '0',
     "total_withdrawals" TEXT NOT NULL DEFAULT '0',
@@ -332,10 +332,10 @@ CREATE UNIQUE INDEX "blockchain_name_key" ON "blockchain"("name");
 CREATE UNIQUE INDEX "blockchain_chain_id_key" ON "blockchain"("chain_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "storage_provider_wallet_address_key" ON "storage_provider"("wallet_address");
+CREATE UNIQUE INDEX "receiver_wallet_address_key" ON "receiver"("wallet_address");
 
 -- CreateIndex
-CREATE INDEX "storage_provider_wallet_address_idx" ON "storage_provider"("wallet_address");
+CREATE INDEX "receiver_wallet_address_idx" ON "receiver"("wallet_address");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "credit_transaction_transaction_hash_key" ON "credit_transaction"("transaction_hash");
@@ -449,7 +449,7 @@ ALTER TABLE "auth_verification" ADD CONSTRAINT "auth_verification_user_id_fkey" 
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "credit_transaction" ADD CONSTRAINT "credit_transaction_storage_provider_id_fkey" FOREIGN KEY ("storage_provider_id") REFERENCES "storage_provider"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "credit_transaction" ADD CONSTRAINT "credit_transaction_receiver_id_fkey" FOREIGN KEY ("receiver_id") REFERENCES "receiver"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "credit_transaction" ADD CONSTRAINT "credit_transaction_user_credit_id_fkey" FOREIGN KEY ("user_credit_id") REFERENCES "user_credit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -476,7 +476,7 @@ ALTER TABLE "withdraw_transaction" ADD CONSTRAINT "withdraw_transaction_credit_t
 ALTER TABLE "user_credit" ADD CONSTRAINT "user_credit_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "user_credit" ADD CONSTRAINT "user_credit_storage_provider_id_fkey" FOREIGN KEY ("storage_provider_id") REFERENCES "storage_provider"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "user_credit" ADD CONSTRAINT "user_credit_receiver_id_fkey" FOREIGN KEY ("receiver_id") REFERENCES "receiver"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "user_credit" ADD CONSTRAINT "user_credit_contract_id_fkey" FOREIGN KEY ("contract_id") REFERENCES "contract"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

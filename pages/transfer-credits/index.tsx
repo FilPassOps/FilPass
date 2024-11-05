@@ -24,7 +24,7 @@ export interface UserCreditItem {
   }
   creditTransactions: {
     id: number
-    storageProvider: {
+    receiver: {
       walletAddress: string
     }
   }[]

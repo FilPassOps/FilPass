@@ -31,7 +31,7 @@ export interface CreditTicket {
 
 interface CreditTransaction {
   id: number
-  storageProvider: {
+  receiver: {
     walletAddress: string
   }
   status: string
@@ -114,7 +114,7 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
         return false
       }
 
-      const result = await refundAmount(systemWalletAddress, userCreditDetails.creditTransactions[0].storageProvider.walletAddress)
+      const result = await refundAmount(systemWalletAddress, userCreditDetails.creditTransactions[0].receiver.walletAddress)
 
       if (result) {
         await api.post('/transfer-credits/refund-credits', {
@@ -197,7 +197,7 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
             <div>
               <div>
                 <dt className="text-gray-900 font-medium">Receiver</dt>
-                <dd className="text-sm text-gray-500">{userCreditDetails.creditTransactions[0].storageProvider.walletAddress}</dd>
+                <dd className="text-sm text-gray-500">{userCreditDetails.creditTransactions[0].receiver.walletAddress}</dd>
               </div>
               <div>
                 <dt className="text-gray-900 font-medium">Contract</dt>
@@ -266,7 +266,7 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
           </Button>
 
           <LinkButton
-            href={`/transfer-credits/top-up?to=${userCreditDetails.creditTransactions[0].storageProvider.walletAddress}`}
+            href={`/transfer-credits/top-up?to=${userCreditDetails.creditTransactions[0].receiver.walletAddress}`}
             variant="primary"
             className="w-fit"
             disabled={isRefundLoading}

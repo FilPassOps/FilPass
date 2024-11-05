@@ -40,7 +40,7 @@ export const getUserCredits = async (props: GetUserCreditsParams) => {
         creditTransactions: {
           select: {
             id: true,
-            storageProvider: {
+            receiver: {
               select: {
                 walletAddress: true,
               },

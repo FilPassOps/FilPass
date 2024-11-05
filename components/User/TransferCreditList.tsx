@@ -53,12 +53,12 @@ export const TransferCreditList = ({ userCreditItems }: TransferCreditListProps)
                 <div className="flex flex-col gap-2">
                   <h2 className="text-2xl font-semibold text-deep-koamaru mb-2">
                     Receiver:{' '}
-                    {item.creditTransactions[0].storageProvider.walletAddress.length > 30
-                      ? `${item.creditTransactions[0].storageProvider.walletAddress.slice(
+                    {item.creditTransactions[0].receiver.walletAddress.length > 30
+                      ? `${item.creditTransactions[0].receiver.walletAddress.slice(
                           0,
                           5,
-                        )}...${item.creditTransactions[0].storageProvider.walletAddress.slice(-5)}`
-                      : item.creditTransactions[0].storageProvider.walletAddress}
+                        )}...${item.creditTransactions[0].receiver.walletAddress.slice(-5)}`
+                      : item.creditTransactions[0].receiver.walletAddress}
                   </h2>
 
                   <div>

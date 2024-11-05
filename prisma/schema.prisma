@@ -196,7 +196,7 @@ model Blockchain {
   @@map("blockchain")
 }
 
-model StorageProvider {
+model Receiver {
   id                 Int                 @id @default(autoincrement())
   walletAddress      String              @unique @map("wallet_address")
   createdAt          DateTime            @default(now()) @map("created_at")
@@ -205,7 +205,7 @@ model StorageProvider {
   userCredit         UserCredit[]
 
   @@index([walletAddress])
-  @@map("storage_provider")
+  @@map("receiver")
 }
 
 model CreditTransaction {
@@ -213,8 +213,8 @@ model CreditTransaction {
   transactionHash      String            @unique @map("transaction_hash")
   status               TransactionStatus @default(PENDING)
   from                 String            @map("from")
-  storageProvider      StorageProvider   @relation(fields: [storageProviderId], references: [id])
-  storageProviderId    Int               @map("storage_provider_id")
+  receiver             Receiver          @relation(fields: [receiverId], references: [id])
+  receiverId           Int               @map("receiver_id")
   createdAt            DateTime          @default(now()) @map("created_at")
   updatedAt            DateTime          @updatedAt @map("updated_at")
   userCredit           UserCredit        @relation(fields: [userCreditId], references: [id])
@@ -308,8 +308,8 @@ model UserCredit {
   id                  Int                   @id @default(autoincrement())
   userId              Int                   @map("user_id")
   user                User                  @relation(fields: [userId], references: [id])
-  storageProviderId   Int                   @map("storage_provider_id")
-  storageProvider     StorageProvider       @relation(fields: [storageProviderId], references: [id])
+  receiverId          Int                   @map("receiver_id")
+  receiver            Receiver              @relation(fields: [receiverId], references: [id])
   amount              String                @default("0") @map("amount")
   totalHeight         String?               @default("0") @map("total_height")
   totalWithdrawals    String                @default("0") @map("total_withdrawals")

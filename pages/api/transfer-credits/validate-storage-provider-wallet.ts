@@ -1,10 +1,10 @@
-import { validateStorageProviderWallet } from 'domain/transfer-credits/validate-storage-provider-wallet'
+import { validateReceiverWallet } from 'domain/transfer-credits/validate-receiver-wallet'
 import { newHandler, NextApiRequestWithSession, withMethods, withUser, withValidation } from 'lib/middleware'
 import yup from 'lib/yup'
 import { NextApiResponse } from 'next'
 
 const requestSchema = yup.object({
-  storageProviderWalletAddress: yup.string().required(),
+  receiverWalletAddress: yup.string().required(),
 })
 
 interface Request extends NextApiRequestWithSession {
@@ -13,7 +13,7 @@ interface Request extends NextApiRequestWithSession {
 
 async function handler(req: Request, res: NextApiResponse) {
   try {
-    const result = await validateStorageProviderWallet(req.body.storageProviderWalletAddress)
+    const result = await validateReceiverWallet(req.body.receiverWalletAddress)
     return res.status(200).json(result)
   } catch (error: any) {
     console.error(error)

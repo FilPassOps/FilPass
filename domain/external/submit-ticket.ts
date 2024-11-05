@@ -29,14 +29,14 @@ export const submitTicket = async (props: SubmitTicketParams): Promise<SubmitTic
       throw new Error('Invalid token', { cause: 'INVALID' })
     }
 
-    const storageProvider = await prisma.storageProvider.findUnique({
+    const receiver = await prisma.receiver.findUnique({
       where: {
         walletAddress: result.data.aud,
       },
     })
 
-    if (!storageProvider) {
-      throw new Error('Storage provider not found', { cause: 'INVALID' })
+    if (!receiver) {
+      throw new Error('Receiver provider not found', { cause: 'INVALID' })
     }
 
     const today = new Date()
@@ -45,7 +45,7 @@ export const submitTicket = async (props: SubmitTicketParams): Promise<SubmitTic
     const withdrawTransactionCount = await prisma.withdrawTransaction.count({
       where: {
         userCredit: {
-          storageProviderId: storageProvider.id,
+          receiverId: receiver.id,
         },
         createdAt: {
           gte: today,

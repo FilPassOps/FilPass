@@ -56,7 +56,7 @@ const TopUp = ({ data }: TopUpProps) => {
     resolver: yupResolver(topUpTransferCreditsValidator),
     defaultValues: {
       amount: 1,
-      storageProviderWallet: to || '',
+      receiverWallet: to || '',
       additionalTicketDays: Number(process.env.NEXT_PUBLIC_SUBMIT_TICKET_DAYS) || 1,
     },
     shouldFocusError: true,
@@ -65,13 +65,13 @@ const TopUp = ({ data }: TopUpProps) => {
 
   const handleFormSubmit = async (values: FormValue) => {
     try {
-      if (!values.amount || !values.storageProviderWallet) return
+      if (!values.amount || !values.receiverWallet) return
 
       setReceiverWalletError(undefined)
 
-      const storageProviderWallet = validateWalletAddress(values.storageProviderWallet)
+      const receiverWallet = validateWalletAddress(values.receiverWallet)
 
-      if (!storageProviderWallet) {
+      if (!receiverWallet) {
         setReceiverWalletError({
           message: `Invalid receiver wallet address.`,
         })
@@ -89,7 +89,7 @@ const TopUp = ({ data }: TopUpProps) => {
         }
 
         setMetamaskWalletError(undefined)
-        await handleDepositAmount(values, storageProviderWallet)
+        await handleDepositAmount(values, receiverWallet)
       } else {
         if (!data.wallets || data.wallets.length === 0) {
           setMetamaskWalletError({
@@ -124,7 +124,7 @@ const TopUp = ({ data }: TopUpProps) => {
     }
   }
 
-  const handleDepositAmount = async (values: FormValue, storageProviderWallet: string) => {
+  const handleDepositAmount = async (values: FormValue, receiverWallet: string) => {
     try {
       const systemWalletAddress = process.env.NEXT_PUBLIC_SYSTEM_WALLET_ADDRESS
 
@@ -148,7 +148,7 @@ const TopUp = ({ data }: TopUpProps) => {
 
       const result = await depositAmount(
         systemWalletAddress,
-        storageProviderWallet,
+        receiverWallet,
         values.additionalTicketDays || Number(process.env.NEXT_PUBLIC_SUBMIT_TICKET_DAYS),
         values.amount.toString(),
       )
@@ -157,7 +157,7 @@ const TopUp = ({ data }: TopUpProps) => {
         await api.post('/transfer-credits', {
           hash: result.hash,
           from: result.from,
-          to: storageProviderWallet,
+          to: receiverWallet,
           amount: values.amount,
           additionalTicketDays: values.additionalTicketDays || Number(process.env.NEXT_PUBLIC_SUBMIT_TICKET_DAYS),
         })
@@ -209,12 +209,12 @@ const TopUp = ({ data }: TopUpProps) => {
             <div className="flex flex-col gap-2">
               <TextInput
                 label="Receiver Wallet"
-                id="storageProviderWallet"
+                id="receiverWallet"
                 type="text"
                 disabled={true}
                 placeholder="Insert a valid address"
-                error={errors.storageProviderWallet || receiverWalletError}
-                {...register(`storageProviderWallet`)}
+                error={errors.receiverWallet || receiverWalletError}
+                {...register(`receiverWallet`)}
               />
             </div>
 

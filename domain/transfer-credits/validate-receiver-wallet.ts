@@ -1,7 +1,7 @@
 import { validateWalletAddress } from "lib/blockchain-utils"
 import { stateMinerInfo } from "lib/filecoin-rpc-api"
 
-export const validateStorageProviderWallet = async (walletAddress: string) => {
+export const validateReceiverWallet = async (walletAddress: string) => {
   const isValid = validateWalletAddress(walletAddress)
 
   if (!isValid) {

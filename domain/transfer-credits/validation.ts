@@ -17,7 +17,7 @@ export const getUserTransactionCreditsByUserIdValidator = yup.object({
 
 export const topUpTransferCreditsValidator = yup.object({
   amount: yup.number().positive().typeError(errorsMessages.required_field.message).required(),
-  storageProviderWallet: yup.string().required(),
+  receiverWallet: yup.string().required(),
   additionalTicketDays: yup
     .number()
     .min(1, 'Additional ticket days must be greater than 0')
@@ -27,7 +27,7 @@ export const topUpTransferCreditsValidator = yup.object({
 
 export const createChannelValidator = yup.object({
   amount: yup.number().positive().typeError(errorsMessages.required_field.message).required(),
-  storageProviderWallet: yup.string().required(),
+  receiverWallet: yup.string().required(),
 })
 
 export const saveTransferCreditsValidator = yup.object({
