@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { CustomWindow, useMetaMask } from './MetaMaskProvider'
 import {
-  FilecoinDepositWithdrawRefund,
-  FilecoinDepositWithdrawRefund__factory as FilecoinDepositWithdrawRefundFactory,
+  FilPass,
+  FilPass__factory as FilPassFactory,
 } from 'typechain-types'
 import { ethers } from 'ethers'
 import { AppConfig } from 'config/system'
@@ -14,7 +14,7 @@ export const useContract = (contractAddress: string | null) => {
   const { chainId, wallet, setBusy } = useMetaMask()
   const [provider, setProvider] = useState<ethers.providers.Web3Provider>()
   const [signer, setSigner] = useState<ethers.providers.JsonRpcSigner>()
-  const [filpass, setFilpass] = useState<FilecoinDepositWithdrawRefund>()
+  const [filpass, setFilpass] = useState<FilPass>()
 
   const { network } = AppConfig.network.getFilecoin()
 
@@ -25,7 +25,7 @@ export const useContract = (contractAddress: string | null) => {
     const signer = provider.getSigner()
 
     if (contractAddress) {
-      const filpass = FilecoinDepositWithdrawRefundFactory.connect(contractAddress, signer)
+      const filpass = FilPassFactory.connect(contractAddress, signer)
       setFilpass(filpass)
     }
 
@@ -85,7 +85,7 @@ export const useContract = (contractAddress: string | null) => {
 
     try {
       setBusy(true)
-      const factory = new FilecoinDepositWithdrawRefundFactory(signer)
+      const factory = new FilPassFactory(signer)
       const contract = await factory.deploy()
       return contract
     } catch (error: any) {

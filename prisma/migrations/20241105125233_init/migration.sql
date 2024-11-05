@@ -5,7 +5,7 @@ CREATE TYPE "Role" AS ENUM ('USER', 'SUPERADMIN', 'ADDRESS_MANAGER', 'VIEWER');
 CREATE TYPE "TransactionStatus" AS ENUM ('PENDING', 'SUCCESS', 'FAILED');
 
 -- CreateEnum
-CREATE TYPE "LedgerType" AS ENUM ('DEPOSIT', 'WITHDRAWAL', 'REFUND');
+CREATE TYPE "LedgerType" AS ENUM ('DEPOSIT', 'SUBMIT_TICKET', 'REFUND');
 
 -- CreateEnum
 CREATE TYPE "CreditTicketStatus" AS ENUM ('REFUNDED', 'EXPIRED', 'REDEEMED', 'VALID', 'INVALID');
@@ -221,7 +221,7 @@ CREATE TABLE "contract" (
 );
 
 -- CreateTable
-CREATE TABLE "withdraw_transaction" (
+CREATE TABLE "submit_ticket_transaction" (
     "id" SERIAL NOT NULL,
     "transaction_hash" TEXT NOT NULL,
     "status" "TransactionStatus" NOT NULL DEFAULT 'PENDING',
@@ -234,7 +234,7 @@ CREATE TABLE "withdraw_transaction" (
     "confirmations" INTEGER NOT NULL DEFAULT 0,
     "block_number" TEXT NOT NULL DEFAULT '0',
 
-    CONSTRAINT "withdraw_transaction_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "submit_ticket_transaction_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -244,13 +244,13 @@ CREATE TABLE "user_credit" (
     "receiver_id" INTEGER NOT NULL,
     "amount" TEXT NOT NULL DEFAULT '0',
     "total_height" TEXT DEFAULT '0',
-    "total_withdrawals" TEXT NOT NULL DEFAULT '0',
+    "total_submit_ticket" TEXT NOT NULL DEFAULT '0',
     "total_refunds" TEXT NOT NULL DEFAULT '0',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
     "refund_starts_at" TIMESTAMP(3),
-    "withdraw_starts_at" TIMESTAMP(3),
-    "withdraw_expires_at" TIMESTAMP(3),
+    "submit_ticket_starts_at" TIMESTAMP(3),
+    "submit_ticket_expires_at" TIMESTAMP(3),
     "contract_id" INTEGER NOT NULL,
 
     CONSTRAINT "user_credit_pkey" PRIMARY KEY ("id")
@@ -377,16 +377,16 @@ CREATE INDEX "contract_user_id_idx" ON "contract"("user_id");
 CREATE INDEX "contract_deployed_from_address_idx" ON "contract"("deployed_from_address");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "withdraw_transaction_transaction_hash_key" ON "withdraw_transaction"("transaction_hash");
+CREATE UNIQUE INDEX "submit_ticket_transaction_transaction_hash_key" ON "submit_ticket_transaction"("transaction_hash");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "withdraw_transaction_credit_ticket_id_key" ON "withdraw_transaction"("credit_ticket_id");
+CREATE UNIQUE INDEX "submit_ticket_transaction_credit_ticket_id_key" ON "submit_ticket_transaction"("credit_ticket_id");
 
 -- CreateIndex
-CREATE INDEX "withdraw_transaction_transaction_hash_idx" ON "withdraw_transaction"("transaction_hash");
+CREATE INDEX "submit_ticket_transaction_transaction_hash_idx" ON "submit_ticket_transaction"("transaction_hash");
 
 -- CreateIndex
-CREATE INDEX "withdraw_transaction_status_idx" ON "withdraw_transaction"("status");
+CREATE INDEX "submit_ticket_transaction_status_idx" ON "submit_ticket_transaction"("status");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "user_credit_contract_id_key" ON "user_credit"("contract_id");
@@ -467,10 +467,10 @@ ALTER TABLE "contract" ADD CONSTRAINT "contract_transaction_id_fkey" FOREIGN KEY
 ALTER TABLE "contract" ADD CONSTRAINT "contract_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "withdraw_transaction" ADD CONSTRAINT "withdraw_transaction_user_credit_id_fkey" FOREIGN KEY ("user_credit_id") REFERENCES "user_credit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "submit_ticket_transaction" ADD CONSTRAINT "submit_ticket_transaction_user_credit_id_fkey" FOREIGN KEY ("user_credit_id") REFERENCES "user_credit"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "withdraw_transaction" ADD CONSTRAINT "withdraw_transaction_credit_ticket_id_fkey" FOREIGN KEY ("credit_ticket_id") REFERENCES "credit_ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "submit_ticket_transaction" ADD CONSTRAINT "submit_ticket_transaction_credit_ticket_id_fkey" FOREIGN KEY ("credit_ticket_id") REFERENCES "credit_ticket"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "user_credit" ADD CONSTRAINT "user_credit_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

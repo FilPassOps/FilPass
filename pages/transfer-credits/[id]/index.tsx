@@ -41,11 +41,11 @@ interface CreditTransaction {
 export interface UserCreditDetails {
   id: number
   totalHeight: string
-  totalWithdrawals: string
+  totalSubmitTicket: string
   totalRefunds: string
   updatedAt: Date
-  withdrawStartsAt: Date
-  withdrawExpiresAt: Date
+  submitTicketStartsAt: Date
+  submitTicketExpiresAt: Date
   refundStartsAt: Date
   amount: string
   creditTransactions: CreditTransaction[]
@@ -81,10 +81,10 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
 
   const { token, network } = AppConfig.network.getFilecoin()
 
-  const isWithdrawExpired = new Date(userCreditDetails.withdrawExpiresAt) < new Date()
+  const isSubmitTicketExpired = new Date(userCreditDetails.submitTicketExpiresAt) < new Date()
   const isRefundStarted = new Date(userCreditDetails.refundStartsAt) < new Date()
 
-  const currentHeight = ethers.BigNumber.from(userCreditDetails.totalWithdrawals).add(userCreditDetails.totalRefunds)
+  const currentHeight = ethers.BigNumber.from(userCreditDetails.totalSubmitTicket).add(userCreditDetails.totalRefunds)
   const currentCredits = ethers.BigNumber.from(userCreditDetails.totalHeight).sub(currentHeight)
 
   const parsedCurrentCredits = formatUnits(currentCredits, token.decimals)
@@ -178,7 +178,7 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
             <div className="mb-7 text-sm rounded-lg p-4 space-y-4 text-gamboge-orange bg-papaya-whip">
               <p className="font-bold">Attention</p>
               <p>
-                This credit has expired on <strong>{new Date(userCreditDetails.withdrawExpiresAt).toLocaleString()}</strong>. <br />
+                This credit has expired on <strong>{new Date(userCreditDetails.submitTicketExpiresAt).toLocaleString()}</strong>. <br />
                 You can only refund your credits or top up to continue using the service with this Receiver.
               </p>
             </div>
@@ -210,7 +210,7 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
                 <dt className="text-gray-900 font-medium">Credits Locked Until:</dt>
                 <dd className="text-sm text-gray-500">
                   <Timestamp
-                    date={new Date(userCreditDetails.withdrawExpiresAt).toISOString()}
+                    date={new Date(userCreditDetails.submitTicketExpiresAt).toISOString()}
                     format={DateTime.DATETIME_SHORT_WITH_SECONDS}
                   />
                 </dd>
@@ -259,8 +259,8 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
             }}
             variant="primary"
             className="w-fit"
-            disabled={isWithdrawExpired || isRefundLoading}
-            toolTipText={isWithdrawExpired ? 'This credit has expired' : ''}
+            disabled={isSubmitTicketExpired || isRefundLoading}
+            toolTipText={isSubmitTicketExpired ? 'This credit has expired' : ''}
           >
             <p>Create Tickets</p>
           </Button>
@@ -280,9 +280,9 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
               connectWalletLabel="Connect MetaMask to refund"
               switchChainLabel="Switch network to refund"
               variant="red"
-              disabled={!isWithdrawExpired || !isRefundStarted || !hasCredits}
+              disabled={!isSubmitTicketExpired || !isRefundStarted || !hasCredits}
               toolTipText={
-                !isWithdrawExpired
+                !isSubmitTicketExpired
                   ? ' This credit has not expired yet'
                   : !isRefundStarted
                   ? 'This credit cannot be refunded yet'

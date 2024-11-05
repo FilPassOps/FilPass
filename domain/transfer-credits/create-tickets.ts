@@ -25,12 +25,12 @@ export const createTickets = async (props: CreateTicketsParams) => {
 
     const { data, error } = await getUserCreditById({ id: fields.id, userId: fields.userId })
 
-    if (!data || error || !data.totalRefunds || !data.totalWithdrawals || !data.withdrawExpiresAt || !data.totalHeight) {
+    if (!data || error || !data.totalRefunds || !data.totalSubmitTicket || !data.submitTicketExpiresAt || !data.totalHeight) {
       throw new Error('User credit not found')
     }
 
-    if (data.withdrawExpiresAt < new Date()) {
-      throw new Error('Withdrawal expired')
+    if (data.submitTicketExpiresAt < new Date()) {
+      throw new Error('Submit ticket expired')
     }
 
     if (!data.contract) {
@@ -43,7 +43,7 @@ export const createTickets = async (props: CreateTicketsParams) => {
       throw new Error('FIL token not found')
     }
 
-    const currentHeight = ethers.BigNumber.from(data.totalWithdrawals).add(data.totalRefunds)
+    const currentHeight = ethers.BigNumber.from(data.totalSubmitTicket).add(data.totalRefunds)
     const totalHeight = ethers.BigNumber.from(data.totalHeight!)
     const remaining = totalHeight.sub(currentHeight)
     const creditPerTicket = parseUnits(fields.creditPerTicket.toString(), token.decimals)
@@ -67,13 +67,13 @@ export const createTickets = async (props: CreateTicketsParams) => {
     }
 
     // TODO: check to set it at a fixed time
-    const expirationDateTime = new Date(data.withdrawExpiresAt.getTime() - ONE_HOUR_TIME).getTime()
+    const expirationDateTime = new Date(data.submitTicketExpiresAt.getTime() - ONE_HOUR_TIME).getTime()
     const issuedAt = Math.floor(Date.now() / 1000)
 
     const ticketGroup = await prisma.ticketGroup.create({
       data: {
         userCreditId: data.id,
-        expiresAt: data.withdrawExpiresAt,
+        expiresAt: data.submitTicketExpiresAt,
       },
     })
 
@@ -108,7 +108,7 @@ export const createTickets = async (props: CreateTicketsParams) => {
               ticket_lane: 0,
               lane_total_amount: ticketHeight.toString(),
               lane_guaranteed_amount: ticketAmount.toString(),
-              lane_guaranteed_until: data.withdrawExpiresAt?.getTime(),
+              lane_guaranteed_until: data.submitTicketExpiresAt?.getTime(),
             },
             process.env.PRIVATE_KEY as string,
             {

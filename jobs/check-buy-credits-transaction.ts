@@ -2,14 +2,14 @@ import { LedgerType, Prisma, TransactionStatus } from '@prisma/client'
 import { AppConfig } from 'config/system'
 import { ethers } from 'ethers'
 import prisma from 'lib/prisma'
-import { FilecoinDepositWithdrawRefund__factory as FilecoinDepositWithdrawRefundFactory } from 'typechain-types'
+import { FilPass__factory as FilPassFactory } from 'typechain-types'
 
 // 1 day
 const LOCK_DAYS_TIME = parseInt(process.env.NEXT_PUBLIC_LOCK_DAYS || '1') * 24 * 60 * 60 * 1000
 
 const ONE_DAY_TIME = 1 * 24 * 60 * 60 * 1000
 
-const contractInterface = FilecoinDepositWithdrawRefundFactory.createInterface()
+const contractInterface = FilPassFactory.createInterface()
 const depositMadeEvent = contractInterface.getEvent('DepositMade')
 
 const { network, token } = AppConfig.network.getFilecoin()
@@ -34,8 +34,8 @@ export default async function run() {
           select: {
             id: true,
             refundStartsAt: true,
-            withdrawStartsAt: true,
-            withdrawExpiresAt: true,
+            submitTicketStartsAt: true,
+            submitTicketExpiresAt: true,
             totalHeight: true,
           },
         },
@@ -109,27 +109,27 @@ export default async function run() {
                 return
               }
 
-              let withdrawStartsAt: Date | undefined
-              let withdrawExpiresAt: Date | undefined
+              let submitTicketStartsAt: Date | undefined
+              let submitTicketExpiresAt: Date | undefined
               let refundStartsAt: Date | undefined
 
               const amount = txUserCredit.amount ? paidAmount.add(txUserCredit.amount).toString() : paidAmount.toString()
 
               const totalHeight = txUserCredit.totalHeight ? paidAmount.add(txUserCredit.totalHeight).toString() : paidAmount.toString()
 
-              const fistCredits = !txUserCredit.withdrawStartsAt
+              const fistCredits = !txUserCredit.submitTicketStartsAt
               const expiredCredit = txUserCredit.refundStartsAt && new Date() >= txUserCredit.refundStartsAt
 
               const ticketTime = additionalTicketDays * 24 * 60 * 60 * 1000
 
               if (fistCredits || expiredCredit) {
-                withdrawStartsAt = new Date()
-                withdrawExpiresAt = new Date(withdrawStartsAt.getTime() + ticketTime)
-                refundStartsAt = new Date(withdrawExpiresAt.getTime() + LOCK_DAYS_TIME + ONE_DAY_TIME)
+                submitTicketStartsAt = new Date()
+                submitTicketExpiresAt = new Date(submitTicketStartsAt.getTime() + ticketTime)
+                refundStartsAt = new Date(submitTicketExpiresAt.getTime() + LOCK_DAYS_TIME + ONE_DAY_TIME)
               } else {
-                withdrawStartsAt = userCredit.withdrawStartsAt!
-                withdrawExpiresAt = new Date(userCredit.withdrawExpiresAt!.getTime() + ticketTime)
-                refundStartsAt = new Date(withdrawExpiresAt.getTime() + ONE_DAY_TIME)
+                submitTicketStartsAt = userCredit.submitTicketStartsAt!
+                submitTicketExpiresAt = new Date(userCredit.submitTicketExpiresAt!.getTime() + ticketTime)
+                refundStartsAt = new Date(submitTicketExpiresAt.getTime() + LOCK_DAYS_TIME + ONE_DAY_TIME)
               }
 
               await tx.creditTransaction.update({
@@ -149,8 +149,8 @@ export default async function run() {
                 },
                 data: {
                   totalHeight,
-                  withdrawStartsAt,
-                  withdrawExpiresAt,
+                  submitTicketStartsAt,
+                  submitTicketExpiresAt,
                   refundStartsAt,
                   amount,
                 },

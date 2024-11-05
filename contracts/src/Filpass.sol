@@ -5,10 +5,10 @@ import '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import '@openzeppelin/contracts/utils/structs/EnumerableSet.sol';
 
 /**
- * @title FilecoinDepositWithdrawRefund
- * @dev This contract facilitates secure deposit, withdrawal, and refund of FIL between a user and multiple oracles.
+ * @title FilPass
+ * @dev This contract facilitates secure deposit, ticket submission, and refund of FIL between a user and multiple oracles.
  */
-contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
+contract FilPass is ReentrancyGuard {
   using EnumerableSet for EnumerableSet.AddressSet;
 
   struct DecodedToken {
@@ -51,7 +51,7 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
   }
 
   event DepositMade(address indexed oracle, address indexed recipient, uint256 amount, uint256 refundTime);
-  event WithdrawalMade(address indexed oracle, address indexed recipient, uint256 amount);
+  event TicketSubmitted(address indexed oracle, address indexed recipient, uint256 amount);
   event RefundMade(address indexed oracle, address indexed recipient, uint256 amount);
   event OracleRemoved(address indexed oracle);
   event RecipientRemoved(address indexed oracle, address indexed recipient);
@@ -59,7 +59,7 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
   error InvalidOracleAddress();
   error InvalidRecipientAddress();
   error InvalidLockupTime();
-  error InvalidWithdrawAmount();
+  error InvalidTicketAmount();
   error InsufficientDepositAmount();
   error InvalidParameters();
   error MaxOraclesReached();
@@ -74,8 +74,8 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
   error EmergencyWithdrawalFailed();
   error DirectDepositsNotAllowed();
   error FunctionDoesNotExist();
-  error WithdrawFailed();
-  error WithdrawTimeExpired();
+  error SubmitTicketFailed();
+  error TicketSubmissionTimeExpired();
   error OnlyUserAllowed();
   /**
    * @dev Modifier to restrict function access exclusively to the designated user.
@@ -96,8 +96,8 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
 
   /**
    * @notice Allows the user to deposit FIL specifying an Oracle and a Recipient.
-   * @param oracleAddress The address of the Oracle authorized to withdraw funds.
-   * @param recipient The address of the Recipient designated to receive withdrawals.
+   * @param oracleAddress The address of the Oracle authorized to submit tickets.
+   * @param recipient The address of the Recipient designated to receive tickets.
    * @param lockUpTime The lock-up period in days (e.g., 1 for 1 day, up to `MAX_LOCKUP_DAYS`).
    */
   function depositAmount(address oracleAddress, address recipient, uint256 lockUpTime) external payable onlyUser nonReentrant {
@@ -137,30 +137,30 @@ contract FilecoinDepositWithdrawRefund is ReentrancyGuard {
   }
 
   /**
-   * @notice Allows the designated Oracle to withdraw funds for a specific Recipient before the refund time.
-   * @param decodedToken The decoded token object containing withdrawal information.
+   * @notice Allows the designated Oracle to submit tickets for a specific Recipient before the refund time.
+   * @param decodedToken The decoded token object containing submit ticket information.
    */
-  function withdrawAmount(DecodedToken memory decodedToken) external nonReentrant {
+  function submitTicket(DecodedToken memory decodedToken) external nonReentrant {
     if (decodedToken.aud == address(0)) revert InvalidRecipientAddress();
-    if (decodedToken.lane_guaranteed_amount == 0 || decodedToken.lane_total_amount == 0) revert InvalidWithdrawAmount();
+    if (decodedToken.lane_guaranteed_amount == 0 || decodedToken.lane_total_amount == 0) revert InvalidTicketAmount();
 
     DepositInfo storage info = deposits[msg.sender][decodedToken.aud];
     if (info.exchangedSoFar > decodedToken.lane_total_amount) revert InsufficientFunds();
-    if (block.timestamp >= info.refundTime) revert WithdrawTimeExpired();
+    if (block.timestamp >= info.refundTime) revert TicketSubmissionTimeExpired();
 
-    uint256 amountToWithdraw = decodedToken.lane_total_amount - info.exchangedSoFar;
+    uint256 ticketAmount = decodedToken.lane_total_amount - info.exchangedSoFar;
 
-    if (amountToWithdraw > info.amount) revert InsufficientFunds();
+    if (ticketAmount > info.amount) revert InsufficientFunds();
 
     // Update the deposited amount before transferring funds to prevent reentrancy attacks.
-    info.amount -= amountToWithdraw;
+    info.amount -= ticketAmount;
     info.exchangedSoFar = decodedToken.lane_total_amount;
 
     // Transfer the specified amount of FIL to the Recipient using a low-level call.
-    (bool success, ) = payable(decodedToken.aud).call{value: amountToWithdraw}('');
-    if (!success) revert WithdrawFailed();
+    (bool success, ) = payable(decodedToken.aud).call{value: ticketAmount}('');
+    if (!success) revert SubmitTicketFailed();
 
-    emit WithdrawalMade(msg.sender, decodedToken.aud, amountToWithdraw);
+    emit TicketSubmitted(msg.sender, decodedToken.aud, ticketAmount);
 
     if (info.amount == 0) {
       _removeRecipient(msg.sender, decodedToken.aud);

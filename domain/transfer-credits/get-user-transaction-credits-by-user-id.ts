@@ -45,9 +45,9 @@ export const getUserTransactionCreditsByUserId = async (props: GetUserTransactio
 
       UNION ALL
 
-      SELECT 'WITHDRAW' as type, wt.id, wt.transaction_hash, wt.status, wt.amount, wt.created_at, rc.wallet_address, uc.id as user_credit_id, c.address as contract_address
-      FROM withdraw_transaction wt
-      JOIN user_credit uc ON wt.user_credit_id = uc.id
+      SELECT 'SUBMIT_TICKET' as type, st.id, st.transaction_hash, st.status, st.amount, st.created_at, rc.wallet_address, uc.id as user_credit_id, c.address as contract_address
+      FROM submit_ticket_transaction st
+      JOIN user_credit uc ON st.user_credit_id = uc.id
       JOIN receiver rc ON uc.receiver_id = rc.id
       JOIN contract c ON uc.contract_id = c.id
       WHERE uc.user_id = ${fields.userId}
@@ -71,8 +71,8 @@ SELECT COUNT(*) as count FROM (
 
   UNION ALL
 
-  SELECT wt.id FROM withdraw_transaction wt
-  JOIN user_credit uc ON wt.user_credit_id = uc.id
+  SELECT st.id FROM submit_ticket_transaction st
+  JOIN user_credit uc ON st.user_credit_id = uc.id
   WHERE uc.user_id = ${fields.userId}
 ) AS combined_count
 `

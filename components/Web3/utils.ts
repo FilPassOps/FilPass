@@ -1,7 +1,7 @@
 import errorsMessages from 'wordings-and-errors/errors-messages'
-import { FilecoinDepositWithdrawRefund__factory as FilecoinDepositWithdrawRefundFactory } from 'typechain-types'
+import { FilPass__factory as FilPassFactory } from 'typechain-types'
 
-export const filpassInterface = FilecoinDepositWithdrawRefundFactory.createInterface()
+export const filpassInterface = FilPassFactory.createInterface()
 
 export const getPaymentErrorMessage = (error: any) => {
   if (error.code === 'UNPREDICTABLE_GAS_LIMIT') {

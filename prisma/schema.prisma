@@ -22,7 +22,7 @@ enum TransactionStatus {
 
 enum LedgerType {
   DEPOSIT
-  WITHDRAWAL
+  SUBMIT_TICKET
   REFUND
 }
 
@@ -284,7 +284,7 @@ model Contract {
   @@map("contract")
 }
 
-model WithdrawTransaction {
+model SubmitTicketTransaction {
   id              Int               @id @default(autoincrement())
   transactionHash String            @unique @map("transaction_hash")
   status          TransactionStatus @default(PENDING)
@@ -301,31 +301,31 @@ model WithdrawTransaction {
 
   @@index([transactionHash])
   @@index([status])
-  @@map("withdraw_transaction")
+  @@map("submit_ticket_transaction")
 }
 
 model UserCredit {
-  id                  Int                   @id @default(autoincrement())
-  userId              Int                   @map("user_id")
-  user                User                  @relation(fields: [userId], references: [id])
-  receiverId          Int                   @map("receiver_id")
-  receiver            Receiver              @relation(fields: [receiverId], references: [id])
-  amount              String                @default("0") @map("amount")
-  totalHeight         String?               @default("0") @map("total_height")
-  totalWithdrawals    String                @default("0") @map("total_withdrawals")
-  totalRefunds        String                @default("0") @map("total_refunds")
-  creditTransactions  CreditTransaction[]
-  createdAt           DateTime              @default(now()) @map("created_at")
-  updatedAt           DateTime              @updatedAt @map("updated_at")
-  refundStartsAt      DateTime?             @map("refund_starts_at")
-  withdrawStartsAt    DateTime?             @map("withdraw_starts_at")
-  withdrawExpiresAt   DateTime?             @map("withdraw_expires_at")
-  contractId          Int                   @unique @map("contract_id")
-  contract            Contract              @relation(fields: [contractId], references: [id])
-  ledger              Ledger[]
-  refundTransaction   RefundTransaction[]
-  withdrawTransaction WithdrawTransaction[]
-  ticketGroups        TicketGroup[]
+  id                      Int                       @id @default(autoincrement())
+  userId                  Int                       @map("user_id")
+  user                    User                      @relation(fields: [userId], references: [id])
+  receiverId              Int                       @map("receiver_id")
+  receiver                Receiver                  @relation(fields: [receiverId], references: [id])
+  amount                  String                    @default("0") @map("amount")
+  totalHeight             String?                   @default("0") @map("total_height")
+  totalSubmitTicket       String                    @default("0") @map("total_submit_ticket")
+  totalRefunds            String                    @default("0") @map("total_refunds")
+  creditTransactions      CreditTransaction[]
+  createdAt               DateTime                  @default(now()) @map("created_at")
+  updatedAt               DateTime                  @updatedAt @map("updated_at")
+  refundStartsAt          DateTime?                 @map("refund_starts_at")
+  submitTicketStartsAt    DateTime?                 @map("submit_ticket_starts_at")
+  submitTicketExpiresAt   DateTime?                 @map("submit_ticket_expires_at")
+  contractId              Int                       @unique @map("contract_id")
+  contract                Contract                  @relation(fields: [contractId], references: [id])
+  ledger                  Ledger[]
+  refundTransaction       RefundTransaction[]
+  submitTicketTransaction SubmitTicketTransaction[]
+  ticketGroups            TicketGroup[]
 
   @@index([userId])
   @@map("user_credit")
@@ -346,18 +346,18 @@ model TicketGroup {
 }
 
 model CreditTicket {
-  id                  Int                  @id @default(autoincrement())
-  publicId            String?              @unique() @map("public_id")
-  height              String               @map("height")
-  amount              String               @map("amount")
-  token               String               @map("token")
-  createdAt           DateTime             @default(now()) @map("created_at")
-  updatedAt           DateTime             @updatedAt @map("updated_at")
-  ticketGroup         TicketGroup          @relation(fields: [ticketGroupId], references: [id])
-  ticketGroupId       Int                  @map("ticket_group_id")
-  withdrawTransaction WithdrawTransaction?
-  status              CreditTicketStatus   @default(VALID) @map("status")
-  approximatedHeight  BigInt               @map("approximated_height")
+  id                      Int                      @id @default(autoincrement())
+  publicId                String?                  @unique() @map("public_id")
+  height                  String                   @map("height")
+  amount                  String                   @map("amount")
+  token                   String                   @map("token")
+  createdAt               DateTime                 @default(now()) @map("created_at")
+  updatedAt               DateTime                 @updatedAt @map("updated_at")
+  ticketGroup             TicketGroup              @relation(fields: [ticketGroupId], references: [id])
+  ticketGroupId           Int                      @map("ticket_group_id")
+  submitTicketTransaction SubmitTicketTransaction?
+  status                  CreditTicketStatus       @default(VALID) @map("status")
+  approximatedHeight      BigInt                   @map("approximated_height")
 
   @@index([ticketGroupId])
   @@index([publicId])

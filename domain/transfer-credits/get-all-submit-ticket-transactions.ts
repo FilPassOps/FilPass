@@ -25,7 +25,7 @@ export async function getAllSubmitTicketTransactions(props: GetAllSubmitTicketTr
     const { pageSize, page } = await getAllSubmitTicketTransactionsValidator.validate(props)
     const currentPage = page - 1 < 0 ? 0 : page - 1
 
-    const transactions = await prisma.withdrawTransaction.findMany({
+    const transactions = await prisma.submitTicketTransaction.findMany({
       select: {
         id: true,
         createdAt: true,
@@ -49,7 +49,7 @@ export async function getAllSubmitTicketTransactions(props: GetAllSubmitTicketTr
       },
     })
 
-    const total = await prisma.withdrawTransaction.count({})
+    const total = await prisma.submitTicketTransaction.count({})
 
     return {
       data: { transactions, total },

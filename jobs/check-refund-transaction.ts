@@ -2,9 +2,9 @@ import { CreditTicketStatus, LedgerType, Prisma, TransactionStatus } from '@pris
 import { AppConfig } from 'config/system'
 import { ethers } from 'ethers'
 import prisma from 'lib/prisma'
-import { FilecoinDepositWithdrawRefund__factory as FilecoinDepositWithdrawRefundFactory } from 'typechain-types'
+import { FilPass__factory as FilPassFactory } from 'typechain-types'
 
-const contractInterface = FilecoinDepositWithdrawRefundFactory.createInterface()
+const contractInterface = FilPassFactory.createInterface()
 const refundMadeEvent = contractInterface.getEvent('RefundMade')
 
 const { network, token } = AppConfig.network.getFilecoin()
@@ -28,8 +28,8 @@ export default async function run() {
           select: {
             id: true,
             refundStartsAt: true,
-            withdrawStartsAt: true,
-            withdrawExpiresAt: true,
+            submitTicketStartsAt: true,
+            submitTicketExpiresAt: true,
             totalHeight: true,
           },
         },
@@ -101,7 +101,7 @@ export default async function run() {
                 },
               })
 
-              const currentHeight = ethers.BigNumber.from(txUserCredit.totalRefunds).add(txUserCredit.totalWithdrawals)
+              const currentHeight = ethers.BigNumber.from(txUserCredit.totalRefunds).add(txUserCredit.totalSubmitTicket)
               const totalHeight = ethers.BigNumber.from(txUserCredit.totalHeight)
               const remainCredits = totalHeight.sub(currentHeight)
               const totalRefunds = remainCredits.add(txUserCredit.totalRefunds).toString()

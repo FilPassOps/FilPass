@@ -34,7 +34,7 @@ export const refundCredits = async (props: RefundCreditsParams) => {
         throw new Error('Internal error')
       }
 
-      const currentHeight = ethers.BigNumber.from(userCredit.totalRefunds).add(userCredit.totalWithdrawals)
+      const currentHeight = ethers.BigNumber.from(userCredit.totalRefunds).add(userCredit.totalSubmitTicket)
       const totalHeight = ethers.BigNumber.from(userCredit.totalHeight)
       const remainCredits = totalHeight.sub(currentHeight)
 

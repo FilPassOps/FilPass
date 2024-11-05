@@ -99,12 +99,12 @@ const getTransactionType = (type: string) => {
         ),
         color: 'text-green-500',
       }
-    case 'WITHDRAW':
+    case 'SUBMIT_TICKET':
       return {
         component: (
           <span className="flex items-center gap-2">
             <ArrowDownIcon className="h-5 w-5 text-red-500 stroke-2" />
-            Withdraw
+            Submit Ticket
           </span>
         ),
         color: 'text-red-500',
