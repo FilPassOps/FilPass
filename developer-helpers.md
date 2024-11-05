@@ -2,6 +2,7 @@
 
 - [Table of Contents](#table-of-contents)
 - [Introduction](#introduction)
+- [Change the chain to calibration or mainnet](#change-the-chain-to-calibration-or-mainnet)
 - [Database](#database)
   - [Seeding the database with development data](#seeding-the-database-with-development-data)
   - [Database Migrations](#database-migrations)
@@ -23,6 +24,10 @@
 
 Here are some useful commands and configuration details to help you use FilPass.
 
+
+## Change the chain to calibration or mainnet
+
+To change the chain to calibration or mainnet, you need to change the IS_DEV environment variable to true or false. True is for calibration and false is for mainnet.
 
 ## Database
 

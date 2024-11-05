@@ -64,6 +64,26 @@ const calibration = {
       },
       iconFileName: 'filecoin-icon.svg',
     },
+    {
+      symbol: 'FIL',
+      coinMarketApiCode: 2280, // from https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?symbol=FIL
+      decimals: 18,
+      units: {
+        0: {
+          name: 'FIL',
+          scale: 0,
+        },
+        '-9': {
+          name: 'NANOFIL',
+          scale: -9,
+        },
+        '-18': {
+          name: 'ATTOFIL',
+          scale: -18,
+        },
+      },
+      iconFileName: 'filecoin-icon.svg',
+    },
   ],
 } as const satisfies Chain
 

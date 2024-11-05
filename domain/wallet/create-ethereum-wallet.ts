@@ -1,5 +1,6 @@
 import { sendWalletVerificationNotification } from 'domain/notifications/send-wallet-verification-notification'
 import prisma from 'lib/prisma'
+import { sanctionCheck } from 'lib/sanction-check-api'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
 interface CreateEthereumWalletRequestParams {
@@ -25,6 +26,8 @@ export async function createEthereumWallet(params: CreateEthereumWalletRequestPa
       },
     }
   }
+
+  const checkAddressResult = await sanctionCheck.checkAddress(address)
 
   const result = await prisma.$transaction(async tx => {
     const walletVerification = await tx.walletVerification.create({
@@ -59,6 +62,17 @@ export async function createEthereumWallet(params: CreateEthereumWalletRequestPa
         id: true,
       },
     })
+
+    if (checkAddressResult && checkAddressResult.isSanctioned) {
+      await tx.user.update({
+        where: { id: userId },
+        data: {
+          isBanned: checkAddressResult.isSanctioned,
+          banReason: JSON.stringify(checkAddressResult.details),
+        },
+      })
+    }
+
     return userWallet
   })
 
