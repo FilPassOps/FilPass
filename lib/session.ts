@@ -14,7 +14,7 @@ export const maxAge = 1209600
 
 export const sessionOptions: IronSessionOptions = {
   password: APP_SECRET,
-  cookieName: `@Emissary:session-${APP_URL}`,
+  cookieName: `@Filpass:session-${APP_URL}`,
   cookieOptions: {
     secure: process.env.NODE_ENV === 'production',
     maxAge: maxAge,

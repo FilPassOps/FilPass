@@ -108,7 +108,7 @@ export const Sidebar = ({ toggle = false, setSidebarToggle }: SidebarProps) => {
       {/* Sidebar component, swap this element with another sidebar if you like */}
       <div className="flex flex-col flex-grow bg-teal-800 overflow-y-auto md:pt-5">
         <div className="hidden md:flex items-center shrink-0 px-4">
-          <Link href="/transfer-credits" passHref className="h-10 w-full relative outline-offset-8">
+          <Link href="/transfer-credits" passHref className="h-14 w-full relative outline-offset-8">
             <img className={`object-fill h-full ${toggleClasses(toggle, 'block')}`} src="/logo-written.svg" alt="Logo" />
           </Link>
         </div>
@@ -120,8 +120,8 @@ export const Sidebar = ({ toggle = false, setSidebarToggle }: SidebarProps) => {
               </button>
               <div className="flex gap-2">
                 <div>
-                  <LinkButton variant="primary" href="/transfer-requests/create">
-                    <div className="flex items-center text-sm font-semibold whitespace-nowrap">Create New Request</div>
+                  <LinkButton variant="primary" href="/transfer-credits">
+                    <div className="flex items-center text-sm font-semibold whitespace-nowrap">Overview Channels</div>
                   </LinkButton>
                 </div>
               </div>

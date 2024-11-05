@@ -52,9 +52,9 @@ const app: App = {
   companyName: 'FilPass',
   emailConfig: {
     domain: '@company-host.ai',
-    fromName: 'Company Name',
+    fromName: 'FilPass Support',
     supportAddress: 'platform-name@company.com',
-    logoUrl: 'logo-url',
+    logoUrl: 'https://s3.us-east-2.amazonaws.com/coinemissary.com/filpass-logo.png',
   },
   enableCoinMarketApi: true,
   twitterUrl: 'https://twitter.com',

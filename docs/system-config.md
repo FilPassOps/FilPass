@@ -12,7 +12,7 @@ Here's a breakdown of its properties:
   - `domain`: This string represents the domain of the company's email addresses. It will be used when checking if it was the system that have made changes on a transfer request and the seed dev creating new users.
   - `fromName`: This string represents the name that will appear in the 'From' field of the emails sent by the application.
   - `supportAddress`: This string represents the email address for the application's support. It will be used on some parts of the system and emails.
-  - `logoUrl`: This string represents the URL of the company's logo. It will be used on the emails. You can use the Emissary logo if you don't have one.
+  - `logoUrl`: This string represents the URL of the company's logo. It will be used on the emails.
   - `twitterIconUrl`: This string represents the URL of the Twitter icon. It will be used on the emails.
   - `linkedinIconUrl`: This string represents the URL of the LinkedIn icon. It will be used on the emails.
   - `youtubeIconUrl`: This string represents the URL of the YouTube icon. It will be used on the emails.
@@ -31,12 +31,12 @@ Here's an example of the system configuration file:
 
 ```typescript
 export const app = {
-  name: 'Emissary',
+  name: 'FilPass',
   companyName: 'Your Company',
   emailConfig: {
     domain: '@your-domain.com',
-    fromName: 'Emissary Support',
-    supportAddress: 'emissary@your-company.com',
+    fromName: 'FilPass Support',
+    supportAddress: 'filpass@your-company.com',
     logoUrl: 'https://your-company.com/logo.png',
     twitterIconUrl: 'https://your-company.com/twitter.png',
     linkedinIconUrl: 'https://your-company.com/linkedin.png',

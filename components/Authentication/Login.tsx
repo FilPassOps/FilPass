@@ -94,7 +94,7 @@ export function Login({ redirectAfterLogin }: LoginProps) {
 
     refresh()
     if (redirectAfterLogin) {
-      Cookie.remove('@Emissary:fromDraftEmail')
+      Cookie.remove('@Filpass:fromDraftEmail')
       router.push(redirectAfterLogin)
       return { error: undefined }
     } else {
