@@ -3,6 +3,7 @@ import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/24/solid'
 import { TransactionStatus } from '@prisma/client'
 import { BlockExplorerLink } from 'components/Shared/BlockExplorerLink'
 import { Cell, Header, Table, TableBody, TableHead } from 'components/Shared/Table'
+import Timestamp from 'components/Shared/Timestamp'
 import { AppConfig } from 'config/system'
 import { Transaction } from 'domain/transfer-credits/get-user-transaction-credits-by-user-id'
 import { formatUnits } from 'ethers/lib/utils'
@@ -35,7 +36,7 @@ export const TransactionList = ({ transactions }: TransactionListProps) => {
             return (
               <tr key={transaction.id + transaction.type}>
                 <Cell className="break-all">
-                  {DateTime.fromISO(transaction.created_at).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS)}
+                  <Timestamp date={transaction.created_at} format={DateTime.DATETIME_SHORT_WITH_SECONDS} />
                 </Cell>
                 <Cell className="break-all">{getTransactionType(transaction.type).component}</Cell>
                 <Cell className="break-all">
