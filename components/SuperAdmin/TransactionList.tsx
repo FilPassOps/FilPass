@@ -1,6 +1,7 @@
 import { TransactionStatus } from '@prisma/client'
 import { BlockExplorerLink } from 'components/Shared/BlockExplorerLink'
 import { Cell, Header, Table, TableBody, TableHead } from 'components/Shared/Table'
+import Timestamp from 'components/Shared/Timestamp'
 import { AppConfig } from 'config/system'
 import { SubmitTicketTransaction } from 'domain/transfer-credits/get-all-submit-ticket-transactions'
 import { DateTime } from 'luxon'
@@ -29,7 +30,7 @@ export const TransactionList = ({ transactions }: TransactionListProps) => {
             return (
               <tr key={transaction.id}>
                 <Cell className="break-all">
-                  {DateTime.fromISO(transaction.createdAt).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS)}
+                  <Timestamp date={transaction.createdAt} format={DateTime.DATETIME_SHORT_WITH_SECONDS} />
                 </Cell>
 
                 <Cell className="break-all">{transaction.userCredit.contract.address}</Cell>
