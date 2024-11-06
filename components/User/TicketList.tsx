@@ -18,7 +18,25 @@ export const TicketList = ({ creditTickets, currentHeight, isOpen, expired }: Ti
   const { token } = AppConfig.network.getFilecoin()
 
   const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text)
+    if (window.location.protocol === 'http:' && process.env.IS_DEV) {
+      unsecuredCopyToClipboard(text)
+    } else {
+      navigator.clipboard.writeText(text)
+    }
+
+    function unsecuredCopyToClipboard(text: string) {
+      const textArea = document.createElement('textarea')
+      textArea.value = text
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
+      try {
+        document.execCommand('copy')
+      } catch (err) {
+        console.error('Unable to copy to clipboard', err)
+      }
+      document.body.removeChild(textArea)
+    }
   }
 
   const downloadTickets = () => {
