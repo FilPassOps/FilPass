@@ -73,8 +73,31 @@ export async function getTicketsByTicketGroupId(props: GetTicketsByTicketGroupId
       },
     })
 
+    const totalInvalid = await prisma.creditTicket.count({
+      where: {
+        ticketGroup: {
+          id: ticketGroupId,
+          userCredit: {
+            userId: userId,
+            id: userCreditId,
+          },
+        },
+        status: {
+          not: CreditTicketStatus.VALID,
+        },
+      },
+    })
+
     return {
-      data: { creditTickets, total, totalRedeemed, expired: group?.expired, expiresAt: group?.expiresAt, createdAt: group?.createdAt },
+      data: {
+        creditTickets,
+        total,
+        totalRedeemed,
+        totalInvalid,
+        expired: group?.expired,
+        expiresAt: group?.expiresAt,
+        createdAt: group?.createdAt,
+      },
     }
   } catch (error) {
     console.error('Error fetching tickets by ticket group:', error)

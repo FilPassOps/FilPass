@@ -32,17 +32,18 @@ interface TicketGroupDetailsProps {
   }
   totalItems: number
   totalRedeemed: number
+  totalInvalid: number
   pageSize: number
 }
 
-const TicketGroupDetails = ({ data, totalItems, totalRedeemed, pageSize }: TicketGroupDetailsProps) => {
+const TicketGroupDetails = ({ data, totalItems, totalRedeemed, totalInvalid, pageSize }: TicketGroupDetailsProps) => {
   const { userCreditDetails, ticketGroup, expired } = data
 
   const currentHeight = ethers.BigNumber.from(userCreditDetails?.totalSubmitTicket ?? 0).add(
     userCreditDetails?.totalRefunds ?? 0
   )
 
-  const totalInFlight = totalItems - totalRedeemed
+  const totalInFlight = totalItems - totalInvalid
 
   return (
     <>
@@ -155,6 +156,7 @@ export const getServerSideProps = withUserSSR(async ({ params, user, query }: an
       },
       totalItems: ticketGroup?.total ?? 0,
       totalRedeemed: ticketGroup?.totalRedeemed ?? 0,
+      totalInvalid: ticketGroup?.totalInvalid ?? 0,
       pageSize: pageSize,
     },
   }
