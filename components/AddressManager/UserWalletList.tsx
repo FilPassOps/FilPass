@@ -1,6 +1,7 @@
 import { ArrowDownOnSquareIcon } from '@heroicons/react/24/outline'
 import { Button } from 'components/Shared/Button'
 import { Cell, Header, Table, TableBody, TableHead } from 'components/Shared/Table'
+import Timestamp from 'components/Shared/Timestamp'
 import { WalletAddress } from 'components/Shared/WalletAddress'
 import { AppConfig } from 'config'
 import { stringify } from 'csv-stringify/sync'
@@ -82,7 +83,9 @@ export const UserWalletList = ({ data = [], totalItems }: UserWalletListProps) =
                   className="hidden sm:flex"
                 />
               </Cell>
-              <Cell>{DateTime.fromISO(wallet.updatedAt).toLocaleString(DateTime.DATETIME_SHORT_WITH_SECONDS)}</Cell>
+              <Cell>
+                <Timestamp date={wallet.updatedAt} format={DateTime.DATETIME_SHORT_WITH_SECONDS} />
+              </Cell>
             </tr>
           ))}
         </TableBody>

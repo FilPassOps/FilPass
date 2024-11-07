@@ -33,7 +33,7 @@ export const TransferCreditList = ({ userCreditItems }: TransferCreditListProps)
             {item.isRefundStarted && hasCredits && (
               <div className="text-gamboge-orange bg-papaya-whip p-4 rounded-t-lg" role="alert">
                 <p className="font-bold">Attention</p>
-                <p>
+                <p suppressHydrationWarning>
                   This credit has expired on {new Date(item.submitTicketExpiresAt).toLocaleString()}. <br />
                   You can only refund your credits or top up to continue using the service with this Receiver.
                 </p>
@@ -73,11 +73,15 @@ export const TransferCreditList = ({ userCreditItems }: TransferCreditListProps)
                 <div className="flex flex-col gap-2">
                   <div className="text-left md:text-right">
                     <p className="text-gray-600">Credits Locked Until:</p>
-                    <p className={'text-sm text-gray-500'}>{new Date(item.submitTicketExpiresAt).toLocaleString()}</p>
+                    <p suppressHydrationWarning className={'text-sm text-gray-500'}>
+                      {new Date(item.submitTicketExpiresAt).toLocaleString()}
+                    </p>
                   </div>
                   <div className="text-left md:text-right">
                     <p className="text-gray-600">Refund Starts on:</p>
-                    <p className={'text-sm text-gray-500'}>{new Date(item.refundStartsAt).toLocaleString()}</p>
+                    <p suppressHydrationWarning className={'text-sm text-gray-500'}>
+                      {new Date(item.refundStartsAt).toLocaleString()}
+                    </p>
                   </div>
                 </div>
               </div>

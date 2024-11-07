@@ -177,7 +177,7 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
           {isRefundStarted && hasCredits && (
             <div className="mb-7 text-sm rounded-lg p-4 space-y-4 text-gamboge-orange bg-papaya-whip">
               <p className="font-bold">Attention</p>
-              <p>
+              <p suppressHydrationWarning>
                 This credit has expired on <strong>{new Date(userCreditDetails.submitTicketExpiresAt).toLocaleString()}</strong>. <br />
                 You can only refund your credits or top up to continue using the service with this Receiver.
               </p>
