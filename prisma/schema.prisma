@@ -319,7 +319,7 @@ model UserCredit {
   refundStartsAt          DateTime?                 @map("refund_starts_at")
   submitTicketStartsAt    DateTime?                 @map("submit_ticket_starts_at")
   submitTicketExpiresAt   DateTime?                 @map("submit_ticket_expires_at")
-  contractId              Int                       @unique @map("contract_id")
+  contractId              Int                       @map("contract_id")
   contract                Contract                  @relation(fields: [contractId], references: [id])
   ledger                  Ledger[]
   refundTransaction       RefundTransaction[]
