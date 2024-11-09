@@ -21,6 +21,7 @@ export const useContract = (contractAddress: string | null) => {
   const connectedToTargetChain = wallet && chainId === network.chainId
 
   useEffect(() => {
+    if (!wallet) return
     const provider = new ethers.providers.Web3Provider(window.ethereum as ExternalProvider)
     const signer = provider.getSigner()
 
@@ -35,7 +36,7 @@ export const useContract = (contractAddress: string | null) => {
     return () => {
       filpass?.removeAllListeners()
     }
-  }, [contractAddress])
+  }, [wallet, contractAddress])
 
   const depositAmount = async (oracleAddress: string, recipientAddress: string, lockUpTime: number, amount: string) => {
     if (!filpass || !signer || !provider || !oracleAddress || !recipientAddress || !lockUpTime || !amount) {

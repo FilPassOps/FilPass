@@ -30,7 +30,7 @@ export const buyCredits = async (props: BuyCreditsParams) => {
 
     let creditReceiver = await prisma.receiver.findUnique({
       where: {
-        walletAddress: fields.to,
+        walletAddress: fields.to.toLowerCase(),
       },
     })
 
