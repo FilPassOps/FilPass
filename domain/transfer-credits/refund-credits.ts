@@ -6,8 +6,9 @@ import { TransactionStatus } from '@prisma/client'
 import errorsMessages from 'wordings-and-errors/errors-messages'
 
 interface RefundCreditsParams {
-  id: number
+  userCreditId: number
   userId: number
+  hash: string
 }
 
 export const refundCredits = async (props: RefundCreditsParams) => {
@@ -17,7 +18,7 @@ export const refundCredits = async (props: RefundCreditsParams) => {
     await prisma.$transaction(async tx => {
       const userCredit = await prisma.userCredit.findUnique({
         where: {
-          id: fields.id,
+          id: fields.userCreditId,
           userId: fields.userId,
         },
       })
