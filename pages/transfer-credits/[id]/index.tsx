@@ -119,7 +119,7 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
       if (result) {
         await api.post('/transfer-credits/refund-credits', {
           hash: result.hash,
-          id: userCreditDetails.id,
+          userCreditId: userCreditDetails.id,
         })
 
         dispatch({

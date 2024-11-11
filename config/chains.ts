@@ -39,7 +39,7 @@ const calibration = {
   name: 'Filecoin',
   networkName: 'Calibration',
   chainId: '0x4cb2f',
-  rpcUrls: ['https://api.calibration.node.glif.io'],
+  rpcUrls: ['https://api.calibration.node.glif.io/rpc/v0'],
   blockExplorer: { name: 'Filfox', url: 'http://47.109.105.51/en/message' },
   contractAddress: '0x650413d87484FC2B9c9bC7b24963f7395a69909b',
   iconFileName: 'filecoin-icon.svg',

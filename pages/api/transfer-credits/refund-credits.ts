@@ -5,6 +5,7 @@ import { NextApiResponse } from 'next'
 
 const requestSchema = yup.object({
   userCreditId: yup.string().required(),
+  hash: yup.string().required(),
 })
 
 interface Request extends NextApiRequestWithSession {
@@ -20,8 +21,9 @@ async function handler(req: Request, res: NextApiResponse) {
 
   try {
     const result = await refundCredits({
-      id: Number(req.body.userCreditId),
+      userCreditId: Number(req.body.userCreditId),
       userId: user.id,
+      hash: req.body.hash,
     })
     return res.status(200).json(result)
   } catch (error: any) {

@@ -58,7 +58,7 @@ export const createTicketsValidatorBackend = yup.object({
 })
 
 export const refundCreditsValidator = yup.object({
-  id: yup.number().required(),
+  userCreditId: yup.number().required(),
   userId: yup.number().required(),
   hash: yup.string().required(),
 })
