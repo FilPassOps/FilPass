@@ -11,7 +11,7 @@ export async function getAvailableTicketsNumber(props: GetAvailableTicketsNumber
   try {
     const { userId, userCreditId } = await getAvailableTicketsNumberValidator.validate(props)
 
-    const totalInvalid = await prisma.creditTicket.count({
+    const totalValid = await prisma.creditTicket.count({
       where: {
         ticketGroup: {
           userCredit: {
@@ -19,19 +19,11 @@ export async function getAvailableTicketsNumber(props: GetAvailableTicketsNumber
             id: userCreditId,
           },
         },
-        status: {
-          not: CreditTicketStatus.VALID,
-        },
+        status: CreditTicketStatus.VALID,
       },
     })
 
-    console.log('totalInvalid', totalInvalid)
-
-    console.log('process.env.NEXT_PUBLIC_MAX_TICKETS', process.env.NEXT_PUBLIC_MAX_TICKETS)
-
-    const availableTicketsNumber = process.env.NEXT_PUBLIC_MAX_TICKETS ? parseInt(process.env.NEXT_PUBLIC_MAX_TICKETS) - totalInvalid : 0
-
-    console.log('availableTicketsNumber', availableTicketsNumber)
+    const availableTicketsNumber = process.env.NEXT_PUBLIC_MAX_TICKETS ? parseInt(process.env.NEXT_PUBLIC_MAX_TICKETS) - totalValid : 0
 
     return { data: availableTicketsNumber }
   } catch (error) {
