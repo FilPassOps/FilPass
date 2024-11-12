@@ -81,6 +81,12 @@ const navigation: NavigationItem[] = [
     roles: [SUPERADMIN_ROLE],
   },
   {
+    target: '/admin-tools',
+    text: 'Admin Tools',
+    icon: DocumentTextIcon,
+    roles: [SUPERADMIN_ROLE],
+  },
+  {
     target: '/profile-settings',
     text: 'Profile & Settings',
     icon: UserIcon,

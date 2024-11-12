@@ -19,6 +19,10 @@ export const getUserCreditByReceiverWallet = async (props: GetUserCreditByReceiv
       },
       select: {
         id: true,
+        totalHeight: true,
+        totalRefunds: true,
+        totalSubmitTicket: true,
+        refundStartsAt: true,
       },
     })
 
