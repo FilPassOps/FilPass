@@ -25,7 +25,13 @@ export async function getAvailableTicketsNumber(props: GetAvailableTicketsNumber
       },
     })
 
+    console.log('totalInvalid', totalInvalid)
+
+    console.log('process.env.NEXT_PUBLIC_MAX_TICKETS', process.env.NEXT_PUBLIC_MAX_TICKETS)
+
     const availableTicketsNumber = process.env.NEXT_PUBLIC_MAX_TICKETS ? parseInt(process.env.NEXT_PUBLIC_MAX_TICKETS) - totalInvalid : 0
+
+    console.log('availableTicketsNumber', availableTicketsNumber)
 
     return { data: availableTicketsNumber }
   } catch (error) {
