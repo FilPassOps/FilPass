@@ -10,4 +10,6 @@ This guide is your go-to resource for understanding how to use FilPass with diff
 
 ### [User](./get-started/user.md)
 
+### [Receiver](./get-started/receiver.md)
+
 ### [Address Manager](./get-started/address-manager.md)

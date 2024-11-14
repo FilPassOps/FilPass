@@ -7,6 +7,7 @@
   - [Overview](#overview)
   - [Creating an account](#creating-an-account)
   - [Connecting a wallet](#connecting-a-wallet)
+    - [Using Fiat On-ramps](#using-fiat-on-ramps)
   - [Deploying a contract](#deploying-a-contract)
   - [Creating a channel](#creating-a-channel)
   - [Top up your credit](#top-up-your-credit)
@@ -32,6 +33,23 @@ Now you have your new FilPass account!
 
 To use the credit and ticket functionalities you will need first to set up your wallet on FilPass. To do it, complete the steps on [Connecting a Wallet](../guide/connecting-a-wallet.md).
 
+### Using Fiat On-ramps
+
+If you need to convert traditional fiat currencies (like USD, EUR, etc.) into FIL tokens, you can use fiat on-ramp services. These services allow you to purchase FIL directly using your local currency through various payment methods.
+
+Some popular fiat on-ramp services that support FIL include:
+- ChangeNow
+- MoonPay
+- Ramp Network
+- Simplex
+
+Before using any service, make sure to:
+1. Verify that the service accepts your preferred payment method
+2. Check if the service supports withdrawals to your wallet type (0x or f410 addresses)
+3. Compare fees and exchange rates between different services
+
+For more detailed information about fiat on-ramps and supported services, visit the [official Filecoin documentation](https://docs.filecoin.io/basics/assets/get-fil#fiat-on-ramps).
+
 ## Deploying a contract
 
 To deploy your own contract on the system you will need to complete the steps on [Deploying a Contract](../guide/deploying-a-contract.md).
@@ -44,7 +62,7 @@ To start using the system with a specific receiver (Storage Provider), you need 
 2. Click on "Create Channel"
 3. Fill in the required information:
    - Your MetaMask Wallet (This information is automatically filled in with your connected wallet)
-   - The receiver's wallet address (Storage Provider)
+   - The receiver's wallet address (if using a f410 it will be saved as 0x address)
    - The amount of FIL tokens you want to convert into credit for the channel
 4. Click on "Create Channel"
 5. Confirm the MetaMask transaction when prompted
