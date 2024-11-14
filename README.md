@@ -27,7 +27,7 @@
 
 ## Introduction
 
-FilPass is a oracle platform that facilitates the data retrieval from the Filecoin network.
+FilPass is an oracle platform that facilitates data retrieval from the Filecoin network in a secure and efficient way.
 
 ## Getting Started
 
