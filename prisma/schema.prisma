@@ -11,7 +11,6 @@ enum Role {
   USER
   SUPERADMIN
   ADDRESS_MANAGER
-  VIEWER
 }
 
 enum TransactionStatus {
@@ -88,7 +87,6 @@ model UserWallet {
   name           String?
   createdAt      DateTime            @default(now()) @map("created_at")
   updatedAt      DateTime            @updatedAt @map("updated_at")
-  isDefault      Boolean             @default(false) @map("is_default")
 
   @@unique([userId, address, blockchainId])
   @@index([address])
@@ -96,22 +94,17 @@ model UserWallet {
 }
 
 model WalletVerification {
-  id                        Int           @id @default(autoincrement())
-  user                      User          @relation(fields: [userId], references: [id])
-  userId                    Int           @map("user_id")
-  isVerified                Boolean       @default(false) @map("is_verified")
-  isActive                  Boolean       @default(true) @map("is_active")
-  blockchain                Blockchain    @relation(fields: [blockchainId], references: [id])
-  blockchainId              Int           @map("blockchain_id")
-  address                   String
-  transactionContent        Json          @map("transaction_content")
-  transactionId             String        @map("transaction_id")
-  transactionAmount         Decimal?      @map("transaction_amount") @db.Decimal(65, 8)
-  transactionCurrencyUnit   CurrencyUnit? @relation(fields: [transactionCurrencyUnitId], references: [id])
-  transactionCurrencyUnitId Int?          @map("transaction_currency_unit_id")
-  createdAt                 DateTime      @default(now()) @map("created_at")
-  updatedAt                 DateTime      @updatedAt @map("updated_at")
-  wallets                   UserWallet[]
+  id           Int          @id @default(autoincrement())
+  user         User         @relation(fields: [userId], references: [id])
+  userId       Int          @map("user_id")
+  isVerified   Boolean      @default(false) @map("is_verified")
+  isActive     Boolean      @default(true) @map("is_active")
+  blockchain   Blockchain   @relation(fields: [blockchainId], references: [id])
+  blockchainId Int          @map("blockchain_id")
+  address      String
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+  wallets      UserWallet[]
 
   @@map("wallet_verification")
 }
@@ -131,15 +124,14 @@ model Currency {
 }
 
 model CurrencyUnit {
-  id                  Int                  @id @default(autoincrement())
-  currency            Currency             @relation(fields: [currencyId], references: [id])
-  currencyId          Int                  @map("currency_id")
-  name                String
-  scale               Int
-  isActive            Boolean              @default(true) @map("is_active")
-  createdAt           DateTime             @default(now()) @map("created_at")
-  updatedAt           DateTime             @updatedAt @map("updated_at")
-  walletVerifications WalletVerification[]
+  id         Int      @id @default(autoincrement())
+  currency   Currency @relation(fields: [currencyId], references: [id])
+  currencyId Int      @map("currency_id")
+  name       String
+  scale      Int
+  isActive   Boolean  @default(true) @map("is_active")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   @@unique([currencyId, name])
   @@map("currency_unit")

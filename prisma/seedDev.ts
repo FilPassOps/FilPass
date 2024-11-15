@@ -11,7 +11,7 @@ const salt = process.env.EMAIL_KEY || ''
 const password = '$2b$10$uRaqhFBl8ox3GFuZc2GE6euiv3AWKLmN8dbfPUmkSZh2P7u8km6wC' // password
 
 async function main() {
-  await Promise.all([createSuperAdmin(), createViewer()])
+  await Promise.all([createSuperAdmin()])
 
   for (let i = 0; i < 150; i++) {
     await createUser(i)
@@ -38,34 +38,6 @@ async function createUser(index: number) {
   })
 
   return { user, userRole }
-}
-
-async function createViewer() {
-  const viewer = await prisma.user.create({
-    data: {
-      email: await encryptPII(`test-viewer${AppConfig.app.emailConfig.domain}`),
-      emailHash: await hash(`test-viewer${AppConfig.app.emailConfig.domain}`, salt),
-      isActive: true,
-      isVerified: true,
-      password: password,
-    },
-  })
-
-  await prisma.userRole.create({
-    data: {
-      userId: viewer.id,
-      role: 'USER',
-    },
-  })
-
-  const viewerRole = await prisma.userRole.create({
-    data: {
-      userId: viewer.id,
-      role: 'VIEWER',
-    },
-  })
-
-  return viewerRole
 }
 
 async function createSuperAdmin() {

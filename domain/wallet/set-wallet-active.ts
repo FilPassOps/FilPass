@@ -11,27 +11,9 @@ export const setWalletActive = async ({ token }: SetWalletActiveParams) => {
     const { data: decoded } = verify(token) as any
 
     return await newPrismaTransaction(async prisma => {
-      const newWallet = await prisma.userWallet.findUnique({
-        where: { id: decoded?.id },
-        select: {
-          address: true,
-          blockchainId: true,
-        },
-      })
-
-      const [hasDefaultActive] = await prisma.userWallet.findMany({
-        where: {
-          userId: decoded?.userId,
-          isDefault: true,
-          isActive: true,
-          blockchainId: newWallet?.blockchainId,
-          address: { not: newWallet?.address },
-        },
-      })
-
       await prisma.userWallet.update({
         where: { id: decoded?.id },
-        data: { isActive: true, isDefault: !hasDefaultActive },
+        data: { isActive: true },
       })
 
       return {

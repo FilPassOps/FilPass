@@ -18,24 +18,31 @@ export const TicketList = ({ creditTickets, currentHeight, isOpen, expired }: Ti
   const { token } = AppConfig.network.getFilecoin()
 
   const copyToClipboard = (text: string) => {
-    if (!process.env.IS_DEV) {
+    if (process.env.IS_DEV) {
       unsecuredCopyToClipboard(text)
     } else {
       navigator.clipboard.writeText(text)
     }
 
+    // dev function to copy the text to clipboard even if it's not http
     function unsecuredCopyToClipboard(text: string) {
-      const textArea = document.createElement('textarea')
-      textArea.value = text
-      document.body.appendChild(textArea)
-      textArea.focus()
-      textArea.select()
-      try {
-        document.execCommand('copy')
-      } catch (err) {
-        console.error('Unable to copy to clipboard', err)
-      }
-      document.body.removeChild(textArea)
+      const span = document.createElement('span')
+      span.textContent = text
+      span.style.whiteSpace = 'pre'
+      span.style.position = 'fixed'
+      span.style.top = '0'
+      span.style.clip = 'rect(0, 0, 0, 0)'
+      span.style.pointerEvents = 'none'
+      document.body.appendChild(span)
+
+      const selection = window.getSelection()!
+      const range = document.createRange()
+      range.selectNode(span)
+      selection.removeAllRanges()
+      selection.addRange(range)
+
+      document.execCommand('copy')
+      document.body.removeChild(span)
     }
   }
 

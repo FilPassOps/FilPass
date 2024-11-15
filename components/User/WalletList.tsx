@@ -5,7 +5,6 @@ export interface Wallet {
   id: number
   address: string
   name: string
-  isDefault: boolean
   verification: {
     isVerified: boolean
   }

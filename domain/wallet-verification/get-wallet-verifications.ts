@@ -30,7 +30,6 @@ export async function getWalletVerifications(params: GetWalletVerificationsParam
       id: true,
       address: true,
       isVerified: true,
-      transactionAmount: true,
     },
   })
 

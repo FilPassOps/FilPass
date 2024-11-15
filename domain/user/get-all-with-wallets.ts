@@ -23,13 +23,12 @@ export async function getAllWithWallets(params: FindAllWithWalletsParams) {
   const currentPage = page - 1 < 0 ? 0 : page - 1
 
   const data = await prisma.userWallet.findMany({
-    where: { isActive: true, isDefault: true, user: { isActive: true } },
+    where: { isActive: true, user: { isActive: true } },
     select: {
       id: true,
       address: true,
       blockchain: true,
       verificationId: true,
-      isDefault: true,
       createdAt: true,
       updatedAt: true,
       verification: {
@@ -51,7 +50,7 @@ export async function getAllWithWallets(params: FindAllWithWalletsParams) {
   })
 
   const total = await prisma.userWallet.count({
-    where: { isActive: true, isDefault: true, user: { isActive: true } },
+    where: { isActive: true, user: { isActive: true } },
   })
 
   const descryptedData = await Promise.all(data.map(async ({ user, ...w }) => ({ ...w, user: { email: await decryptPII(user.email) } })))

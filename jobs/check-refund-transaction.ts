@@ -117,7 +117,7 @@ export default async function run() {
                 },
               })
 
-              // TODO: check if delete it
+              // TODO: check if delete the tickets and the group
 
               await tx.creditTicket.updateMany({
                 where: {

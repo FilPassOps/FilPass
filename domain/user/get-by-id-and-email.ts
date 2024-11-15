@@ -37,7 +37,6 @@ const select = {
           name: true,
         },
       },
-      isDefault: true,
       verification: {
         select: {
           id: true,
