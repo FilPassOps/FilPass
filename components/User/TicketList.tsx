@@ -16,6 +16,7 @@ interface TicketListProps {
 
 export const TicketList = ({ creditTickets, currentHeight, isOpen, expired }: TicketListProps) => {
   const { token } = AppConfig.network.getFilecoin()
+  console.log('NEXT_PUBLIC_USE_SECURE_PROTOCOL', process.env.NEXT_PUBLIC_USE_SECURE_PROTOCOL)
 
   const copyToClipboard = (text: string) => {
     if (process.env.NEXT_PUBLIC_USE_SECURE_PROTOCOL === 'false') {
