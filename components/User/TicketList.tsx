@@ -18,7 +18,7 @@ export const TicketList = ({ creditTickets, currentHeight, isOpen, expired }: Ti
   const { token } = AppConfig.network.getFilecoin()
 
   const copyToClipboard = (text: string) => {
-    if (!process.env.NEXT_PUBLIC_USE_SECURE_PROTOCOL) {
+    if (process.env.NEXT_PUBLIC_USE_SECURE_PROTOCOL === 'false') {
       unsecuredCopyToClipboard(text)
     } else {
       navigator.clipboard.writeText(text)
