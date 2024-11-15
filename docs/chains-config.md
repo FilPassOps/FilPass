@@ -12,8 +12,6 @@ Here's a breakdown of its properties:
 
 - `chainId`: This is a string that represents the chain id of the chain. It will be used on the system as a unique identifier of the chain and also when connecting to MetaMask.
 
-- `coinMarketApiCode`: This is a number that represents the code of the chain on CoinMarketCap. It will be used on the system to fetch the price of the token. (Optional)
-
 - `units`: This is an object that represents the units of the token. It will be used on the system to convert the token amount to the correct unit. The object has the following properties:
   - `name`: This is a string that represents the name of the unit. It will be used on the system to convert the token amount to the correct unit.
   - `scale`: This is a number that represents the scale of the unit. It will be used on the system to convert the token amount to the correct unit.

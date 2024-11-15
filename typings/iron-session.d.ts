@@ -16,6 +16,5 @@ declare module 'iron-session' {
     addressManagerId?: number
     superAdminId?: number
     userRoleId?: number
-    viewerId?: number
   }
 }

@@ -16,7 +16,6 @@ interface Wallet {
   createdAt: Date
   verificationId: number | null
   blockchain: 'FILECOIN'
-  isDefault: boolean
   verification: {
     isVerified: boolean
   } | null

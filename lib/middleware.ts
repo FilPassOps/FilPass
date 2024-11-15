@@ -159,7 +159,6 @@ export function withUser<T>(handler: NextApiHandlerWithUser<T>): NextApiHandlerW
     req.addressManagerId = extractedRoles.addressManagerId
     req.superAdminId = extractedRoles.superAdminId
     req.userRoleId = extractedRoles.userRoleId
-    req.viewerId = extractedRoles.viewerId
 
     return handler(req, res)
   })

@@ -12,7 +12,6 @@ export interface App {
     linkedinIconUrl?: string
     youtubeIconUrl?: string
   }
-  enableCoinMarketApi: boolean
   youtubeChannelUrl?: string
   twitterUrl?: string
   linkedinUrl?: string
@@ -56,7 +55,6 @@ const app: App = {
     supportAddress: 'platform-name@company.com',
     logoUrl: 'https://s3.us-east-2.amazonaws.com/coinemissary.com/filpass-logo.png',
   },
-  enableCoinMarketApi: true,
   twitterUrl: 'https://twitter.com',
   linkedinUrl: 'https://www.linkedin.com',
   youtubeChannelUrl: 'https://www.youtube.com',

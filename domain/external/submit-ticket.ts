@@ -46,7 +46,7 @@ export const submitTicket = async (props: SubmitTicketParams): Promise<SubmitTic
     })
 
     if (!receiver) {
-      throw new Error('Receiver provider not found', { cause: 'INVALID' })
+      throw new Error('Receiver not found', { cause: 'INVALID' })
     }
 
     const today = new Date()

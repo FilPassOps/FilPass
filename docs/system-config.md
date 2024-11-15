@@ -17,8 +17,6 @@ Here's a breakdown of its properties:
   - `linkedinIconUrl`: This string represents the URL of the LinkedIn icon. It will be used on the emails.
   - `youtubeIconUrl`: This string represents the URL of the YouTube icon. It will be used on the emails.
 
-- `enableCoinMarketApi`: This boolean indicates whether the Coin Market API is enabled. The coin market API is used to get the actual value of the token as a Super Admin.
-
 - `twitterUrl`: This string represents the company's Twitter page URL. It will be used on the emails. If it is not set, it will not appear.
 
 - `linkedinUrl`: This string represents the company's LinkedIn page URL. It will be used on the emails. If it is not set, it will not appear.
@@ -42,7 +40,6 @@ export const app = {
     linkedinIconUrl: 'https://your-company.com/linkedin.png',
     youtubeIconUrl: 'https://your-company.com/youtube.png',
     },
-  enableCoinMarketApi: true,
   twitterUrl: 'https://twitter.com/your-company/',
   linkedinUrl: 'https://www.linkedin.com/company/your-company/',
   youtubeChannelUrl: 'https://www.youtube.com/your-company/',

@@ -35,9 +35,6 @@ export async function createEthereumWallet(params: CreateEthereumWalletRequestPa
         userId,
         address,
         blockchainId: blockchainEntity.id,
-        transactionContent: Math.floor(Math.random() * 1000000),
-        transactionId: '0x',
-        isVerified: true,
       },
     })
 
