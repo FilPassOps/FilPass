@@ -53,8 +53,6 @@ contract FilPass is ReentrancyGuard {
   event DepositMade(address indexed oracle, address indexed recipient, uint256 amount, uint256 refundTime);
   event TicketSubmitted(address indexed oracle, address indexed recipient, uint256 amount);
   event RefundMade(address indexed oracle, address indexed recipient, uint256 amount);
-  event OracleRemoved(address indexed oracle);
-  event RecipientRemoved(address indexed oracle, address indexed recipient);
 
   error InvalidOracleAddress();
   error InvalidRecipientAddress();
@@ -119,7 +117,6 @@ contract FilPass is ReentrancyGuard {
     DepositInfo storage info = deposits[oracleAddress][recipient];
     bool isFirstDeposit = (info.refundTime == 0);
     info.amount += msg.value;
-    info.exchangedSoFar = 0;
 
     uint256 proposedRefundTime = block.timestamp + (lockUpTime * 1 days);
 
@@ -144,7 +141,12 @@ contract FilPass is ReentrancyGuard {
     if (decodedToken.aud == address(0)) revert InvalidRecipientAddress();
     if (decodedToken.lane_guaranteed_amount == 0 || decodedToken.lane_total_amount == 0) revert InvalidTicketAmount();
 
+    if (!oracles.contains(msg.sender)) revert InvalidOracleAddress();
+
     DepositInfo storage info = deposits[msg.sender][decodedToken.aud];
+
+    if (info.amount == 0) revert InsufficientFunds();
+
     if (info.exchangedSoFar > decodedToken.lane_total_amount) revert InsufficientFunds();
     if (block.timestamp >= info.refundTime) revert TicketSubmissionTimeExpired();
 
@@ -161,13 +163,6 @@ contract FilPass is ReentrancyGuard {
     if (!success) revert SubmitTicketFailed();
 
     emit TicketSubmitted(msg.sender, decodedToken.aud, ticketAmount);
-
-    if (info.amount == 0) {
-      _removeRecipient(msg.sender, decodedToken.aud);
-      if (recipientsPerOracle[msg.sender].length() == 0) {
-        _removeOracle(msg.sender);
-      }
-    }
   }
 
   /**
@@ -208,11 +203,6 @@ contract FilPass is ReentrancyGuard {
     info.refundTime = 0; // Reset refund time
     info.exchangedSoFar += refundAmountValue;
 
-    _removeRecipient(oracleAddress, recipient);
-    if (recipientsPerOracle[oracleAddress].length() == 0) {
-      _removeOracle(oracleAddress);
-    }
-
     // Transfer the refund amount back to the user using a low-level call.
     (bool success, ) = payable(user).call{value: refundAmountValue}('');
     if (!success) revert RefundTransferFailed();
@@ -242,19 +232,12 @@ contract FilPass is ReentrancyGuard {
         hasRefunds = true;
         info.exchangedSoFar += refundAmountValue;
 
-        _removeRecipient(oracleAddress, currentRecipient);
-
         // Transfer the refund amount back to the user.
         (bool success, ) = payable(user).call{value: refundAmountValue}('');
         if (!success) revert RefundTransferFailed();
 
         emit RefundMade(oracleAddress, currentRecipient, refundAmountValue);
       }
-    }
-
-    // After processing all Recipients, remove the Oracle if no Recipients are left.
-    if (recipientsPerOracle[oracleAddress].length() == 0) {
-      _removeOracle(oracleAddress);
     }
 
     if (!hasRefunds) revert NoEligibleFundsToRefund();
@@ -283,7 +266,6 @@ contract FilPass is ReentrancyGuard {
           info.refundTime = 0; // Reset refund time
           hasRefunds = true;
           info.exchangedSoFar += refundAmountValue;
-          _removeRecipient(currentOracle, currentRecipient);
 
           // Transfer the refund amount back to the user.
           (bool success, ) = payable(user).call{value: refundAmountValue}('');
@@ -292,24 +274,9 @@ contract FilPass is ReentrancyGuard {
           emit RefundMade(currentOracle, currentRecipient, refundAmountValue);
         }
       }
-
-      // After processing all Recipients, remove the Oracle if no Recipients are left.
-      if (recipientsPerOracle[currentOracle].length() == 0) {
-        _removeOracle(currentOracle);
-      }
     }
 
     if (!hasRefunds) revert NoEligibleFundsToRefund();
-  }
-
-  function _removeRecipient(address oracleAddress, address recipient) internal {
-    recipientsPerOracle[oracleAddress].remove(recipient);
-    emit RecipientRemoved(oracleAddress, recipient);
-  }
-
-  function _removeOracle(address oracleAddress) internal {
-    oracles.remove(oracleAddress);
-    emit OracleRemoved(oracleAddress);
   }
 
   /**
