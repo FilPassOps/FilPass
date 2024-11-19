@@ -50,7 +50,7 @@ const ResetPasswordModal = ({ open = false, onClose, token }: ResetPasswordModal
   }
 
   return (
-    <Modal open={open} onModalClosed={handleClose}>
+    <Modal open={open} onModalClosed={handleClose} isPersistent={true}>
       {!showSuccess && (
         <>
           <h2 className="text-lg font-medium text-gray-900 mb-16 text-center">Reset Password</h2>
