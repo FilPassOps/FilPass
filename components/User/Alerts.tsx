@@ -36,7 +36,7 @@ export const ErrorAlert: React.FC<React.PropsWithChildren<ErrorAlertProps>> = ({
   )
 }
 
-export const SuccessAlert: React.FC<React.PropsWithChildren<{ hash: string; handleClose: () => void; blockExplorerUrl: string }>> = ({
+export const SuccessWithExplorerAlert: React.FC<React.PropsWithChildren<{ hash: string; handleClose: () => void; blockExplorerUrl: string }>> = ({
   hash,
   handleClose,
   blockExplorerUrl,
@@ -55,4 +55,18 @@ export const SuccessAlert: React.FC<React.PropsWithChildren<{ hash: string; hand
       </a>
     </div>
   </>
+)
+
+export const SuccessTransactionAlert: React.FC<React.PropsWithChildren<{ handleClose: () => void; transactionType: string }>> = ({
+  handleClose,
+  transactionType,
+}) => (
+  <div className="flex flex-col items-center">
+    <p className="text-sm text-gray-500 text-center">Your {transactionType} Transaction has been successfully sent and is being processed.</p>
+    <div className="mt-4 text-sm text-gray-500 text-center mb-4">
+      <Button className="w-36 mt-4" onClick={() => handleClose()}>
+        Close
+      </Button>
+    </div>
+  </div>
 )
