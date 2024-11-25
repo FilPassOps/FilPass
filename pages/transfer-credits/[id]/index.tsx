@@ -19,8 +19,9 @@ import { getTicketGroupsByUserCreditId } from 'domain/transfer-credits/get-split
 import { getAvailableTicketsNumber } from 'domain/transfer-credits/get-available-tickets-number'
 import { CreateTicketsModal } from 'components/User/Modal/CreateTicketsModal'
 import { TicketGroupList } from 'components/User/TicketGroupList'
-import { ErrorAlert } from 'components/User/Alerts'
+import { ErrorAlert, SuccessTransactionAlert } from 'components/User/Alerts'
 import { CreditTicketStatus } from '@prisma/client'
+import router from 'next/router'
 
 export interface CreditTicket {
   id: number
@@ -124,27 +125,15 @@ const TransferCreditDetails = ({ data }: TransferCreditDetailsProps) => {
 
         dispatch({
           type: 'success',
-          title: 'Refund transaction sent',
-          config: {
-            closeable: true,
-          },
+          title: 'Transaction sent',
           body: () => (
-            <>
-              <p className="text-sm text-gray-500 mb-4 text-center">
-                Your refund transaction has been successfully sent and is being processed.
-              </p>
-              <div className="mt-4 text-sm text-gray-500 text-center mb-4">
-                <a
-                  href={`${network?.blockExplorer.url}/${result.hash}`}
-                  onClick={() => close()}
-                  rel="noreferrer"
-                  target="_blank"
-                  className="underline text-green-700"
-                >
-                  Check the message
-                </a>
-              </div>
-            </>
+            <SuccessTransactionAlert
+              transactionType="Refund Credits"
+              handleClose={() => {
+                close()
+                router.push('/transfer-credits/transaction-history')
+              }}
+            />
           ),
         })
       }

@@ -43,7 +43,6 @@ export const CreateTicketsModal = ({
   })
 
   const handleCreateTickets = async (body: { splitNumber: number; creditPerTicket: number }) => {
-    // TODO: verify the credits and check for a maximum number of splits
     const { error } = await api.post('transfer-credits/create-tickets', {
       userCreditId,
       splitNumber: body.splitNumber,

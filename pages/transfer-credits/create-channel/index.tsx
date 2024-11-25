@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { api } from 'lib/api'
 import { useAlertDispatcher } from 'components/Layout/Alerts'
-import { ErrorAlert, SuccessAlert } from 'components/User/Alerts'
+import { ErrorAlert, SuccessTransactionAlert } from 'components/User/Alerts'
 import { ReactElement, useState } from 'react'
 import { LinkButton } from 'components/Shared/Button'
 import { NumberInput, TextInput } from 'components/Shared/FormInput'
@@ -20,6 +20,7 @@ import { Contract, DeployContractTransaction, UserWallet } from '@prisma/client'
 import { getPendingContractTransactions } from 'domain/contracts/get-pending-contract-transactions'
 import { getWalletsByUserId } from 'domain/wallet/get-wallets-by-user-id'
 import { validateWalletAddress } from 'lib/blockchain-utils'
+import router from 'next/router'
 
 type FormValue = yup.InferType<typeof createChannelValidator>
 
@@ -165,11 +166,16 @@ const CreateChannel = ({ data }: CreateChannelProps) => {
 
         dispatch({
           type: 'success',
-          title: 'Payment sent',
-          config: {
-            closeable: true,
-          },
-          body: () => <SuccessAlert hash={result.hash} blockExplorerUrl={network?.blockExplorer.url} handleClose={() => close()} />,
+          title: 'Transaction sent',
+          body: () => (
+            <SuccessTransactionAlert
+              transactionType="Channel Creation"
+              handleClose={() => {
+                close()
+                router.push('/transfer-credits/transaction-history')
+              }}
+            />
+          ),
         })
       }
     } catch (error: any) {

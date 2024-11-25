@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { api } from 'lib/api'
 import { useAlertDispatcher } from 'components/Layout/Alerts'
-import { ErrorAlert, SuccessAlert } from 'components/User/Alerts'
+import { ErrorAlert, SuccessTransactionAlert } from 'components/User/Alerts'
 import { ReactElement, useState } from 'react'
 import { LinkButton } from 'components/Shared/Button'
 import { NumberInput, TextInput } from 'components/Shared/FormInput'
@@ -164,11 +164,16 @@ const TopUp = ({ data }: TopUpProps) => {
 
         dispatch({
           type: 'success',
-          title: 'Payment sent',
-          config: {
-            closeable: true,
-          },
-          body: () => <SuccessAlert hash={result.hash} blockExplorerUrl={network?.blockExplorer.url} handleClose={() => close()} />,
+          title: 'Transaction sent',
+          body: () => (
+            <SuccessTransactionAlert
+              transactionType="Top Up"
+              handleClose={() => {
+                close()
+                router.push('/transfer-credits/transaction-history')
+              }}
+            />
+          ),
         })
       }
     } catch (error: any) {
