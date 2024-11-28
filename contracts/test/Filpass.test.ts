@@ -28,6 +28,7 @@ function createDecodedToken(
   oracle: string,
   recipient: string,
   amount: BigNumber,
+  totalAmount: BigNumber,
   expirationDays: number = 7,
 ): DecodedToken {
   const now = Math.floor(Date.now() / 1000)
@@ -42,7 +43,7 @@ function createDecodedToken(
     sub: oracle,
     aud: recipient,
     ticket_lane: 0,
-    lane_total_amount: amount,
+    lane_total_amount: totalAmount,
     lane_guaranteed_amount: amount,
     lane_guaranteed_until: now + expirationDays * 24 * 60 * 60,
   }
@@ -151,7 +152,7 @@ describe('FilPass', function () {
 
       await filpass.connect(user).depositAmount(oracle1.address, recipient1.address, lockUpTime, { value: depositAmount })
 
-      const decodedToken = createDecodedToken(user.address, oracle1.address, recipient1.address, depositAmount)
+      const decodedToken = createDecodedToken(user.address, oracle1.address, recipient1.address, depositAmount, depositAmount)
 
       await expect(filpass.connect(oracle1).submitTicket(decodedToken))
         .to.emit(filpass, 'TicketSubmitted')
@@ -160,6 +161,11 @@ describe('FilPass', function () {
       const deposit = await filpass.deposits(oracle1.address, recipient1.address)
       expect(deposit.amount).to.equal(0)
       expect(deposit.exchangedSoFar).to.equal(depositAmount)
+
+      // Verify we can still make new deposits for the same oracle/recipient pair
+      await filpass.connect(user).depositAmount(oracle1.address, recipient1.address, lockUpTime, { value: depositAmount })
+      const newDeposit = await filpass.deposits(oracle1.address, recipient1.address)
+      expect(newDeposit.amount).to.equal(depositAmount)
     })
 
     it('Should revert if ticket submission is attempted after refund time', async function () {
@@ -173,9 +179,12 @@ describe('FilPass', function () {
       await ethers.provider.send('evm_increaseTime', [8 * 24 * 60 * 60])
       await ethers.provider.send('evm_mine', [])
 
-      const decodedToken = createDecodedToken(user.address, oracle1.address, recipient1.address, depositAmount)
+      const decodedToken = createDecodedToken(user.address, oracle1.address, recipient1.address, depositAmount, depositAmount)
 
-      await expect(filpass.connect(oracle1).submitTicket(decodedToken)).to.be.revertedWithCustomError(filpass, 'TicketSubmissionTimeExpired')
+      await expect(filpass.connect(oracle1).submitTicket(decodedToken)).to.be.revertedWithCustomError(
+        filpass,
+        'TicketSubmissionTimeExpired',
+      )
 
       const deposit = await filpass.deposits(oracle1.address, recipient1.address)
       expect(deposit.exchangedSoFar).to.equal(0)
@@ -189,7 +198,7 @@ describe('FilPass', function () {
 
       await filpass.connect(user).depositAmount(oracle1.address, recipient1.address, lockUpTime, { value: depositAmount })
 
-      const decodedToken = createDecodedToken(user.address, oracle1.address, recipient1.address, ticketAmount)
+      const decodedToken = createDecodedToken(user.address, oracle1.address, recipient1.address, ticketAmount, ticketAmount)
 
       await expect(filpass.connect(oracle1).submitTicket(decodedToken)).to.be.revertedWithCustomError(filpass, 'InsufficientFunds')
 
@@ -204,7 +213,13 @@ describe('FilPass', function () {
 
       await filpass.connect(user).depositAmount(oracle1.address, recipient1.address, lockUpTime, { value: depositAmount })
 
-      const decodedToken = createDecodedToken(user.address, oracle1.address, recipient1.address, ethers.constants.Zero)
+      const decodedToken = createDecodedToken(
+        user.address,
+        oracle1.address,
+        recipient1.address,
+        ethers.constants.Zero,
+        ethers.constants.Zero,
+      )
 
       await expect(filpass.connect(oracle1).submitTicket(decodedToken)).to.be.revertedWithCustomError(filpass, 'InvalidTicketAmount')
     })
@@ -217,9 +232,15 @@ describe('FilPass', function () {
 
       await filpass.connect(user).depositAmount(oracle1.address, recipient1.address, lockUpTime, { value: depositAmount })
 
-      const decodedToken1 = createDecodedToken(user.address, oracle1.address, recipient1.address, partialTicketAmount)
+      const decodedToken1 = createDecodedToken(user.address, oracle1.address, recipient1.address, partialTicketAmount, partialTicketAmount)
 
-      const decodedToken2 = createDecodedToken(user.address, oracle1.address, recipient1.address, partialTicketAmount.mul(2))
+      const decodedToken2 = createDecodedToken(
+        user.address,
+        oracle1.address,
+        recipient1.address,
+        partialTicketAmount.mul(2),
+        partialTicketAmount.mul(2),
+      )
 
       // Partial withdrawal
       await expect(filpass.connect(oracle1).submitTicket(decodedToken1))
@@ -241,10 +262,69 @@ describe('FilPass', function () {
       expect(finalDeposit.amount).to.equal(depositAmount.sub(partialTicketAmount.mul(2)))
       expect(finalDeposit.exchangedSoFar).to.equal(decodedToken2.lane_total_amount)
     })
+
+    it('Should correctly track exchangedSoFar through multiple operations', async function () {
+      const { filpass, user, oracle1, recipient1 } = await loadFixture(deployContractFixture)
+      const initialDeposit = ethers.utils.parseEther('3')
+      const firstTicketAmount = ethers.utils.parseEther('1')
+      const secondDeposit = ethers.utils.parseEther('2')
+      const finalTicketAmount = ethers.utils.parseEther('2') // 1 from first ticket + 2 more
+      const lockUpTime = 7
+
+      await filpass.connect(user).depositAmount(oracle1.address, recipient1.address, lockUpTime, { value: initialDeposit })
+
+      const firstToken = createDecodedToken(user.address, oracle1.address, recipient1.address, firstTicketAmount, firstTicketAmount)
+      await filpass.connect(oracle1).submitTicket(firstToken)
+
+      let deposit = await filpass.deposits(oracle1.address, recipient1.address)
+      expect(deposit.amount).to.equal(initialDeposit.sub(firstTicketAmount))
+      expect(deposit.exchangedSoFar).to.equal(firstTicketAmount) // 1 FIL exchanged
+
+      // Wait for lockup period and refund remaining amount
+      await ethers.provider.send('evm_increaseTime', [8 * 24 * 60 * 60])
+      await ethers.provider.send('evm_mine', [])
+
+      await filpass.connect(user).refundAmount(oracle1.address, recipient1.address)
+
+      // Check state after refund
+      deposit = await filpass.deposits(oracle1.address, recipient1.address)
+      expect(deposit.amount).to.equal(0)
+      expect(deposit.exchangedSoFar).to.equal(initialDeposit) // 3 FIL total (1 from ticket + 2 from refund)
+      await filpass.connect(user).depositAmount(oracle1.address, recipient1.address, lockUpTime, { value: secondDeposit })
+
+      deposit = await filpass.deposits(oracle1.address, recipient1.address)
+      expect(deposit.amount).to.equal(secondDeposit)
+      expect(deposit.exchangedSoFar).to.equal(initialDeposit) // Still 3 FIL (no new exchanges yet)
+
+      const finalToken = createDecodedToken(
+        user.address,
+        oracle1.address,
+        recipient1.address,
+        finalTicketAmount,
+        initialDeposit.add(finalTicketAmount),
+      )
+      await filpass.connect(oracle1).submitTicket(finalToken)
+
+      // Check final state
+      deposit = await filpass.deposits(oracle1.address, recipient1.address)
+      expect(deposit.amount).to.equal(0)
+      expect(deposit.exchangedSoFar).to.equal(initialDeposit.add(finalTicketAmount)) // 5 FIL total (1 from first ticket + 2 from refund + 2 from final ticket)
+    })
+
+    it('Should revert if non-oracle tries to submit ticket', async function () {
+      const { filpass, user, oracle1, recipient1 } = await loadFixture(deployContractFixture)
+      const depositAmount = ethers.utils.parseEther('1')
+      const lockUpTime = 7
+
+      await filpass.connect(user).depositAmount(oracle1.address, recipient1.address, lockUpTime, { value: depositAmount })
+      const decodedToken = createDecodedToken(user.address, oracle1.address, recipient1.address, depositAmount, depositAmount)
+
+      await expect(filpass.connect(recipient1).submitTicket(decodedToken)).to.be.revertedWithCustomError(filpass, 'InvalidOracleAddress')
+    })
   })
 
   describe('Refunds', function () {
-    it('Should allow user to refund after refund time', async function () {
+    it('Should allow user to refund after refund time and reuse the oracle/recipient pair', async function () {
       const { filpass, user, oracle1, recipient1 } = await loadFixture(deployContractFixture)
       const depositAmount = ethers.utils.parseEther('1')
       const lockUpTime = 7
@@ -258,9 +338,15 @@ describe('FilPass', function () {
         .to.emit(filpass, 'RefundMade')
         .withArgs(oracle1.address, recipient1.address, depositAmount)
 
+      // Verify the deposit is updated
       const deposit = await filpass.deposits(oracle1.address, recipient1.address)
       expect(deposit.amount).to.equal(0)
       expect(deposit.exchangedSoFar).to.equal(depositAmount)
+
+      // Verify we can still make new deposits for the same oracle/recipient pair
+      await filpass.connect(user).depositAmount(oracle1.address, recipient1.address, lockUpTime, { value: depositAmount })
+      const newDeposit = await filpass.deposits(oracle1.address, recipient1.address)
+      expect(newDeposit.amount).to.equal(depositAmount)
     })
 
     it('Should refund all recipients for a specific oracle', async function () {
@@ -329,7 +415,7 @@ describe('FilPass', function () {
 
       await filpass.connect(user).depositAmount(oracle1.address, recipient1.address, lockUpTime, { value: depositAmount })
 
-      const decodedToken = createDecodedToken(user.address, oracle1.address, recipient1.address, partialTicketAmount)
+      const decodedToken = createDecodedToken(user.address, oracle1.address, recipient1.address, partialTicketAmount, partialTicketAmount)
       await filpass.connect(oracle1).submitTicket(decodedToken)
 
       await ethers.provider.send('evm_increaseTime', [8 * 24 * 60 * 60])
@@ -360,6 +446,35 @@ describe('FilPass', function () {
       const deposit = await filpass.deposits(oracle1.address, recipient1.address)
       expect(deposit.amount).to.equal(depositAmount)
       expect(deposit.exchangedSoFar).to.equal(0)
+    })
+
+    it('Should revert refund if called before refund time', async function () {
+      const { filpass, user, oracle1, recipient1 } = await loadFixture(deployContractFixture)
+      const depositAmount = ethers.utils.parseEther('1')
+      const lockUpTime = 7
+
+      await filpass.connect(user).depositAmount(oracle1.address, recipient1.address, lockUpTime, { value: depositAmount })
+
+      await expect(filpass.connect(user).refundAmount(oracle1.address, recipient1.address)).to.be.revertedWithCustomError(
+        filpass,
+        'RefundTimeNotPassed',
+      )
+    })
+
+    it('Should revert if non-user tries to refund', async function () {
+      const { filpass, user, oracle1, recipient1 } = await loadFixture(deployContractFixture)
+      const depositAmount = ethers.utils.parseEther('1')
+      const lockUpTime = 7
+
+      await filpass.connect(user).depositAmount(oracle1.address, recipient1.address, lockUpTime, { value: depositAmount })
+
+      await ethers.provider.send('evm_increaseTime', [8 * 24 * 60 * 60])
+      await ethers.provider.send('evm_mine', [])
+
+      await expect(filpass.connect(oracle1).refundAmount(oracle1.address, recipient1.address)).to.be.revertedWithCustomError(
+        filpass,
+        'OnlyUserAllowed',
+      )
     })
   })
 
@@ -410,6 +525,82 @@ describe('FilPass', function () {
           value: amount,
         }),
       ).to.be.revertedWithCustomError(filpass, 'FunctionDoesNotExist')
+    })
+  })
+
+  describe('Lockup Time', function () {
+    it('Should revert when lockup time exceeds MAX_LOCKUP_DAYS', async function () {
+      const { filpass, user, oracle1, recipient1 } = await loadFixture(deployContractFixture)
+      const depositAmount = ethers.utils.parseEther('1')
+      const lockUpTime = 366 // MAX_LOCKUP_DAYS is 365
+
+      await expect(
+        filpass.connect(user).depositAmount(
+          oracle1.address,
+          recipient1.address,
+          lockUpTime,
+          { value: depositAmount }
+        )
+      ).to.be.revertedWithCustomError(filpass, 'InvalidLockupTime')
+    })
+  })
+
+  describe('Ticket Validation', function () {
+    it('Should revert if ticket has invalid total amount', async function () {
+      const { filpass, user, oracle1, recipient1 } = await loadFixture(deployContractFixture)
+      const depositAmount = ethers.utils.parseEther('1')
+      const lockUpTime = 7
+
+      await filpass.connect(user).depositAmount(
+        oracle1.address,
+        recipient1.address,
+        lockUpTime,
+        { value: depositAmount }
+      )
+
+      const decodedToken = createDecodedToken(
+        user.address,
+        oracle1.address,
+        recipient1.address,
+        depositAmount,
+        ethers.constants.Zero // Invalid total amount
+      )
+
+      await expect(filpass.connect(oracle1).submitTicket(decodedToken))
+        .to.be.revertedWithCustomError(filpass, 'InvalidTicketAmount')
+    })
+
+    it('Should revert if ticket exchangedSoFar would decrease', async function () {
+      const { filpass, user, oracle1, recipient1 } = await loadFixture(deployContractFixture)
+      const depositAmount = ethers.utils.parseEther('2')
+      const lockUpTime = 7
+
+      await filpass.connect(user).depositAmount(
+        oracle1.address,
+        recipient1.address,
+        lockUpTime,
+        { value: depositAmount }
+      )
+
+      const firstToken = createDecodedToken(
+        user.address,
+        oracle1.address,
+        recipient1.address,
+        depositAmount.div(2),
+        depositAmount.div(2)
+      )
+      await filpass.connect(oracle1).submitTicket(firstToken)
+
+      // Second ticket with lower total amount
+      const secondToken = createDecodedToken(
+        user.address,
+        oracle1.address,
+        recipient1.address,
+        depositAmount.div(4),
+        depositAmount.div(4) // Lower than previous total
+      )
+      await expect(filpass.connect(oracle1).submitTicket(secondToken))
+        .to.be.revertedWithCustomError(filpass, 'InsufficientFunds')
     })
   })
 })
