@@ -61,6 +61,7 @@ export interface TicketGroup {
   ticketGroupId: string
   totalTickets: number
   createdAt: Date
+  expired: boolean
 }
 
 interface TransferCreditDetailsProps {

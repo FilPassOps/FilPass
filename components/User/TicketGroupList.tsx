@@ -17,7 +17,14 @@ export const TicketGroupList = ({ ticketGroups, userCreditId }: TicketsGroupList
             <div key={ticketGroup.ticketGroupId} className="border-b pb-4 last:border-b-0">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-semibold text-deep-koamaru">Tickets Group {index + 1}</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-deep-koamaru">Tickets Group {index + 1}</h3>
+                    {ticketGroup.expired && (
+                      <span className="px-2 py-0.5 text-xs font-medium text-red-700 bg-red-100 rounded-full">
+                        Expired
+                      </span>
+                    )}
+                  </div>
                   <p className=" text-deep-koamaru">{ticketGroup.totalTickets} tickets</p>
                   <Timestamp date={ticketGroup.createdAt.toString()} format={DateTime.DATETIME_SHORT} />
                 </div>

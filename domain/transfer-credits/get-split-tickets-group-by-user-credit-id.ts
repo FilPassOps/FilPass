@@ -27,6 +27,7 @@ export const getTicketGroupsByUserCreditId = async (props: GetTicketGroupsByUser
       ticketGroupId: group.id,
       totalTickets: group._count.creditTickets,
       createdAt: group.createdAt,
+      expired: group.expired,
     }))
 
     return { data: formattedResult }
