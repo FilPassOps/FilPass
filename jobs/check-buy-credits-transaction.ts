@@ -130,6 +130,15 @@ export default async function run() {
                 submitTicketStartsAt = userCredit.submitTicketStartsAt!
                 submitTicketExpiresAt = new Date(userCredit.submitTicketExpiresAt!.getTime() + ticketTime)
                 refundStartsAt = new Date(submitTicketExpiresAt.getTime() + LOCK_DAYS_TIME + ONE_DAY_TIME)
+
+                await tx.ticketGroup.updateMany({
+                  where: {
+                    userCreditId: txUserCredit.id,
+                  },
+                  data: {
+                    expiresAt: submitTicketExpiresAt,
+                  },
+                })
               }
 
               await tx.creditTransaction.update({
