@@ -17,23 +17,13 @@ interface SubmitTicketResult {
   error?: string
 }
 
-const temporaryTestPublicKey = `-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr5Rsblt8pjtnV0yyw0yS
-UUlnCKWC2kBNDFlz30v5AFVytoCulh/ntbB4G4tEOXqnVFBq1CrTH0g2EahvN1SZ
-TbavlaDCryZODPam2bHy0jH/Unm2sgJx4+xdVYjIlFhZRGoU+A1MuskAsElD8mFe
-fWEEVIK3TUqiGny+kLmEtXUDJGhJkYilhXeMKJbVDgZhJuCsLLgWFv3gmfRA749V
-NWMBEqmEUR+G//NYXoumeFH8hkli1Q7lwx/tu7f9eHbEwfT9NeWXGT1uwer16aXT
-MMIhcZbfAzEKp+0d093OGMsHuTVRfM5xy38+1TD+yQ5AvEsR0LMapDt89A3SDiaX
-KwIDAQAB
------END PUBLIC KEY-----`
-
 export const submitTicket = async (props: SubmitTicketParams): Promise<SubmitTicketResult> => {
   try {
     const fields = await submitTicketValidator.validate(props)
 
     const { network } = AppConfig.network.getFilecoin()
 
-    const result = verify(fields.token, temporaryTestPublicKey as string)
+    const result = verify(fields.token, process.env.PUBLIC_KEY as string)
 
     if (!result.data.jti || !result.data.aud) {
       throw new Error('Invalid token', { cause: 'INVALID' })
