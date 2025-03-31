@@ -120,7 +120,25 @@ export const withAuthToken = (handler: NextApiHandler) => (req: NextApiRequest, 
 }
 
 export function withSession<T>(handler: NextApiHandlerWithUser<T>) {
-  return withIronSessionApiRoute(handler, sessionOptions)
+  return withIronSessionApiRoute(async (req, res) => {
+    // Log cookie info before processing
+    console.log('🍪 Request cookies:', {
+      hasCookies: !!req.cookies,
+      cookieCount: Object.keys(req.cookies || {}).length,
+      sessionCookieName: '@Filpass:session',
+      hasSessionCookie: !!req.cookies?.['@Filpass:session'],
+    });
+
+    const result = await handler(req, res);
+
+    // Log after processing
+    console.log('🍪 Response cookies:', {
+      hasCookieHeader: !!res.getHeader('Set-Cookie'),
+      cookieHeader: res.getHeader('Set-Cookie'),
+    });
+
+    return result;
+  }, sessionOptions);
 }
 
 export function withUser<T>(handler: NextApiHandlerWithUser<T>): NextApiHandlerWithUser<T> {
@@ -225,38 +243,69 @@ export const withExternalLimiter = (handler: NextApiHandler) => async (req: Next
 }
 
 const validateSession = async (req: NextApiRequestWithSession) => {
+  console.log('🔍 Validating session', {
+    hasSession: !!req.session,
+    hasUser: !!req.session?.user,
+    hasIdentifier: !!req.session?.identifier,
+    sessionId: req.session?.identifier
+  });
+
   const sessionId = req.session.identifier
 
   if (!req.session.user || !sessionId) {
+    console.log('❌ Session validation failed: missing user or sessionId');
     return { invalid: true }
   }
 
   const sessionData = await getSession({ sessionId })
+  console.log('📋 Session data from DB:', {
+    found: !!sessionData,
+    isValid: sessionData?.isValid,
+    expires: sessionData?.expires
+  });
 
   if (!sessionData) {
+    console.log('❌ Session validation failed: session not found in DB');
     return { invalid: true }
   }
 
   if (!sessionData.isValid) {
+    console.log('❌ Session validation failed: session marked as invalid in DB');
     return { invalid: true }
   }
 
   const currentTime = DateTime.now()
   const generatedTime = DateTime.fromJSDate(sessionData.expires)
+  const timeRemaining = generatedTime.diff(currentTime).toObject();
+
+  console.log('⏱️ Session time check:', {
+    currentTime: currentTime.toISO(),
+    expiresAt: generatedTime.toISO(),
+    timeRemaining
+  });
 
   if (currentTime > generatedTime) {
+    console.log('❌ Session validation failed: session expired');
     return { invalid: true }
   }
 
+  console.log('✅ Session validation successful');
   return { invalid: false }
 }
 
 const destroySession = async (req: NextApiRequestWithSession, res: NextApiResponse) => {
+  console.log('🗑️ Destroying session', {
+    sessionId: req.session?.identifier,
+    hasUser: !!req.session?.user
+  });
+
   if (req.session.identifier) {
     await invalidateSession({ sessionId: req.session.identifier })
   }
   req.session.user = undefined
   req.user = undefined
   req.session.destroy()
+  console.log('🗑️ Session destroyed');
+
   return res.status(401).json({ message: 'Forbidden access' })
 }
