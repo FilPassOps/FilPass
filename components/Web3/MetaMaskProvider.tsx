@@ -90,6 +90,12 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode | undefined
     if (!onboarding.current) {
       onboarding.current = new MetaMaskOnboarding()
     }
+
+    return () => {
+      if (onboarding.current) {
+        onboarding.current.stopOnboarding();
+      }
+    }
   }, [])
 
   useEffect(() => {
@@ -141,7 +147,12 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode | undefined
     if (MetaMaskOnboarding.isMetaMaskInstalled()) {
       window.ethereum
         .request({ method: 'eth_requestAccounts' })
-        .then(handleNewAccounts)
+        .then((accounts) => {
+          handleNewAccounts(accounts);
+          if (onboarding.current) {
+            onboarding.current.stopOnboarding();
+          }
+        })
         .finally(() => {
           setBusy(false)
         })

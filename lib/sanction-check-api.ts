@@ -12,20 +12,18 @@ interface ChainalysisResponse {
 }
 
 export class SanctionCheckAPI {
-  private readonly apiKey: string;
+  private readonly apiKey?: string;
   private readonly baseURL: string = 'https://public.chainalysis.com/api/v1';
+  private readonly isEnabled: boolean;
 
   constructor() {
-    const apiKey = process.env.CHAINALYSIS_API_KEY;
-    if (!apiKey) {
-      throw new Error('CHAINALYSIS_API_KEY environment variable is not set');
-    }
-    this.apiKey = apiKey;
+    this.apiKey = process.env.CHAINALYSIS_API_KEY;
+    this.isEnabled = !!this.apiKey;
   }
 
   private getHeaders() {
     return {
-      'X-API-Key': this.apiKey,
+      'X-API-Key': this.apiKey || '',
       'Accept': 'application/json',
     };
   }
@@ -39,6 +37,10 @@ export class SanctionCheckAPI {
     isSanctioned: boolean;
     details?: ChainalysisIdentification[];
   }> {
+    if (!this.isEnabled) {
+      return { isSanctioned: false };
+    }
+
     try {
       const response = await axios.get<ChainalysisResponse>(
         `${this.baseURL}/address/${address}`,
@@ -72,6 +74,10 @@ export class SanctionCheckAPI {
     isSanctioned: boolean;
     details?: ChainalysisIdentification[];
   }>> {
+    if (!this.isEnabled) {
+      return Object.fromEntries(addresses.map(address => [address, { isSanctioned: false }]));
+    }
+
     const results: Record<string, {
       isSanctioned: boolean;
       details?: ChainalysisIdentification[];
