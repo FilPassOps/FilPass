@@ -13,17 +13,38 @@ async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
     return res.status(403).send({ message: 'Forbidden' })
   }
 
-  const { data, error } = await getUserByIdAndEmail({ userId: user.id, email: user.email })
+  try {
+    const { data, error } = await getUserByIdAndEmail({ userId: user.id, email: user.email })
 
-  if (error) {
-    console.log('❌ Error getting user from database', error);
-    return res.status(error.status).json(error)
+    if (error) {
+      console.log('❌ Error getting user from database', error);
+
+      // Return the session user data instead of failing
+      // This prevents session destruction due to temporary DB issues
+      console.log('⚠️ Falling back to session user data');
+      return res.status(200).json({
+        id: user.id,
+        email: user.email,
+        roles: user.roles || [],
+        ...(user as any)
+      });
+    }
+
+    console.log('✅ Successfully returning user data from /me');
+    return res.status(200).json({
+      ...data,
+    })
+  } catch (err) {
+    console.error('Unexpected error in /me endpoint:', err);
+
+    // Fall back to session data on any error
+    return res.status(200).json({
+      id: user.id,
+      email: user.email,
+      roles: user.roles || [],
+      ...(user as any)
+    });
   }
-
-  console.log('✅ Successfully returning user data from /me');
-  return res.status(200).json({
-    ...data,
-  })
 }
 
 export default newHandler(withUser(withMethods(['GET'], handler)))
