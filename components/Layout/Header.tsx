@@ -17,7 +17,9 @@ export const Header = ({ title, setSidebarToggle }: HeaderProps) => {
   const { push } = useRouter()
 
   const handleLogout = async () => {
-    const res = await api.get('/auth/logout')
+    console.log('Logging out...');
+    const res = await api.post('/auth/logout');
+    console.log('Logout response:', res);
     if (res?.data?.success) {
       push('/')
     }

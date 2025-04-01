@@ -1,6 +1,6 @@
 import crypto from 'crypto'
 import { ADDRESS_MANAGER_ROLE, SUPERADMIN_ROLE, SystemRoles } from 'domain/auth/constants'
-import { getSession, invalidateSession } from 'domain/auth/session'
+import { getSession } from 'domain/auth/session'
 import { getUserByIdAndEmail } from 'domain/user/get-by-id-and-email'
 import { Request, RequestHandler } from 'express'
 import rateLimit from 'express-rate-limit'
@@ -8,7 +8,6 @@ import { IronSessionData } from 'iron-session'
 import { withIronSessionApiRoute } from 'iron-session/next'
 import jwt from 'jsonwebtoken'
 import { sessionOptions } from 'lib/session'
-import { DateTime } from 'luxon'
 import multer from 'multer'
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 import { tmpdir } from 'os'
@@ -143,43 +142,102 @@ export function withSession<T>(handler: NextApiHandlerWithUser<T>) {
 
 export function withUser<T>(handler: NextApiHandlerWithUser<T>): NextApiHandlerWithUser<T> {
   return withSession(async (req, res) => {
-    const { invalid } = await validateSession(req)
-    if (invalid) {
-      return await destroySession(req, res)
+    console.log('🔍 withUser middleware called');
+
+    // Basic validation - check if we have a user and sessionId
+    if (!req.session?.user || !req.session?.identifier) {
+      console.log('❌ Missing user or session identifier');
+      return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const user = req.session.user
+    const sessionId = req.session.identifier;
 
-    if (!user) {
-      return await destroySession(req, res)
+    // Check database for session validity
+    console.log('🔍 Checking session validity in database', { sessionId });
+    const sessionData = await getSession({ sessionId });
+
+    // Log session data for debugging
+    console.log('📋 Session data from DB:', {
+      found: !!sessionData,
+      isValid: sessionData?.isValid,
+      expires: sessionData ? new Date(sessionData.expires) : null
+    });
+
+    // Validate session based on database records
+    if (!sessionData) {
+      console.log('❌ Session not found in database');
+      req.session.destroy();
+      return res.status(401).json({ message: 'Session expired' });
     }
 
-    const { data, error } = await getUserByIdAndEmail({ userId: user.id, email: user.email })
-
-    if (data?.isBanned) {
-      return res.status(403).json({ message: 'Forbidden access' })
+    if (!sessionData.isValid) {
+      console.log('❌ Session marked as invalid in database');
+      req.session.destroy();
+      return res.status(401).json({ message: 'Session invalidated' });
     }
 
-    if (error || !data) {
-      return await destroySession(req, res)
+    const currentTime = new Date();
+    const expiryTime = new Date(sessionData.expires);
+
+    console.log('⏱️ Checking session expiry', {
+      currentTime,
+      expiryTime,
+      isExpired: currentTime > expiryTime
+    });
+
+    if (currentTime > expiryTime) {
+      console.log('❌ Session expired based on timestamp');
+      req.session.destroy();
+      return res.status(401).json({ message: 'Session expired' });
     }
 
-    const extractedRoles = extractRoles(data.roles)
+    // Session is valid, proceed with user data
+    const user = req.session.user;
 
-    const freshUser = {
-      id: data.id,
-      email: data.email,
-      roles: data.roles?.map(role => ({ id: role.id, role: role.role })),
-      terms: data.terms,
+    // Set up the user property on the request
+    req.user = user;
+
+    // Try to get fresh user data, but continue even if fails
+    try {
+      console.log('🔍 Fetching fresh user data', { userId: user.id });
+      const { data } = await getUserByIdAndEmail({
+        userId: user.id,
+        email: user.email
+      });
+
+      if (data) {
+        if (data.isBanned) {
+          console.log('⛔ User is banned');
+          return res.status(403).json({ message: 'Forbidden access' });
+        }
+
+        // Update with fresh data
+        console.log('✅ Updated user data from database');
+        const extractedRoles = extractRoles(data.roles);
+
+        // Update req.user with fresh data
+        req.user = {
+          id: data.id,
+          email: data.email,
+          roles: data.roles?.map(role => ({ id: role.id, role: role.role })),
+        };
+
+        if (data.terms) {
+          (req.user as any).terms = data.terms;
+        }
+
+        req.addressManagerId = extractedRoles.addressManagerId;
+        req.superAdminId = extractedRoles.superAdminId;
+        req.userRoleId = extractedRoles.userRoleId;
+      }
+    } catch (err) {
+      console.log('⚠️ Error fetching fresh user data, continuing with session data', err);
+      // Continue with session data
     }
 
-    req.user = freshUser
-    req.addressManagerId = extractedRoles.addressManagerId
-    req.superAdminId = extractedRoles.superAdminId
-    req.userRoleId = extractedRoles.userRoleId
-
-    return handler(req, res)
-  })
+    console.log('✅ Session validation successful, proceeding with request');
+    return handler(req, res);
+  });
 }
 
 export function withRoles<T>(roles: SystemRoles[] = [], handler: NextApiHandlerWithUser<T>) {
@@ -242,6 +300,9 @@ export const withExternalLimiter = (handler: NextApiHandler) => async (req: Next
   return handler(req, res)
 }
 
+// These functions are kept for reference but we're not using them anymore
+// If they're needed elsewhere, remove the comments
+/*
 const validateSession = async (req: NextApiRequestWithSession) => {
   console.log('🔍 Validating session', {
     hasSession: !!req.session,
@@ -309,3 +370,4 @@ const destroySession = async (req: NextApiRequestWithSession, res: NextApiRespon
 
   return res.status(401).json({ message: 'Forbidden access' })
 }
+*/

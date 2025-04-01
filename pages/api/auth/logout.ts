@@ -1,5 +1,5 @@
 import { invalidateSession } from 'domain/auth/session'
-import { newHandler, NextApiRequestWithSession, withMethods } from 'lib/middleware'
+import { newHandler, NextApiRequestWithSession, withMethods, withUser } from 'lib/middleware'
 import { NextApiResponse } from 'next'
 
 async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
@@ -22,4 +22,4 @@ async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
   return res.status(200).json({ success: true })
 }
 
-export default newHandler(withMethods(['POST'], handler))
+export default newHandler(withUser(withMethods(['POST'], handler)))

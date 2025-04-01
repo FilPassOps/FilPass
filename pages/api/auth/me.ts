@@ -3,18 +3,24 @@ import { newHandler, NextApiRequestWithSession, withMethods, withUser } from 'li
 import { NextApiResponse } from 'next'
 
 async function handler(req: NextApiRequestWithSession, res: NextApiResponse) {
-  const user = req.user
+  console.log('📝 /me endpoint called');
+
+  const user = req.user;
+  console.log('👤 User from request', { userId: user?.id });
 
   if (!user) {
+    console.log('❌ No user found in request');
     return res.status(403).send({ message: 'Forbidden' })
   }
 
   const { data, error } = await getUserByIdAndEmail({ userId: user.id, email: user.email })
 
   if (error) {
+    console.log('❌ Error getting user from database', error);
     return res.status(error.status).json(error)
   }
 
+  console.log('✅ Successfully returning user data from /me');
   return res.status(200).json({
     ...data,
   })
