@@ -92,14 +92,25 @@ export function Login({ redirectAfterLogin }: LoginProps) {
       return { error: verifyError } as { error: any }
     }
 
-    refresh()
-    if (redirectAfterLogin) {
-      Cookie.remove('@Filpass:fromDraftEmail')
-      router.push(redirectAfterLogin)
-      return { error: undefined }
-    } else {
-      router.push('/transfer-credits')
-      return { error: undefined }
+    // Wait for refresh to complete before redirecting
+    try {
+      console.log('Refreshing user session...');
+      await refresh();
+      console.log('Session refresh completed successfully');
+
+      if (redirectAfterLogin) {
+        Cookie.remove('@Filpass:fromDraftEmail')
+        console.log('Redirecting to', redirectAfterLogin);
+        router.push(redirectAfterLogin)
+        return { error: undefined }
+      } else {
+        console.log('Redirecting to /transfer-credits');
+        router.push('/transfer-credits')
+        return { error: undefined }
+      }
+    } catch (err) {
+      console.error('Session refresh failed:', err);
+      return { error: { message: 'Session refresh failed' } };
     }
   }
 

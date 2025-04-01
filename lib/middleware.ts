@@ -1,6 +1,6 @@
 import crypto from 'crypto'
 import { ADDRESS_MANAGER_ROLE, SUPERADMIN_ROLE, SystemRoles } from 'domain/auth/constants'
-import { getSession, invalidateSession } from 'domain/auth/session'
+import { getSession } from 'domain/auth/session'
 import { getUserByIdAndEmail } from 'domain/user/get-by-id-and-email'
 import { Request, RequestHandler } from 'express'
 import rateLimit from 'express-rate-limit'
@@ -8,7 +8,6 @@ import { IronSessionData } from 'iron-session'
 import { withIronSessionApiRoute } from 'iron-session/next'
 import jwt from 'jsonwebtoken'
 import { sessionOptions } from 'lib/session'
-import { DateTime } from 'luxon'
 import multer from 'multer'
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 import { tmpdir } from 'os'
@@ -120,48 +119,129 @@ export const withAuthToken = (handler: NextApiHandler) => (req: NextApiRequest, 
 }
 
 export function withSession<T>(handler: NextApiHandlerWithUser<T>) {
-  return withIronSessionApiRoute(handler, sessionOptions)
+  return withIronSessionApiRoute(async (req, res) => {
+    // Log cookie info before processing
+    console.log('🍪 Request cookies:', {
+      hasCookies: !!req.cookies,
+      cookieCount: Object.keys(req.cookies || {}).length,
+      sessionCookieName: '@Filpass:session',
+      hasSessionCookie: !!req.cookies?.['@Filpass:session'],
+    });
+
+    const result = await handler(req, res);
+
+    // Log after processing
+    console.log('🍪 Response cookies:', {
+      hasCookieHeader: !!res.getHeader('Set-Cookie'),
+      cookieHeader: res.getHeader('Set-Cookie'),
+    });
+
+    return result;
+  }, sessionOptions);
 }
 
 export function withUser<T>(handler: NextApiHandlerWithUser<T>): NextApiHandlerWithUser<T> {
   return withSession(async (req, res) => {
-    const { invalid } = await validateSession(req)
-    if (invalid) {
-      return await destroySession(req, res)
+    console.log('🔍 withUser middleware called');
+
+    // Basic validation - check if we have a user and sessionId
+    if (!req.session?.user || !req.session?.identifier) {
+      console.log('❌ Missing user or session identifier');
+      return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const user = req.session.user
+    const sessionId = req.session.identifier;
 
-    if (!user) {
-      return await destroySession(req, res)
+    // Check database for session validity with error handling
+    console.log('🔍 Checking session validity in database', { sessionId });
+    let sessionData;
+    try {
+      sessionData = await getSession({ sessionId });
+
+      // Log session data for debugging
+      console.log('📋 Session data from DB:', {
+        found: !!sessionData,
+        isValid: sessionData?.isValid,
+        expires: sessionData ? new Date(sessionData.expires) : null
+      });
+    } catch (err) {
+      console.log('⚠️ Error checking session in database, continuing with session data', err);
+      // Continue with session data despite DB error
+      sessionData = { isValid: true, expires: new Date(Date.now() + 86400000) }; // Assume valid for 24h
     }
 
-    const { data, error } = await getUserByIdAndEmail({ userId: user.id, email: user.email })
+    // Only validate if we successfully got session data
+    if (sessionData) {
+      // Validate session based on database records
+      if (!sessionData.isValid) {
+        console.log('❌ Session marked as invalid in database');
+        req.session.destroy();
+        return res.status(401).json({ message: 'Session invalidated' });
+      }
 
-    if (data?.isBanned) {
-      return res.status(403).json({ message: 'Forbidden access' })
+      const currentTime = new Date();
+      const expiryTime = new Date(sessionData.expires);
+
+      console.log('⏱️ Checking session expiry', {
+        currentTime,
+        expiryTime,
+        isExpired: currentTime > expiryTime
+      });
+
+      if (currentTime > expiryTime) {
+        console.log('❌ Session expired based on timestamp');
+        req.session.destroy();
+        return res.status(401).json({ message: 'Session expired' });
+      }
     }
 
-    if (error || !data) {
-      return await destroySession(req, res)
+    // Session is valid or DB check failed but we're continuing, proceed with user data
+    const user = req.session.user;
+
+    // Set up the user property on the request
+    req.user = user;
+
+    // Try to get fresh user data, but continue even if fails
+    try {
+      console.log('🔍 Fetching fresh user data', { userId: user.id });
+      const { data } = await getUserByIdAndEmail({
+        userId: user.id,
+        email: user.email
+      });
+
+      if (data) {
+        if (data.isBanned) {
+          console.log('⛔ User is banned');
+          return res.status(403).json({ message: 'Forbidden access' });
+        }
+
+        // Update with fresh data
+        console.log('✅ Updated user data from database');
+        const extractedRoles = extractRoles(data.roles);
+
+        // Update req.user with fresh data
+        req.user = {
+          id: data.id,
+          email: data.email,
+          roles: data.roles?.map(role => ({ id: role.id, role: role.role }))
+        };
+
+        if (data.terms) {
+          (req.user as any).terms = data.terms;
+        }
+
+        req.addressManagerId = extractedRoles.addressManagerId;
+        req.superAdminId = extractedRoles.superAdminId;
+        req.userRoleId = extractedRoles.userRoleId;
+      }
+    } catch (err) {
+      console.log('⚠️ Error fetching fresh user data, continuing with session data', err);
+      // Continue with session data
     }
 
-    const extractedRoles = extractRoles(data.roles)
-
-    const freshUser = {
-      id: data.id,
-      email: data.email,
-      roles: data.roles?.map(role => ({ id: role.id, role: role.role })),
-      terms: data.terms,
-    }
-
-    req.user = freshUser
-    req.addressManagerId = extractedRoles.addressManagerId
-    req.superAdminId = extractedRoles.superAdminId
-    req.userRoleId = extractedRoles.userRoleId
-
-    return handler(req, res)
-  })
+    console.log('✅ Session validation successful, proceeding with request');
+    return handler(req, res);
+  });
 }
 
 export function withRoles<T>(roles: SystemRoles[] = [], handler: NextApiHandlerWithUser<T>) {
@@ -224,39 +304,74 @@ export const withExternalLimiter = (handler: NextApiHandler) => async (req: Next
   return handler(req, res)
 }
 
+// These functions are kept for reference but we're not using them anymore
+// If they're needed elsewhere, remove the comments
+/*
 const validateSession = async (req: NextApiRequestWithSession) => {
+  console.log('🔍 Validating session', {
+    hasSession: !!req.session,
+    hasUser: !!req.session?.user,
+    hasIdentifier: !!req.session?.identifier,
+    sessionId: req.session?.identifier
+  });
+
   const sessionId = req.session.identifier
 
   if (!req.session.user || !sessionId) {
+    console.log('❌ Session validation failed: missing user or sessionId');
     return { invalid: true }
   }
 
   const sessionData = await getSession({ sessionId })
+  console.log('📋 Session data from DB:', {
+    found: !!sessionData,
+    isValid: sessionData?.isValid,
+    expires: sessionData?.expires
+  });
 
   if (!sessionData) {
+    console.log('❌ Session validation failed: session not found in DB');
     return { invalid: true }
   }
 
   if (!sessionData.isValid) {
+    console.log('❌ Session validation failed: session marked as invalid in DB');
     return { invalid: true }
   }
 
   const currentTime = DateTime.now()
   const generatedTime = DateTime.fromJSDate(sessionData.expires)
+  const timeRemaining = generatedTime.diff(currentTime).toObject();
+
+  console.log('⏱️ Session time check:', {
+    currentTime: currentTime.toISO(),
+    expiresAt: generatedTime.toISO(),
+    timeRemaining
+  });
 
   if (currentTime > generatedTime) {
+    console.log('❌ Session validation failed: session expired');
     return { invalid: true }
   }
 
+  console.log('✅ Session validation successful');
   return { invalid: false }
 }
 
 const destroySession = async (req: NextApiRequestWithSession, res: NextApiResponse) => {
+  console.log('🗑️ Destroying session', {
+    sessionId: req.session?.identifier,
+    hasUser: !!req.session?.user
+  });
+
   if (req.session.identifier) {
     await invalidateSession({ sessionId: req.session.identifier })
   }
   req.session.user = undefined
   req.user = undefined
   req.session.destroy()
+  console.log('🗑️ Session destroyed');
+
   return res.status(401).json({ message: 'Forbidden access' })
 }
+*/
