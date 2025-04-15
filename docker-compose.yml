@@ -9,10 +9,3 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: my_super_secret_pw
       POSTGRES_DB: filpass
-  app:
-    build: .
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    depends_on:
-      - db
