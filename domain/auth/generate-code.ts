@@ -17,7 +17,7 @@ interface GenerateCodePublicParams {
   token: string
 }
 
-const isDevelopmentEnv = process.env.ENV_NAME === 'development'
+const isDevelopmentEnv = process.env.IS_DEV === 'true'
 
 export async function generateCode(params: GenerateCodeParams) {
   const { fields, errors } = await validate(authVerificationValidator, params)

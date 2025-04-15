@@ -17,6 +17,7 @@
     - [Starting the container](#starting-the-container)
     - [Running migrations](#running-migrations)
     - [Seeding the database with essential data](#seeding-the-database-with-essential-data)
+    - [Seeding test data](#seeding-test-data)
   - [Application Start Up](#application-start-up)
   - [Running the application](#running-the-application)
   - [Documentation](#documentation)
@@ -71,13 +72,32 @@ npm run migrate
 npm run seed
 ```
 
+#### Seeding test data
+
+If you want to include testing users, you can also execute the following command:
+
+```shell
+npm run seed:dev
+```
+
+  The command create the following test users:
+
+  - General users
+
+    - user1@test.com to user149@test.com / password
+
+  - Users with specific roles (the email domain for specific users is defined on the config.js file)
+
+    - test-super / password
+
+  If you have set the IS_DEV environment variable as true, the security code will be 1234
+
+
 ### Application Start Up
 
 Before starting the application, make sure you have the following files set up:
 
-- Environment: Create a file named `.env` in the root folder containing all environment variables defined at [env-vars](env-vars.md), also found in the root folder.
-
-- Chains: If needed, change the `chains.ts` file to match your desired chains. The default chain is `filecoin`. You can find more information about the chains configuration file at [chains](./docs/chains-config.md).
+- Environment: Create a file named `.env` in the root folder by copying the `.env.example` file and filling in the missing information based on [env-vars](env-vars.md), also found in the root folder.
 
 - System: Change the app information on the `system.ts` file to match your company information. You can find more information about the system configuration file at [system-config](./docs/system-config.md).
 

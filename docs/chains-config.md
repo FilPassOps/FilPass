@@ -30,33 +30,39 @@ Here's a breakdown of its properties:
 Here's an example of the system configuration file:
 
 ```typescript
-const ethereum = {
-  name: 'Ethereum',
-  networkName: 'Sepolia',
-  symbol: 'ETH',
-  chainId: '0xaa36a7',
-  coinMarketApiCode: 1027, // from https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?symbol=MATIC
-  units: {
-    0: {
-      name: 'ETH',
-      scale: 0,
+const calibration = {
+  name: 'Filecoin',
+  networkName: 'Calibration',
+  chainId: '0x4cb2f',
+  rpcUrls: ['https://api.calibration.node.glif.io/rpc/v0'],
+  blockExplorer: { name: 'Filfox', url: 'http://47.109.105.51/en/message' },
+  contractAddress: '0x650413d87484FC2B9c9bC7b24963f7395a69909b',
+  iconFileName: 'filecoin-icon.svg',
+  tokens: [
+    {
+      symbol: 'tFIL',
+      coinMarketApiCode: 2280, // from https://pro-api.coinmarketcap.com/v1/cryptocurrency/map?symbol=FIL
+      decimals: 18,
+      units: {
+        0: {
+          name: 'FIL',
+          scale: 0,
+        },
+        '-9': {
+          name: 'NANOFIL',
+          scale: -9,
+        },
+        '-18': {
+          name: 'ATTOFIL',
+          scale: -18,
+        },
+      },
+      iconFileName: 'filecoin-icon.svg',
     },
-    '-9': {
-      name: 'GWEI',
-      scale: -9,
-    },
-    '-18': {
-      name: 'WEI',
-      scale: -18,
-    },
-  },
-  rpcUrls: ['https://ethereum-sepolia.blockpi.network/v1/rpc/public'],
-  blockExplorer: { name: 'Etherscan', url: 'https://sepolia.etherscan.io/tx' },
-  contractAddress: '0x9697210C47cFb1460eE60809e7a6CB12c90d4a4e',
-  iconFileName: 'ethereum-icon.svg',
+  ],
 } as const satisfies Chain
 
-const chains = [ethereum]
+const chains = [calibration]
 ```
 
 **You can find the list of the chain and its configurations at [chainlist.org](https://chainlist.org/).**

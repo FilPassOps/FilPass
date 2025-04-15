@@ -4,7 +4,6 @@
 - [Introduction](#introduction)
 - [Change the chain to calibration or mainnet](#change-the-chain-to-calibration-or-mainnet)
 - [Database](#database)
-  - [Seeding the database with development data](#seeding-the-database-with-development-data)
   - [Database Migrations](#database-migrations)
   - [DDL Migrations (Structural changes)](#ddl-migrations-structural-changes)
   - [DML Migrations (Data changes)](#dml-migrations-data-changes)
@@ -30,22 +29,6 @@ Here are some useful commands and configuration details to help you use FilPass.
 To change the chain to calibration or mainnet, you need to change the IS_DEV environment variable to true or false. True is for calibration and false is for mainnet.
 
 ## Database
-
-### Seeding the database with development data
-
-If you want to start the system with test data like users, programs, transfer requests, and others to test the application, you can seed the database with the following command:
-
- `npm run seed:dev`
-
-  The command create the following test users:
-
-  - General users
-
-    - user1@test.com to user149@test.com / password
-
-  - Users with specific roles (the email domain for specific users is defined on the config.js file)
-
-    - test-super / password
 
 ### Database Migrations
 
