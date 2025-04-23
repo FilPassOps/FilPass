@@ -30,6 +30,7 @@ contract FilPass is ReentrancyGuard {
   mapping(address => mapping(address => DepositInfo)) public deposits;
   EnumerableSet.AddressSet private oracles;
   mapping(address => EnumerableSet.AddressSet) private recipientsPerOracle;
+  mapping(address => mapping(string => bool)) public usedJtis;
 
   /// @notice Address of the user who deploys the contract and has authority over deposits and refunds.
   address public user;
@@ -42,6 +43,12 @@ contract FilPass is ReentrancyGuard {
 
   /// @notice Maximum lock-up period in days.
   uint256 public constant MAX_LOCKUP_DAYS = 365;
+
+  // Fee in basis points (e.g., 200 = 2%)
+  uint256 public feeBps = 200;
+  uint256 public constant MIN_FEE_BPS = 50; // 0.5%
+  uint256 public constant MAX_FEE_BPS = 1000; // Max 10%
+  uint256 public constant BPS_DIVISOR = 10000;
 
   /// @notice Struct to store deposit information for each Oracle-Recipient pair.
   struct DepositInfo {
@@ -75,6 +82,9 @@ contract FilPass is ReentrancyGuard {
   error SubmitTicketFailed();
   error TicketSubmissionTimeExpired();
   error OnlyUserAllowed();
+  error TokenAlreadyUsed();
+  error InvalidFee();
+
   /**
    * @dev Modifier to restrict function access exclusively to the designated user.
    * Reverts if the caller is not the user.
@@ -143,6 +153,8 @@ contract FilPass is ReentrancyGuard {
 
     if (!oracles.contains(msg.sender)) revert InvalidOracleAddress();
 
+    if (usedJtis[msg.sender][decodedToken.jti]) revert TokenAlreadyUsed();
+    usedJtis[msg.sender][decodedToken.jti] = true;
     DepositInfo storage info = deposits[msg.sender][decodedToken.aud];
 
     if (info.amount == 0) revert InsufficientFunds();
@@ -154,13 +166,21 @@ contract FilPass is ReentrancyGuard {
 
     if (ticketAmount > info.amount) revert InsufficientFunds();
 
+    // Calculate fee and net amount
+    uint256 feeAmount = (ticketAmount * feeBps) / BPS_DIVISOR;
+    uint256 netAmount = ticketAmount - feeAmount;
+
     // Update the deposited amount before transferring funds to prevent reentrancy attacks.
     info.amount -= ticketAmount;
     info.exchangedSoFar = decodedToken.lane_total_amount;
 
     // Transfer the specified amount of FIL to the Recipient using a low-level call.
-    (bool success, ) = payable(decodedToken.aud).call{value: ticketAmount}('');
+    (bool success, ) = payable(decodedToken.aud).call{value: netAmount}('');
     if (!success) revert SubmitTicketFailed();
+
+    // Transfer fee to user
+    (bool successFee, ) = payable(msg.sender).call{value: feeAmount}('');
+    if (!successFee) revert SubmitTicketFailed();
 
     emit TicketSubmitted(msg.sender, decodedToken.aud, ticketAmount);
   }
@@ -220,7 +240,11 @@ contract FilPass is ReentrancyGuard {
 
     bool hasRefunds = false;
     // Iterate through all Recipients in reverse order and process refunds where applicable.
-    for (uint256 i = recipients.length(); i > 0; i--) {
+    uint256 len = recipients.length();
+    for (uint256 i = len; i > 0; ) {
+      unchecked {
+        i--;
+      }
       address currentRecipient = recipients.at(i - 1);
       DepositInfo storage info = deposits[oracleAddress][currentRecipient];
 
@@ -250,12 +274,22 @@ contract FilPass is ReentrancyGuard {
     bool hasRefunds = false;
 
     // Iterate through all Oracles in reverse order.
-    for (uint256 o = oracles.length(); o > 0; o--) {
+    uint256 olen = oracles.length();
+    for (uint256 o = olen; o > 0; ) {
+      unchecked {
+        o--;
+      }
+
       address currentOracle = oracles.at(o - 1);
       EnumerableSet.AddressSet storage recipients = recipientsPerOracle[currentOracle];
 
       // Iterate through all Recipients for the current Oracle in reverse order.
-      for (uint256 r = recipients.length(); r > 0; r--) {
+      uint256 rlen = recipients.length();
+      for (uint256 r = rlen; r > 0; ) {
+        unchecked {
+          r--;
+        }
+
         address currentRecipient = recipients.at(r - 1);
         DepositInfo storage info = deposits[currentOracle][currentRecipient];
 
@@ -287,6 +321,11 @@ contract FilPass is ReentrancyGuard {
     if (balance == 0) revert NoFundsToRefund();
     (bool success, ) = payable(user).call{value: balance}('');
     if (!success) revert EmergencyWithdrawalFailed();
+  }
+
+  function setFeeBps(uint256 newFeeBps) external onlyUser {
+    if (newFeeBps < MIN_FEE_BPS || newFeeBps > MAX_FEE_BPS) revert InvalidFee();
+    feeBps = newFeeBps;
   }
 
   /**
