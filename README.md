@@ -30,6 +30,10 @@
 
 FilPass is an oracle platform that facilitates data retrieval from the Filecoin network in a secure and efficient way.
 
+## Demo Video
+
+[Demo Video](https://drive.google.com/file/d/155CqhmvoY8YcKKLtT6fY5PGpuiwdWz-e/view?usp=drive_link)
+
 ## Getting Started
 
 To start using FilPass locally, follow the steps below.
